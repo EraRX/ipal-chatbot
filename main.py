@@ -5,19 +5,44 @@ import io
 import os
 import base64
 
-st.set_page_config(page_title="Helpdesk Filter + Vrije Zoek")
+st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
 # 📷 Logo en titel in gekleurde balk
 encoded_logo = base64.b64encode(open("logo.png", "rb").read()).decode()
 st.markdown(
     f"""
-    <div style='background-color: rgb(42, 68, 173); padding: 10px; display: flex; align-items: center;'>
-        <img src='data:image/png;base64,{encoded_logo}' style='height: 80px; margin-right: 20px;'>
-        <h1 style='color: white; margin: 0;'>🔍 Helpdesk Zoekfunctie</h1>
-    </div>
     <style>
         .stApp {{
             font-family: "Segoe UI", sans-serif;
+            background-color: #FFD3AC;
+        }}
+        @media only screen and (max-width: 600px) {{
+            h1 {{
+                font-size: 22px !important;
+                line-height: 1.2;
+            }}
+            img.logo {{
+                height: 40px !important;
+            }}
+            .stSelectbox label, .stTextInput label, .stRadio label {{
+                font-size: 14px !important;
+            }}
+        }}
+        .header-container {{
+            background-color: rgb(42, 68, 173);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }}
+        .header-container img {{
+            height: 80px;
+            margin-right: 20px;
+        }}
+        .header-container h1 {{
+            color: white;
+            margin: 0;
+            font-size: 36px;
         }}
         .stSelectbox label, .stTextInput label, .stRadio label {{
             color: rgb(42, 68, 173) !important;
@@ -32,6 +57,10 @@ st.markdown(
             background-color: rgb(30, 50, 130);
         }}
     </style>
+    <div class='header-container'>
+        <img src='data:image/png;base64,{encoded_logo}' class='logo'>
+        <h1>🔍 Helpdesk Zoekfunctie</h1>
+    </div>
     """,
     unsafe_allow_html=True
 )
@@ -152,7 +181,6 @@ if keuze == "🔍 Vrij zoeken":
                     st.info("ℹ️ Geen antwoord of oplossing beschikbaar voor deze melding.")
                 st.markdown("---")
 
-        # 📥 Downloadknop voor zoekresultaten
         buffer = io.BytesIO()
         zoek_resultaten.drop(columns=["zoektekst"], errors="ignore").to_excel(buffer, index=False)
         st.download_button(
