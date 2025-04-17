@@ -58,7 +58,7 @@ if "wachtwoord_ok" not in st.session_state:
 if not st.session_state.wachtwoord_ok:
     wachtwoord = st.text_input("Wachtwoord:", type="password")
     if wachtwoord == "ipal2024":
-    st.session_state.wachtwoord_ok = True
+        st.session_state.wachtwoord_ok = True
     st.success("Toegang verleend.")
     st.stop()
     elif wachtwoord != "":
