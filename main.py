@@ -53,12 +53,108 @@ st.markdown(
 
 # 🔐 Wachtwoord
 if "wachtwoord_ok" not in st.session_state:
-    wachtwoord = st.text_input("Wachtwoord:", type="password")
-    if wachtwoord != "ipal2024":
-        st.warning("Voer het juiste wachtwoord in om toegang te krijgen.")
-        st.stop()
-    else:
-        st.session_state.wachtwoord_ok = True
-        st.rerun()
+    st.session_state.wachtwoord_ok = False
 
-# Rest van de code blijft ongewijzigd...
+if not st.session_state.wachtwoord_ok:
+    wachtwoord = st.text_input("Wachtwoord:", type="password")
+    if wachtwoord == "ipal2024":
+        st.session_state.wachtwoord_ok = True
+        st.experimental_rerun()
+    elif wachtwoord != "":
+        st.error("Ongeldig wachtwoord.")
+    st.stop()
+
+# 📄 Excel inladen
+try:
+    df = pd.read_excel("faq.xlsx")
+except Exception as e:
+    st.error("Fout bij inlezen Excelbestand.")
+    st.code(traceback.format_exc())
+    st.stop()
+
+# 🔍 Zoektekst samenstellen voor vrije zoekfunctie (inclusief antwoord)
+df["zoektekst"] = (
+    df["Systeem"].astype(str) + " " +
+    df["Subthema"].astype(str) + " " +
+    df["Categorie"].astype(str) + " " +
+    df["Omschrijving melding"].astype(str) + " " +
+    df["Toelichting melding"].astype(str) + " " +
+    df["Soort melding"].astype(str) + " " +
+    df["Antwoord of oplossing"].astype(str)
+)
+
+st.markdown("---")
+keuze = st.radio("🔎 Kies zoekmethode:", ["🎯 Gefilterde zoekopdracht", "🔍 Vrij zoeken"], horizontal=True)
+
+if keuze == "🎯 Gefilterde zoekopdracht":
+    st.subheader("🎯 Gefilterde zoekopdracht")
+    filter_df = df.copy()
+
+    systeem = st.selectbox("Systeem", sorted(filter_df["Systeem"].dropna().unique()), key="systeem")
+    filter_df = filter_df[filter_df["Systeem"] == systeem]
+
+    subthema = st.selectbox("Subthema", sorted(filter_df["Subthema"].dropna().unique()), key="subthema")
+    filter_df = filter_df[filter_df["Subthema"] == subthema]
+
+    categorie = st.selectbox("Categorie", sorted(filter_df["Categorie"].dropna().unique()), key="categorie")
+    filter_df = filter_df[filter_df["Categorie"] == categorie]
+
+    omschrijving = st.selectbox("Omschrijving melding", sorted(filter_df["Omschrijving melding"].dropna().unique()), key="omschrijving")
+    filter_df = filter_df[filter_df["Omschrijving melding"] == omschrijving]
+
+    toelichting = st.selectbox("Toelichting melding", sorted(filter_df["Toelichting melding"].dropna().unique()), key="toelichting")
+    filter_df = filter_df[filter_df["Toelichting melding"] == toelichting]
+
+    soort = st.selectbox("Soort melding", sorted(filter_df["Soort melding"].dropna().unique()), key="soort")
+    filter_df = filter_df[filter_df["Soort melding"] == soort]
+
+    st.subheader("📋 Resultaat op basis van filters")
+    if filter_df.empty:
+        st.warning("Geen resultaat gevonden op basis van de filters.")
+    else:
+        for _, rij in filter_df.iterrows():
+            antwoord = rij["Antwoord of oplossing"]
+            if pd.notna(antwoord) and antwoord.strip():
+                st.markdown("**💬 Antwoord of oplossing:**")
+                st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>{antwoord}</div>", unsafe_allow_html=True)
+                st.markdown("<br><hr>", unsafe_allow_html=True)
+            st.markdown(f"🗂️ **Subthema:** {rij['Subthema']}")
+            st.markdown(f"📌 **Categorie:** {rij['Categorie']}")
+            st.markdown(f"📝 **Omschrijving melding:** {rij['Omschrijving melding']}")
+            st.markdown(f"ℹ️ **Toelichting melding:** {rij['Toelichting melding']}")
+            st.markdown(f"🏷️ **Soort melding:** {rij['Soort melding']}")
+            st.markdown("<br><hr>", unsafe_allow_html=True)
+
+if keuze == "🔍 Vrij zoeken":
+    st.subheader("🔍 Vrij zoeken in alle velden (inclusief antwoord)")
+    zoekterm = st.text_input("Zoek in alle velden inclusief antwoord:")
+
+    if zoekterm:
+        zoek_resultaten = df[df["zoektekst"].str.contains(zoekterm, case=False, na=False)]
+        st.subheader(f"📄 {len(zoek_resultaten)} resultaat/resultaten gevonden:")
+
+        if zoek_resultaten.empty:
+            st.warning("Geen resultaten gevonden.")
+        else:
+            for _, rij in zoek_resultaten.iterrows():
+                antwoord = rij["Antwoord of oplossing"]
+                if pd.notna(antwoord) and antwoord.strip():
+                    st.markdown("**💬 Antwoord of oplossing:**")
+                    st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>{antwoord}</div>", unsafe_allow_html=True)
+                    st.markdown("<br><hr>", unsafe_allow_html=True)
+                st.markdown(f"📁 **Systeem:** {rij['Systeem']}")
+                st.markdown(f"🗂️ **Subthema:** {rij['Subthema']}")
+                st.markdown(f"📌 **Categorie:** {rij['Categorie']}")
+                st.markdown(f"📝 **Omschrijving melding:** {rij['Omschrijving melding']}")
+                st.markdown(f"ℹ️ **Toelichting melding:** {rij['Toelichting melding']}")
+                st.markdown(f"🏷️ **Soort melding:** {rij['Soort melding']}")
+                st.markdown("<br><hr>", unsafe_allow_html=True)
+
+        buffer = io.BytesIO()
+        zoek_resultaten.drop(columns=["zoektekst"], errors="ignore").to_excel(buffer, index=False)
+        st.download_button(
+            label="📥 Download resultaten als Excel",
+            data=buffer.getvalue(),
+            file_name="zoekresultaten.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
