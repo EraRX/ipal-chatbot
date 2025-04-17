@@ -19,6 +19,15 @@ st.markdown(
         html, body, .stApp {{
             background-color: #FFD3AC;
         }}
+        .stSelectbox > div {{
+            border-radius: 10px !important;
+            box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
+            border: 1px solid #2A44AD;
+            padding: 4px;
+        }}
+        .stSelectbox > div:hover {{
+            border: 1px solid rgb(42, 68, 173);
+        }}
         .stSelectbox label, .stTextInput label, .stRadio label {{
             color: rgb(42, 68, 173) !important;
             font-weight: bold;
@@ -31,10 +40,6 @@ st.markdown(
         }}
         .stDownloadButton button:hover, .stButton button:hover {{
             background-color: rgb(30, 50, 130);
-        }}
-        div[data-baseweb="select"] > div {{
-            border-radius: 10px !important;
-            box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
         }}
     </style>
     """,
