@@ -61,10 +61,10 @@ if not st.session_state.wachtwoord_ok:
     if wachtwoord == "ipal2024":
         st.session_state.wachtwoord_ok = True
         st.success("Toegang verleend.")
-        st.stop()
     elif wachtwoord != "":
         st.error("Ongeldig wachtwoord.")
-    st.stop()
+    if not st.session_state.wachtwoord_ok:
+        st.stop()
 
 # 📄 Excel inladen
 try:
