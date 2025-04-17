@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import traceback
 import io
+import os
 import base64
 
 st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
@@ -10,13 +11,12 @@ st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 encoded_logo = base64.b64encode(open("logo.png", "rb").read()).decode()
 st.markdown(
     f"""
-    <div style='background-color: rgb(42, 68, 173); padding: 10px; display: flex; align-items: center;'>
-        <img src='data:image/png;base64,{encoded_logo}' style='height: 100px; margin-right: 20px;'>
-        <h1 style='color: white; margin: 0;'>🔍 Helpdesk Zoekfunctie</h1>
+    <div style='background-color: rgb(42, 68, 173); padding: 10px 20px; display: flex; align-items: center; border-radius: 0 0 10px 10px;'>
+        <img src='data:image/png;base64,{encoded_logo}' style='height: 100px; margin-right: 25px;'>
+        <h1 style='color: white; font-size: 2.5rem;'>🔍 Helpdesk Zoekfunctie</h1>
     </div>
     <style>
-        .stApp {{
-            font-family: "Segoe UI", sans-serif;
+        html, body, .stApp {{
             background-color: #FFD3AC;
         }}
         .stSelectbox label, .stTextInput label, .stRadio label {{
@@ -27,9 +27,14 @@ st.markdown(
             background-color: rgb(42, 68, 173);
             color: white;
             font-weight: bold;
+            border-radius: 8px;
         }}
         .stDownloadButton button:hover, .stButton button:hover {{
             background-color: rgb(30, 50, 130);
+        }}
+        div[data-baseweb="select"] > div {{
+            border-radius: 10px !important;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
         }}
     </style>
     """,
@@ -73,24 +78,34 @@ keuze = st.radio("🔎 Kies zoekmethode:", ["🎯 Gefilterde zoekopdracht", "�
 if keuze == "🎯 Gefilterde zoekopdracht":
     st.subheader("🎯 Gefilterde zoekopdracht")
 
+    if "zoek_reset" not in st.session_state:
+        st.session_state["zoek_reset"] = ""
+
     filter_df = df.copy()
-    systeem = st.selectbox("Systeem", sorted(filter_df["Systeem"].dropna().unique()))
+
+    systeem = st.selectbox("Systeem", sorted(filter_df["Systeem"].dropna().unique()), key="systeem")
     filter_df = filter_df[filter_df["Systeem"] == systeem]
+    st.session_state["zoek_reset"] = systeem
 
-    subthema = st.selectbox("Subthema", sorted(filter_df["Subthema"].dropna().unique()))
+    subthema = st.selectbox("Subthema", sorted(filter_df["Subthema"].dropna().unique()), key="subthema")
     filter_df = filter_df[filter_df["Subthema"] == subthema]
+    st.session_state["zoek_reset"] += subthema
 
-    categorie = st.selectbox("Categorie", sorted(filter_df["Categorie"].dropna().unique()))
+    categorie = st.selectbox("Categorie", sorted(filter_df["Categorie"].dropna().unique()), key="categorie")
     filter_df = filter_df[filter_df["Categorie"] == categorie]
+    st.session_state["zoek_reset"] += categorie
 
-    omschrijving = st.selectbox("Omschrijving melding", sorted(filter_df["Omschrijving melding"].dropna().unique()))
+    omschrijving = st.selectbox("Omschrijving melding", sorted(filter_df["Omschrijving melding"].dropna().unique()), key="omschrijving")
     filter_df = filter_df[filter_df["Omschrijving melding"] == omschrijving]
+    st.session_state["zoek_reset"] += omschrijving
 
-    toelichting = st.selectbox("Toelichting melding", sorted(filter_df["Toelichting melding"].dropna().unique()))
+    toelichting = st.selectbox("Toelichting melding", sorted(filter_df["Toelichting melding"].dropna().unique()), key="toelichting")
     filter_df = filter_df[filter_df["Toelichting melding"] == toelichting]
+    st.session_state["zoek_reset"] += toelichting
 
-    soort = st.selectbox("Soort melding", sorted(filter_df["Soort melding"].dropna().unique()))
+    soort = st.selectbox("Soort melding", sorted(filter_df["Soort melding"].dropna().unique()), key="soort")
     filter_df = filter_df[filter_df["Soort melding"] == soort]
+    st.session_state["zoek_reset"] += str(soort) if soort else ""
 
     st.subheader("📋 Resultaat op basis van filters")
     if filter_df.empty:
@@ -110,6 +125,7 @@ if keuze == "🎯 Gefilterde zoekopdracht":
             st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>ℹ️ Toelichting melding: {rij['Toelichting melding']}</div>", unsafe_allow_html=True)
             st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>🏷️ Soort melding: {rij['Soort melding']}</div>", unsafe_allow_html=True)
             st.markdown("<br><hr>", unsafe_allow_html=True)
+            st.markdown("---")
 
 # 🔍 Vrij zoeken
 if keuze == "🔍 Vrij zoeken":
