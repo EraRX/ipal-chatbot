@@ -51,19 +51,19 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 🔐 Wachtwoord
+# 🔐 Wachtwoordbeveiliging vóór de layout of data
 if "wachtwoord_ok" not in st.session_state:
     st.session_state.wachtwoord_ok = False
 
 if not st.session_state.wachtwoord_ok:
-    wachtwoord = st.text_input("Wachtwoord:", type="password")
+    st.title("🔐 Helpdesk Toegang")
+    wachtwoord = st.text_input("Voer wachtwoord in om verder te gaan:", type="password")
     if wachtwoord == "ipal2024":
         st.session_state.wachtwoord_ok = True
-        st.success("Toegang verleend.")
-        st.stop()
+        st.experimental_rerun()
     elif wachtwoord != "":
         st.error("Ongeldig wachtwoord.")
-        st.stop()
+    st.stop()
 
 # 📄 Excel inladen
 try:
