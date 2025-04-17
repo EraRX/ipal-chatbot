@@ -14,11 +14,11 @@ exact_logo = base64.b64encode(open("Exact.png", "rb").read()).decode()
 
 st.markdown(
     f"""
-    <div style='background-color: rgb(42, 68, 173); padding: 10px 20px; display: flex; align-items: center; border-radius: 0 0 10px 10px;'>
+    <div style='background-color: rgb(42, 68, 173); padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; border-radius: 0 0 10px 10px;'>
         <img src='data:image/png;base64,{ipal_logo}' style='height: 80px; margin-right: 20px;'>
         <img src='data:image/png;base64,{docbase_logo}' style='height: 60px; margin-right: 20px;'>
         <img src='data:image/png;base64,{exact_logo}' style='height: 40px; margin-right: 20px;'>
-        <h1 style='color: white; font-size: 2.5rem;'>🔍 Helpdesk Zoekfunctie</h1>
+        <h1 style='color: white; font-size: 2rem; text-align: center; flex-basis: 100%;'>🔍 Helpdesk Zoekfunctie</h1>
     </div>
     <style>
         html, body, .stApp {{
