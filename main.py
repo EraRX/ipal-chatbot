@@ -27,7 +27,7 @@ st.markdown(f"""
   --bg-card:#F7FBFF;         /* kaart‑achtergrond */
   --text:#0F274A;
 }}
-body,.stApp{{background:var(--bg);font-family:"Inter",sans-serif;color:var(--text);} }
+body,.stApp{{background:var(--bg);font-family:"Inter",sans-serif;color:var(--text);}}
 
 /* Header */
 .header-container{{
