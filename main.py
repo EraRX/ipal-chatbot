@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
-import traceback, io, base64
+import streamlit.components.v1 as components
+import traceback, io, base64, io, base64
 
 # ─────────────────────────────────────────────────────────────
 #  Page config
@@ -154,7 +155,7 @@ for _, row in res.iterrows():
   </ul>
 </div>
 """
-    st.markdown(card_html, unsafe_allow_html=True)
+    components.html(card_html, height=260, scrolling=False)
 
 # Download (alleen bij vrije zoek zodat f niet leeg is)
 if mode == "🔍 Vrij" and not res.empty:
