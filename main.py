@@ -140,7 +140,7 @@ else:
 if res.empty and mode=="🎯 Gefilterd":
     st.info("Geen resultaat.")
 for _, row in res.iterrows():
-        card_html = f"""
+    card_html = f"""
 <div class='card'>
   <strong>💬 Antwoord:</strong><br>
   <div style='color:var(--accent);font-weight:600;'>{row['Antwoord of oplossing'] or '–'}</div><hr>
