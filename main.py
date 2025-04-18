@@ -140,20 +140,20 @@ else:
 if res.empty and mode=="🎯 Gefilterd":
     st.info("Geen resultaat.")
 for _, row in res.iterrows():
-    card_html = f"""
-    <div class='card'>
-      <strong>💬 Antwoord:</strong><br>
-      <div style='color:var(--accent);font-weight:600;'>{row['Antwoord of oplossing'] or '–'}</div><hr>
-      <ul style='list-style:none;padding:0;margin:0'>
-        <li>📁 <b>Systeem:</b> {row['Systeem']}</li>
-        <li>🗂️ <b>Subthema:</b> {row['Subthema']}</li>
-        <li>📌 <b>Categorie:</b> {row['Categorie']}</li>
-        <li>📝 <b>Omschrijving:</b> {row['Omschrijving melding']}</li>
-        <li>ℹ️ <b>Toelichting:</b> {row['Toelichting melding']}</li>
-        <li>🏷️ <b>Soort:</b> {row['Soort melding']}</li>
-      </ul>
-    </div>
-    """
+        card_html = f"""
+<div class='card'>
+  <strong>💬 Antwoord:</strong><br>
+  <div style='color:var(--accent);font-weight:600;'>{row['Antwoord of oplossing'] or '–'}</div><hr>
+  <ul style='list-style:none;padding:0;margin:0'>
+    <li>📁 <b>Systeem:</b> {row['Systeem']}</li>
+    <li>🗂️ <b>Subthema:</b> {row['Subthema']}</li>
+    <li>📌 <b>Categorie:</b> {row['Categorie']}</li>
+    <li>📝 <b>Omschrijving:</b> {row['Omschrijving melding']}</li>
+    <li>ℹ️ <b>Toelichting:</b> {row['Toelichting melding']}</li>
+    <li>🏷️ <b>Soort:</b> {row['Soort melding']}</li>
+  </ul>
+</div>
+"""
     st.markdown(card_html, unsafe_allow_html=True)
 
 # Download (alleen bij vrije zoek zodat f niet leeg is)
