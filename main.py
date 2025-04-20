@@ -1,162 +1,133 @@
+# main.py  ────────────────────────────────────────────────────────────────────
 import pandas as pd
 import streamlit as st
-import traceback
-import io
-import os
-import base64
+import traceback, io, base64
 
+# ── Pagina‑config
 st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
-# 📷 Logo's in gekleurde balk
-ipal_logo = base64.b64encode(open("logo.png", "rb").read()).decode()
-docbase_logo = base64.b64encode(open("logo-docbase-icon.png", "rb").read()).decode()
-exact_logo = base64.b64encode(open("Exact.png", "rb").read()).decode()
+# ── Logo‑assets lezen
+ipal_logo   = base64.b64encode(open("logo.png",               "rb").read()).decode()
+doc_logo    = base64.b64encode(open("logo-docbase-icon.png",  "rb").read()).decode()
+exact_logo  = base64.b64encode(open("Exact.png",              "rb").read()).decode()
 
-st.markdown(
-    f"""
-    <div style='background-color: rgb(42, 68, 173); padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; border-radius: 0 0 10px 10px;'>
-        <img src='data:image/png;base64,{ipal_logo}' style='height: 80px; margin-right: 20px;'>
-        <img src='data:image/png;base64,{docbase_logo}' style='height: 60px; margin-right: 20px;'>
-        <img src='data:image/png;base64,{exact_logo}' style='height: 40px; margin-right: 20px;'>
-        <h1 style='color: white; font-size: 2rem; text-align: center; flex-basis: 100%;'>🔍 Helpdesk Zoekfunctie</h1>
-    </div>
-    <style>
-        html, body, .stApp {{
-            background-color: #FFD3AC;
-        }}
-        .stSelectbox > div {{
-            border-radius: 10px !important;
-            box-shadow: 1px 1px 6px rgba(0,0,0,0.15);
-            border: 1px solid #2A44AD;
-            padding: 4px;
-        }}
-        .stSelectbox > div:hover {{
-            border: 1px solid rgb(42, 68, 173);
-        }}
-        .stSelectbox label, .stTextInput label, .stRadio label {{
-            color: rgb(42, 68, 173) !important;
-            font-weight: bold;
-        }}
-        .stDownloadButton button, .stButton button {{
-            background-color: rgb(42, 68, 173);
-            color: white;
-            font-weight: bold;
-            border-radius: 8px;
-        }}
-        .stDownloadButton button:hover, .stButton button:hover {{
-            background-color: rgb(30, 50, 130);
-        }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# ── Globale CSS  (soft‑UI stijl)
+st.markdown(f"""
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{{--accent:#2A44AD;--accent2:#5A6AF4;--bg:#FFD3AC;--card:#FFFFFF;--text:#0F274A;}}
+body,.stApp{{background:var(--bg);font-family:"Inter",sans-serif;color:var(--text)}}
 
-# 🔐 Wachtwoordbeveiliging vóór de layout of data
-if "wachtwoord_ok" not in st.session_state:
-    st.session_state.wachtwoord_ok = False
+.header{{background:linear-gradient(135deg,var(--accent)0%,var(--accent2)100%);
+        padding:12px 24px;border-radius:0 0 14px 14px;display:flex;flex-wrap:wrap;
+        align-items:center;justify-content:center;gap:24px;box-shadow:0 4px 12px rgba(0,0,0,.15)}}
+.header img{{height:60px}}
+.header h1{{flex-basis:100%;margin:6px 0 0;text-align:center;color:#fff;font-size:2rem;font-weight:600}}
+@media(min-width:760px){{.header h1{{flex-basis:auto;margin-left:18px}}}}
 
-if not st.session_state.wachtwoord_ok:
+.stSelectbox>div{{border:none!important;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);
+                   padding:8px 12px;background:#fff}}
+.stSelectbox label,.stTextInput label,.stRadio label{{font-weight:600;color:var(--accent)}}
+.stDownloadButton button,.stButton button{{background:var(--accent);color:#fff;border-radius:8px;font-weight:600}}
+.stDownloadButton button:hover,.stButton button:hover{{background:#1B2E8A}}
+
+.card{{background:var(--card);border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08);
+       padding:22px;margin:22px 0}}
+</style>
+""", unsafe_allow_html=True)
+
+# ── Header HTML
+st.markdown(f"""
+<div class='header'>
+  <img src='data:image/png;base64,{ipal_logo}'>
+  <img src='data:image/png;base64,{doc_logo}'>
+  <img src='data:image/png;base64,{exact_logo}'>
+  <h1>🔍 Helpdesk&nbsp;Zoekfunctie</h1>
+</div>
+""", unsafe_allow_html=True)
+
+# ── Wachtwoord
+if "ok" not in st.session_state:
+    st.session_state.ok = False
+
+if not st.session_state.ok:
     st.title("🔐 Helpdesk Toegang")
-    wachtwoord = st.text_input("Voer wachtwoord in om verder te gaan:", type="password")
-    if wachtwoord == "ipal2024":
-        st.session_state.wachtwoord_ok = True
+    pw = st.text_input("Voer wachtwoord in:", type="password")
+    if pw == "ipal2024":
+        st.session_state.ok = True
         st.success("Toegang verleend.")
-    elif wachtwoord != "":
+    elif pw:
         st.error("Ongeldig wachtwoord.")
-    if not st.session_state.wachtwoord_ok:
+    if not st.session_state.ok:
         st.stop()
 
-# 📄 Excel inladen
+# ── Data inladen
 try:
     df = pd.read_excel("faq.xlsx")
-except Exception as e:
-    st.error("Fout bij inlezen Excelbestand.")
+except Exception:
+    st.error("Excelbestand niet gevonden of onleesbaar.")
     st.code(traceback.format_exc())
     st.stop()
 
-# 🔍 Zoektekst samenstellen voor vrije zoekfunctie (inclusief antwoord)
-df["zoektekst"] = (
-    df["Systeem"].astype(str) + " " +
-    df["Subthema"].astype(str) + " " +
-    df["Categorie"].astype(str) + " " +
-    df["Omschrijving melding"].astype(str) + " " +
-    df["Toelichting melding"].astype(str) + " " +
-    df["Soort melding"].astype(str) + " " +
-    df["Antwoord of oplossing"].astype(str)
-)
+# Zoekkolom
+df["zoektekst"] = df.fillna("").astype(str).agg(" ".join, axis=1)
 
+# ── Zoekmethode
 st.markdown("---")
-keuze = st.radio("🔎 Kies zoekmethode:", ["🎯 Gefilterde zoekopdracht", "🔍 Vrij zoeken"], horizontal=True)
+mode = st.radio("🔎 Kies zoekmethode:", ["🎯 Gefilterde zoekopdracht", "🔍 Vrij zoeken"], horizontal=True)
 
-if keuze == "🎯 Gefilterde zoekopdracht":
+if mode == "🎯 Gefilterde zoekopdracht":
     st.subheader("🎯 Gefilterde zoekopdracht")
-    filter_df = df.copy()
+    f = df.copy()
 
-    systeem = st.selectbox("Systeem", sorted(filter_df["Systeem"].dropna().unique()), key="systeem")
-    filter_df = filter_df[filter_df["Systeem"] == systeem]
+    s  = st.selectbox("Systeem",     sorted(f["Systeem"].dropna().unique()))
+    f  = f[f["Systeem"]==s]
 
-    subthema = st.selectbox("Subthema", sorted(filter_df["Subthema"].dropna().unique()), key="subthema")
-    filter_df = filter_df[filter_df["Subthema"] == subthema]
+    st1 = st.selectbox("Subthema",   sorted(f["Subthema"].dropna().unique()))
+    f   = f[f["Subthema"]==st1]
 
-    categorie = st.selectbox("Categorie", sorted(filter_df["Categorie"].dropna().unique()), key="categorie")
-    filter_df = filter_df[filter_df["Categorie"] == categorie]
+    cat = st.selectbox("Categorie",  sorted(f["Categorie"].dropna().unique()))
+    f   = f[f["Categorie"]==cat]
 
-    omschrijving = st.selectbox("Omschrijving melding", sorted(filter_df["Omschrijving melding"].dropna().unique()), key="omschrijving")
-    filter_df = filter_df[filter_df["Omschrijving melding"] == omschrijving]
+    oms = st.selectbox("Omschrijving melding", sorted(f["Omschrijving melding"].dropna().unique()))
+    f   = f[f["Omschrijving melding"]==oms]
 
-    toelichting = st.selectbox("Toelichting melding", sorted(filter_df["Toelichting melding"].dropna().unique()), key="toelichting")
-    filter_df = filter_df[filter_df["Toelichting melding"] == toelichting]
+    tol = st.selectbox("Toelichting melding",  sorted(f["Toelichting melding"].dropna().unique()))
+    f   = f[f["Toelichting melding"]==tol]
 
-    soort = st.selectbox("Soort melding", sorted(filter_df["Soort melding"].dropna().unique()), key="soort")
-    filter_df = filter_df[filter_df["Soort melding"] == soort]
+    typ = st.selectbox("Soort melding",        sorted(f["Soort melding"].dropna().unique()))
+    res = f[f["Soort melding"]==typ]
 
-    st.subheader("📋 Resultaat op basis van filters")
-    if filter_df.empty:
-        st.warning("Geen resultaat gevonden op basis van de filters.")
-    else:
-        for _, rij in filter_df.iterrows():
-            antwoord = rij["Antwoord of oplossing"]
-            if pd.notna(antwoord) and antwoord.strip():
-                st.markdown("**💬 Antwoord of oplossing:**")
-                st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>{antwoord}</div>", unsafe_allow_html=True)
-                st.markdown("<br><hr>", unsafe_allow_html=True)
-            st.markdown(f"🗂️ **Subthema:** {rij['Subthema']}")
-            st.markdown(f"📌 **Categorie:** {rij['Categorie']}")
-            st.markdown(f"📝 **Omschrijving melding:** {rij['Omschrijving melding']}")
-            st.markdown(f"ℹ️ **Toelichting melding:** {rij['Toelichting melding']}")
-            st.markdown(f"🏷️ **Soort melding:** {rij['Soort melding']}")
-            st.markdown("<br><hr>", unsafe_allow_html=True)
+else:
+    st.subheader("🔍 Vrij zoeken in alle velden")
+    term = st.text_input("Zoekterm:")
+    res  = df[df["zoektekst"].str.contains(term, case=False, na=False)] if term else pd.DataFrame()
 
-if keuze == "🔍 Vrij zoeken":
-    st.subheader("🔍 Vrij zoeken in alle velden (inclusief antwoord)")
-    zoekterm = st.text_input("Zoek in alle velden inclusief antwoord:")
+# ── Resultaten tonen
+if res.empty:
+    st.info("Geen resultaten gevonden.")
+else:
+    st.subheader(f"📄 {len(res)} resultaat/resultaten")
+    for _, r in res.iterrows():
+        st.markdown(f"""
+<div class='card'>
+  <strong>💬 Antwoord:</strong><br>
+  <div style='color:var(--accent);font-weight:600;'>{r['Antwoord of oplossing'] or '–'}</div><hr>
+  <ul style='list-style:none;padding:0;margin:0'>
+    <li>📁 <b>Systeem:</b> {r['Systeem']}</li>
+    <li>🗂️ <b>Subthema:</b> {r['Subthema']}</li>
+    <li>📌 <b>Categorie:</b> {r['Categorie']}</li>
+    <li>📝 <b>Omschrijving:</b> {r['Omschrijving melding']}</li>
+    <li>ℹ️ <b>Toelichting:</b> {r['Toelichting melding']}</li>
+    <li>🏷️ <b>Soort:</b> {r['Soort melding']}</li>
+  </ul>
+</div>
+""", unsafe_allow_html=True)
 
-    if zoekterm:
-        zoek_resultaten = df[df["zoektekst"].str.contains(zoekterm, case=False, na=False)]
-        st.subheader(f"📄 {len(zoek_resultaten)} resultaat/resultaten gevonden:")
-
-        if zoek_resultaten.empty:
-            st.warning("Geen resultaten gevonden.")
-        else:
-            for _, rij in zoek_resultaten.iterrows():
-                antwoord = rij["Antwoord of oplossing"]
-                if pd.notna(antwoord) and antwoord.strip():
-                    st.markdown("**💬 Antwoord of oplossing:**")
-                    st.markdown(f"<div style='color: rgb(42, 68, 173); font-weight: bold;'>{antwoord}</div>", unsafe_allow_html=True)
-                    st.markdown("<br><hr>", unsafe_allow_html=True)
-                st.markdown(f"📁 **Systeem:** {rij['Systeem']}")
-                st.markdown(f"🗂️ **Subthema:** {rij['Subthema']}")
-                st.markdown(f"📌 **Categorie:** {rij['Categorie']}")
-                st.markdown(f"📝 **Omschrijving melding:** {rij['Omschrijving melding']}")
-                st.markdown(f"ℹ️ **Toelichting melding:** {rij['Toelichting melding']}")
-                st.markdown(f"🏷️ **Soort melding:** {rij['Soort melding']}")
-                st.markdown("<br><hr>", unsafe_allow_html=True)
-
-        buffer = io.BytesIO()
-        zoek_resultaten.drop(columns=["zoektekst"], errors="ignore").to_excel(buffer, index=False)
-        st.download_button(
-            label="📥 Download resultaten als Excel",
-            data=buffer.getvalue(),
-            file_name="zoekresultaten.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+# ── Downloadknop (alleen bij vrije zoek en resultaten)
+if mode == "🔍 Vrij zoeken" and not res.empty:
+    buff = io.BytesIO(); res.drop(columns=["zoektekst"], errors="ignore").to_excel(buff, index=False)
+    st.download_button("📥 Download resultaten", data=buff.getvalue(),
+                       file_name="zoekresultaten.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+# ─────────────────────────────────────────────────────────────
