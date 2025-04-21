@@ -88,13 +88,14 @@ if 'auth' not in st.session_state:
 if not st.session_state.auth:
     st.title('🔐 Helpdesk Toegang')
     pwd = st.text_input('Voer wachtwoord in:', type='password')
-    if pwd:
-        if pwd == 'ipal2024':
-            st.session_state.auth = True
-            st.experimental_rerun()
-        else:
-            st.error('Onjuist wachtwoord.')
-    st.stop()
+    if not pwd:
+        st.stop()  # wachtwoord nog niet ingevuld
+    if pwd != 'ipal2024':
+        st.error('Onjuist wachtwoord.')
+        st.stop()  # fout wachtwoord, stop
+    # juist wachtwoord
+    st.session_state.auth = True
+    st.success('Toegang verleend. Ga verder met de zoekfunctie.')
 
 # ─────────────────── Data Loading ───────────────────
 try:
