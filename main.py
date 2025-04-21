@@ -16,91 +16,70 @@ components.html(f"""
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
+:root {{
   --accent: #2A44AD;
   --accent2: #5A6AF4;
   --bg: #FFFFFF;
   --page-bg: #F3F6F9;
   --text: #0F274A;
   --border: #E0E0E0;
-}
-html, body, .stApp {
+}}
+html, body, .stApp {{
   margin: 0; padding: 0;
   background: var(--page-bg);
   font-family: 'Inter', sans-serif;
   color: var(--text);
-}
-.topbar {
+}}
+.topbar {{
   position: relative; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
   padding: calc(14px + env(safe-area-inset-top)) 24px 14px;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: 20px; border-radius: 0 0 20px 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.topbar img { height: 60px; }
-.topbar h1 {
+}}
+.topbar img {{ height: 60px; }}
+.topbar h1 {{
   flex-basis: 100%; text-align: center;
   color: #FFFFFF; margin: 6px 0 0;
   font-size: 2rem; font-weight: 600;
-}
-@media (min-width: 768px) {
-  .topbar h1 { flex-basis: auto; margin-left: 18px; }
-}
-.stSelectbox > div {
+}}
+@media (min-width: 768px) {{
+  .topbar h1 {{ flex-basis: auto; margin-left: 18px; }}
+}}
+.stSelectbox > div {{
   background: var(--bg);
   border: 1px solid var(--border) !important;
   border-radius: 12px;
   padding: 8px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-.stSelectbox label, .stTextInput label, .stRadio label {
+}}
+.stSelectbox label, .stTextInput label, .stRadio label {{
   color: var(--accent) !important;
   font-weight: 600;
-}
-.stButton > button, .stDownloadButton > button {
+}}
+.stButton > button, .stDownloadButton > button {{
   background: var(--accent);
   color: #FFFFFF !important;
   font-weight: 600;
   border-radius: 8px;
-}
-.stButton > button:hover, .stDownloadButton > button:hover {
+}}
+.stButton > button:hover, .stDownloadButton > button:hover {{
   background: var(--accent2);
-}
-.card {
+}}
+.card {{
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   padding: 22px;
   margin: 20px 0;
-}
+}}
 </style>
 <div class="topbar">
   <img src="data:image/png;base64,{ipal_logo}" alt="IPAL">
   <img src="data:image/png;base64,{doc_logo}" alt="DocBase">
   <img src="data:image/png;base64,{exact_logo}" alt="Exact">
-  <h1>🔍 Helpdesk Zoekfunctie</h1>
-</div>
-""", height=140, scrolling=False);
-  background:linear-gradient(135deg,#2A44AD 0%,#5A6AF4 100%);
-  padding:calc(14px + env(safe-area-inset-top)) 24px 14px;
-  display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-  gap:20px; border-radius:0 0 20px 20px; box-shadow:0 4px 12px rgba(0,0,0,.15);
-}}
-.topbar img {{height:60px;}}
-.topbar h1 {{flex-basis:100%; text-align:center; color:#fff; margin:6px 0 0; font-size:2rem; font-weight:600;}}
-@media(min-width:768px) {{ .topbar h1 {{flex-basis:auto; margin-left:18px;}} }}
-.stSelectbox>div {{border:none!important; border-radius:12px; padding:8px 12px; box-shadow:0 2px 8px rgba(0,0,0,.1); background:#fff;}}
-.stSelectbox label, .stTextInput label, .stRadio label {{color:#2A44AD!important; font-weight:600;}}
-.stButton>button, .stDownloadButton>button {{background:#2A44AD!important; color:#fff!important; font-weight:600!important; border-radius:8px!important;}}
-.stButton>button:hover, .stDownloadButton>button:hover {{background:#1B2E8A!important;}}
-.card {{background:#FFFFFF; border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,.08); padding:22px; margin:20px 0;}}
-</style>
-<div class="topbar">
-  <img src="data:image/png;base64,{ipal_logo}" alt="IPAL logo">
-  <img src="data:image/png;base64,{doc_logo}" alt="DocBase logo">
-  <img src="data:image/png;base64,{exact_logo}" alt="Exact logo">
   <h1>🔍 Helpdesk Zoekfunctie</h1>
 </div>
 """, height=140, scrolling=False)
@@ -155,7 +134,6 @@ if res.empty:
     st.info('Geen resultaten gevonden.')
 else:
     st.write(f'### 📄 {len(res)} resultaat/resultaten gevonden')
-    import streamlit.components.v1 as components
     def show(r):
         html = f"""
 <div class='card'>
