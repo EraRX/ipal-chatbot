@@ -47,8 +47,8 @@ html, body, .stApp {
   margin: 0;
 }
 .stSelectbox>div, .stTextInput>div>div {
-  background-color: #000 !important;
-  color: var(--accent) !important;
+  background-color: #FFFFFF !important;  /* witte velden */
+  color: var(--text-color) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 8px;
   padding: 6px 10px;
@@ -102,11 +102,10 @@ if not st.session_state.auth:
     st.title('🔐 Helpdesk Toegang')
     pwd = st.text_input('Voer wachtwoord in:', type='password')
     if pwd:
-        if pwd == 'ipal2024':
-            st.session_state.auth = True
-            st.experimental_rerun()
-        else:
-            st.error('Onjuist wachtwoord.')
+            if pwd == 'ipal2024':
+        st.session_state.auth = True
+    else:
+        st.error('Onjuist wachtwoord.')
     st.stop()
 
 # ───────────────────────── Data Loading ─────────────────────────
