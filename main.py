@@ -20,7 +20,7 @@ components.html(f"""
   --accent: #2A44AD;
   --accent2: #5A6AF4;
   --bg: #FFFFFF;
-  --page-bg: #F3F6F9;
+  --page-bg: #EAF2FF;  /* lichtblauw achtergrond */
   --text: #0F274A;
   --border: #E0E0E0;
 }}
@@ -47,12 +47,15 @@ html, body, .stApp {{
 @media (min-width: 768px) {{
   .topbar h1 {{ flex-basis: auto; margin-left: 18px; }}
 }}
-.stSelectbox > div {{
-  background: var(--bg);
+.stSelectbox > div {
+  background: #000000 !important;       /* zwarte dropdown-achtergrond */
   border: 1px solid var(--border) !important;
   border-radius: 12px;
   padding: 8px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.stSelectbox option {
+  color: var(--accent) !important;      /* donkerblauwe tekst */
 }}
 .stSelectbox label, .stTextInput label, .stRadio label {{
   color: var(--accent) !important;
