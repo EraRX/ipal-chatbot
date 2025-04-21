@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
 import base64, io, traceback
+import streamlit.components.v1 as components
 
 # ───────────────────────── Page Config ─────────────────────────
 st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
 # ───────────────────────── Global CSS & Header ─────────────────────────
-# Kleuren en safe-area ondersteuning
 css = """
 <style>
 :root {
@@ -22,22 +22,20 @@ html, body, .stApp {
   color: var(--text-color) !important;
   font-family: 'Inter', sans-serif;
 }
-/* full-width header with safe-area for notch */
 #root > div:nth-child(1) {
   padding-top: env(safe-area-inset-top);
 }
 .topbar {
   width: 100vw;
-  position: relative; left: 50%; transform: translateX(-50%);
+  position: relative;
+  left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
   padding: 10px 20px;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;
-  border-radius: 0 0 20px 20px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 12px; border-radius: 0 0 20px 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
-.topbar img {
-  height: 48px;
-}
+.topbar img { height: 48px; }
 .topbar h1 {
   flex: 1 1 auto;
   text-align: center;
@@ -47,7 +45,7 @@ html, body, .stApp {
   margin: 0;
 }
 .stSelectbox>div, .stTextInput>div>div {
-  background-color: #FFFFFF !important;  /* witte velden */
+  background-color: #FFFFFF !important;
   color: var(--text-color) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: 8px;
@@ -77,14 +75,15 @@ html, body, .stApp {
 </style>
 """
 st.markdown(css, unsafe_allow_html=True)
+
 # Header met logo's
 dir_ipal = "logo.png"
 dir_doc  = "logo-docbase-icon.png"
-dir_ex  = "Exact.png"
+dir_ex   = "Exact.png"
 ipal_logo  = base64.b64encode(open(dir_ipal, "rb").read()).decode()
 doc_logo   = base64.b64encode(open(dir_doc,  "rb").read()).decode()
 exact_logo = base64.b64encode(open(dir_ex,   "rb").read()).decode()
-header = f"""
+header_html = f"""
 <div class='topbar'>
   <img src='data:image/png;base64,{ipal_logo}' alt='IPAL'>
   <img src='data:image/png;base64,{doc_logo}' alt='DocBase'>
@@ -92,7 +91,7 @@ header = f"""
   <h1>🔍 Helpdesk Zoekfunctie</h1>
 </div>
 """
-st.markdown(header, unsafe_allow_html=True)
+st.markdown(header_html, unsafe_allow_html=True)
 
 # ───────────────────────── Authentication ─────────────────────────
 if 'auth' not in st.session_state:
@@ -102,10 +101,10 @@ if not st.session_state.auth:
     st.title('🔐 Helpdesk Toegang')
     pwd = st.text_input('Voer wachtwoord in:', type='password')
     if pwd:
-            if pwd == 'ipal2024':
-        st.session_state.auth = True
-    else:
-        st.error('Onjuist wachtwoord.')
+        if pwd == 'ipal2024':
+            st.session_state.auth = True
+        else:
+            st.error('Onjuist wachtwoord.')
     st.stop()
 
 # ───────────────────────── Data Loading ─────────────────────────
@@ -126,7 +125,7 @@ mode = st.radio('🔎 Kies zoekmethode', ['🎯 Gefilterd', '🔍 Vrij zoeken'],
 if mode == '🎯 Gefilterd':
     st.subheader('🎯 Gefilterde zoekopdracht')
     tmp = df.copy()
-    for field in cols[:-1]:  # exclude answer
+    for field in cols[:-1]:
         sel = st.selectbox(field, sorted(tmp[field].dropna().unique()), key=field)
         tmp = tmp[tmp[field] == sel]
     res = tmp
@@ -141,8 +140,7 @@ if res.empty:
 else:
     st.write(f'### 📄 {len(res)} resultaat/resultaten gevonden')
     def render(r):
-        html = (
-            f"""
+        html = f"""
 <div class='card'>
   <strong>💬 Antwoord:</strong><br>{r['Antwoord of oplossing'] or '-'}<hr>
   📁 <b>Systeem:</b> {r['Systeem']}<br>
@@ -152,11 +150,9 @@ else:
   ℹ️ <b>Toelichting:</b> {r['Toelichting melding']}<br>
   🏷️ <b>Soort melding:</b> {r['Soort melding']}
 </div>"""
-        )
-        h = 260 + (len(str(r['Antwoord of oplossing'])) // 80) * 18
-        components.html(html, height=h, scrolling=False)
-    df_res = res.copy()
-    df_res.apply(render, axis=1)
+        height = 260 + (len(str(r['Antwoord of oplossing'])) // 80) * 18
+        components.html(html, height=height, scrolling=False)
+    res.apply(render, axis=1)
 
 # ───────────────────────── Download Button ─────────────────────────
 if mode == '🔍 Vrij zoeken' and not res.empty:
