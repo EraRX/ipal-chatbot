@@ -20,7 +20,7 @@ components.html(f"""
   --accent: #2A44AD;
   --accent2: #5A6AF4;
   --bg: #FFFFFF;
-  --page-bg: #EAF2FF;  /* lichtblauw achtergrond */
+  --page-bg: #EAF2FF;
   --text: #0F274A;
   --border: #E0E0E0;
 }}
@@ -36,7 +36,7 @@ html, body, .stApp {{
   padding: calc(14px + env(safe-area-inset-top)) 24px 14px;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: 20px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
 }}
 .topbar img {{ height: 60px; }}
 .topbar h1 {{
@@ -47,15 +47,16 @@ html, body, .stApp {{
 @media (min-width: 768px) {{
   .topbar h1 {{ flex-basis: auto; margin-left: 18px; }}
 }}
-.stSelectbox > div {
-  background: #000000 !important;       /* zwarte dropdown-achtergrond */
+.stSelectbox > div {{
+  background: #000000 !important;
   border: 1px solid var(--border) !important;
   border-radius: 12px;
   padding: 8px 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-.stSelectbox option {
-  color: var(--accent) !important;      /* donkerblauwe tekst */
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}}
+.stSelectbox option {{
+  background: #000000;
+  color: var(--accent) !important;
 }}
 .stSelectbox label, .stTextInput label, .stRadio label {{
   color: var(--accent) !important;
@@ -74,7 +75,7 @@ html, body, .stApp {{
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 14px rgba(0,0,0,.04);
   padding: 22px;
   margin: 20px 0;
 }}
