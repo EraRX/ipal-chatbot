@@ -3,11 +3,11 @@ import pandas as pd
 import base64, io, traceback
 import streamlit.components.v1 as components
 
-# ───────────────────────── Page Config ─────────────────────────
+# ─────────────────── Page Config ───────────────────
 st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
-# ───────────────────────── Global CSS & Header ─────────────────────────
-css = """
+# ─────────────────── CSS + Header ───────────────────
+css = '''
 <style>
 :root {
   --accent: #2A44AD;
@@ -27,56 +27,44 @@ html, body, .stApp {
 }
 .topbar {
   width: 100vw;
-  position: relative;
-  left: 50%; transform: translateX(-50%);
+  position: relative; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
   padding: 10px 20px;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 12px; border-radius: 0 0 20px 20px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;
+  border-radius: 0 0 20px 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 .topbar img { height: 48px; }
 .topbar h1 {
-  flex: 1 1 auto;
-  text-align: center;
-  color: #fff;
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin: 0;
+  flex: 1 1 auto; text-align: center; color: #fff;
+  font-size: 1.6rem; font-weight: 600; margin: 0;
 }
 .stSelectbox>div, .stTextInput>div>div {
   background-color: #FFFFFF !important;
   color: var(--text-color) !important;
   border: 1px solid var(--border-color) !important;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: 8px; padding: 6px 10px;
 }
 .stSelectbox label, .stTextInput label, .stRadio label {
-  color: var(--accent) !important;
-  font-weight: 600;
+  color: var(--accent) !important; font-weight: 600;
 }
 .stButton>button, .stDownloadButton>button {
-  background-color: var(--accent) !important;
-  color: #fff !important;
-  font-weight: 600;
-  border-radius: 8px !important;
+  background-color: var(--accent) !important; color: #fff !important;
+  font-weight: 600; border-radius: 8px !important;
 }
 .stButton>button:hover, .stDownloadButton>button:hover {
   background-color: var(--accent2) !important;
 }
 .card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  padding: 16px;
-  margin: 16px 0;
+  background: var(--card-bg); border: 1px solid var(--border-color);
+  border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 16px; margin: 16px 0;
 }
 </style>
-"""
+'''
 st.markdown(css, unsafe_allow_html=True)
 
-# Header met logo's
+# Header logos
 dir_ipal = "logo.png"
 dir_doc  = "logo-docbase-icon.png"
 dir_ex   = "Exact.png"
@@ -93,7 +81,7 @@ header_html = f"""
 """
 st.markdown(header_html, unsafe_allow_html=True)
 
-# ───────────────────────── Authentication ─────────────────────────
+# ─────────────────── Authentication ───────────────────
 if 'auth' not in st.session_state:
     st.session_state.auth = False
 
@@ -103,11 +91,12 @@ if not st.session_state.auth:
     if pwd:
         if pwd == 'ipal2024':
             st.session_state.auth = True
+            st.experimental_rerun()
         else:
             st.error('Onjuist wachtwoord.')
     st.stop()
 
-# ───────────────────────── Data Loading ─────────────────────────
+# ─────────────────── Data Loading ───────────────────
 try:
     df = pd.read_excel('faq.xlsx')
 except Exception:
@@ -118,7 +107,7 @@ except Exception:
 cols = ['Systeem','Subthema','Categorie','Omschrijving melding','Toelichting melding','Soort melding','Antwoord of oplossing']
 df['zoek'] = df[cols].fillna('').astype(str).agg(' '.join, axis=1)
 
-# ───────────────────────── Search Interface ─────────────────────────
+# ─────────────────── Search Interface ───────────────────
 st.markdown('---')
 mode = st.radio('🔎 Kies zoekmethode', ['🎯 Gefilterd', '🔍 Vrij zoeken'], horizontal=True)
 
@@ -134,7 +123,7 @@ else:
     q = st.text_input('Zoekterm:')
     res = df[df['zoek'].str.contains(q, case=False, na=False)] if q else pd.DataFrame()
 
-# ───────────────────────── Results Display ─────────────────────────
+# ─────────────────── Results Display ───────────────────
 if res.empty:
     st.info('Geen resultaten gevonden.')
 else:
@@ -154,7 +143,7 @@ else:
         components.html(html, height=height, scrolling=False)
     res.apply(render, axis=1)
 
-# ───────────────────────── Download Button ─────────────────────────
+# ─────────────────── Download Button ───────────────────
 if mode == '🔍 Vrij zoeken' and not res.empty:
     buffer = io.BytesIO()
     res.drop(columns=['zoek'], errors='ignore').to_excel(buffer, index=False)
