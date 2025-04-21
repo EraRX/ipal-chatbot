@@ -13,8 +13,8 @@ exact_logo = base64.b64encode(open("Exact.png",             "rb").read()).decode
 
 # ─────────────────────────── Header & CSS ─────────────────────────
 components.html(f"""
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap\" rel=\"stylesheet\">
 <style>
 :root {{
   --accent: #2A44AD;
@@ -33,7 +33,7 @@ html, body, .stApp {{
 .topbar {{
   position: relative; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  padding: calc(14px + env(safe-area-inset-top)) 24px 14px;
+  padding: calc(10px + env(safe-area-inset-top)) 24px 10px;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: 20px; border-radius: 0 0 20px 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,.15);
@@ -41,8 +41,8 @@ html, body, .stApp {{
 .topbar img {{ height: 60px; }}
 .topbar h1 {{
   flex-basis: 100%; text-align: center;
-  color: #FFFFFF; margin: 6px 0 0;
-  font-size: 2rem; font-weight: 600;
+  color: #FFFFFF; margin: 4px 0 0;
+  font-size: 1.8rem; font-weight: 600;
 }}
 @media (min-width: 768px) {{
   .topbar h1 {{ flex-basis: auto; margin-left: 18px; }}
@@ -80,11 +80,11 @@ html, body, .stApp {{
   margin: 20px 0;
 }}
 </style>
-<div class="topbar">
-  <img src="data:image/png;base64,{ipal_logo}" alt="IPAL">
-  <img src="data:image/png;base64,{doc_logo}" alt="DocBase">
-  <img src="data:image/png;base64,{exact_logo}" alt="Exact">
-  <h1>🔍 Helpdesk Zoekfunctie</h1>
+<div class=\"topbar\">\
+  <img src=\"data:image/png;base64,{ipal_logo}\" alt=\"IPAL\">\
+  <img src=\"data:image/png;base64,{doc_logo}\" alt=\"DocBase\">\
+  <img src=\"data:image/png;base64,{exact_logo}\" alt=\"Exact\">\
+  <h1>🔍 Helpdesk Zoekfunctie</h1>\
 </div>
 """, height=140, scrolling=False)
 
