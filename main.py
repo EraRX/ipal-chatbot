@@ -1,82 +1,98 @@
 import streamlit as st
 import pandas as pd
 import base64, io, traceback
-import streamlit.components.v1 as components
 
 # ───────────────────────── Page Config ─────────────────────────
 st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
-# ───────────────────────── Assets Loading ─────────────────────────
-ipal_logo  = base64.b64encode(open("logo.png",              "rb").read()).decode()
-doc_logo   = base64.b64encode(open("logo-docbase-icon.png", "rb").read()).decode()
-exact_logo = base64.b64encode(open("Exact.png",             "rb").read()).decode()
-
-# ───────────────────────── Header & Global CSS ─────────────────────────
-components.html(f"""
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+# ───────────────────────── Global CSS & Header ─────────────────────────
+# Kleuren en safe-area ondersteuning
+css = """
 <style>
-:root {{
+:root {
   --accent: #2A44AD;
   --accent2: #5A6AF4;
-  --page-bg: #ADD8E6;  /* hele achtergrond lichtblauw */
+  --page-bg: #ADD8E6;
   --card-bg: #FFFFFF;
-  --text: #0F274A;
-  --border: #E0E0E0;
-}}
-html, body, .stApp {{
-  margin: 0; padding: 0;
-  background: var(--page-bg) !important;
+  --text-color: #0F274A;
+  --border-color: #E0E0E0;
+}
+html, body, .stApp {
+  background-color: var(--page-bg) !important;
+  color: var(--text-color) !important;
   font-family: 'Inter', sans-serif;
-  color: var(--text);
-}}
-.topbar {{
+}
+/* full-width header with safe-area for notch */
+#root > div:nth-child(1) {
+  padding-top: env(safe-area-inset-top);
+}
+.topbar {
+  width: 100vw;
   position: relative; left: 50%; transform: translateX(-50%);
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  padding: calc(10px + env(safe-area-inset-top)) 24px 10px;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 20px; border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}}
-.topbar img {{ height: 60px; }}
-.topbar h1 {{
-  flex-basis: 100%; text-align: center;
-  color: #FFFFFF; margin: 4px 0 0;
-  font-size: 1.8rem; font-weight: 600;
-}}
-@media (min-width: 768px) {{ .topbar h1 {{ flex-basis: auto; margin-left: 18px; }} }}
-.stSelectbox > div {{
-  background: #000000 !important;
+  padding: 10px 20px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+.topbar img {
+  height: 48px;
+}
+.topbar h1 {
+  flex: 1 1 auto;
+  text-align: center;
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 0;
+}
+.stSelectbox>div, .stTextInput>div>div {
+  background-color: #000 !important;
   color: var(--accent) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 12px;
-  padding: 8px 12px;
-}}
-.stSelectbox option {{ background: #000000; color: var(--accent) !important; }}
-.stSelectbox label, .stTextInput label, .stRadio label {{ color: var(--accent) !important; font-weight: 600; }}
-.stButton > button, .stDownloadButton > button {{
-  background: var(--accent) !important;
-  color: #FFFFFF !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+.stSelectbox label, .stTextInput label, .stRadio label {
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+.stButton>button, .stDownloadButton>button {
+  background-color: var(--accent) !important;
+  color: #fff !important;
   font-weight: 600;
   border-radius: 8px !important;
-}}
-.stButton > button:hover, .stDownloadButton > button:hover {{ background: var(--accent2) !important; }}
-.card {{
+}
+.stButton>button:hover, .stDownloadButton>button:hover {
+  background-color: var(--accent2) !important;
+}
+.card {
   background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-  padding: 22px;
-  margin: 20px 0;
-}}
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 16px;
+  margin: 16px 0;
+}
 </style>
-<div class="topbar">
-  <img src="data:image/png;base64,{ipal_logo}" alt="IPAL">
-  <img src="data:image/png;base64,{doc_logo}" alt="DocBase">
-  <img src="data:image/png;base64,{exact_logo}" alt="Exact">
+"""
+st.markdown(css, unsafe_allow_html=True)
+# Header met logo's
+dir_ipal = "logo.png"
+dir_doc  = "logo-docbase-icon.png"
+dir_ex  = "Exact.png"
+ipal_logo  = base64.b64encode(open(dir_ipal, "rb").read()).decode()
+doc_logo   = base64.b64encode(open(dir_doc,  "rb").read()).decode()
+exact_logo = base64.b64encode(open(dir_ex,   "rb").read()).decode()
+header = f"""
+<div class='topbar'>
+  <img src='data:image/png;base64,{ipal_logo}' alt='IPAL'>
+  <img src='data:image/png;base64,{doc_logo}' alt='DocBase'>
+  <img src='data:image/png;base64,{exact_logo}' alt='Exact'>
   <h1>🔍 Helpdesk Zoekfunctie</h1>
 </div>
-""", height=140, scrolling=False)
+"""
+st.markdown(header, unsafe_allow_html=True)
 
 # ───────────────────────── Authentication ─────────────────────────
 if 'auth' not in st.session_state:
@@ -84,10 +100,11 @@ if 'auth' not in st.session_state:
 
 if not st.session_state.auth:
     st.title('🔐 Helpdesk Toegang')
-    pw = st.text_input('Voer wachtwoord in:', type='password')
-    if pw:
-        if pw == 'ipal2024':
+    pwd = st.text_input('Voer wachtwoord in:', type='password')
+    if pwd:
+        if pwd == 'ipal2024':
             st.session_state.auth = True
+            st.experimental_rerun()
         else:
             st.error('Onjuist wachtwoord.')
     st.stop()
@@ -125,7 +142,8 @@ if res.empty:
 else:
     st.write(f'### 📄 {len(res)} resultaat/resultaten gevonden')
     def render(r):
-        html = f"""
+        html = (
+            f"""
 <div class='card'>
   <strong>💬 Antwoord:</strong><br>{r['Antwoord of oplossing'] or '-'}<hr>
   📁 <b>Systeem:</b> {r['Systeem']}<br>
@@ -135,9 +153,11 @@ else:
   ℹ️ <b>Toelichting:</b> {r['Toelichting melding']}<br>
   🏷️ <b>Soort melding:</b> {r['Soort melding']}
 </div>"""
+        )
         h = 260 + (len(str(r['Antwoord of oplossing'])) // 80) * 18
         components.html(html, height=h, scrolling=False)
-    res.apply(render, axis=1)
+    df_res = res.copy()
+    df_res.apply(render, axis=1)
 
 # ───────────────────────── Download Button ─────────────────────────
 if mode == '🔍 Vrij zoeken' and not res.empty:
