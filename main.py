@@ -148,7 +148,7 @@ st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
 # Selectbox voor subthema-keuze
 if subthema_opties:
-    st.session_state.selected_subthema = st.selectbox("📁 Kies een ondewerp", ["(Kies een subthema)"] + subthema_opties)
+    st.session_state.selected_subthema = st.selectbox("📁 Kies een ondewerp", ["(Kies een thema)"] + subthema_opties)
     if st.session_state.selected_subthema == "(Kies een subthema)":
         st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
         st.stop()
