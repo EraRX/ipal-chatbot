@@ -66,7 +66,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                         return f"[{display_text}]({url})"
                 return text
             df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
-            df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1).str.lower()
+            df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
             return df
         except Exception as e:
             print(f"Error loading FAQ: {str(e)}")
@@ -110,17 +110,17 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-def faq_fallback(user_text: str) -> str:
+def faq_matches(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            keywords = [w.lower() for w in re.findall(r'\w+', user_text) if len(w) > 2]
-            matches = faq_df[faq_df['combined'].apply(lambda x: all(k in x for k in keywords))]
+            pattern = re.escape(user_text)
+            matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
                 top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "Hier zijn mogelijke antwoorden uit onze FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
+                return "📘 Relevante informatie uit de FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
-    return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
+    return ""
 
 def get_answer(user_text: str) -> str:
     system_prompt = (
@@ -139,23 +139,16 @@ def get_answer(user_text: str) -> str:
                 temperature=0.3,
                 max_tokens=300
             )
-        return resp.choices[0].message.content.strip()
-    except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
-        print("AuthenticationError: Invalid API key")
-        return faq_fallback(user_text)
-    except openai.RateLimitError:
-        st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
-        print("RateLimitError: API rate limit exceeded")
-        return faq_fallback(user_text)
-    except openai.APIConnectionError:
-        st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
-        print("APIConnectionError: Failed to connect to OpenAI")
-        return faq_fallback(user_text)
+        ai_reply = resp.choices[0].message.content.strip()
+        faq_reply = faq_matches(user_text)
+        full_reply = f"🤖 **AI-antwoord:**\n{ai_reply}"
+        if faq_reply:
+            full_reply += f"\n\n{faq_reply}"
+        return full_reply
     except Exception as e:
-        st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
-        print(f"Unexpected error: {str(e)}")
-        return faq_fallback(user_text)
+        print(f"OpenAI error: {e}")
+        fallback = faq_matches(user_text)
+        return fallback if fallback else "⚠️ Er is een fout opgetreden."
 
 def main():
     user_input = st.chat_input('Typ je vraag hier...')
