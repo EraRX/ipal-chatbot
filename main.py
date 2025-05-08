@@ -170,4 +170,96 @@ def get_ai_answer(user_text: str) -> str:
     )
     # Beperk chatgeschiedenis om tokens te besparen
     history_limit = 10
-    messages = [{'role': 'system
+    messages = [{'role': 'system', 'content': system_prompt}]
+    for m in st.session_state.history[-history_limit:]:
+        messages.append({'role': m['role'], 'content': m['content']})
+    full_question = f"[{st.session_state.selected_subthema}] {user_text}"
+    messages.append({'role': 'user', 'content': full_question})
+    try:
+        with st.spinner("Bezig met het genereren van een IPAL-Helpdesk antwoord..."):
+            resp = openai.chat.completions.create(
+                model=MODEL,
+                messages=messages,
+                temperature=0.3,
+                max_tokens=150  # Verlaagd om tokens te besparen
+            )
+        return "IPAL-Helpdesk antwoord: " + resp.choices[0].message.content.strip()
+    except openai.AuthenticationError:
+        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand of Streamlit Cloud Secrets.")
+        print("AuthenticationError: Invalid API key")
+        return None
+    except openai.RateLimitError as e:
+        error_details = getattr(e, 'response', None)
+        print(f"RateLimitError: {str(e)}")
+        if error_details:
+            headers = error_details.headers
+            print(f"Rate Limit Headers: {dict(headers)}")
+        st.error("⚠️ Limiet van OpenAI API bereikt, zelfs bij nul gebruik. Controleer je account op https://platform.openai.com/usage of neem contact op met OpenAI-support.")
+        return None
+    except openai.APIConnectionError:
+        st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
+        print("APIConnectionError: Failed to connect to OpenAI")
+        return None
+    except Exception as e:
+        st.error(f"⚠️ Er ging iets mis bij het ophalen van het IPAL-Helpdesk antwoord: {str(e)}")
+        print(f"Unexpected error: {str(e)}")
+        return None
+
+# Gecombineerde antwoordfunctie
+def get_answer(user_text: str) -> str:
+    # Haal AI-antwoord op
+    ai_answer = get_ai_answer(user_text)
+    # Haal FAQ-antwoord op
+    faq_answer = get_faq_answer(user_text)
+    # Combineer antwoorden
+    if ai_answer and faq_answer.startswith("📌"):
+        return f"{ai_answer}\n\n{faq_answer}"
+    elif ai_answer:
+        return ai_answer
+    else:
+        return faq_answer
+
+# Main UI
+def main():
+    # Controleer of reset is geactiveerd
+    if st.session_state.reset_triggered:
+        st.session_state.history = [
+            {
+                'role': 'assistant',
+                'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+            }
+        ]
+        st.session_state.selected_subthema = None
+        st.session_state.reset_triggered = False
+
+    st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
+
+    # Selectbox voor subthema-keuze
+    if subthema_opties:
+        st.session_state.selected_subthema = st.selectbox("📁 Kies een subthema", ["(Kies een subthema)"] + subthema_opties)
+        if st.session_state.selected_subthema == "(Kies een subthema)":
+            st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
+            st.stop()
+    else:
+        st.error("⚠️ Geen subthema's beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
+        st.stop()
+
+    render_chat()
+    
+    # Gebruik een unieke key voor st.chat_input om reactiviteit te verbeteren
+    vraag = st.chat_input(
+        "Stel je vraag over: " + (st.session_state.selected_subthema or "(geen subthema)"),
+        key="chat_input_" + str(len(st.session_state.history))
+    )
+    
+    if vraag:
+        add_message('user', vraag)
+        with st.spinner("Antwoord wordt gegenereerd..."):
+            antwoord = get_answer(vraag)
+            add_message('assistant', antwoord)
+        # Forceer een rerun om de UI direct te updaten
+        st.rerun()
+
+if __name__ == '__main__':
+    main()
