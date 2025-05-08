@@ -244,7 +244,7 @@ def main():
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
 
-        # CSS om een uniform kader rond de logo's te maken
+        # CSS om de button te stylen als een kader met een afbeelding erin
         st.markdown("""
             <style>
             .logo-container {
@@ -253,35 +253,25 @@ def main():
                 gap: 20px;
                 margin-top: 20px;
             }
-            .logo-box {
+            .stButton > button {
                 width: 120px;
                 height: 120px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 border: 2px solid #e0e0e0;
                 border-radius: 10px;
                 background-color: #f9f9f9;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+                margin: 0;
             }
-            .logo-box img {
+            .stButton > button img {
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
             }
-            .stButton > button {
-                padding: 0;
-                margin: 0;
-                border: none;
-                background: none;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 120px;
-                height: 120px;
-            }
             .stButton > button:hover {
-                background: none;
-                border: none;
+                background-color: #e0e0e0;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -292,42 +282,34 @@ def main():
         with col1:
             # DocBase logo
             if os.path.exists("logo-docbase-icon.png"):
-                with st.container():
-                    st.markdown('<div class="logo-box">', unsafe_allow_html=True)
-                    if st.button("", key="docbase_button"):
-                        st.session_state.selected_product = "DocBase"
-                        st.session_state.history = [
-                            {
-                                'role': 'assistant',
-                                'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
-                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                            }
-                        ]
-                        st.rerun()
-                    # Plaats de afbeelding binnen de button
-                    st.image("logo-docbase-icon.png", use_container_width=False)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                if st.button("", key="docbase_button"):
+                    st.session_state.selected_product = "DocBase"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
+                st.image("logo-docbase-icon.png", use_container_width=False)
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
 
         with col2:
             # Exact logo
             if os.path.exists("Exact.png"):
-                with st.container():
-                    st.markdown('<div class="logo-box">', unsafe_allow_html=True)
-                    if st.button("", key="exact_button"):
-                        st.session_state.selected_product = "Exact"
-                        st.session_state.history = [
-                            {
-                                'role': 'assistant',
-                                'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
-                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                            }
-                        ]
-                        st.rerun()
-                    # Plaats de afbeelding binnen de button
-                    st.image("Exact.png", use_container_width=False)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                if st.button("", key="exact_button"):
+                    st.session_state.selected_product = "Exact"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
+                st.image("Exact.png", use_container_width=False)
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
