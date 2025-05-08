@@ -110,10 +110,15 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
+# Dropdown tonen alleen als er systeemopties zijn
+if systeemopties:
+    st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
 
-if st.session_state.selected_systeem == "(Kies een onderwerp)":
-    st.warning("⚠️ Kies een onderwerp voordat je een vraag stelt.")
+    if st.session_state.selected_systeem == "(Kies een onderwerp)":
+        st.warning("⚠️ Kies een onderwerp voordat je een vraag stelt.")
+        st.stop()
+else:
+    st.warning("⚠️ Geen onderwerpen beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
     st.stop()
 
 def faq_fallback(user_text: str) -> str:
@@ -153,7 +158,7 @@ def get_answer(user_text: str) -> str:
 
 def main():
     render_chat()
-    vraag = st.chat_input("Stel je vraag over: " + st.session_state.selected_systeem)
+    vraag = st.chat_input("Stel je vraag over: " + (st.session_state.selected_systeem or "(geen onderwerp)"))
     if vraag:
         add_message('user', vraag)
         antwoord = get_answer(vraag)
