@@ -21,12 +21,12 @@ MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 # Valideer API-sleutel
 def validate_api_key():
     if not openai.api_key:
-        st.error("⚠️ Stel je OPENAI_API_KEY in in een .env-bestand.")
+        st.error("⚠️ Stel je OPENAI_API_KEY in in een .env-bestand of Streamlit Cloud Secrets.")
         st.stop()
     try:
         openai.models.list()
     except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OPENAI_API_KEY. Controleer je .env-bestand.")
+        st.error("⚠️ Ongeldige OPENAI_API_KEY. Controleer je .env-bestand of Streamlit Cloud Secrets.")
         st.stop()
     except openai.RateLimitError as e:
         st.error("⚠️ API-limiet bereikt bij validatie. Controleer je account op https://platform.openai.com/usage.")
@@ -62,7 +62,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     try:
         df = pd.read_excel(path)
         st.write("📊 Ingelezen kolommen:", df.columns.tolist())
-        required_columns = ['Systeem', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
+        required_columns = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
         if not all(col in df.columns for col in required_columns):
             st.error(f"⚠️ FAQ-bestand mist vereiste kolommen. Verwachte kolommen: {required_columns}")
             return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
@@ -76,10 +76,19 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                 return text
             return text
         df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
-        df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
+        # Gebruik alle kolommen behalve 'Antwoord of oplossing' voor zoekfunctionaliteit
+        search_columns = [col for col in required_columns if col != 'Antwoord of oplossing']
+        df['combined'] = df[search_columns].fillna('').agg(' '.join, axis=1)
         st.write("✅ FAQ geladen, aantal rijen:", len(df))
-        st.write("📁 Unieke systemen:", df['Systeem'].dropna().unique())
+        st.write("📁 Unieke subthema's:", df['Subthema'].dropna().unique())
         return df
+    except ImportError as e:
+        if 'openpyxl' in str(e):
+            st.error("⚠️ Python-bibliotheek 'openpyxl' ontbreekt. Zorg dat 'openpyxl' in requirements.txt staat.")
+        else:
+            st.error(f"⚠️ Fout bij het laden van FAQ-bestand: {str(e)}")
+        print(f"ImportError: {str(e)}")
+        return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
     except Exception as e:
         st.error(f"⚠️ Fout bij het laden van FAQ-bestand: {str(e)}")
         print(f"Error loading FAQ: {str(e)}")
@@ -87,12 +96,12 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# Genereer systeemopties
-systeemopties = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip()]) if not faq_df.empty else []
+# Genereer subthema-opties
+subthema_opties = sorted([s for s in faq_df['Subthema'].dropna().unique() if isinstance(s, str) and s.strip()]) if not faq_df.empty else []
 
 # Controleer of FAQ correct is geladen
-if faq_df.empty or not systeemopties:
-    st.error("⚠️ FAQ-bestand is niet correct geladen of bevat geen geldige systemen. Controleer het bestand en probeer opnieuw.")
+if faq_df.empty or not subthema_opties:
+    st.error("⚠️ FAQ-bestand is niet correct geladen of bevat geen geldige subthema's. Controleer het bestand en probeer opnieuw.")
     st.stop()
 
 # Initialiseren van sessiestatus
@@ -104,7 +113,7 @@ if 'history' not in st.session_state:
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
-    st.session_state.selected_systeem = None
+    st.session_state.selected_subthema = None
 
 # Voeg bericht toe aan geschiedenis
 def add_message(role: str, content: str):
@@ -134,19 +143,19 @@ def on_reset():
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
-    st.session_state.selected_systeem = None
+    st.session_state.selected_subthema = None
     st.rerun()
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-# Selectbox voor systeemkeuze
-if systeemopties:
-    st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
-    if st.session_state.selected_systeem == "(Kies een onderwerp)":
-        st.warning("⚠️ Kies een onderwerp voordat je een vraag stelt.")
+# Selectbox voor subthema-keuze
+if subthema_opties:
+    st.session_state.selected_subthema = st.selectbox("📁 Kies een subthema", ["(Kies een subthema)"] + subthema_opties)
+    if st.session_state.selected_subthema == "(Kies een subthema)":
+        st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
         st.stop()
 else:
-    st.error("⚠️ Geen onderwerpen beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
+    st.error("⚠️ Geen subthema's beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
     st.stop()
 
 # FAQ fallback functie
@@ -157,7 +166,7 @@ def faq_fallback(user_text: str) -> str:
             matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
                 top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "júFAQ-resultaten:\n" + "\n".join(f"- {ans}" for ans in top)
+                return "📌 FAQ-resultaten:\n" + "\n".join(f"- {ans}" for ans in top)
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
     return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
@@ -178,7 +187,7 @@ def get_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history[-history_limit:]:
         messages.append({'role': m['role'], 'content': m['content']})
-    full_question = f"[{st.session_state.selected_systeem}] {user_text}"
+    full_question = f"[{st.session_state.selected_subthema}] {user_text}"
     messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Bezig met het genereren van een antwoord..."):
@@ -190,7 +199,7 @@ def get_answer(user_text: str) -> str:
             )
         return "🤖 AI-antwoord: " + resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
+        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand of Streamlit Cloud Secrets.")
         print("AuthenticationError: Invalid API key")
         return faq_fallback(user_text)
     except openai.RateLimitError as e:
@@ -206,14 +215,14 @@ def get_answer(user_text: str) -> str:
         print("APIConnectionError: Failed to connect to OpenAI")
         return faq_fallback(user_text)
     except Exception as e:
-        st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord: {str(e)}")
+        st.error(f"⚠️ Er ging iets mis bij het ophalen van het antwoord: {str(e)}")
         print(f"Unexpected error: {str(e)}")
         return faq_fallback(user_text)
 
 # Main UI
 def main():
     render_chat()
-    vraag = st.chat_input("Stel je vraag over: " + (st.session_state.selected_systeem or "(geen onderwerp)"))
+    vraag = st.chat_input("Stel je vraag over: " + (st.session_state.selected_subthema or "(geen subthema)"))
     if vraag:
         add_message('user', vraag)
         antwoord = get_answer(vraag)
