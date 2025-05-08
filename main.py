@@ -283,7 +283,7 @@ def main():
                     st.session_state.history = [
                         {
                             'role': 'assistant',
-                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                            'content': '👋 Je hebt DocBase gekozen. Stel nu je vraag om verder te gaan.',
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                         }
                     ]
@@ -300,7 +300,7 @@ def main():
                     st.session_state.history = [
                         {
                             'role': 'assistant',
-                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                            'content': '👋 Je hebt Exact gekozen. Stel nu je vraag om verder te gaan.',
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                         }
                     ]
