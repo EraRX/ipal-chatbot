@@ -68,17 +68,18 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-def reset_history():
+systeemopties = sorted(faq_df['Systeem'].dropna().unique()) if not faq_df.empty else []
+
+if 'history' not in st.session_state:
     st.session_state.history = [
         {
             'role': 'assistant',
-            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
+            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Kies eerst een onderwerp hieronder en stel daarna je vraag.',
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
+    st.session_state.selected_systeem = None
 
-if 'history' not in st.session_state:
-    reset_history()
 
 def add_message(role: str, content: str):
     st.session_state.history.append({
@@ -98,22 +99,32 @@ def render_chat():
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{content}\n*{timestamp}*")
 
 def on_reset():
-    reset_history()
+    st.session_state.history = [
+        {
+            'role': 'assistant',
+            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Kies eerst een onderwerp hieronder en stel daarna je vraag.',
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+        }
+    ]
+    st.session_state.selected_systeem = None
     st.rerun()
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
+if not st.session_state.selected_systeem:
+    st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", opties := ["(Kies een onderwerp)"] + systeemopties)
+    if st.session_state.selected_systeem == "(Kies een onderwerp)":
+        st.stop()
+
+
 def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            tokens = user_text.split()
-            if not tokens:
-                return ""
-            pattern = '(?=.*' + ')(?=.*'.join(re.escape(token) for token in tokens) + ')'
+            pattern = re.escape(user_text)
             matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
                 top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "📌 Antwoord uit de FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
+                return "📌 FAQ-resultaten:\n" + "\n".join(f"- {ans}" for ans in top)
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
     return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
@@ -135,33 +146,19 @@ def get_answer(user_text: str) -> str:
                 temperature=0.3,
                 max_tokens=300
             )
-        return resp.choices[0].message.content.strip()
-    except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
-        print("AuthenticationError: Invalid API key")
-        return faq_fallback(user_text)
-    except openai.RateLimitError:
-        st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
-        print("RateLimitError: API rate limit exceeded")
-        return faq_fallback(user_text)
-    except openai.APIConnectionError:
-        st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
-        print("APIConnectionError: Failed to connect to OpenAI")
-        return faq_fallback(user_text)
+        return "🤖 AI-antwoord: " + resp.choices[0].message.content.strip()
     except Exception as e:
-        st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
-        print(f"Unexpected error: {str(e)}")
+        print(f"Fallback triggered: {str(e)}")
         return faq_fallback(user_text)
 
 def main():
-    user_input = st.chat_input('Typ je vraag hier...')
-    if user_input and user_input.strip() and len(user_input) <= 500:
-        add_message('user', user_input)
-        answer = get_answer(user_input)
-        add_message('assistant', answer)
-    elif user_input and len(user_input) > 500:
-        add_message('assistant', '⚠️ Je bericht is te lang. Houd het onder 500 tekens.')
     render_chat()
+    vraag = st.chat_input("Stel je vraag over: " + st.session_state.selected_systeem)
+    if vraag:
+        add_message('user', vraag)
+        antwoord = get_answer(vraag)
+        add_message('assistant', antwoord)
 
 if __name__ == '__main__':
     main()
+
