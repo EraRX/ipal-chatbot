@@ -121,6 +121,8 @@ if 'selected_subthema' not in st.session_state:
     st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
+if 'form_submitted' not in st.session_state:
+    st.session_state.form_submitted = None
 
 # Voeg bericht toe aan geschiedenis
 def add_message(role: str, content: str):
@@ -147,6 +149,7 @@ def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
     st.session_state.selected_subthema = None
+    st.session_state.form_submitted = None
 
 # FAQ zoekfunctie
 def get_faq_answer(user_text: str) -> str:
@@ -236,6 +239,7 @@ def main():
         ]
         st.session_state.selected_product = None
         st.session_state.selected_subthema = None
+        st.session_state.form_submitted = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -244,7 +248,7 @@ def main():
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
 
-        # CSS om de button te stylen als een kader met een afbeelding erin
+        # CSS om de button te stylen als een kader met een achtergrondafbeelding
         st.markdown("""
             <style>
             .logo-container {
@@ -253,65 +257,61 @@ def main():
                 gap: 20px;
                 margin-top: 20px;
             }
-            .stButton > button {
+            .logo-button {
                 width: 120px;
                 height: 120px;
                 border: 2px solid #e0e0e0;
                 border-radius: 10px;
                 background-color: #f9f9f9;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 0;
-                margin: 0;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                cursor: pointer;
             }
-            .stButton > button img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-            }
-            .stButton > button:hover {
+            .logo-button:hover {
                 background-color: #e0e0e0;
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Maak twee kolommen voor de logo's
-        col1, col2 = st.columns(2)
+        # Maak een formulier om de klikacties te verwerken
+        with st.form(key="product_selection_form"):
+            col1, col2 = st.columns(2)
 
-        with col1:
-            # DocBase logo
-            if os.path.exists("logo-docbase-icon.png"):
-                if st.button("", key="docbase_button"):
-                    st.session_state.selected_product = "DocBase"
+            with col1:
+                # DocBase logo
+                if os.path.exists("logo-docbase-icon.png"):
+                    st.markdown(
+                        f'<button type="submit" name="product" value="DocBase" class="logo-button" style="background-image: url(logo-docbase-icon.png);"></button>',
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
+
+            with col2:
+                # Exact logo
+                if os.path.exists("Exact.png"):
+                    st.markdown(
+                        f'<button type="submit" name="product" value="Exact" class="logo-button" style="background-image: url(Exact.png);"></button>',
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
+
+            # Verwerk de form submission
+            submitted = st.form_submit_button(label="", use_container_width=True, disabled=True)
+            if submitted:
+                selected = st.session_state.get("product_selection_form", {}).get("product")
+                if selected:
+                    st.session_state.selected_product = selected
                     st.session_state.history = [
                         {
                             'role': 'assistant',
-                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                            'content': f'👋 Je hebt {selected} gekozen. Kies nu een subthema om verder te gaan.',
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                         }
                     ]
                     st.rerun()
-                st.image("logo-docbase-icon.png", use_container_width=False)
-            else:
-                st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
-
-        with col2:
-            # Exact logo
-            if os.path.exists("Exact.png"):
-                if st.button("", key="exact_button"):
-                    st.session_state.selected_product = "Exact"
-                    st.session_state.history = [
-                        {
-                            'role': 'assistant',
-                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
-                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                        }
-                    ]
-                    st.rerun()
-                st.image("Exact.png", use_container_width=False)
-            else:
-                st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
         return  # Stop hier totdat een product is gekozen
 
