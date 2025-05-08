@@ -245,7 +245,7 @@ def main():
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
 
-        # CSS om de kaders te stylen
+        # CSS om de kaders en knoppen te stylen
         st.markdown("""
             <style>
             .logo-container {
@@ -263,7 +263,6 @@ def main():
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                position: relative;
             }
             .logo-box img {
                 max-width: 100%;
@@ -271,22 +270,23 @@ def main():
                 object-fit: contain;
             }
             .stButton > button {
-                position: absolute;
-                top: 0;
-                left: 0;
                 width: 120px;
-                height: 120px;
-                background: transparent;
-                border: none;
+                height: 30px;
+                font-size: 14px;
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+                background-color: #f0f0f0;
+                color: #333;
                 cursor: pointer;
+                margin-top: 5px;
             }
             .stButton > button:hover {
-                background: rgba(0, 0, 0, 0.1);
+                background-color: #e0e0e0;
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Maak twee kolommen voor de logo's
+        # Maak twee kolommen voor de logo's en knoppen
         col1, col2 = st.columns(2)
 
         with col1:
@@ -295,8 +295,7 @@ def main():
                 st.markdown('<div class="logo-box">', unsafe_allow_html=True)
                 st.image("logo-docbase-icon.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
                 st.markdown('</div>', unsafe_allow_html=True)
-                # Plaats een transparante button over het kader
-                if st.button("", key="docbase_button"):
+                if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
                     st.session_state.history = [
                         {
@@ -315,8 +314,7 @@ def main():
                 st.markdown('<div class="logo-box">', unsafe_allow_html=True)
                 st.image("Exact.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
                 st.markdown('</div>', unsafe_allow_html=True)
-                # Plaats een transparante button over het kader
-                if st.button("", key="exact_button"):
+                if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
                     st.session_state.history = [
                         {
