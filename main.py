@@ -33,6 +33,11 @@ validate_api_key()
 # Paginaconfiguratie
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 
+# Sidebar logo
+logo_path = "logo.png"
+if os.path.exists(logo_path):
+    st.sidebar.image(logo_path, width=160)
+
 # Laad en schaal avatar.png
 assistant_avatar = None
 avatar_path = 'avatar.png'
@@ -53,7 +58,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
             if not all(col in df.columns for col in required_columns):
                 st.warning("FAQ-bestand mist vereiste kolommen.")
                 return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
-            # Converteer mogelijke hyperlink-formules naar Markdown
             def convert_hyperlink(text):
                 if isinstance(text, str) and text.startswith('=HYPERLINK'):
                     match = re.match(r'=HYPERLINK\("([^"]+)","([^"]+)"\)', text)
@@ -71,7 +75,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# Functie om chatgeschiedenis te (re)initialiseren
 def reset_history():
     st.session_state.history = [
         {
@@ -84,7 +87,6 @@ def reset_history():
 if 'history' not in st.session_state:
     reset_history()
 
-# Voeg bericht toe aan geschiedenis
 def add_message(role: str, content: str):
     st.session_state.history.append({
         'role': role,
@@ -95,7 +97,6 @@ def add_message(role: str, content: str):
     if len(st.session_state.history) > MAX_HISTORY:
         st.session_state.history = st.session_state.history[-MAX_HISTORY:]
 
-# Toon chatgeschiedenis
 def render_chat():
     for msg in st.session_state.history:
         avatar = assistant_avatar if (msg['role'] == 'assistant' and assistant_avatar) else ('🤖' if msg['role'] == 'assistant' else '🙂')
@@ -103,14 +104,12 @@ def render_chat():
         timestamp = msg['time']
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{content}\n*{timestamp}*")
 
-# Sidebar-knop om gesprek te resetten
 def on_reset():
     reset_history()
     st.rerun()
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-# FAQ fallback functie
 def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
         try:
@@ -123,7 +122,6 @@ def faq_fallback(user_text: str) -> str:
             print(f"FAQ search error: {str(e)}")
     return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
 
-# Antwoordfunctie: AI + FAQ-fallback
 def get_answer(user_text: str) -> str:
     system_prompt = (
         "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. "
@@ -159,7 +157,6 @@ def get_answer(user_text: str) -> str:
         print(f"Unexpected error: {str(e)}")
         return faq_fallback(user_text)
 
-# Main UI
 def main():
     user_input = st.chat_input('Typ je vraag hier...')
     if user_input and user_input.strip() and len(user_input) <= 500:
