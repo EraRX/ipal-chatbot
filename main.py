@@ -224,16 +224,6 @@ def get_answer(user_text: str) -> str:
     else:
         return faq_answer
 
-# Functie om afbeelding naar base64 te converteren
-def image_to_base64(image_path):
-    try:
-        with open(image_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
-        return f"data:image/png;base64,{encoded_string}"
-    except Exception as e:
-        st.warning(f"⚠️ Kon afbeelding niet laden: {image_path}. Fout: {str(e)}")
-        return ""
-
 # Main UI
 def main():
     # Controleer of reset is geactiveerd
@@ -264,7 +254,7 @@ def main():
                 gap: 20px;
                 margin-top: 20px;
             }
-            .stButton > button {
+            .logo-box {
                 width: 120px;
                 height: 120px;
                 border: 2px solid #e0e0e0;
@@ -273,16 +263,25 @@ def main():
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                padding: 0;
-                margin: 0;
+                position: relative;
             }
-            .stButton > button img {
+            .logo-box img {
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
             }
+            .stButton > button {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 120px;
+                height: 120px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+            }
             .stButton > button:hover {
-                background-color: #e0e0e0;
+                background: rgba(0, 0, 0, 0.1);
             }
             </style>
         """, unsafe_allow_html=True)
@@ -293,44 +292,40 @@ def main():
         with col1:
             # DocBase logo
             if os.path.exists("logo-docbase-icon.png"):
-                docbase_logo_base64 = image_to_base64("logo-docbase-icon.png")
-                if docbase_logo_base64:
-                    if st.button("", key="docbase_button"):
-                        st.session_state.selected_product = "DocBase"
-                        st.session_state.history = [
-                            {
-                                'role': 'assistant',
-                                'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
-                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                            }
-                        ]
-                        st.rerun()
-                    st.markdown(
-                        f'<style>.stButton button[aria-label="docbase_button"] {{ background-image: url("{docbase_logo_base64}"); background-size: contain; background-repeat: no-repeat; background-position: center; }}</style>',
-                        unsafe_allow_html=True
-                    )
+                st.markdown('<div class="logo-box">', unsafe_allow_html=True)
+                st.image("logo-docbase-icon.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
+                st.markdown('</div>', unsafe_allow_html=True)
+                # Plaats een transparante button over het kader
+                if st.button("", key="docbase_button"):
+                    st.session_state.selected_product = "DocBase"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
 
         with col2:
             # Exact logo
             if os.path.exists("Exact.png"):
-                exact_logo_base64 = image_to_base64("Exact.png")
-                if exact_logo_base64:
-                    if st.button("", key="exact_button"):
-                        st.session_state.selected_product = "Exact"
-                        st.session_state.history = [
-                            {
-                                'role': 'assistant',
-                                'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
-                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                            }
-                        ]
-                        st.rerun()
-                    st.markdown(
-                        f'<style>.stButton button[aria-label="exact_button"] {{ background-image: url("{exact_logo_base64}"); background-size: contain; background-repeat: no-repeat; background-position: center; }}</style>',
-                        unsafe_allow_html=True
-                    )
+                st.markdown('<div class="logo-box">', unsafe_allow_html=True)
+                st.image("Exact.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
+                st.markdown('</div>', unsafe_allow_html=True)
+                # Plaats een transparante button over het kader
+                if st.button("", key="exact_button"):
+                    st.session_state.selected_product = "Exact"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
