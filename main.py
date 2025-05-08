@@ -17,9 +17,6 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-print("✅ OPENAI_API_KEY geladen:", bool(openai.api_key))
-print("✅ MODEL ingesteld op:", MODEL)
-
 # Valideer API-sleutel
 def validate_api_key():
     if not openai.api_key:
@@ -113,54 +110,49 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-def faq_fallback(user_text: str) -> str:
+def get_faq_samenvatting(vraag: str) -> str:
     if not faq_df.empty:
         try:
-            pattern = re.escape(user_text)
+            pattern = re.escape(vraag)
             matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
-            if not matches.empty:
-                top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "Hier zijn mogelijke antwoorden uit onze FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
+            top = matches.head(3)['Antwoord of oplossing'].tolist()
+            return "\n".join(top) if top else ""
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
-    return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
+    return ""
 
 def get_answer(user_text: str) -> str:
+    faq_info = get_faq_samenvatting(user_text)
     system_prompt = (
-        "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. "
-        "Answer questions briefly and clearly."
+        "Je bent IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent. "
+        "Gebruik de meegegeven FAQ-informatie om vragen zo goed mogelijk te beantwoorden."
     )
-    messages = [{'role': 'system', 'content': system_prompt}]
-    for m in st.session_state.history:
-        messages.append({'role': m['role'], 'content': m['content']})
-    messages.append({'role': 'user', 'content': user_text})
+    user_prompt = f"Gebruikersvraag: {user_text}\n\nFAQ-informatie:\n{faq_info}"
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
     try:
         with st.spinner("Bezig met het genereren van een antwoord..."):
-            print("➡️ Verstuur API-call...")
             resp = openai.chat.completions.create(
                 model=MODEL,
                 messages=messages,
                 temperature=0.3,
                 max_tokens=300
             )
-            print("✅ Antwoord ontvangen:", resp)
         return resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
         st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
-        print("AuthenticationError: Invalid API key")
-        return faq_fallback(user_text)
+        return faq_info or "⚠️ Ongeldige sleutel."
     except openai.RateLimitError:
         st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
-        print("RateLimitError: API rate limit exceeded")
-        return faq_fallback(user_text)
+        return faq_info or "⚠️ Geen resultaat."
     except openai.APIConnectionError:
         st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
-        print("APIConnectionError: Failed to connect to OpenAI")
-        return faq_fallback(user_text)
+        return faq_info or "⚠️ Geen antwoord mogelijk."
     except Exception as e:
         st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
-        print(f"Unexpected error: {str(e)}")
-        return faq_fallback(user_text)
+        return faq_info or "⚠️ Geen antwoord gevonden."
 
 def main():
     user_input = st.chat_input('Typ je vraag hier...')
