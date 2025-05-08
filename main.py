@@ -98,12 +98,12 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# Genereer subthema-opties
-subthema_opties = sorted([s for s in faq_df['Subthema'].dropna().unique() if isinstance(s, str) and s.strip()]) if not faq_df.empty else []
+# Genereer product- en subthema-opties
+producten = sorted([p for p in faq_df['Systeem'].dropna().unique() if isinstance(p, str) and p.strip()]) if not faq_df.empty else []
 
 # Controleer of FAQ correct is geladen
-if faq_df.empty or not subthema_opties:
-    st.error("⚠️ FAQ-bestand is niet correct geladen of bevat geen geldige subthema's. Controleer het bestand en probeer opnieuw.")
+if faq_df.empty or not producten:
+    st.error("⚠️ FAQ-bestand is niet correct geladen of bevat geen geldige producten. Controleer het bestand en probeer opnieuw.")
     st.stop()
 
 # Initialiseren van sessiestatus
@@ -115,6 +115,8 @@ if 'history' not in st.session_state:
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
+if 'selected_product' not in st.session_state:
+    st.session_state.selected_product = None
 if 'selected_subthema' not in st.session_state:
     st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
@@ -143,6 +145,8 @@ def render_chat():
 def on_reset():
     # Zet een vlag om aan te geven dat reset is geactiveerd
     st.session_state.reset_triggered = True
+    st.session_state.selected_product = None
+    st.session_state.selected_subthema = None
 
 # FAQ zoekfunctie
 def get_faq_answer(user_text: str) -> str:
@@ -230,21 +234,58 @@ def main():
                 'time': datetime.now().strftime('%Y-%m-%d %H:%M')
             }
         ]
+        st.session_state.selected_product = None
         st.session_state.selected_subthema = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-    # Selectbox voor subthema-keuze
-    if subthema_opties:
-        st.session_state.selected_subthema = st.selectbox("📁 Kies een subthema", ["(Kies een subthema)"] + subthema_opties)
-        if st.session_state.selected_subthema == "(Kies een subthema)":
-            st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
-            st.stop()
-    else:
-        st.error("⚠️ Geen subthema's beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
+    # Stap 1: Productselectie (startscherm)
+    if not st.session_state.selected_product:
+        st.markdown("### Kies een product om mee te beginnen:")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("📖 DocBase"):
+                st.session_state.selected_product = "DocBase"
+                st.session_state.history = [
+                    {
+                        'role': 'assistant',
+                        'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                    }
+                ]
+        
+        with col2:
+            if st.button("📊 Exact"):
+                st.session_state.selected_product = "Exact"
+                st.session_state.history = [
+                    {
+                        'role': 'assistant',
+                        'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                    }
+                ]
+        return  # Stop hier totdat een product is gekozen
+
+    # Stap 2: Subthema-selectie (vervolgscherm)
+    # Filter subthema's op basis van het geselecteerde product
+    subthema_opties = sorted([s for s in faq_df[faq_df['Systeem'] == st.session_state.selected_product]['Subthema'].dropna().unique() if isinstance(s, str) and s.strip()])
+    
+    if not subthema_opties:
+        st.error(f"⚠️ Geen subthema's beschikbaar voor {st.session_state.selected_product}. Controleer of het FAQ-bestand goed geladen is.")
         st.stop()
 
+    st.session_state.selected_subthema = st.selectbox(
+        f"📁 Kies een subthema voor {st.session_state.selected_product}",
+        ["(Kies een subthema)"] + subthema_opties
+    )
+    
+    if st.session_state.selected_subthema == "(Kies een subthema)":
+        st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
+        st.stop()
+
+    # Stap 3: Toon chat en verwerk vragen
     render_chat()
     
     # Gebruik een unieke key voor st.chat_input om reactiviteit te verbeteren
