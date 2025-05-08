@@ -264,7 +264,7 @@ def main():
                 gap: 20px;
                 margin-top: 20px;
             }
-            .logo-box {
+            .stButton > button {
                 width: 120px;
                 height: 120px;
                 border: 2px solid #e0e0e0;
@@ -273,29 +273,16 @@ def main():
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                cursor: pointer;
-                position: relative;
+                padding: 0;
+                margin: 0;
             }
-            .logo-box img {
+            .stButton > button img {
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
             }
-            .logo-box:hover {
-                background-color: #e0e0e0;
-            }
-            .stButton > button {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 120px;
-                height: 120px;
-                background: transparent;
-                border: none;
-                cursor: pointer;
-            }
             .stButton > button:hover {
-                background: rgba(0, 0, 0, 0.1);
+                background-color: #e0e0e0;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -308,11 +295,6 @@ def main():
             if os.path.exists("logo-docbase-icon.png"):
                 docbase_logo_base64 = image_to_base64("logo-docbase-icon.png")
                 if docbase_logo_base64:
-                    st.markdown(
-                        f'<div class="logo-box"><img src="{docbase_logo_base64}" alt="DocBase"></div>',
-                        unsafe_allow_html=True
-                    )
-                    # Plaats een transparante button over het kader
                     if st.button("", key="docbase_button"):
                         st.session_state.selected_product = "DocBase"
                         st.session_state.history = [
@@ -323,6 +305,10 @@ def main():
                             }
                         ]
                         st.rerun()
+                    st.markdown(
+                        f'<style>.stButton button[aria-label="docbase_button"] {{ background-image: url("{docbase_logo_base64}"); background-size: contain; background-repeat: no-repeat; background-position: center; }}</style>',
+                        unsafe_allow_html=True
+                    )
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
 
@@ -331,11 +317,6 @@ def main():
             if os.path.exists("Exact.png"):
                 exact_logo_base64 = image_to_base64("Exact.png")
                 if exact_logo_base64:
-                    st.markdown(
-                        f'<div class="logo-box"><img src="{exact_logo_base64}" alt="Exact"></div>',
-                        unsafe_allow_html=True
-                    )
-                    # Plaats een transparante button over het kader
                     if st.button("", key="exact_button"):
                         st.session_state.selected_product = "Exact"
                         st.session_state.history = [
@@ -346,6 +327,10 @@ def main():
                             }
                         ]
                         st.rerun()
+                    st.markdown(
+                        f'<style>.stButton button[aria-label="exact_button"] {{ background-image: url("{exact_logo_base64}"); background-size: contain; background-repeat: no-repeat; background-position: center; }}</style>',
+                        unsafe_allow_html=True
+                    )
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
