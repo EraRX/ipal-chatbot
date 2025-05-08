@@ -56,7 +56,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
             # Converteer mogelijke hyperlink-formules naar Markdown
             def convert_hyperlink(text):
                 if isinstance(text, str) and text.startswith('=HYPERLINK'):
-                    # Extract URL en tekst uit =HYPERLINK("url","tekst")
                     match = re.match(r'=HYPERLINK\("([^"]+)","([^"]+)"\)', text)
                     if match:
                         url, display_text = match.groups()
@@ -92,7 +91,6 @@ def add_message(role: str, content: str):
         'content': content,
         'time': datetime.now().strftime('%Y-%m-%d %H:%M')
     })
-    # Beperk geschiedenisgrootte
     MAX_HISTORY = 100
     if len(st.session_state.history) > MAX_HISTORY:
         st.session_state.history = st.session_state.history[-MAX_HISTORY:]
@@ -103,7 +101,6 @@ def render_chat():
         avatar = assistant_avatar if (msg['role'] == 'assistant' and assistant_avatar) else ('🤖' if msg['role'] == 'assistant' else '🙂')
         content = msg['content']
         timestamp = msg['time']
-        # Gebruik st.markdown voor klikbare links
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{content}\n*{timestamp}*")
 
 # Sidebar-knop om gesprek te resetten
@@ -117,7 +114,6 @@ st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            # Escape special characters voor regex
             pattern = re.escape(user_text)
             matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
