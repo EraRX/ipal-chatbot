@@ -77,7 +77,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                 return text
             return text
         
-        df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
+        df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply291(convert_hyperlink)
         # Gebruik alle kolommen behalve 'Antwoord of oplossing' voor zoekfunctionaliteit
         search_columns = [col for col in required_columns if col != 'Antwoord of oplossing']
         df['combined'] = df[search_columns].fillna('').agg(' '.join, axis=1)
@@ -243,41 +243,89 @@ def main():
     # Stap 1: Productselectie (startscherm)
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
+
+        # CSS om een uniform kader rond de logo's te maken
+        st.markdown("""
+            <style>
+            .logo-container {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 20px;
+            }
+            .logo-box {
+                width: 120px;
+                height: 120px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid #e0e0e0;
+                border-radius: 10px;
+                background-color: #f9f9f9;
+            }
+            .logo-box img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+            .stButton > button {
+                background: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            .stButton > button:hover {
+                background: none;
+                border: none;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Maak twee kolommen voor de logo's
         col1, col2 = st.columns(2)
-        
+
         with col1:
-            # Toon het DocBase-logo
+            # DocBase logo
             if os.path.exists("logo-docbase-icon.png"):
-                st.image("logo-docbase-icon.png", width=100)
+                st.markdown('<div class="logo-container"><div class="logo-box">', unsafe_allow_html=True)
+                if st.button("", key="docbase_button"):
+                    st.session_state.selected_product = "DocBase"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
+                # Plaats de afbeelding in de button door de button te herpositioneren
+                st.markdown('<style>.stButton [data-testid="stButton"][key="docbase_button"] { position: absolute; top: 0; left: 0; width: 120px; height: 120px; }</style>', unsafe_allow_html=True)
+                st.image("logo-docbase-icon.png", use_column_width=False)
+                st.markdown('</div></div>', unsafe_allow_html=True)
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
-            if st.button("DocBase"):
-                st.session_state.selected_product = "DocBase"
-                st.session_state.history = [
-                    {
-                        'role': 'assistant',
-                        'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
-                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                    }
-                ]
-                st.rerun()  # Direct herladen om naar subthema-selectie te gaan
-        
+
         with col2:
-            # Toon het Exact-logo
+            # Exact logo
             if os.path.exists("Exact.png"):
-                st.image("Exact.png", width=100)
+                st.markdown('<div class="logo-container"><div class="logo-box">', unsafe_allow_html=True)
+                if st.button("", key="exact_button"):
+                    st.session_state.selected_product = "Exact"
+                    st.session_state.history = [
+                        {
+                            'role': 'assistant',
+                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                        }
+                    ]
+                    st.rerun()
+                # Plaats de afbeelding in de button door de button te herpositioneren
+                st.markdown('<style>.stButton [data-testid="stButton"][key="exact_button"] { position: absolute; top: 0; left: 0; width: 120px; height: 120px; }</style>', unsafe_allow_html=True)
+                st.image("Exact.png", use_column_width=False)
+                st.markdown('</div></div>', unsafe_allow_html=True)
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
-            if st.button("Exact"):
-                st.session_state.selected_product = "Exact"
-                st.session_state.history = [
-                    {
-                        'role': 'assistant',
-                        'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
-                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                    }
-                ]
-                st.rerun()  # Direct herladen om naar subthema-selectie te gaan
+
         return  # Stop hier totdat een product is gekozen
 
     # Stap 2: Subthema-selectie (vervolgscherm)
