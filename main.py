@@ -61,7 +61,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
         return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
     try:
         df = pd.read_excel(path)
-        st.write("📊 Ingelezen kolommen:", df.columns.tolist())
         required_columns = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
         if not all(col in df.columns for col in required_columns):
             st.error(f"⚠️ FAQ-bestand mist vereiste kolommen. Verwachte kolommen: {required_columns}")
@@ -79,8 +78,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
         # Gebruik alle kolommen behalve 'Antwoord of oplossing' voor zoekfunctionaliteit
         search_columns = [col for col in required_columns if col != 'Antwoord of oplossing']
         df['combined'] = df[search_columns].fillna('').agg(' '.join, axis=1)
-        st.write("✅ FAQ geladen, aantal rijen:", len(df))
-        st.write("📁 Unieke subthema's:", df['Subthema'].dropna().unique())
         return df
     except ImportError as e:
         if 'openpyxl' in str(e):
