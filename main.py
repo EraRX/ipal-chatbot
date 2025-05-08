@@ -246,7 +246,12 @@ def main():
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📖 DocBase"):
+            # Toon het DocBase-logo
+            if os.path.exists("logo-docbase-icon.png"):
+                st.image("logo-docbase-icon.png", width=100)
+            else:
+                st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
+            if st.button("DocBase"):
                 st.session_state.selected_product = "DocBase"
                 st.session_state.history = [
                     {
@@ -255,9 +260,15 @@ def main():
                         'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                     }
                 ]
+                st.rerun()  # Direct herladen om naar subthema-selectie te gaan
         
         with col2:
-            if st.button("📊 Exact"):
+            # Toon het Exact-logo
+            if os.path.exists("Exact.png"):
+                st.image("Exact.png", width=100)
+            else:
+                st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
+            if st.button("Exact"):
                 st.session_state.selected_product = "Exact"
                 st.session_state.history = [
                     {
@@ -266,6 +277,7 @@ def main():
                         'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                     }
                 ]
+                st.rerun()  # Direct herladen om naar subthema-selectie te gaan
         return  # Stop hier totdat een product is gekozen
 
     # Stap 2: Subthema-selectie (vervolgscherm)
