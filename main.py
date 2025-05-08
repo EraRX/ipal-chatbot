@@ -7,6 +7,7 @@ import re
 from dotenv import load_dotenv
 from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+import base64
 
 # ---------------------------------------------
 # IPAL Directe Interactieve Chatbox
@@ -121,8 +122,6 @@ if 'selected_subthema' not in st.session_state:
     st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
-if 'form_submitted' not in st.session_state:
-    st.session_state.form_submitted = None
 
 # Voeg bericht toe aan geschiedenis
 def add_message(role: str, content: str):
@@ -149,7 +148,6 @@ def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
     st.session_state.selected_subthema = None
-    st.session_state.form_submitted = None
 
 # FAQ zoekfunctie
 def get_faq_answer(user_text: str) -> str:
@@ -226,6 +224,16 @@ def get_answer(user_text: str) -> str:
     else:
         return faq_answer
 
+# Functie om afbeelding naar base64 te converteren
+def image_to_base64(image_path):
+    try:
+        with open(image_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        return f"data:image/png;base64,{encoded_string}"
+    except Exception as e:
+        st.warning(f"⚠️ Kon afbeelding niet laden: {image_path}. Fout: {str(e)}")
+        return ""
+
 # Main UI
 def main():
     # Controleer of reset is geactiveerd
@@ -239,7 +247,6 @@ def main():
         ]
         st.session_state.selected_product = None
         st.session_state.selected_subthema = None
-        st.session_state.form_submitted = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -248,7 +255,7 @@ def main():
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
 
-        # CSS om de button te stylen als een kader met een achtergrondafbeelding
+        # CSS om de kaders te stylen
         st.markdown("""
             <style>
             .logo-container {
@@ -257,61 +264,88 @@ def main():
                 gap: 20px;
                 margin-top: 20px;
             }
-            .logo-button {
+            .logo-box {
                 width: 120px;
                 height: 120px;
                 border: 2px solid #e0e0e0;
                 border-radius: 10px;
                 background-color: #f9f9f9;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+            }
+            .logo-box img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+            .stButton > button {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 120px;
+                height: 120px;
+                background: transparent;
+                border: none;
                 cursor: pointer;
             }
-            .logo-button:hover {
-                background-color: #e0e0e0;
+            .stButton > button:hover {
+                background: rgba(0, 0, 0, 0.1);
             }
             </style>
         """, unsafe_allow_html=True)
 
-        # Maak een formulier om de klikacties te verwerken
-        with st.form(key="product_selection_form"):
-            col1, col2 = st.columns(2)
+        # Maak twee kolommen voor de logo's
+        col1, col2 = st.columns(2)
 
-            with col1:
-                # DocBase logo
-                if os.path.exists("logo-docbase-icon.png"):
+        with col1:
+            # DocBase logo
+            if os.path.exists("logo-docbase-icon.png"):
+                # Converteer afbeelding naar base64
+                docbase_logo_base64 = image_to_base64("logo-docbase-icon.png")
+                if docbase_logo_base64:
                     st.markdown(
-                        f'<button type="submit" name="product" value="DocBase" class="logo-button" style="background-image: url(logo-docbase-icon.png);"></button>',
+                        f'<div class="logo-box"><img src="{docbase_logo_base64}" alt="DocBase"></div>',
                         unsafe_allow_html=True
                     )
-                else:
-                    st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
+                    # Plaats een transparante button over het kader
+                    if st.button("", key="docbase_button"):
+                        st.session_state.selected_product = "DocBase"
+                        st.session_state.history = [
+                            {
+                                'role': 'assistant',
+                                'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
+                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                            }
+                        ]
+                        st.rerun()
+            else:
+                st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
 
-            with col2:
-                # Exact logo
-                if os.path.exists("Exact.png"):
+        with col2:
+            # Exact logo
+            if os.path.exists("Exact.png"):
+                # Converteer afbeelding naar base64
+                exact_logo_base64 = image_to_base64("Exact.png")
+                if exact_logo_base64:
                     st.markdown(
-                        f'<button type="submit" name="product" value="Exact" class="logo-button" style="background-image: url(Exact.png);"></button>',
+                        f'<div class="logo-box"><img src="{exact_logo_base64}" alt="Exact"></div>',
                         unsafe_allow_html=True
                     )
-                else:
-                    st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
-
-            # Verwerk de form submission
-            submitted = st.form_submit_button(label="", use_container_width=True, disabled=True)
-            if submitted:
-                selected = st.session_state.get("product_selection_form", {}).get("product")
-                if selected:
-                    st.session_state.selected_product = selected
-                    st.session_state.history = [
-                        {
-                            'role': 'assistant',
-                            'content': f'👋 Je hebt {selected} gekozen. Kies nu een subthema om verder te gaan.',
-                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                        }
-                    ]
-                    st.rerun()
+                    # Plaats een transparante button over het kader
+                    if st.button("", key="exact_button"):
+                        st.session_state.selected_product = "Exact"
+                        st.session_state.history = [
+                            {
+                                'role': 'assistant',
+                                'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
+                                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                            }
+                        ]
+                        st.rerun()
+            else:
+                st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
         return  # Stop hier totdat een product is gekozen
 
