@@ -110,6 +110,7 @@ if 'history' not in st.session_state:
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
+if 'selected_subthema' not in st.session_state:
     st.session_state.selected_subthema = None
 
 # Voeg bericht toe aan geschiedenis
@@ -194,7 +195,7 @@ def get_ai_answer(user_text: str) -> str:
                 temperature=0.3,
                 max_tokens=150  # Verlaagd om tokens te besparen
             )
-        return "🤖 AI-antwoord: " + resp.choices[0].message.content.strip()
+        return "IPAL Helpdesk-antwoord: " + resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
         st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand of Streamlit Cloud Secrets.")
         print("AuthenticationError: Invalid API key")
@@ -233,11 +234,20 @@ def get_answer(user_text: str) -> str:
 # Main UI
 def main():
     render_chat()
-    vraag = st.chat_input("Stel je vraag over: " + (st.session_state.selected_subthema or "(geen subthema)"))
+    
+    # Gebruik een unieke key voor st.chat_input om reactiviteit te verbeteren
+    vraag = st.chat_input(
+        "Stel je vraag over: " + (st.session_state.selected_subthema or "(geen subthema)"),
+        key="chat_input_" + str(len(st.session_state.history))
+    )
+    
     if vraag:
         add_message('user', vraag)
-        antwoord = get_answer(vraag)
-        add_message('assistant', antwoord)
+        with st.spinner("Antwoord wordt gegenereerd..."):
+            antwoord = get_answer(vraag)
+            add_message('assistant', antwoord)
+        # Forceer een rerun om de UI direct te updaten
+        st.rerun()
 
 if __name__ == '__main__':
     main()
