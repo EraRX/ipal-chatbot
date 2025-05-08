@@ -47,6 +47,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     if os.path.exists(path):
         try:
             df = pd.read_excel(path)
+            st.write("📊 Ingelezen kolommen:", df.columns.tolist())
             required_columns = ['Systeem', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
             if not all(col in df.columns for col in required_columns):
                 st.warning("FAQ-bestand mist vereiste kolommen.")
@@ -110,7 +111,6 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-# Dropdown tonen alleen als er systeemopties zijn
 if systeemopties:
     st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
 
