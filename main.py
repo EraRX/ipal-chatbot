@@ -99,7 +99,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# Genereer product-opties
+# Genereer product- en subthema-opties
 producten = sorted([p for p in faq_df['Systeem'].dropna().unique() if isinstance(p, str) and p.strip()]) if not faq_df.empty else []
 
 # Controleer of FAQ correct is geladen
@@ -118,6 +118,8 @@ if 'history' not in st.session_state:
     ]
 if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
+if 'selected_subthema' not in st.session_state:
+    st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
 
@@ -145,6 +147,7 @@ def on_reset():
     # Zet een vlag om aan te geven dat reset is geactiveerd
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
+    st.session_state.selected_subthema = None
 
 # FAQ zoekfunctie
 def get_faq_answer(user_text: str) -> str:
@@ -175,7 +178,7 @@ def get_ai_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history[-history_limit:]:
         messages.append({'role': m['role'], 'content': m['content']})
-    full_question = f"[{st.session_state.selected_product}] {user_text}"  # Gebruik alleen het product
+    full_question = f"[{st.session_state.selected_subthema}] {user_text}"
     messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Bezig met het genereren van een IPAL-Helpdesk antwoord..."):
@@ -233,6 +236,7 @@ def main():
             }
         ]
         st.session_state.selected_product = None
+        st.session_state.selected_subthema = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -279,7 +283,7 @@ def main():
                     st.session_state.history = [
                         {
                             'role': 'assistant',
-                            'content': '👋 Je hebt DocBase gekozen. Stel hier uw vraag.',
+                            'content': '👋 Je hebt DocBase gekozen. Kies nu een subthema om verder te gaan.',
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                         }
                     ]
@@ -296,7 +300,7 @@ def main():
                     st.session_state.history = [
                         {
                             'role': 'assistant',
-                            'content': '👋 Je hebt Exact gekozen. Stel hier uw vraag.',
+                            'content': '👋 Je hebt Exact gekozen. Kies nu een subthema om verder te gaan.',
                             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
                         }
                     ]
@@ -306,12 +310,29 @@ def main():
 
         return  # Stop hier totdat een product is gekozen
 
-    # Stap 2: Toon chat en verwerk vragen
+    # Stap 2: Subthema-selectie (vervolgscherm)
+    # Filter subthema's op basis van het geselecteerde product
+    subthema_opties = sorted([s for s in faq_df[faq_df['Systeem'] == st.session_state.selected_product]['Subthema'].dropna().unique() if isinstance(s, str) and s.strip()])
+    
+    if not subthema_opties:
+        st.error(f"⚠️ Geen subthema's beschikbaar voor {st.session_state.selected_product}. Controleer of het FAQ-bestand goed geladen is.")
+        st.stop()
+
+    st.session_state.selected_subthema = st.selectbox(
+        f"📁 Kies een subthema voor {st.session_state.selected_product}",
+        ["(Kies een subthema)"] + subthema_opties
+    )
+    
+    if st.session_state.selected_subthema == "(Kies een subthema)":
+        st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
+        st.stop()
+
+    # Stap 3: Toon chat en verwerk vragen
     render_chat()
     
     # Gebruik een unieke key voor st.chat_input om reactiviteit te verbeteren
     vraag = st.chat_input(
-        "Stel je vraag over: " + (st.session_state.selected_product or "(geen product)"),
+        "Stel je vraag over: " + (st.session_state.selected_subthema or "(geen subthema)"),
         key="chat_input_" + str(len(st.session_state.history))
     )
     
