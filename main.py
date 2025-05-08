@@ -66,7 +66,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                         return f"[{display_text}]({url})"
                 return text
             df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
-            df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
+            df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1).str.lower()
             return df
         except Exception as e:
             print(f"Error loading FAQ: {str(e)}")
@@ -110,28 +110,27 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-def get_faq_samenvatting(vraag: str) -> str:
+def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            pattern = re.escape(vraag)
-            matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
-            top = matches.head(3)['Antwoord of oplossing'].tolist()
-            return "\n".join(top) if top else ""
+            keywords = [w.lower() for w in re.findall(r'\w+', user_text) if len(w) > 2]
+            matches = faq_df[faq_df['combined'].apply(lambda x: all(k in x for k in keywords))]
+            if not matches.empty:
+                top = matches.head(3)['Antwoord of oplossing'].tolist()
+                return "Hier zijn mogelijke antwoorden uit onze FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
-    return ""
+    return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
 
 def get_answer(user_text: str) -> str:
-    faq_info = get_faq_samenvatting(user_text)
     system_prompt = (
-        "Je bent IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent. "
-        "Gebruik de meegegeven FAQ-informatie om vragen zo goed mogelijk te beantwoorden."
+        "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. "
+        "Answer questions briefly and clearly."
     )
-    user_prompt = f"Gebruikersvraag: {user_text}\n\nFAQ-informatie:\n{faq_info}"
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt}
-    ]
+    messages = [{'role': 'system', 'content': system_prompt}]
+    for m in st.session_state.history:
+        messages.append({'role': m['role'], 'content': m['content']})
+    messages.append({'role': 'user', 'content': user_text})
     try:
         with st.spinner("Bezig met het genereren van een antwoord..."):
             resp = openai.chat.completions.create(
@@ -143,16 +142,20 @@ def get_answer(user_text: str) -> str:
         return resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
         st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
-        return faq_info or "⚠️ Ongeldige sleutel."
+        print("AuthenticationError: Invalid API key")
+        return faq_fallback(user_text)
     except openai.RateLimitError:
         st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
-        return faq_info or "⚠️ Geen resultaat."
+        print("RateLimitError: API rate limit exceeded")
+        return faq_fallback(user_text)
     except openai.APIConnectionError:
         st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
-        return faq_info or "⚠️ Geen antwoord mogelijk."
+        print("APIConnectionError: Failed to connect to OpenAI")
+        return faq_fallback(user_text)
     except Exception as e:
         st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
-        return faq_info or "⚠️ Geen antwoord gevonden."
+        print(f"Unexpected error: {str(e)}")
+        return faq_fallback(user_text)
 
 def main():
     user_input = st.chat_input('Typ je vraag hier...')
