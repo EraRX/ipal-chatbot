@@ -245,7 +245,7 @@ def main():
     if not st.session_state.selected_product:
         st.markdown("### Kies een product om mee te beginnen:")
 
-        # CSS om de kaders en knoppen te stylen
+        # CSS om de knoppen te stylen
         st.markdown("""
             <style>
             .logo-container {
@@ -253,21 +253,6 @@ def main():
                 justify-content: center;
                 gap: 20px;
                 margin-top: 20px;
-            }
-            .logo-box {
-                width: 120px;
-                height: 120px;
-                border: 2px solid #e0e0e0;
-                border-radius: 10px;
-                background-color: #f9f9f9;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .logo-box img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
             }
             .stButton > button {
                 width: 120px;
@@ -292,9 +277,7 @@ def main():
         with col1:
             # DocBase logo
             if os.path.exists("logo-docbase-icon.png"):
-                st.markdown('<div class="logo-box">', unsafe_allow_html=True)
-                st.image("logo-docbase-icon.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
                     st.session_state.history = [
@@ -311,9 +294,7 @@ def main():
         with col2:
             # Exact logo
             if os.path.exists("Exact.png"):
-                st.markdown('<div class="logo-box">', unsafe_allow_html=True)
-                st.image("Exact.png", use_container_width=False, width=116)  # 116px om binnen de 120px kader te passen
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
                     st.session_state.history = [
