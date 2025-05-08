@@ -10,14 +10,11 @@ from PIL import Image
 # ---------------------------------------------
 # IPAL Directe Interactieve Chatbox
 # ---------------------------------------------
-# Vereisten: streamlit, openai, pandas, pillow, python-dotenv
 
-# Laad API-sleutel en model uit .env
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-# Valideer API-sleutel
 def validate_api_key():
     if not openai.api_key:
         st.error("⚠️ Stel je OPENAI_API_KEY in in een .env-bestand.")
@@ -30,15 +27,12 @@ def validate_api_key():
 
 validate_api_key()
 
-# Paginaconfiguratie
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 
-# Sidebar logo
 logo_path = "logo.png"
 if os.path.exists(logo_path):
     st.sidebar.image(logo_path, width=160)
 
-# Laad en schaal avatar.png
 assistant_avatar = None
 avatar_path = 'avatar.png'
 if os.path.exists(avatar_path):
@@ -48,7 +42,6 @@ if os.path.exists(avatar_path):
     except Exception:
         assistant_avatar = None
 
-# Laad FAQ-data voor fallback
 @st.cache_data
 def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     if os.path.exists(path):
@@ -110,17 +103,20 @@ def on_reset():
 
 st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-def faq_matches(user_text: str) -> str:
+def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            pattern = re.escape(user_text)
+            tokens = user_text.split()
+            if not tokens:
+                return ""
+            pattern = '(?=.*' + ')(?=.*'.join(re.escape(token) for token in tokens) + ')'
             matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
                 top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "📘 Relevante informatie uit de FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
+                return "📌 Antwoord uit de FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
         except Exception as e:
             print(f"FAQ search error: {str(e)}")
-    return ""
+    return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
 
 def get_answer(user_text: str) -> str:
     system_prompt = (
@@ -139,16 +135,23 @@ def get_answer(user_text: str) -> str:
                 temperature=0.3,
                 max_tokens=300
             )
-        ai_reply = resp.choices[0].message.content.strip()
-        faq_reply = faq_matches(user_text)
-        full_reply = f"🤖 **AI-antwoord:**\n{ai_reply}"
-        if faq_reply:
-            full_reply += f"\n\n{faq_reply}"
-        return full_reply
+        return resp.choices[0].message.content.strip()
+    except openai.AuthenticationError:
+        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
+        print("AuthenticationError: Invalid API key")
+        return faq_fallback(user_text)
+    except openai.RateLimitError:
+        st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
+        print("RateLimitError: API rate limit exceeded")
+        return faq_fallback(user_text)
+    except openai.APIConnectionError:
+        st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
+        print("APIConnectionError: Failed to connect to OpenAI")
+        return faq_fallback(user_text)
     except Exception as e:
-        print(f"OpenAI error: {e}")
-        fallback = faq_matches(user_text)
-        return fallback if fallback else "⚠️ Er is een fout opgetreden."
+        st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
+        print(f"Unexpected error: {str(e)}")
+        return faq_fallback(user_text)
 
 def main():
     user_input = st.chat_input('Typ je vraag hier...')
