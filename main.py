@@ -61,6 +61,8 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                 return text
             df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
             df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
+            st.write("✅ FAQ geladen, aantal rijen:", len(df))
+            st.write("📁 Unieke systemen:", df['Systeem'].dropna().unique())
             return df
         except Exception as e:
             print(f"Error loading FAQ: {str(e)}")
@@ -69,7 +71,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-systeemopties = sorted(faq_df['Systeem'].dropna().unique()) if not faq_df.empty else []
+systeemopties = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip()]) if not faq_df.empty else []
 
 if 'history' not in st.session_state:
     st.session_state.history = [
