@@ -1,4 +1,7 @@
 streamlit
-pandas
 openai
+pandas
+pillow
 python-dotenv
+tenacity
+openpyxl
