@@ -17,6 +17,9 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
+print("✅ OPENAI_API_KEY geladen:", bool(openai.api_key))
+print("✅ MODEL ingesteld op:", MODEL)
+
 # Valideer API-sleutel
 def validate_api_key():
     if not openai.api_key:
@@ -133,12 +136,14 @@ def get_answer(user_text: str) -> str:
     messages.append({'role': 'user', 'content': user_text})
     try:
         with st.spinner("Bezig met het genereren van een antwoord..."):
+            print("➡️ Verstuur API-call...")
             resp = openai.chat.completions.create(
                 model=MODEL,
                 messages=messages,
                 temperature=0.3,
                 max_tokens=300
             )
+            print("✅ Antwoord ontvangen:", resp)
         return resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
         st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
