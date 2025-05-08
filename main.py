@@ -77,7 +77,7 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                 return text
             return text
         
-        df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply291(convert_hyperlink)
+        df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)  # Corrected from apply291
         # Gebruik alle kolommen behalve 'Antwoord of oplossing' voor zoekfunctionaliteit
         search_columns = [col for col in required_columns if col != 'Antwoord of oplossing']
         df['combined'] = df[search_columns].fillna('').agg(' '.join, axis=1)
