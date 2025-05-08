@@ -74,22 +74,11 @@ if 'history' not in st.session_state:
     st.session_state.history = [
         {
             'role': 'assistant',
-            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Kies eerst een onderwerp hieronder en stel daarna je vraag.',
+            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
             'time': datetime.now().strftime('%Y-%m-%d %H:%M')
         }
     ]
-
-st.sidebar.button('🔄 Nieuw gesprek', on_click=lambda: st.experimental_rerun())
-
-# Toon dropdown altijd
-keuze = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
-
-# Stop als nog niets gekozen is
-if keuze == "(Kies een onderwerp)":
-    st.stop()
-
-# Bewaar selectie
-st.session_state.selected_systeem = keuze
+    st.session_state.selected_systeem = None
 
 def add_message(role: str, content: str):
     st.session_state.history.append({
@@ -107,6 +96,25 @@ def render_chat():
         content = msg['content']
         timestamp = msg['time']
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{content}\n*{timestamp}*")
+
+def on_reset():
+    st.session_state.history = [
+        {
+            'role': 'assistant',
+            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
+            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+        }
+    ]
+    st.session_state.selected_systeem = None
+    st.rerun()
+
+st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
+
+st.session_state.selected_systeem = st.selectbox("📁 Kies een onderwerp", ["(Kies een onderwerp)"] + systeemopties)
+
+if st.session_state.selected_systeem == "(Kies een onderwerp)":
+    st.warning("⚠️ Kies een onderwerp voordat je een vraag stelt.")
+    st.stop()
 
 def faq_fallback(user_text: str) -> str:
     if not faq_df.empty:
@@ -128,7 +136,8 @@ def get_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history:
         messages.append({'role': m['role'], 'content': m['content']})
-    messages.append({'role': 'user', 'content': user_text})
+    full_question = f"[{st.session_state.selected_systeem}] {user_text}"
+    messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Bezig met het genereren van een antwoord..."):
             resp = openai.chat.completions.create(
