@@ -112,6 +112,8 @@ if 'history' not in st.session_state:
     ]
 if 'selected_subthema' not in st.session_state:
     st.session_state.selected_subthema = None
+if 'reset_triggered' not in st.session_state:
+    st.session_state.reset_triggered = False
 
 # Voeg bericht toe aan geschiedenis
 def add_message(role: str, content: str):
@@ -134,27 +136,8 @@ def render_chat():
 
 # Reset gesprek
 def on_reset():
-    st.session_state.history = [
-        {
-            'role': 'assistant',
-            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
-            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-        }
-    ]
-    st.session_state.selected_subthema = None
-    st.rerun()
-
-st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
-
-# Selectbox voor subthema-keuze
-if subthema_opties:
-    st.session_state.selected_subthema = st.selectbox("📁 Kies een ondewerp", ["(Kies een thema)"] + subthema_opties)
-    if st.session_state.selected_subthema == "(Kies een subthema)":
-        st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
-        st.stop()
-else:
-    st.error("⚠️ Geen subthema's beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
-    st.stop()
+    # Zet een vlag om aan te geven dat reset is geactiveerd
+    st.session_state.reset_triggered = True
 
 # FAQ zoekfunctie
 def get_faq_answer(user_text: str) -> str:
@@ -195,7 +178,7 @@ def get_ai_answer(user_text: str) -> str:
                 temperature=0.3,
                 max_tokens=150  # Verlaagd om tokens te besparen
             )
-        return "IPAL Helpdesk-antwoord: " + resp.choices[0].message.content.strip()
+        return "🤖 AI-antwoord: " + resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
         st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand of Streamlit Cloud Secrets.")
         print("AuthenticationError: Invalid API key")
@@ -233,6 +216,30 @@ def get_answer(user_text: str) -> str:
 
 # Main UI
 def main():
+    # Controleer of reset is geactiveerd
+    if st.session_state.reset_triggered:
+        st.session_state.history = [
+            {
+                'role': 'assistant',
+                'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
+                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+            }
+        ]
+        st.session_state.selected_subthema = None
+        st.session_state.reset_triggered = False
+
+    st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
+
+    # Selectbox voor subthema-keuze
+    if subthema_opties:
+        st.session_state.selected_subthema = st.selectbox("📁 Kies een subthema", ["(Kies een subthema)"] + subthema_opties)
+        if st.session_state.selected_subthema == "(Kies een subthema)":
+            st.warning("⚠️ Kies een subthema voordat je een vraag stelt.")
+            st.stop()
+    else:
+        st.error("⚠️ Geen subthema's beschikbaar. Controleer of het FAQ-bestand goed geladen is.")
+        st.stop()
+
     render_chat()
     
     # Gebruik een unieke key voor st.chat_input om reactiviteit te verbeteren
