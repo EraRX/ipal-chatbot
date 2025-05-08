@@ -1,169 +1,175 @@
 import os
-from datetime import datetime
-import streamlit as st
-import openai
+import io
+import traceback
+import base64
 import pandas as pd
-import re
-from dotenv import load_dotenv
-from PIL import Image
+import streamlit as st
+import streamlit.components.v1 as components
+import openai
 
-# ---------------------------------------------
-# IPAL Directe Interactieve Chatbox
-# ---------------------------------------------
-# Vereisten: streamlit, openai, pandas, pillow, python-dotenv
+# ───────────────────────── API Key voor Streamlit Cloud ─────────────────────────
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Laad API-sleutel en model uit .env
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+# ───────────────────────── Streamlit Pagina ─────────────────────────
+st.set_page_config(page_title="Helpdesk Zoekfunctie", layout="wide")
 
-# Valideer API-sleutel
-def validate_api_key():
-    if not openai.api_key:
-        st.error("⚠️ Stel je OPENAI_API_KEY in in een .env-bestand.")
+# ───────────────────────── CSS & HEADER ─────────────────────────
+css = '''
+<style>
+:root {
+  --accent: #2A44AD;
+  --accent2: #5A6AF4;
+  --page-bg: #ADD8E6;
+  --card-bg: #FFFFFF;
+  --text-color: #0F274A;
+  --border-color: #E0E0E0;
+}
+html, body, .stApp {
+  background-color: var(--page-bg) !important;
+  color: var(--text-color) !important;
+  font-family: 'Inter', sans-serif;
+}
+.topbar {
+  width: 100vw; position: relative; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  padding: 10px 20px; display:flex; flex-wrap:wrap;
+  align-items:center; justify-content:center; gap:12px;
+  border-radius:0 0 20px 20px; box-shadow:0 4px 10px rgba(0,0,0,0.12);
+}
+.topbar img { height:48px; }
+.topbar h1 {
+  flex:1 1 auto; text-align:center; color:#FFF;
+  font-size:1.6rem; font-weight:600; margin:0;
+}
+.stSelectbox>div, .stTextInput>div>div {
+  background-color:#FFF !important;
+  color: var(--text-color) !important;
+  border:1px solid var(--border-color) !important;
+  border-radius:8px; padding:6px 10px;
+}
+.stSelectbox label, .stTextInput label, .stRadio label {
+  color: var(--accent) !important; font-weight:600;
+}
+.stButton>button, .stDownloadButton>button {
+  background-color: var(--accent) !important;
+  color:#FFF !important; font-weight:600;
+  border-radius:8px !important;
+}
+.stButton>button:hover, .stDownloadButton>button:hover {
+  background-color: var(--accent2) !important;
+}
+.card {
+  background: var(--card-bg);
+  border:1px solid var(--border-color);
+  border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);
+  padding:16px; margin:16px 0;
+}
+</style>
+''' 
+st.markdown(css, unsafe_allow_html=True)
+
+# Logo's in header
+ip = base64.b64encode(open("logo.png","rb").read()).decode()
+db = base64.b64encode(open("logo-docbase-icon.png","rb").read()).decode()
+ex = base64.b64encode(open("Exact.png","rb").read()).decode()
+header_html = f'''<div class="topbar">
+  <img src="data:image/png;base64,{ip}" alt="IPAL">
+  <img src="data:image/png;base64,{db}" alt="DocBase">
+  <img src="data:image/png;base64,{ex}" alt="Exact">
+  <h1>🔍 Helpdesk Zoekfunctie</h1>
+</div>'''
+st.markdown(header_html, unsafe_allow_html=True)
+
+# ───────────────────────── Authentication ─────────────────────────
+if 'auth' not in st.session_state:
+    st.session_state.auth = False
+
+if not st.session_state.auth:
+    st.title('🔐 Helpdesk Toegang')
+    pwd = st.text_input('Voer wachtwoord in:', type='password')
+    if not pwd:
         st.stop()
-    try:
-        openai.models.list()
-    except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OPENAI_API_KEY. Controleer je .env-bestand.")
+    if pwd != 'ipal2024':
+        st.error('Onjuist wachtwoord.')
         st.stop()
+    # correct
+    st.session_state.auth = True
+    st.success('Toegang verleend! De FAQ wordt geladen...')
+    st.stop()
 
-validate_api_key()
+# ───────────────────────── Data Loading ─────────────────────────
+try:
+    df = pd.read_excel('faq.xlsx')
+except Exception:
+    st.error('Fout bij inlezen van faq.xlsx')
+    st.code(traceback.format_exc())
+    st.stop()
 
-# Paginaconfiguratie
-st.set_page_config(page_title="IPAL Chatbox", layout="centered")
+# Combineer kolommen voor zoek
+cols = ['Systeem','Subthema','Categorie','Omschrijving melding','Toelichting melding','Soort melding','Antwoord of oplossing']
+df['zoek'] = df[cols].fillna('').astype(str).agg(' '.join, axis=1)
 
-# Laad en schaal avatar.png
-assistant_avatar = None
-avatar_path = 'avatar.png'
-if os.path.exists(avatar_path):
-    try:
-        img = Image.open(avatar_path)
-        assistant_avatar = img.resize((img.width * 2, img.height * 2), Image.Resampling.LANCZOS)
-    except Exception:
-        assistant_avatar = None
+# ───────────────────────── Search Interface ─────────────────────────
+st.markdown('---')
+mode = st.radio('🔎 Kies zoekmethode', ['🎯 Gefilterd', '🔍 Vrij zoeken'], horizontal=True)
 
-# Laad FAQ-data voor fallback
-@st.cache_data
-def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
-    if os.path.exists(path):
+if mode == '🎯 Gefilterd':
+    st.subheader('🎯 Gefilterde zoekopdracht')
+    temp = df.copy()
+    for field in cols[:-1]:
+        sel = st.selectbox(field, sorted(temp[field].dropna().unique()), key=field)
+        temp = temp[temp[field] == sel]
+    results = temp
+else:
+    st.subheader('🔍 Vrij zoeken')
+    q = st.text_input('Zoekterm:')
+    results = df[df['zoek'].str.contains(q, case=False, na=False)] if q else pd.DataFrame()
+
+# ───────────────────────── Results Display ─────────────────────────
+if results.empty:
+    st.info('Geen resultaten gevonden.')
+else:
+    st.write(f'### 📄 {len(results)} resultaat/resultaten gevonden')
+    for _, row in results.iterrows():
+        card_html = f"""
+<div class='card'>
+  <strong>💬 Antwoord:</strong><br>{row['Antwoord of oplossing'] or '-'}<hr>
+  📁 <b>Systeem:</b> {row['Systeem']}<br>
+  🗂️ <b>Subthema:</b> {row['Subthema']}<br>
+  📌 <b>Categorie:</b> {row['Categorie']}<br>
+  📝 <b>Omschrijving melding:</b> {row['Omschrijving melding']}<br>
+  ℹ️ <b>Toelichting:</b> {row['Toelichting melding']}<br>
+  🏷️ <b>Soort:</b> {row['Soort melding']}
+</div>"""
+        height = 260 + (len(str(row['Antwoord of oplossing']))//80)*18
+        components.html(card_html, height=height, scrolling=False)
+
+    # RAG: natuurlijke taal generatie
+    vraag = st.text_input('🗣️ Formuleer je vraag in eigen woorden:')
+    if vraag:
+        top3 = results['Antwoord of oplossing'].dropna().head(3).tolist()
+        context = "\n".join(f"- {a}" for a in top3)
+        system = "Je bent een helpdeskassistent. Geef een helder, vloeiend antwoord in volledige zinnen." 
+        user = f"Gebruikersvraag:\n{vraag}\n\nKennis uit FAQ:\n{context}\n\nFormuleer een zelfstandig antwoord op de vraag."
         try:
-            df = pd.read_excel(path)
-            required_columns = ['Systeem', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
-            if not all(col in df.columns for col in required_columns):
-                st.warning("FAQ-bestand mist vereiste kolommen.")
-                return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
-            df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
-            return df
-        except Exception as e:
-            print(f"Error loading FAQ: {str(e)}")
-            return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
-    return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
-
-faq_df = load_faq()
-
-# Functie om chatgeschiedenis te (re)initialiseren
-def reset_history():
-    st.session_state.history = [
-        {
-            'role': 'assistant',
-            'content': '👋 Hallo! Ik ben de IPAL Chatbox. Hoe kan ik je helpen vandaag?',
-            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-        }
-    ]
-
-if 'history' not in st.session_state:
-    reset_history()
-
-# Voeg bericht toe aan geschiedenis
-def add_message(role: str, content: str):
-    st.session_state.history.append({
-        'role': role,
-        'content': content,
-        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-    })
-    # Beperk geschiedenisgrootte
-    MAX_HISTORY = 100
-    if len(st.session_state.history) > MAX_HISTORY:
-        st.session_state.history = st.session_state.history[-MAX_HISTORY:]
-
-# Toon chatgeschiedenis
-def render_chat():
-    for msg in st.session_state.history:
-        avatar = assistant_avatar if (msg['role'] == 'assistant' and assistant_avatar) else ('🤖' if msg['role'] == 'assistant' else '🙂')
-        content = msg['content']
-        timestamp = msg['time']
-        st.chat_message(msg['role'], avatar=avatar).write(f"{content}\n*{timestamp}*")
-
-# Sidebar-knop om gesprek te resetten
-def on_reset():
-    reset_history()
-    st.rerun()
-
-if assistant_avatar:
-    st.sidebar.image(assistant_avatar, width=160)
-st.sidebar.button('Nieuw gesprek', on_click=on_reset)
-
-# FAQ fallback functie
-def faq_fallback(user_text: str) -> str:
-    if not faq_df.empty:
-        try:
-            # Escape special characters for regex
-            pattern = re.escape(user_text)
-            matches = faq_df[faq_df['combined'].str.contains(pattern, case=False, na=False, regex=True)]
-            if not matches.empty:
-                top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "Hier zijn mogelijke antwoorden uit onze FAQ:\n" + "\n".join(f"- {ans}" for ans in top)
-        except Exception as e:
-            print(f"FAQ search error: {str(e)}")
-    return "⚠️ Geen antwoord gevonden in FAQ. Probeer je vraag specifieker te stellen."
-
-# Antwoordfunctie: AI + FAQ-fallback
-def get_answer(user_text: str) -> str:
-    system_prompt = (
-        "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. "
-        "Answer questions briefly and clearly."
-    )
-    messages = [{'role': 'system', 'content': system_prompt}]
-    for m in st.session_state.history:
-        messages.append({'role': m['role'], 'content': m['content']})
-    messages.append({'role': 'user', 'content': user_text})
-    try:
-        with st.spinner("Bezig met het genereren van een antwoord..."):
-            resp = openai.chat.completions.create(
-                model=MODEL,
-                messages=messages,
+            resp = openai.ChatCompletion.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role":"system","content":system},
+                    {"role":"user","content":user},
+                ],
                 temperature=0.3,
                 max_tokens=300
             )
-        return resp.choices[0].message.content.strip()
-    except openai.AuthenticationError:
-        st.error("⚠️ Ongeldige OpenAI API-sleutel. Controleer je .env-bestand.")
-        print("AuthenticationError: Invalid API key")
-        return faq_fallback(user_text)
-    except openai.RateLimitError:
-        st.error("⚠️ Limiet van OpenAI API bereikt. Probeer later opnieuw.")
-        print("RateLimitError: API rate limit exceeded")
-        return faq_fallback(user_text)
-    except openai.APIConnectionError:
-        st.error("⚠️ Verbindingsprobleem met OpenAI. Controleer je internetverbinding.")
-        print("APIConnectionError: Failed to connect to OpenAI")
-        return faq_fallback(user_text)
-    except Exception as e:
-        st.error("⚠️ Er ging iets mis bij het ophalen van het antwoord. Probeer opnieuw.")
-        print(f"Unexpected error: {str(e)}")
-        return faq_fallback(user_text)
+            antwoord = resp.choices[0].message.content.strip()
+            st.markdown("**💬 Geformuleerd antwoord:**")
+            st.write(antwoord)
+        except Exception as e:
+            st.error("Fout bij genereren van antwoord.")
+            st.code(traceback.format_exc())
 
-# Main UI
-def main():
-    user_input = st.chat_input('Typ je vraag hier...')
-    if user_input and user_input.strip() and len(user_input) <= 500:
-        add_message('user', user_input)
-        answer = get_answer(user_input)
-        add_message('assistant', answer)
-    elif user_input and len(user_input) > 500:
-        add_message('assistant', '⚠️ Je bericht is te lang. Houd het onder 500 tekens.')
-    render_chat()
-
-if __name__ == '__main__':
-    main()
+# ───────────────────────── Download ─────────────────────────
+if mode == '🔍 Vrij zoeken' and not results.empty:
+    buf = io.BytesIO()
+    results.drop(columns=['zoek'], errors='ignore').to_excel(buf, index=False)
+    st.download_button('📥 Download Excel', buf.getvalue(), 'zoekresultaten.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
