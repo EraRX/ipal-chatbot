@@ -243,7 +243,7 @@ def main():
 
     # Stap 1: Productselectie (startscherm)
     if not st.session_state.selected_product:
-        st.markdown("### Kies een product om mee te beginnen:")
+        st.markdown("### Welkom bij de IPAL helpdesk, maak hier uw keuze:")
 
         # CSS om de knoppen te stylen
         st.markdown("""
