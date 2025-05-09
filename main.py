@@ -186,7 +186,7 @@ def get_ai_answer(user_text: str) -> str:
                 model=MODEL,
                 messages=messages,
                 temperature=0.3,
-                max_tokens=150  # Verlaagd om tokens te besparen
+                max_tokens=1000  # Verlaagd om tokens te besparen
             )
         return "IPAL-Helpdesk antwoord: " + resp.choices[0].message.content.strip()
     except openai.AuthenticationError:
