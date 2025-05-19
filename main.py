@@ -136,16 +136,14 @@ def main():
                 st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
-                    st.session_state.history = []
-                    add_message('assistant', 'Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Kies nu uit de keuzelijst.')
+                    add_message('assistant', 'Je hebt DocBase gekozen. Kies nu een module om verder te gaan.')
                     st.rerun()
         with col2:
             if os.path.exists("Exact.png"):
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
-                    st.session_state.history = []
-                    add_message('assistant', 'Hallo, ik ben de IPAL AI-assistent. Je hebt Exact gekozen. Kies nu uit de keuzelijst.')
+                    add_message('assistant', 'Je hebt Exact gekozen. Kies nu een module om verder te gaan.')
                     st.rerun()
         render_chat()
         return
@@ -164,7 +162,7 @@ def main():
             render_chat()
             return
         else:
-            add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {st.session_state.selected_module} gekozen. Stel nu je vraag hieronder.")
+            add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {st.session_state.selected_module} gekozen. Welke vraag heb je?")
 
     render_chat()
     vraag = st.chat_input(f"Stel je vraag over {st.session_state.selected_module}:", key="chat_input_" + str(len(st.session_state.history)))
