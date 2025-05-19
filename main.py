@@ -113,8 +113,6 @@ if 'history' not in st.session_state:
     st.session_state.history = []
 if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
-if 'selected_subthema' not in st.session_state:
-    st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
 
@@ -141,7 +139,6 @@ def render_chat():
 def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
-    st.session_state.selected_subthema = None
 
 # Functie om informatie van de Exact kennisbank te halen (placeholder)
 def get_exact_knowledge_base_info(query: str) -> str:
@@ -167,13 +164,10 @@ def get_exact_knowledge_base_info(query: str) -> str:
 def get_faq_answer(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            # Filter FAQ op basis van het geselecteerde product en subthema
-            df_filtered = faq_df[
-                (faq_df['Systeem'] == st.session_state.selected_product) &
-                (faq_df['Subthema'] == st.session_state.selected_subthema)
-            ]
+            # Filter FAQ op basis van het geselecteerde product
+            df_filtered = faq_df[faq_df['Systeem'] == st.session_state.selected_product]
             if df_filtered.empty:
-                return "Geen FAQ-items gevonden voor dit product en subthema."
+                return "Geen FAQ-items gevonden voor dit product."
             
             pattern = re.escape(user_text)
             matches = df_filtered[df_filtered['combined'].str.contains(pattern, case=False, na=False, regex=True)]
@@ -210,7 +204,7 @@ def get_ai_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history[-history_limit:]:
         messages.append({'role': m['role'], 'content': m['content']})
-    full_question = f"[{st.session_state.selected_product}] [{st.session_state.selected_subthema}] {user_text}"
+    full_question = f"[{st.session_state.selected_product}] {user_text}"
     messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Even nadenken..."):
@@ -252,7 +246,7 @@ def get_answer(user_text: str) -> str:
         return "Ik kan alleen vragen beantwoorden over Exact en DocBase. Waarmee kan ik u helpen?"
 
     knowledge_base_answer = None
-    if st.session_state.selected_product.lower() == "exact":
+    if "exact" in st.session_state.selected_product.lower():
         knowledge_base_answer = get_exact_knowledge_base_info(user_text)
 
     faq_answer = get_faq_answer(user_text)
@@ -280,7 +274,6 @@ def main():
     if st.session_state.reset_triggered:
         st.session_state.history = []
         st.session_state.selected_product = None
-        st.session_state.selected_subthema = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -323,9 +316,8 @@ def main():
                 st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
-                    # Gecombineerd bericht
-                    st.session_state.history = []  # Reset geschiedenis om oude begroeting te verwijderen
-                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Ik wil je graag helpen, maar kies een subthema om verder te gaan.")
+                    st.session_state.history = []  # Reset geschiedenis
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Stel nu je vraag hieronder.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
@@ -334,10 +326,9 @@ def main():
             if os.path.exists("Exact.png"):
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
-                    st.session_state.selected_product = "Exact"
-                    # Gecombineerd bericht
-                    st.session_state.history = []  # Reset geschiedenis om oude begroeting te verwijderen
-                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt Exact gekozen. Ik wil je graag helpen, maar kies een subthema om verder te gaan.")
+                    st.session_state.selected_product = "Exact Online (Module: Bank)"  # Specifieke module
+                    st.session_state.history = []  # Reset geschiedenis
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt Exact Online (Module: Bank) gekozen. Stel nu je vraag hieronder.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
@@ -345,32 +336,11 @@ def main():
         render_chat()
         return
 
-    # Subthema-selectie
-    subthema_opties = sorted([
-        s for s in faq_df[faq_df['Systeem'] == st.session_state.selected_product]['Subthema'].dropna().unique()
-        if isinstance(s, str) and s.strip()
-    ])
-    
-    if not subthema_opties:
-        st.error(f"Geen subthema's beschikbaar voor {st.session_state.selected_product}. Controleer of het FAQ-bestand goed geladen is.")
-        st.stop()
-
-    st.session_state.selected_subthema = st.selectbox(
-        f"Kies een subthema voor {st.session_state.selected_product}:",
-        ["(Kies een subthema)"] + subthema_opties,
-        key="subthema_select"
-    )
-
-    if st.session_state.selected_subthema == "(Kies een subthema)":
-        st.warning("Kies een subthema voordat je een vraag stelt.")
-        render_chat()
-        return
-
     # Toon chat en verwerk vragen
     render_chat()
     
     vraag = st.chat_input(
-        f"Stel je vraag over {st.session_state.selected_product} - {st.session_state.selected_subthema}:",
+        f"Stel je vraag over {st.session_state.selected_product}:",
         key="chat_input_" + str(len(st.session_state.history))
     )
     
