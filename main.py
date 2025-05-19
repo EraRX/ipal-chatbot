@@ -110,13 +110,7 @@ if faq_df.empty or not producten:
 
 # Initialiseren van sessiestatus
 if 'history' not in st.session_state:
-    st.session_state.history = [
-        {
-            'role': 'assistant',
-            'content': 'Hallo, ik ben de IPAL AI-assistent, waarmee kan ik u helpen?',
-            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-        }
-    ]
+    st.session_state.history = []
 if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
 if 'selected_subthema' not in st.session_state:
@@ -284,13 +278,7 @@ def get_answer(user_text: str) -> str:
 # Main UI
 def main():
     if st.session_state.reset_triggered:
-        st.session_state.history = [
-            {
-                'role': 'assistant',
-                'content': 'Hallo, ik ben de IPAL AI-assistent, waarmee kan ik u helpen?',
-                'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-            }
-        ]
+        st.session_state.history = []
         st.session_state.selected_product = None
         st.session_state.selected_subthema = None
         st.session_state.reset_triggered = False
@@ -298,6 +286,10 @@ def main():
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
     if not st.session_state.selected_product:
+        # Toon alleen de welkomstboodschap als er nog geen product is gekozen
+        if not st.session_state.history:
+            add_message('assistant', 'Hallo, ik ben de IPAL AI-assistent, waarmee kan ik u helpen?')
+
         st.markdown("### Welkom bij de IPAL-Helpdesk:")
         st.markdown("""
             <style>
@@ -331,11 +323,9 @@ def main():
                 st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
-                    st.session_state.history.append({
-                        'role': 'assistant',
-                        'content': 'Je hebt DocBase gekozen. Kies een subthema om verder te gaan.',
-                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                    })
+                    # Gecombineerd bericht
+                    st.session_state.history = []  # Reset geschiedenis om oude begroeting te verwijderen
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Ik wil je graag helpen, maar kies een subthema om verder te gaan.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
@@ -345,15 +335,14 @@ def main():
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
-                    st.session_state.history.append({
-                        'role': 'assistant',
-                        'content': 'Je hebt Exact gekozen. Kies een subthema om verder te gaan.',
-                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                    })
+                    # Gecombineerd bericht
+                    st.session_state.history = []  # Reset geschiedenis om oude begroeting te verwijderen
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt Exact gekozen. Ik wil je graag helpen, maar kies een subthema om verder te gaan.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
+        render_chat()
         return
 
     # Subthema-selectie
