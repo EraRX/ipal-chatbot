@@ -5,3 +5,5 @@ pillow
 python-dotenv
 tenacity
 openpyxl
+requests
+beautifulsoup4
