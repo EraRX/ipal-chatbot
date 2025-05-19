@@ -104,14 +104,30 @@ faq_df = load_faq()
 # Genereer product-opties (alleen Exact en DocBase als hoofdkeuzes)
 producten = ["Exact", "DocBase"]
 
+# Handmatig gedefinieerde module-opties (tijdelijke oplossing)
+module_opties_exact = [
+    "Exact Online (Module: Bank)",
+    "Exact Online (Module: Facturatie)",
+    "Exact Online (Module: Boekhouding)",
+    "Exact Online (Module: CRM)"
+]
+module_opties_docbase = ["DocBase"]
+
+# Probeer modules uit FAQ te halen (voor toekomstig gebruik)
+try:
+    if not faq_df.empty:
+        module_opties_exact_from_faq = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "Exact" in s])
+        module_opties_docbase_from_faq = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "DocBase" in s])
+        if module_opties_exact_from_faq:
+            module_opties_exact = module_opties_exact_from_faq
+        if module_opties_docbase_from_faq:
+            module_opties_docbase = module_opties_docbase_from_faq
+except Exception as e:
+    st.warning(f"Kon modules niet laden uit FAQ: {str(e)}. Gebruik handmatig gedefinieerde modules.")
+
 # Controleer of FAQ correct is geladen
 if faq_df.empty:
-    st.error("⚠️ FAQ-bestand is niet correct geladen. Controleer het bestand en probeer opnieuw.")
-    st.stop()
-
-# Genereer module-opties uit faq_df['Systeem']
-module_opties_exact = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "Exact" in s])
-module_opties_docbase = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "DocBase" in s])
+    st.warning("⚠️ FAQ-bestand is niet correct geladen. Gebruik handmatig gedefinieerde modules.")
 
 # Initialiseren van sessiestatus
 if 'history' not in st.session_state:
