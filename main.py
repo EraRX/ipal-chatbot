@@ -43,7 +43,7 @@ if os.path.exists(logo_path):
     st.sidebar.image(logo_path, width=160)
 
 assistant_avatar = None
-avatar_path = 'avatar.png'
+avatar_path = 'aichatbox.jpg'
 if os.path.exists(avatar_path):
     try:
         img = Image.open(avatar_path)
@@ -162,7 +162,7 @@ def main():
             return
         else:
             st.session_state.selected_module = keuze
-            st.session_state.history = []  # Reset gesprek
+            st.session_state.history = []
             add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {keuze} gekozen. Welke vraag heb je?")
             st.rerun()
 
