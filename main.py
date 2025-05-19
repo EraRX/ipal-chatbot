@@ -114,8 +114,50 @@ def on_reset():
     st.session_state.selected_product = None
     st.session_state.selected_module = None
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
+def get_ai_answer(user_text: str) -> str:
+    system_prompt = "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. Answer clearly and concisely."
+    history_limit = 10
+    messages = [{'role': 'system', 'content': system_prompt}]
+    for m in st.session_state.history[-history_limit:]:
+        messages.append({'role': m['role'], 'content': m['content']})
+    full_question = f"[{st.session_state.selected_module}] {user_text}"
+    messages.append({'role': 'user', 'content': full_question})
+    try:
+        resp = openai.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=400
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception as e:
+        return None
+
+def get_faq_answer(user_text: str) -> str:
+    if not faq_df.empty:
+        try:
+            df_filtered = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
+            pattern = re.escape(user_text)
+            matches = df_filtered[df_filtered['combined'].str.contains(pattern, case=False, na=False, regex=True)]
+            if not matches.empty:
+                top = matches.head(3)['Antwoord of oplossing'].tolist()
+                return "\n".join(f"- {ans}" for ans in top)
+        except Exception as e:
+            return "FAQ-zoekfout."
+    return None
+
 def get_answer(user_text: str) -> str:
-    return f"IPAL-Helpdesk antwoord: Je vroeg: '{user_text}'. Meer functionaliteit volgt binnenkort."
+    ai = get_ai_answer(user_text)
+    faq = get_faq_answer(user_text)
+    if ai and faq:
+        return f"IPAL-Helpdesk antwoord:\n{ai}\n\nVeelgestelde vragen:\n{faq}"
+    elif faq:
+        return f"IPAL-Helpdesk antwoord uit FAQ:\n{faq}"
+    elif ai:
+        return f"IPAL-Helpdesk antwoord:\n{ai}"
+    else:
+        return "⚠️ Geen antwoord gevonden. Probeer je vraag anders te formuleren."
 
 def main():
     if st.session_state.reset_triggered:
