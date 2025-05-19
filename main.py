@@ -136,14 +136,12 @@ def main():
                 st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
-                    add_message('assistant', 'Je hebt DocBase gekozen. Kies nu een module om verder te gaan.')
                     st.rerun()
         with col2:
             if os.path.exists("Exact.png"):
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
-                    add_message('assistant', 'Je hebt Exact gekozen. Kies nu een module om verder te gaan.')
                     st.rerun()
         render_chat()
         return
@@ -153,16 +151,19 @@ def main():
         if not opties:
             st.error("⚠️ Geen subthema's beschikbaar voor dit product.")
             return
-        st.session_state.selected_module = st.selectbox(
+        keuze = st.selectbox(
             f"📁 Kies een module voor {st.session_state.selected_product}:",
-            ["(Kies een module)"] + opties
+            ["(Kies een module)"] + opties,
+            key="module_select"
         )
-        if st.session_state.selected_module == "(Kies een module)":
+        if keuze == "(Kies een module)":
             st.warning("Kies een module voordat je een vraag stelt.")
             render_chat()
             return
         else:
-            add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {st.session_state.selected_module} gekozen. Welke vraag heb je?")
+            st.session_state.selected_module = keuze
+            add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {keuze} gekozen. Welke vraag heb je?")
+            st.rerun()
 
     render_chat()
     vraag = st.chat_input(f"Stel je vraag over {st.session_state.selected_module}:", key="chat_input_" + str(len(st.session_state.history)))
