@@ -162,6 +162,7 @@ def main():
             return
         else:
             st.session_state.selected_module = keuze
+            st.session_state.history = []  # Reset gesprek
             add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {keuze} gekozen. Welke vraag heb je?")
             st.rerun()
 
