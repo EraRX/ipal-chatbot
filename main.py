@@ -119,6 +119,8 @@ if 'history' not in st.session_state:
     ]
 if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
+if 'selected_subthema' not in st.session_state:
+    st.session_state.selected_subthema = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
 
@@ -145,6 +147,7 @@ def render_chat():
 def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
+    st.session_state.selected_subthema = None
 
 # Functie om informatie van de Exact kennisbank te halen (placeholder)
 def get_exact_knowledge_base_info(query: str) -> str:
@@ -170,9 +173,13 @@ def get_exact_knowledge_base_info(query: str) -> str:
 def get_faq_answer(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            df_filtered = faq_df[faq_df['Systeem'] == st.session_state.selected_product]
+            # Filter FAQ op basis van het geselecteerde product en subthema
+            df_filtered = faq_df[
+                (faq_df['Systeem'] == st.session_state.selected_product) &
+                (faq_df['Subthema'] == st.session_state.selected_subthema)
+            ]
             if df_filtered.empty:
-                return "Geen FAQ-items gevonden voor dit product."
+                return "Geen FAQ-items gevonden voor dit product en subthema."
             
             pattern = re.escape(user_text)
             matches = df_filtered[df_filtered['combined'].str.contains(pattern, case=False, na=False, regex=True)]
@@ -209,7 +216,7 @@ def get_ai_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history[-history_limit:]:
         messages.append({'role': m['role'], 'content': m['content']})
-    full_question = f"[{st.session_state.selected_product}] {user_text}"
+    full_question = f"[{st.session_state.selected_product}] [{st.session_state.selected_subthema}] {user_text}"
     messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Even nadenken..."):
@@ -285,6 +292,7 @@ def main():
             }
         ]
         st.session_state.selected_product = None
+        st.session_state.selected_subthema = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -323,13 +331,11 @@ def main():
                 st.image("logo-docbase-icon.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
-                    st.session_state.history = [
-                        {
-                            'role': 'assistant',
-                            'content': '👋 Je hebt DocBase gekozen. Stel hier uw vraag.',
-                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                        }
-                    ]
+                    st.session_state.history.append({
+                        'role': 'assistant',
+                        'content': 'Je hebt DocBase gekozen. Kies een subthema om verder te gaan.',
+                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                    })
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
@@ -339,29 +345,49 @@ def main():
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
                     st.session_state.selected_product = "Exact"
-                    st.session_state.history = [
-                        {
-                            'role': 'assistant',
-                            'content': '👋 Je hebt Exact gekozen. Stel hier uw vraag.',
-                            'time': datetime.now().strftime('%Y-%m-%d %H:%M')
-                        }
-                    ]
+                    st.session_state.history.append({
+                        'role': 'assistant',
+                        'content': 'Je hebt Exact gekozen. Kies een subthema om verder te gaan.',
+                        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+                    })
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
 
         return
 
+    # Subthema-selectie
+    subthema_opties = sorted([
+        s for s in faq_df[faq_df['Systeem'] == st.session_state.selected_product]['Subthema'].dropna().unique()
+        if isinstance(s, str) and s.strip()
+    ])
+    
+    if not subthema_opties:
+        st.error(f"Geen subthema's beschikbaar voor {st.session_state.selected_product}. Controleer of het FAQ-bestand goed geladen is.")
+        st.stop()
+
+    st.session_state.selected_subthema = st.selectbox(
+        f"Kies een subthema voor {st.session_state.selected_product}:",
+        ["(Kies een subthema)"] + subthema_opties,
+        key="subthema_select"
+    )
+
+    if st.session_state.selected_subthema == "(Kies een subthema)":
+        st.warning("Kies een subthema voordat je een vraag stelt.")
+        render_chat()
+        return
+
+    # Toon chat en verwerk vragen
     render_chat()
     
     vraag = st.chat_input(
-        "Stel je vraag over: " + (st.session_state.selected_product or "(geen product)"),
+        f"Stel je vraag over {st.session_state.selected_product} - {st.session_state.selected_subthema}:",
         key="chat_input_" + str(len(st.session_state.history))
     )
     
     if vraag:
         add_message('user', vraag)
-        with st.spinner("Antwoord wordt gegenereerd..."):
+        with st.spinner("Even nadenken..."):
             antwoord = get_answer(vraag)
             add_message('assistant', antwoord)
         st.rerun()
