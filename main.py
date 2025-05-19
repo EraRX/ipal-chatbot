@@ -10,11 +10,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 import base64
 import requests
 from bs4 import BeautifulSoup
+import pytz
 
 # ---------------------------------------------
 # IPAL Directe Interactieve Chatbox
 # ---------------------------------------------
-# Vereisten: streamlit, openai, pandas, pillow, python-dotenv, tenacity, openpyxl, requests, beautifulsoup4
+# Vereisten: streamlit, openai, pandas, pillow, python-dotenv, tenacity, openpyxl, requests, beautifulsoup4, pytz
 
 # Laad API-sleutel en model uit .env
 load_dotenv()
@@ -100,28 +101,38 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# Genereer product-opties
-producten = sorted([p for p in faq_df['Systeem'].dropna().unique() if isinstance(p, str) and p.strip()]) if not faq_df.empty else []
+# Genereer product-opties (alleen Exact en DocBase als hoofdkeuzes)
+producten = ["Exact", "DocBase"]
 
 # Controleer of FAQ correct is geladen
-if faq_df.empty or not producten:
-    st.error("⚠️ FAQ-bestand is niet correct geladen of bevat geen geldige producten. Controleer het bestand en probeer opnieuw.")
+if faq_df.empty:
+    st.error("⚠️ FAQ-bestand is niet correct geladen. Controleer het bestand en probeer opnieuw.")
     st.stop()
+
+# Genereer module-opties uit faq_df['Systeem']
+module_opties_exact = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "Exact" in s])
+module_opties_docbase = sorted([s for s in faq_df['Systeem'].dropna().unique() if isinstance(s, str) and s.strip() and "DocBase" in s])
 
 # Initialiseren van sessiestatus
 if 'history' not in st.session_state:
     st.session_state.history = []
 if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
+if 'selected_module' not in st.session_state:
+    st.session_state.selected_module = None
 if 'reset_triggered' not in st.session_state:
     st.session_state.reset_triggered = False
 
-# Voeg bericht toe aan geschiedenis
+# Stel de tijdzone in op CEST
+timezone = pytz.timezone("Europe/Amsterdam")
+
+# Voeg bericht toe aan geschiedenis met correcte tijdzone
 def add_message(role: str, content: str):
+    current_time = datetime.now(timezone).strftime('%Y-%m-%d %H:%M')
     st.session_state.history.append({
         'role': role,
         'content': content,
-        'time': datetime.now().strftime('%Y-%m-%d %H:%M')
+        'time': current_time
     })
     MAX_HISTORY = 100
     if len(st.session_state.history) > MAX_HISTORY:
@@ -139,6 +150,7 @@ def render_chat():
 def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
+    st.session_state.selected_module = None
 
 # Functie om informatie van de Exact kennisbank te halen (placeholder)
 def get_exact_knowledge_base_info(query: str) -> str:
@@ -164,10 +176,10 @@ def get_exact_knowledge_base_info(query: str) -> str:
 def get_faq_answer(user_text: str) -> str:
     if not faq_df.empty:
         try:
-            # Filter FAQ op basis van het geselecteerde product
-            df_filtered = faq_df[faq_df['Systeem'] == st.session_state.selected_product]
+            # Filter FAQ op basis van de geselecteerde module
+            df_filtered = faq_df[faq_df['Systeem'] == st.session_state.selected_module]
             if df_filtered.empty:
-                return "Geen FAQ-items gevonden voor dit product."
+                return "Geen FAQ-items gevonden voor deze module."
             
             pattern = re.escape(user_text)
             matches = df_filtered[df_filtered['combined'].str.contains(pattern, case=False, na=False, regex=True)]
@@ -187,7 +199,7 @@ def get_faq_answer(user_text: str) -> str:
 def get_ai_answer(user_text: str) -> str:
     keywords = ['exact', 'docbase', 'doc base', 'documentbase', 'doc-base']
     user_text_lower = user_text.lower()
-    is_relevant = any(keyword in user_text_lower for keyword in keywords) or st.session_state.selected_product.lower() in user_text_lower
+    is_relevant = any(keyword in user_text_lower for keyword in keywords) or st.session_state.selected_module.lower() in user_text_lower
 
     if not is_relevant:
         return "Ik kan alleen vragen beantwoorden over Exact en DocBase. Waarmee kan ik u helpen?"
@@ -204,7 +216,7 @@ def get_ai_answer(user_text: str) -> str:
     messages = [{'role': 'system', 'content': system_prompt}]
     for m in st.session_state.history[-history_limit:]:
         messages.append({'role': m['role'], 'content': m['content']})
-    full_question = f"[{st.session_state.selected_product}] {user_text}"
+    full_question = f"[{st.session_state.selected_module}] {user_text}"
     messages.append({'role': 'user', 'content': full_question})
     try:
         with st.spinner("Even nadenken..."):
@@ -240,13 +252,13 @@ def get_ai_answer(user_text: str) -> str:
 def get_answer(user_text: str) -> str:
     keywords = ['exact', 'docbase', 'doc base', 'documentbase', 'doc-base']
     user_text_lower = user_text.lower()
-    is_relevant = any(keyword in user_text_lower for keyword in keywords) or st.session_state.selected_product.lower() in user_text_lower
+    is_relevant = any(keyword in user_text_lower for keyword in keywords) or st.session_state.selected_module.lower() in user_text_lower
 
     if not is_relevant:
         return "Ik kan alleen vragen beantwoorden over Exact en DocBase. Waarmee kan ik u helpen?"
 
     knowledge_base_answer = None
-    if "exact" in st.session_state.selected_product.lower():
+    if "exact" in st.session_state.selected_module.lower():
         knowledge_base_answer = get_exact_knowledge_base_info(user_text)
 
     faq_answer = get_faq_answer(user_text)
@@ -274,6 +286,7 @@ def main():
     if st.session_state.reset_triggered:
         st.session_state.history = []
         st.session_state.selected_product = None
+        st.session_state.selected_module = None
         st.session_state.reset_triggered = False
 
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -317,7 +330,7 @@ def main():
                 if st.button("Klik hier", key="docbase_button"):
                     st.session_state.selected_product = "DocBase"
                     st.session_state.history = []  # Reset geschiedenis
-                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Stel nu je vraag hieronder.")
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt DocBase gekozen. Kies nu uit de keuzelijst.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'logo-docbase-icon.png' niet gevonden in de repository.")
@@ -326,9 +339,9 @@ def main():
             if os.path.exists("Exact.png"):
                 st.image("Exact.png", use_container_width=False, width=120)
                 if st.button("Klik hier", key="exact_button"):
-                    st.session_state.selected_product = "Exact Online (Module: Bank)"  # Specifieke module
+                    st.session_state.selected_product = "Exact"
                     st.session_state.history = []  # Reset geschiedenis
-                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt Exact Online (Module: Bank) gekozen. Stel nu je vraag hieronder.")
+                    add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt Exact gekozen. Kies nu uit de keuzelijst.")
                     st.rerun()
             else:
                 st.warning("⚠️ Logo 'Exact.png' niet gevonden in de repository.")
@@ -336,11 +349,36 @@ def main():
         render_chat()
         return
 
+    # Module-selectie
+    if st.session_state.selected_product and not st.session_state.selected_module:
+        if st.session_state.selected_product == "Exact":
+            module_opties = module_opties_exact
+        else:  # DocBase
+            module_opties = module_opties_docbase
+
+        if not module_opties:
+            st.error(f"Geen modules beschikbaar voor {st.session_state.selected_product}. Controleer of het FAQ-bestand goed geladen is.")
+            st.stop()
+
+        st.session_state.selected_module = st.selectbox(
+            f"Kies een module voor {st.session_state.selected_product}:",
+            ["(Kies een module)"] + module_opties,
+            key="module_select"
+        )
+
+        if st.session_state.selected_module == "(Kies een module)":
+            st.warning("Kies een module voordat je een vraag stelt.")
+            render_chat()
+            return
+        else:
+            # Module gekozen, voeg bericht toe
+            add_message('assistant', f"Hallo, ik ben de IPAL AI-assistent. Je hebt {st.session_state.selected_module} gekozen. Stel nu je vraag hieronder.")
+
     # Toon chat en verwerk vragen
     render_chat()
     
     vraag = st.chat_input(
-        f"Stel je vraag over {st.session_state.selected_product}:",
+        f"Stel je vraag over {st.session_state.selected_module}:",
         key="chat_input_" + str(len(st.session_state.history))
     )
     
