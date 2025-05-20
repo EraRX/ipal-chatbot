@@ -141,10 +141,28 @@ def get_faq_answer(user_text: str) -> str:
             pattern = re.escape(user_text)
             matches = df_filtered[df_filtered['combined'].str.contains(pattern, case=False, na=False, regex=True)]
             if not matches.empty:
-                top = matches.head(3)['Antwoord of oplossing'].tolist()
-                return "\n".join(f"- {ans}" for ans in top)
+                antwoorden = matches.head(3)['Antwoord of oplossing'].tolist()
+                verduidelijkte_antwoorden = []
+
+                for ans in antwoorden:
+                    try:
+                        uitleg_resp = openai.chat.completions.create(
+                            model=MODEL,
+                            messages=[
+                                {"role": "system", "content": "Je bent een Nederlandse helpdeskassistent. Herschrijf een technisch antwoord uit een FAQ op een duidelijke, vriendelijke en goed leesbare manier, geschikt voor niet-technische gebruikers."},
+                                {"role": "user", "content": f"Herschrijf dit begrijpelijk:\n{ans}"}
+                            ],
+                            temperature=0.3,
+                            max_tokens=300
+                        )
+                        uitleg = uitleg_resp.choices[0].message.content.strip()
+                        verduidelijkte_antwoorden.append(f"- {ans}\n  ↳ {uitleg}")
+                    except Exception as e:
+                        verduidelijkte_antwoorden.append(f"- {ans}\n  ↳ (Kon niet verduidelijken: {str(e)})")
+
+                return "\n\n".join(verduidelijkte_antwoorden)
         except Exception as e:
-            return "FAQ-zoekfout."
+            return f"FAQ-zoekfout: {str(e)}"
     return None
 
 def get_answer(user_text: str) -> str:
