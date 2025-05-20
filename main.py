@@ -188,7 +188,7 @@ def main():
 
     if not st.session_state.selected_product:
         if not st.session_state.history:
-            add_message('assistant', 'Hallo, ik ben de IPAL AI-assistent, waarmee kan ik u helpen?')
+            add_message('assistant', 'Hallo, ik ben de IPAL AI-assistent, waarmee kan ik u helpen? Kies eerst Exact of DocBase')
         st.markdown("### Welkom bij de IPAL-Helpdesk:")
         col1, col2 = st.columns(2)
         with col1:
