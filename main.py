@@ -47,7 +47,7 @@ avatar_path = 'aichatbox.jpg'
 if os.path.exists(avatar_path):
     try:
         img = Image.open(avatar_path)
-        assistant_avatar = img.resize((img.width * 4, img.height * 4), Image.Resampling.LANCZOS)
+        assistant_avatar = img.resize((img.width * 50, img.height * 50), Image.Resampling.LANCZOS)
     except Exception:
         assistant_avatar = None
 
