@@ -175,7 +175,7 @@ def get_answer(text: str) -> str:
         ai_resp = get_ai_answer(text)
         if ai_resp:
             return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+{ai_resp}""
     # 3) Anders geen antwoord
     return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alstublieft.'
 
