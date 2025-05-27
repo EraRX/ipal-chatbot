@@ -41,6 +41,17 @@ blacklist_categories = [
 ]
 
 def filter_chatbot_topics(message: str) -> (bool, str):
+    # Controleer blacklist
+    for blocked in blacklist_categories:
+        if re.search(r'' + re.escape(blocked) + r'', message, re.IGNORECASE):
+            return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
+    # Controleer whitelist keywords binnen de geselecteerde module
+    mod = st.session_state.selected_module or ''
+    if any(cat.lower() in mod.lower() for cat in whitelist_topics.keys()):
+        for kw in whitelist_topics.get(mod.replace(' ', '_').lower(), []):
+            if re.search(r'' + re.escape(kw) + r'', message, re.IGNORECASE):
+                return True, ''
+    return False, '⚠️ Geen geldig onderwerp voor AI-ondersteuning' (bool, str):
     # Check blacklist
     for blocked in blacklist_categories:
         if re.search(r'' + re.escape(blocked) + r'', message, re.IGNORECASE):
@@ -258,6 +269,11 @@ def main():
     vraag = st.chat_input('Stel hier uw vraag:')
     if vraag:
         add_message('user', vraag)
+        # Filter ongewenste of ongeautoriseerde onderwerpen
+        allowed, reason = filter_chatbot_topics(vraag)
+        if not allowed:
+            add_message('assistant', reason)
+            st.rerun()
         with st.spinner('Even zoeken...'):
             antwoord = get_answer(vraag)
             add_message('assistant', antwoord)
