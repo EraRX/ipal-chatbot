@@ -197,7 +197,7 @@ def main():
             st.rerun()
         render_chat()
         return
-    # Kies module
+        # Kies module
     if not st.session_state.selected_module:
         opties = subthema_dict.get(st.session_state.selected_product, [])
         keuze = st.selectbox('Kies een onderwerp:', ['(Kies)'] + opties)
@@ -207,7 +207,9 @@ def main():
             st.rerun()
         render_chat()
         return
-    # Chat input\    render_chat()
+
+    # Chat input
+    render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if vraag:
         add_message('user', vraag)
