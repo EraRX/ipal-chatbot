@@ -229,5 +229,5 @@ def main():
         st.rerun()
 
 # Kick-off
-ing if __name__ == '__main__':
+if __name__ == '__main__':
     main()
