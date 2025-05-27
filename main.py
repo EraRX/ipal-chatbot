@@ -7,8 +7,7 @@ IPAL Chatbox voor oudere vrijwilligers
 - Topicfiltering (whitelist/blacklist)
 - Logging en foutafhandeling
 
-Deze versie heeft volledige module- en product-definitie fallback
-Geschatte lengte: ~230 regels
+Geschatte lengte: ~230 lijnen
 """
 import os
 import re
@@ -23,7 +22,8 @@ from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import pytz
 
-# Configure logging\N(logging.basicConfig(
+# Configure logging
+logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(sys.stdout)]
@@ -58,13 +58,15 @@ BLACKLIST_CATEGORIES = [
 def filter_chatbot_topics(message: str) -> (bool, str):
     """
     Controleer of een bericht AI-fallback mag krijgen:
-      - blacklist check
-      - whitelist keywords scoped to selected module
+    - Geen blacklisted woorden
+    - Bevat whitelisted keywords als module context
     """
     text = message.lower()
+    # Blacklist
     for blocked in BLACKLIST_CATEGORIES:
         if re.search(rf"\b{re.escape(blocked)}\b", text):
             return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
+    # Whitelist scoped to selected module
     mod = (st.session_state.get('selected_module') or '').lower().replace(' ', '_')
     if mod in WHITELIST_TOPICS:
         for kw in WHITELIST_TOPICS[mod]:
@@ -79,12 +81,15 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
-st.markdown('''
-<style>
-  html, body, [class*="css"] { font-size: 20px; }
-  button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
-</style>
-''', unsafe_allow_html=True)
+# Globale styling voor leesbaarheid
+st.markdown(
+    '''
+    <style>
+      html, body, [class*="css"] { font-size: 20px; }
+      button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
+    </style>
+    ''', unsafe_allow_html=True
+)
 
 # -------------------- Validatie --------------------
 def validate_api_key():
@@ -102,6 +107,7 @@ def validate_api_key():
         logging.error(f"API-validatie fout: {e}")
         st.error('⚠️ Fout bij API-validatie')
         st.stop()
+
 validate_api_key()
 
 # -------------------- FAQ Laden --------------------
@@ -110,73 +116,92 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     if not os.path.exists(path):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=['combined','Antwoord'])
+        return pd.DataFrame(columns=['combined', 'Antwoord'])
     try:
         df = pd.read_excel(path)
     except Exception as e:
         logging.error(f"Fout bij laden FAQ: {e}")
         st.error('⚠️ Kan FAQ niet laden')
-        return pd.DataFrame(columns=['combined','Antwoord'])
-    required = ['Systeem','Subthema','Omschrijving melding','Toelichting melding','Antwoord of oplossing']
+        return pd.DataFrame(columns=['combined', 'Antwoord'])
+    required = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
     missing = [c for c in required if c not in df.columns]
     if missing:
         logging.error(f"FAQ mist kolommen: {missing}")
         st.error(f"FAQ mist kolommen: {missing}")
-        return pd.DataFrame(columns=['combined','Antwoord'])
-    if 'Afbeelding' not in df.columns: df['Afbeelding'] = None
+        return pd.DataFrame(columns=['combined', 'Antwoord'])
+    if 'Afbeelding' not in df.columns:
+        df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[required].fillna('').agg(' '.join, axis=1)
     return df
+
 faq_df = load_faq()
-producten=['Exact','DocBase']
-subthema_dict={p:sorted(faq_df[faq_df['Systeem']==p]['Subthema'].dropna().unique()) for p in producten}
+producten = ['Exact', 'DocBase']
+subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique().tolist()) for p in producten}
 
 # -------------------- Sessiestatus --------------------
 def init_session():
-    for k,v in {'history':[],'selected_product':None,'selected_module':None,'reset_triggered':False}.items(): st.session_state.setdefault(k,v)
+    defaults = {'history': [], 'selected_product': None, 'selected_module': None, 'reset_triggered': False}
+    for k, v in defaults.items():
+        st.session_state.setdefault(k, v)
+
 init_session()
 timezone = pytz.timezone('Europe/Amsterdam')
 
 # -------------------- Chat Helpers --------------------
 def add_message(role: str, content: str):
-    ts=datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
-    st.session_state.history.append({'role':role,'content':content,'time':ts})
-    if len(st.session_state.history)>100: st.session_state.history=st.session_state.history[-100:]
+    ts = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
+    st.session_state.history.append({'role': role, 'content': content, 'time': ts})
+    if len(st.session_state.history) > 100:
+        st.session_state.history = st.session_state.history[-100:]
+
 
 def render_chat():
     for msg in st.session_state.history:
-        avatar=Image.open('aichatbox.jpg').resize((64,64)) if msg['role']=='assistant' and os.path.exists('aichatbox.jpg') else '🙂'
-        st.chat_message(msg['role'],avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+        avatar = None
+        if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg'):
+            avatar = Image.open('aichatbox.jpg').resize((64, 64))
+        else:
+            avatar = '🙂'
+        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
-def on_reset(): init_session()
+
+def on_reset():
+    init_session()
 
 # -------------------- AI Interaction --------------------
-@retry(stop=stop_after_attempt(3),wait=wait_exponential(min=1,max=10),retry=retry_if_exception_type(openai.RateLimitError))
-def rewrite_answer(text:str)->str:
-    resp=openai.chat.completions.create(model=MODEL,messages=[{'role':'system','content':'Herschrijf eenvoudig.'},{'role':'user','content':text}],temperature=0.2,max_tokens=300)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
+def rewrite_answer(text: str) -> str:
+    resp = openai.chat.completions.create(
+        model=MODEL,
+        messages=[
+            {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
+            {'role': 'user', 'content': text}
+        ],
+        temperature=0.2,
+        max_tokens=300
+    )
     return resp.choices[0].message.content.strip()
 
-@retry(stop=stop_after_attempt(3),wait=wait_exponential(min=1,max=10),retry=retry_if_exception_type(openai.RateLimitError))
-def get_ai_answer(text:str)->str:
-    msgs=[{'role':'system','content':'You are IPAL Chatbox...'}]
-    msgs+=[{'role':m['role'],'content':m['content']} for m in st.session_state.history[-10:]]
-    msgs.append({'role':'user','content':f"[{st.session_state.selected_module}] {text}"})
-    resp=openai.chat.completions.create(model=MODEL,messages=msgs,temperature=0.3,max_tokens=300)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
+def get_ai_answer(text: str) -> str:
+    messages = [{'role': 'system', 'content': 'You are IPAL Chatbox, helpful Dutch helpdesk assistant.'}]
+    for m in st.session_state.history[-10:]:
+        messages.append({'role': m['role'], 'content': m['content']})
+    messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
+    resp = openai.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        temperature=0.3,
+        max_tokens=300
+    )
     return resp.choices[0].message.content.strip()
 
 # -------------------- Antwoordlogica --------------------
 def get_answer(text: str) -> str:
-    """
-    Beantwoord de vraag:
-    1) FAQ lookup
-    2) Module-definitie fallback (partial match)
-    3) Product-definitie fallback (partial match)
-    4) AI-fallback op whitelist keywords
-    5) Anders blokkade geven
-    """
     text_low = text.strip().lower()
-    mod_sel = st.session_state.get('selected_module') or ''
-    prod_sel = st.session_state.get('selected_product') or ''
+    mod_sel = st.session_state.get('selected_module', '')
+    prod_sel = st.session_state.get('selected_product', '')
 
     # 1) FAQ lookup
     if mod_sel and not faq_df.empty:
@@ -196,34 +221,28 @@ def get_answer(text: str) -> str:
 
     # 2) Module-definitie fallback (partial match)
     if mod_sel and text_low in mod_sel.lower():
-        logging.info(f"Module-definition fallback triggered for '{text_low}' in '{mod_sel}'")
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
         except Exception as e:
-            logging.error(f"Def fallback mislukt: {e}")
+            logging.error(f"Module fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
 
     # 3) Product-definitie fallback (partial match)
     if prod_sel and text_low in prod_sel.lower():
-        logging.info(f"Product-definition fallback triggered for '{text_low}' in '{prod_sel}'")
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
         except Exception as e:
-            logging.error(f"Prod fallback mislukt: {e}")
+            logging.error(f"Product fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
 
     # 4) AI-fallback op whitelist keywords
     allowed, reason = filter_chatbot_topics(text)
     if allowed:
-        logging.info(f"Whitelist AI fallback allowed for '{text_low}' in module '{mod_sel}'")
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
         except Exception as e:
             logging.error(f"AI-call mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
@@ -231,27 +250,52 @@ def get_answer(text: str) -> str:
     # 5) Anders blokkeren
     return reason
 
-# -------------------- Hoofdapplicatie -------------------- --------------------
+# -------------------- Hoofdapplicatie --------------------
 def main():
-    if st.session_state.reset_triggered: on_reset()
-    st.sidebar.button('🔄 Nieuw gesprek',on_click=on_reset)
+    if st.session_state.reset_triggered:
+        on_reset()
+    st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
+
+    # Stap 1: product kiezen
     if not st.session_state.selected_product:
-        st.header('Welkom IPAL Helpdesk')
-        c1,c2=st.columns(2)
-        if c1.button('DocBase',use_container_width=True):st.session_state.selected_product='DocBase';add_message('assistant','Gekozen: DocBase');st.rerun()
-        if c2.button('Exact',use_container_width=True):st.session_state.selected_product='Exact';add_message('assistant','Gekozen: Exact');st.rerun()
-        render_chat();return
+        st.header('Welkom bij de IPAL Chatbox')
+        st.write('Klik op het systeem:')
+        c1, c2 = st.columns(2)
+        if c1.button('DocBase', use_container_width=True):
+            st.session_state.selected_product = 'DocBase'
+            add_message('assistant', 'Gekozen: DocBase')
+            st.rerun()
+        if c2.button('Exact', use_container_width=True):
+            st.session_state.selected_product = 'Exact'
+            add_message('assistant', 'Gekozen: Exact')
+            st.rerun()
+        render_chat()
+        return
+
+    # Stap 2: module kiezen
     if not st.session_state.selected_module:
-        opts=subthema_dict.get(st.session_state.selected_product,[])
-        sel=st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
-        if sel!='(Kies)':st.session_state.selected_module=sel;add_message('assistant',f"Gekozen: {sel}");st.rerun()
-        render_chat();return
+        opties = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opties)
+        if sel != '(Kies)':
+            st.session_state.selected_module = sel
+            add_message('assistant', f"Gekozen: {sel}")
+            st.rerun()
+        render_chat()
+        return
+
+    # Stap 3: chat interactie
     render_chat()
-    vraag=st.chat_input('Stel uw vraag:')
+    vraag = st.chat_input('Stel hier uw vraag:')
     if vraag:
-        add_message('user',vraag)
-        allowed,reason=filter_chatbot_topics(vraag)
-        if not allowed:add_message('assistant',reason);st.rerun()
-        with st.spinner('Even zoeken...'):antwoord=get_answer(vraag);add_message('assistant',antwoord)
+        add_message('user', vraag)
+        allowed, reason = filter_chatbot_topics(vraag)
+        if not allowed:
+            add_message('assistant', reason)
+            st.rerun()
+        with st.spinner('Even zoeken...'):
+            antwoord = get_answer(vraag)
+            add_message('assistant', antwoord)
         st.rerun()
-if __name__=='__main__':main()
+
+if __name__ == '__main__':
+    main()
