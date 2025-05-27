@@ -119,14 +119,31 @@ def render_chat():
             avatar = avatar_img.resize((64, 64))
         else:
             avatar = '🙂'
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}
-
-_{msg['time']}_")
+        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
     st.session_state.reset_triggered = True
     st.session_state.selected_product = None
     st.session_state.selected_module = None
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
+def get_ai_answer(user_text: str) -> str:
+    system_prompt = "You are IPAL Chatbox, a helpful Dutch helpdesk assistant. Answer clearly and concisely."
+    messages = [{'role': 'system', 'content': system_prompt}]
+    for m in st.session_state.history[-10:]:
+        messages.append({'role': m['role'], 'content': m['content']})
+    full_question = f"[{st.session_state.selected_module}] {user_text}"
+    messages.append({'role': 'user', 'content': full_question})
+    try:
+        resp = openai.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=400
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception:
+        return None
 
 def get_answer(user_text: str) -> str:
     if not faq_df.empty:
@@ -149,9 +166,13 @@ def get_answer(user_text: str) -> str:
                 uitleg = uitleg_resp.choices[0].message.content.strip()
                 if afbeelding and os.path.exists(afbeelding):
                     st.image(afbeelding, caption="Voorbeeld", use_column_width=True)
-                return f"{uitleg}"
+                return uitleg
             except Exception as e:
                 return f"{antwoord}\n\n(Kon niet verduidelijken: {str(e)})"
+    ai = get_ai_answer(user_text)
+    if ai:
+        return f"IPAL-Helpdesk antwoord:
+{ai}"
     return "Er is geen antwoord gevonden. Formuleer uw vraag anders of klik op 'Nieuw gesprek'."
 
 def main():
