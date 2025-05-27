@@ -168,14 +168,14 @@ def get_answer(text: str) -> str:
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # 2) AI fallback if allowed by topic filter
+    # 2) AI fallback als topic toegestaan
     allowed, reason = filter_chatbot_topics(text)
     if allowed:
         ai_resp = get_ai_answer(text)
         if ai_resp:
             return f"IPAL-Helpdesk antwoord:
 {ai_resp}"
-    # 3) Geen antwoord
+    # 3) Anders geen antwoord
     return reason
 
 # Main functie
