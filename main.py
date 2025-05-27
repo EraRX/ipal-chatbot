@@ -1,6 +1,6 @@
 # Dit is een aangepaste versie van main.py, speciaal voor oudere vrijwilligers met beperkte computervaardigheden.
 # Het script toont grote knoppen, grotere letters en eenvoudige taal.
-# Antwoorden komen uit de FAQ en worden aangevuld door AI-fallback voor specifieke modules.
+# Antwoorden komen uit de FAQ en worden aangevuld via AI-fallback voor specifieke modules.
 
 import os
 from datetime import datetime
@@ -13,8 +13,10 @@ from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import pytz
 
-# Laad omgevingsvariabelen en API-sleutel
-load_dotenv()
+# Laad omgevingsvariabelen
+dotenv_path = '.env'
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
 openai.api_key = os.getenv('OPENAI_API_KEY')
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
@@ -42,10 +44,9 @@ def validate_api_key():
     except openai.RateLimitError:
         st.error('⚠️ API-limiet bereikt, probeer later opnieuw.')
         st.stop()
-
 validate_api_key()
 
-# Laad en verwerk de FAQ uit Excel
+# Laad en verwerk de FAQ uit Excel-bestand
 def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
@@ -56,10 +57,8 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     if missing:
         st.error(f"FAQ-bestand mist kolommen: {missing}")
         return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
-    # Optionele kolom voor afbeeldingen
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
-    # Converteer Excel HYPERLINK-formules
     def convert_link(cell):
         if isinstance(cell, str) and cell.startswith('=HYPERLINK'):
             m = re.match(r'=HYPERLINK\("([^"]+)","([^"]+)"\)', cell)
@@ -68,22 +67,22 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
                 return f"[{text}]({url})"
         return cell
     df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_link)
-    # Combineer kolommen voor zoekindex
     df['combined'] = df[required].fillna('').agg(' '.join, axis=1)
     return df
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 
-# Bouw een dict met subthema's per product
+# Bouw subthema-dict
 subthema_dict = {}
 if not faq_df.empty:
     for prod in producten:
         subthema_dict[prod] = sorted(
-            faq_df.loc[faq_df['Systeem'] == prod, 'Subthema'].dropna().unique().tolist()
+            faq_df.loc[faq_df['Systeem'] == prod, 'Subthema']
+                  .dropna().unique().tolist()
         )
 
-# Standaardwaarden in session_state
+# Session state defaults
 defaults = {
     'history': [],
     'selected_product': None,
@@ -94,30 +93,33 @@ for key, val in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
+# Tijdzone
 timezone = pytz.timezone('Europe/Amsterdam')
 
-# Voeg berichten toe
+# Voeg een bericht toe aan de chatgeschiedenis
 def add_message(role: str, text: str):
     ts = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
     st.session_state.history.append({'role': role, 'content': text, 'time': ts})
     if len(st.session_state.history) > 100:
         st.session_state.history = st.session_state.history[-100:]
 
-# Render de chat
+# Render de chatgeschiedenis
 def render_chat():
     for msg in st.session_state.history:
         if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg'):
             avatar = Image.open('aichatbox.jpg').resize((64, 64))
         else:
             avatar = '🙂'
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+        st.chat_message(msg['role'], avatar=avatar).markdown(
+            f"{msg['content']}\n\n_{msg['time']}_"
+        )
 
 # Reset helper
 def on_reset():
     for k, v in defaults.items():
         st.session_state[k] = v
 
-# AI herschrijving
+# AI-herschrijving voor FAQ-antwoorden
 def rewrite_answer(text: str) -> str:
     messages = [
         {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
@@ -131,26 +133,24 @@ def rewrite_answer(text: str) -> str:
     )
     return resp.choices[0].message.content.strip()
 
-# AI fallback functie
+# AI-fallback functie
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def get_ai_answer(text: str) -> str:
-    system_prompt = 'You are IPAL Chatbox, a helpful Dutch helpdesk assistant. Geef een kort zakelijk antwoord binnen context.'
+    system_prompt = 'You are IPAL Chatbox, a helpful Dutch helpdesk assistant. Geef een kort zakelijk antwoord.'
     messages = [{'role': 'system', 'content': system_prompt}]
-    for m in st.session_state.history[-10:]:
-        messages.append({'role': m['role'], 'content': m['content']})
+    messages += [{'role': m['role'], 'content': m['content']} for m in st.session_state.history[-10:]]
     messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=0.3,
-        max_tokens=300
-    )
+    resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=300)
     return resp.choices[0].message.content.strip()
 
 # Modules waarvoor AI-fallback is toegestaan
-AI_WHITELIST = ['Financiële administratie', 'Ledenadministratie', 'Rooms Katholieke Kerk']
+AI_WHITELIST = [
+    'Financiële administratie',
+    'Ledenadministratie',
+    'Rooms Katholieke Kerk'
+]
 
-# Antwoord logica: FAQ eerst, dan AI fallback voor whitelist, anders melding
+# Verkrijg antwoord: eerst FAQ, dan AI-fallback (whitelist), anders melding
 def get_answer(text: str) -> str:
     # 1) FAQ lookup
     if st.session_state.selected_module and not faq_df.empty:
@@ -161,7 +161,6 @@ def get_answer(text: str) -> str:
             row = matches.iloc[0]
             ans = row['Antwoord of oplossing']
             img = row.get('Afbeelding')
-            # AI-herschrijving voor leesbaarheid
             try:
                 ans = rewrite_answer(ans)
             except:
@@ -171,24 +170,23 @@ def get_answer(text: str) -> str:
             return ans
     # 2) AI fallback voor whitelisted modules
     mod = st.session_state.selected_module or ''
-        if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
+    if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
         ai_resp = get_ai_answer(text)
         if ai_resp:
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
-    # 3) Anders geen antwoord
+            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
+    # 3) Geen antwoord
     return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alstublieft.'
 
-# Main functie
+# Hoofdapplicatie functie
 def main():
     if st.session_state.reset_triggered:
         on_reset()
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-    # Stap 1: product selecteren
+    # Stap 1: Product selecteren
     if not st.session_state.selected_product:
         st.header('Welkom bij de IPAL Helpdesk')
-        st.write('Klik op het systeem waarover u een vraag heeft:')
+        st.write('Klik hieronder op het systeem waarover u een vraag heeft:')
         c1, c2 = st.columns(2)
         if c1.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
@@ -201,7 +199,7 @@ def main():
         render_chat()
         return
 
-    # Stap 2: module selecteren
+    # Stap 2: Module selecteren
     if not st.session_state.selected_module:
         opties = subthema_dict.get(st.session_state.selected_product, [])
         keuze = st.selectbox('Kies een onderwerp:', ['(Kies)'] + opties)
@@ -212,7 +210,7 @@ def main():
         render_chat()
         return
 
-    # Stap 3: chat interactie
+    # Stap 3: Chat interactie
     render_chat()
     vraag = st.chat_input('Stel hier uw vraag:')
     if vraag:
