@@ -14,7 +14,9 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 import pytz
 
 # Laad omgevingsvariabelen
-load_dotenv()
+dotenv_path = '.env'
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
@@ -24,8 +26,8 @@ st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 # Stijlen voor grotere tekst/knoppen
 st.markdown("""
 <style>
-  html, body, [class*=\"css\"] { font-size: 20px; }
-  button[kind=\"primary\"] { font-size: 22px !important; padding: 0.75em 1.5em; }
+  html, body, [class*="css"] { font-size: 20px; }
+  button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -83,7 +85,7 @@ producten = ["Exact", "DocBase"]
 # Bouw subthema-dict
 subthema_dict = {
     prod: sorted(
-        faq_df.loc[faq_df['Systeem']==prod, 'Subthema']
+        faq_df.loc[faq_df['Systeem'] == prod, 'Subthema']
               .dropna().unique().tolist()
     )
     for prod in producten
@@ -103,6 +105,7 @@ for key, val in defaults.items():
 
 timezone = pytz.timezone('Europe/Amsterdam')
 
+# Berichten toevoegen en weergeven
 def add_message(role: str, text: str):
     timestamp = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
     st.session_state.history.append({'role': role, 'content': text, 'time': timestamp})
@@ -111,8 +114,8 @@ def add_message(role: str, text: str):
 
 def render_chat():
     for msg in st.session_state.history:
-        if msg['role']=='assistant' and os.path.exists('aichatbox.jpg'):
-            img = Image.open('aichatbox.jpg').resize((64,64))
+        if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg'):
+            img = Image.open('aichatbox.jpg').resize((64, 64))
             avatar = img
         else:
             avatar = '🙂'
@@ -124,19 +127,14 @@ def on_reset():
     for key in defaults:
         st.session_state[key] = defaults[key]
 
-# AI antwoord (Chat completion)
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(min=1, max=10),
-    retry=retry_if_exception_type(openai.RateLimitError)
-)
+# AI chat completion
 def get_ai_answer(text: str) -> str:
     system = 'You are IPAL Chatbox, a helpful Dutch helpdesk assistant. Answer concisely.'
     history = st.session_state.history[-10:]
-    messages = [{'role':'system','content':system}] + [
-        {'role':m['role'],'content':m['content']} for m in history
+    messages = [{'role': 'system', 'content': system}] + [
+        {'role': m['role'], 'content': m['content']} for m in history
     ] + [
-        {'role':'user','content':f"[{st.session_state.selected_module}] {text}"}
+        {'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"}
     ]
     try:
         res = openai.chat.completions.create(
@@ -152,7 +150,7 @@ def get_ai_answer(text: str) -> str:
 # Combineer FAQ en AI antwoorden
 def get_answer(text: str) -> str:
     if st.session_state.selected_module and not faq_df.empty:
-        df_mod = faq_df[faq_df['Subthema']==st.session_state.selected_module]
+        df_mod = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
         pat = re.escape(text)
         matches = df_mod[df_mod['combined'].str.contains(pat, case=False, na=False)]
         if not matches.empty:
@@ -161,29 +159,28 @@ def get_answer(text: str) -> str:
             img = row.get('Afbeelding')
             # Verduidelijk via AI
             try:
-                ai_resp = openai.chat.completions.create(
+                resp = openai.chat.completions.create(
                     model=MODEL,
                     messages=[
-                        {'role':'system','content':'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
-                        {'role':'user','content':ans}
+                        {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
+                        {'role': 'user', 'content': ans}
                     ],
                     temperature=0.2,
                     max_tokens=300
                 )
-                ans = ai_resp.choices[0].message.content.strip()
+                ans = resp.choices[0].message.content.strip()
             except:
                 pass
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # Fallback AI
     ai_answer = get_ai_answer(text)
     if ai_answer:
         return f"IPAL-Helpdesk antwoord:\n{ai_answer}"
     return "Er is geen antwoord gevonden. Formuleer uw vraag anders of klik op 'Nieuw gesprek'."
 
 # Hoofdapplicatie
- def main():
+def main():
     if st.session_state.reset_triggered:
         on_reset()
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
@@ -195,34 +192,34 @@ def get_answer(text: str) -> str:
         c1, c2 = st.columns(2)
         if c1.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
-            add_message('assistant','U heeft gekozen voor DocBase.')
+            add_message('assistant', 'U heeft gekozen voor DocBase.')
             st.rerun()
         if c2.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
-            add_message('assistant','U heeft gekozen voor Exact.')
+            add_message('assistant', 'U heeft gekozen voor Exact.')
             st.rerun()
         render_chat()
         return
 
     # Stap 2: kies module
     if not st.session_state.selected_module:
-        opties = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox('Kies een onderwerp:', ['(Kies)'] + opties)
-        if sel != '(Kies)':
+        opts = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox('Kies een onderwerp:', ['(Kies)'] + opts, key='module')
+        if sel and sel != '(Kies)':
             st.session_state.selected_module = sel
-            add_message('assistant',f"U heeft gekozen voor '{sel}'. Wat wilt u hierover weten?")
+            add_message('assistant', f"U heeft gekozen voor '{sel}'. Wat wilt u hierover weten?")
             st.rerun()
         render_chat()
         return
 
-    # Stap 3: chat input
+    # Stap 3: chat input en antwoord
     render_chat()
-    prompt = st.chat_input('Stel hier uw vraag:')
-    if prompt:
-        add_message('user',prompt)
+    vraag = st.chat_input('Stel hier uw vraag:', key='chat')
+    if vraag:
+        add_message('user', vraag)
         with st.spinner('Even zoeken...'):
-            antwoord = get_answer(prompt)
-            add_message('assistant',antwoord)
+            antwoord = get_answer(vraag)
+            add_message('assistant', antwoord)
         st.rerun()
 
 if __name__ == '__main__':
