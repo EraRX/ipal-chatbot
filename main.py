@@ -191,7 +191,7 @@ def get_ai_answer(text: str) -> str:
 
 # -------------------- Antwoordlogica --------------------
 def get_answer(text: str) -> str:
-    # Check FAQ eerst
+    # 1) FAQ lookup
     if st.session_state.selected_module and not faq_df.empty:
         dfm = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
         pattern = re.escape(text)
@@ -207,15 +207,27 @@ def get_answer(text: str) -> str:
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # AI-fallback
+    # 1b) Module definition fallback (module name queries)
+    mod = (st.session_state.selected_module or '').lower()
+    if text.strip().lower() == mod:
+        try:
+            ai_resp = get_ai_answer(text)
+            return "IPAL-Helpdesk antwoord:
+{}".format(ai_resp)
+        except Exception as e:
+            logging.error(f"AI-definition fallback mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+    # 2) AI-fallback voor whitelisted topics
     allowed, reason = filter_chatbot_topics(text)
     if allowed:
         try:
             ai_resp = get_ai_answer(text)
-            return "IPAL-Helpdesk antwoord:\n{}".format(ai_resp)
+            return "IPAL-Helpdesk antwoord:
+{}".format(ai_resp)
         except Exception as e:
             logging.error(f"AI-aanroep mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
+    # 3) Anders geen antwoord met reden
     return reason
 
 # -------------------- Hoofdapplicatie --------------------
