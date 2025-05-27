@@ -58,22 +58,15 @@ BLACKLIST_CATEGORIES = [
 def filter_chatbot_topics(message: str) -> (bool, str):
     """
     Controleer of een bericht AI-fallback mag krijgen:
-    - Geen blacklisted woorden
-    - Bevat whitelisted keywords als module context
+    - Niet in blacklist categorieën
     """
     text = message.lower()
     # Blacklist
     for blocked in BLACKLIST_CATEGORIES:
-        if re.search(rf"\b{re.escape(blocked)}\b", text):
+        if re.search(rf"{re.escape(blocked)}", text):
             return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
-    # Whitelist scoped to selected module
-    mod = (st.session_state.get('selected_module') or '').lower().replace(' ', '_')
-    if mod in WHITELIST_TOPICS:
-        for kw in WHITELIST_TOPICS[mod]:
-            if re.search(rf"\b{re.escape(kw)}\b", text):
-                return True, ''
-        return False, '⚠️ Geen geldig onderwerp voor AI-ondersteuning'
-    return False, '⚠️ AI-fallback niet toegestaan voor dit onderwerp'
+    # Alles wat niet geblacklist is, mag via AI
+    return True, ''
 
 # -------------------- Configuratie --------------------
 load_dotenv()
