@@ -173,6 +173,7 @@ def get_answer(user_text: str) -> str:
     if ai:
         return f"IPAL-Helpdesk antwoord:
 {ai}"
+{ai}"
     return "Er is geen antwoord gevonden. Formuleer uw vraag anders of klik op 'Nieuw gesprek'."
 
 def main():
