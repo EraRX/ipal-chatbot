@@ -221,8 +221,7 @@ def get_answer(text: str) -> str:
         try:
             ai_resp = get_ai_answer(text)
             # ensure single-line f-string
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:{ai_resp}"
         except Exception as e:
             logging.error(f"AI-definition fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
@@ -232,8 +231,7 @@ def get_answer(text: str) -> str:
         try:
             ai_resp = get_ai_answer(text)
             # ensure single-line f-string
-            return f"IPAL-Helpdesk antwoord:
-{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:{ai_resp}"
         except Exception as e:
             logging.error(f"AI-aanroep mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
