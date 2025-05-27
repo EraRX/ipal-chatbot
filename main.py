@@ -138,24 +138,32 @@ def rewrite_answer(text: str) -> str:
 
 # Haal antwoord uit FAQ en herschrijf
 def get_answer(text: str) -> str:
+    # Probeer eerst antwoord uit de FAQ
     if st.session_state.selected_module and not faq_df.empty:
-        subset = faq_df[faq_df['Subthema']==st.session_state.selected_module]
+        subset = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
         pattern = re.escape(text)
-        matches = subset[subset['combined'].str.contains(pattern,case=False,na=False)]
+        matches = subset[subset['combined'].str.contains(pattern, case=False, na=False)]
         if not matches.empty:
             row = matches.iloc[0]
             ans = row['Antwoord of oplossing']
             img = row.get('Afbeelding')
-            # Herschrijf via AI
+            # Herschrijf via AI voor leesbaarheid
             try:
                 ans = rewrite_answer(ans)
             except:
                 pass
             # Toon afbeelding als beschikbaar
-            if isinstance(img,str) and img and os.path.exists(img):
-                st.image(img,caption='Voorbeeld',use_column_width=True)
+            if isinstance(img, str) and img and os.path.exists(img):
+                st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    return '⚠️ Ik kan alleen vragen beantwoorden over het geselecteerde onderwerp via de FAQ. Als uw vraag daar niet bij staat, neem dan contact op.'
+    # Geen FAQ-match: fallback naar AI binnen context
+    if st.session_state.selected_module:
+        ai_resp = get_ai_answer(text)
+        if ai_resp:
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+    # Anders melding
+    return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alsjeblieft.'
 
 # Hoofdapplicatie
 def main():
