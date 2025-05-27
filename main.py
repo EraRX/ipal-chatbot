@@ -28,6 +28,9 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(sys.stdout)]
 )
+s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 # -------------------- Topic Filtering --------------------
 WHITELIST_TOPICS = {
@@ -161,20 +164,8 @@ def render_chat():
 
 def on_reset():
     init_session()
-
-# -------------------- AI Interaction --------------------
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
-def rewrite_answer(text: str) -> str:
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
-            {'role': 'user', 'content': text}
-        ],
-        temperature=0.2,
-        max_tokens=300
-    )
-    return resp.choices[0].message.content.strip()
+    # Force rerun to reset UI
+    st.experimental_rerun() resp.choices[0].message.content.strip()
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def get_ai_answer(text: str) -> str:
