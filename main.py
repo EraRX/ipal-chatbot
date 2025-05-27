@@ -171,7 +171,7 @@ def get_answer(text: str) -> str:
             return ans
     # 2) AI fallback voor whitelisted modules
     mod = st.session_state.selected_module or ''
-    if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
+        if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
         ai_resp = get_ai_answer(text)
         if ai_resp:
             return f"IPAL-Helpdesk antwoord:
