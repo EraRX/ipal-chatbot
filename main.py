@@ -152,7 +152,7 @@ AI_WHITELIST = ['Financiële administratie', 'Ledenadministratie', 'Rooms Kathol
 
 # Antwoord logica: FAQ eerst, dan AI fallback voor whitelist, anders melding
 def get_answer(text: str) -> str:
-    # FAQ lookup
+    # 1) FAQ lookup
     if st.session_state.selected_module and not faq_df.empty:
         df_mod = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
         pat = re.escape(text)
@@ -161,6 +161,7 @@ def get_answer(text: str) -> str:
             row = matches.iloc[0]
             ans = row['Antwoord of oplossing']
             img = row.get('Afbeelding')
+            # AI-herschrijving voor leesbaarheid
             try:
                 ans = rewrite_answer(ans)
             except:
@@ -168,14 +169,13 @@ def get_answer(text: str) -> str:
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-        # 2) AI fallback voor whitelisted modules
+    # 2) AI fallback voor whitelisted modules
     mod = st.session_state.selected_module or ''
-    # Check substring match in whitelist
     if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
         ai_resp = get_ai_answer(text)
         if ai_resp:
             return f"IPAL-Helpdesk antwoord:
-{ai_resp}""
+{ai_resp}"
     # 3) Anders geen antwoord
     return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alstublieft.'
 
