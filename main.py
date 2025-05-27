@@ -165,35 +165,73 @@ def get_ai_answer(text:str)->str:
     return resp.choices[0].message.content.strip()
 
 # -------------------- Antwoordlogica --------------------
-def get_answer(text:str)->str:
-    mod_sel=st.session_state.get('selected_module')
+def get_answer(text: str) -> str:
+    """
+    Beantwoord de vraag:
+    1) FAQ lookup
+    2) Module-definitie fallback (partial match)
+    3) Product-definitie fallback (partial match)
+    4) AI-fallback op whitelist keywords
+    5) Anders blokkade geven
+    """
+    text_low = text.strip().lower()
+    mod_sel = st.session_state.get('selected_module') or ''
+    prod_sel = st.session_state.get('selected_product') or ''
+
+    # 1) FAQ lookup
     if mod_sel and not faq_df.empty:
-        dfm=faq_df[faq_df['Subthema']==mod_sel]
-        m=dfm[dfm['combined'].str.contains(re.escape(text),case=False,na=False)]
-        if not m.empty:
-            row=m.iloc[0];ans=row['Antwoord'];img=row.get('Afbeelding')
-            try: ans=rewrite_answer(ans)
-            except Exception as e: logging.warning(f"Herschrijf mislukt: {e}")
-            if isinstance(img,str) and img and os.path.exists(img): st.image(img,caption='Voorbeeld',use_column_width=True)
+        dfm = faq_df[faq_df['Subthema'] == mod_sel]
+        matches = dfm[dfm['combined'].str.contains(re.escape(text), case=False, na=False)]
+        if not matches.empty:
+            row = matches.iloc[0]
+            ans = row['Antwoord']
+            img = row.get('Afbeelding')
+            try:
+                ans = rewrite_answer(ans)
+            except Exception as e:
+                logging.warning(f"Herschrijf mislukt: {e}")
+            if isinstance(img, str) and img and os.path.exists(img):
+                st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # Module-definitie fallback
-    base_mod=(mod_sel or '').lower().strip()
-    if text.strip().lower()==base_mod:
-        try: ai_resp=get_ai_answer(text);return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
-        except Exception as e:logging.error(f"Def fallback mislukt: {e}");return "⚠️ Fout tijdens AI-fallback"
-    # Product-definitie fallback
-    prod=(st.session_state.get('selected_product') or '').lower().strip()
-    if text.strip().lower()==prod:
-        try: ai_resp=get_ai_answer(text);return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
-        except Exception as e:logging.error(f"Prod fallback mislukt: {e}");return "⚠️ Fout tijdens AI-fallback"
-    # Whitelist AI-fallback
-    allowed,reason=filter_chatbot_topics(text)
+
+    # 2) Module-definitie fallback (partial match)
+    if mod_sel and text_low in mod_sel.lower():
+        logging.info(f"Module-definition fallback triggered for '{text_low}' in '{mod_sel}'")
+        try:
+            ai_resp = get_ai_answer(text)
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+        except Exception as e:
+            logging.error(f"Def fallback mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+
+    # 3) Product-definitie fallback (partial match)
+    if prod_sel and text_low in prod_sel.lower():
+        logging.info(f"Product-definition fallback triggered for '{text_low}' in '{prod_sel}'")
+        try:
+            ai_resp = get_ai_answer(text)
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+        except Exception as e:
+            logging.error(f"Prod fallback mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+
+    # 4) AI-fallback op whitelist keywords
+    allowed, reason = filter_chatbot_topics(text)
     if allowed:
-        try: ai_resp=get_ai_answer(text);return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
-        except Exception as e:logging.error(f"AI-call mislukt: {e}");return "⚠️ Fout tijdens AI-fallback"
+        logging.info(f"Whitelist AI fallback allowed for '{text_low}' in module '{mod_sel}'")
+        try:
+            ai_resp = get_ai_answer(text)
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+        except Exception as e:
+            logging.error(f"AI-call mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+
+    # 5) Anders blokkeren
     return reason
 
-# -------------------- Hoofdapplicatie --------------------
+# -------------------- Hoofdapplicatie -------------------- --------------------
 def main():
     if st.session_state.reset_triggered: on_reset()
     st.sidebar.button('🔄 Nieuw gesprek',on_click=on_reset)
