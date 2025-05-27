@@ -220,7 +220,9 @@ def get_answer(text: str) -> str:
     if text.strip().lower() == base_mod:
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:{ai_resp}"
+            # ensure single-line f-string
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
         except Exception as e:
             logging.error(f"AI-definition fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
@@ -229,7 +231,9 @@ def get_answer(text: str) -> str:
     if allowed:
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:{ai_resp}"
+            # ensure single-line f-string
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
         except Exception as e:
             logging.error(f"AI-aanroep mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
