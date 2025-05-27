@@ -150,21 +150,33 @@ def get_ai_answer(text: str) -> str:
 
 # Antwoord logica
 def get_answer(text: str) -> str:
-    # 1) FAQ\    if st.session_state.selected_module and not faq_df.empty:
-        dfm = faq_df[faq_df['Subthema']==st.session_state.selected_module]
+    # 1) FAQ lookup
+    if st.session_state.selected_module and not faq_df.empty:
+        dfm = faq_df[faq_df['Subthema'] == st.session_state.selected_module]
         pat = re.escape(text)
-        matches = dfm[dfm['combined'].str.contains(pat,case=False,na=False)]
+        matches = dfm[dfm['combined'].str.contains(pat, case=False, na=False)]
         if not matches.empty:
             row = matches.iloc[0]
             ans = row['Antwoord']
             img = row.get('Afbeelding')
-            try: ans = rewrite_answer(ans)
-            except: pass
-            if isinstance(img,str) and img and os.path.exists(img): st.image(img,caption='Voorbeeld',use_column_width=True)
+            # AI-herschrijving voor leesbaarheid
+            try:
+                ans = rewrite_answer(ans)
+            except:
+                pass
+            # Toon afbeelding als beschikbaar
+            if isinstance(img, str) and img and os.path.exists(img):
+                st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # 2) AI fallback
-    ai_resp = get_ai_answer(text)
-    return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
+    # 2) AI fallback if allowed by topic filter
+    allowed, reason = filter_chatbot_topics(text)
+    if allowed:
+        ai_resp = get_ai_answer(text)
+        if ai_resp:
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+    # 3) Geen antwoord
+    return reason
 
 # Main functie
 def main():
