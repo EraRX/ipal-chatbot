@@ -193,10 +193,10 @@ def get_ai_answer(text: str) -> str:
 def get_answer(text: str) -> str:
     """
     Beantwoord de vraag:
-    1) FAQ lookup
-    1b) Module definities
-    2) AI-fallback whitelist
-    3) Anders reden
+    1) Zoek in FAQ onder geselecteerde module.
+    1b) Definitie van module via AI als alleen module naam is gevraagd.
+    2) AI-fallback op whitelisted topics.
+    3) Anders geef blokkade-reden terug.
     """
     # 1) FAQ lookup
     mod_sel = st.session_state.get('selected_module')
@@ -216,15 +216,15 @@ def get_answer(text: str) -> str:
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
     # 1b) Module definition fallback
-    mod = (mod_sel or '').lower().strip()
-    if text.strip().lower() == mod:
+    base_mod = (mod_sel or '').lower().strip()
+    if text.strip().lower() == base_mod:
         try:
             ai_resp = get_ai_answer(text)
             return f"IPAL-Helpdesk antwoord:{ai_resp}"
         except Exception as e:
             logging.error(f"AI-definition fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
-    # 2) AI-fallback whitelist
+    # 2) AI-fallback op whitelist
     allowed, reason = filter_chatbot_topics(text)
     if allowed:
         try:
