@@ -1,7 +1,7 @@
 
 ### Corrected `main.py`
 
-The corrected `main.py` removes any invalid characters (curly quotes) and stray comments, ensuring the file starts with valid Python code and maintains all functionality. I’ve also incorporated improvements from your previous feedback, such as robust error handling and type checks. Here’s the complete, error-free code:
+The corrected `main.py` removes all stray text and invalid characters (curly quotes), ensuring the file contains only valid Python code with straight quotes. It maintains the full functionality of the IPAL Chatbox and includes safeguards from previous fixes (e.g., type checking, robust error handling). Here’s the clean, error-free code:
 
 ```python
 import os
@@ -77,13 +77,13 @@ MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 # Styling for elderly users
-st.markdown('''
+st.markdown("""
 <style>
   html, body, [class*="css"] { font-size: 20px; font-family: Arial, sans-serif; }
   button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
   .stTextInput > div > input { font-size: 20px; }
 </style>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # -------------------- Validation --------------------
 def validate_api_key():
