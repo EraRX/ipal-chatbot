@@ -168,13 +168,15 @@ def get_answer(text: str) -> str:
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
-    # AI fallback alleen voor whitelisted modules
-    mod = st.session_state.selected_module
-    if mod in AI_WHITELIST:
+        # 2) AI fallback voor whitelisted modules
+    mod = st.session_state.selected_module or ''
+    # Check substring match in whitelist
+    if any(wl.lower() in mod.lower() for wl in AI_WHITELIST):
         ai_resp = get_ai_answer(text)
         if ai_resp:
-            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
-    # Anders geen antwoord
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
+    # 3) Anders geen antwoord
     return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alstublieft.'
 
 # Main functie
