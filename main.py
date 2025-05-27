@@ -83,7 +83,8 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 
-# Maak een dictionary van subthema's per product\ nsubthema_dict = {}
+# Maak een dictionary van subthema's per product
+subthema_dict = {}
 if not faq_df.empty:
     for prod in producten:
         subthema_dict[prod] = sorted(
@@ -128,7 +129,8 @@ def on_reset():
     for k, v in defaults.items():
         st.session_state[k] = v
 
-# Herschrijf FAQ-antwoord voor leesbaarheid via AI\ n@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
+# Herschrijf FAQ-antwoord voor leesbaarheid via AI
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def rewrite_answer(text: str) -> str:
     messages = [
         {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
@@ -159,7 +161,6 @@ def get_ai_answer(text: str) -> str:
     return resp.choices[0].message.content.strip()
 
 # Verkrijg antwoord: eerst uit FAQ, anders AI-fallback, anders melding
-
 def get_answer(text: str) -> str:
     # 1) Zoek in FAQ
     if st.session_state.selected_module and not faq_df.empty:
@@ -181,7 +182,7 @@ def get_answer(text: str) -> str:
     if st.session_state.selected_module:
         ai_resp = get_ai_answer(text)
         if ai_resp:
-            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:\n{ai_resp}" 
     # 3) Geen antwoord beschikbaar
     return '⚠️ Ik kan uw vraag niet beantwoorden. Neem contact op alsjeblieft.'
 
@@ -194,7 +195,7 @@ def main():
     # Stap 1: kies product
     if not st.session_state.selected_product:
         st.header('Welkom bij de IPAL Helpdesk')
-        st.write('Klik op een systeem:')
+        st.write('Klik op het systeem waarover u een vraag heeft:')
         c1, c2 = st.columns(2)
         if c1.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
@@ -228,6 +229,5 @@ def main():
             add_message('assistant', antwoord)
         st.rerun()
 
-# Kick-off
-if __name__ == '__main__':
+# Kick-off\ nif __name__ == '__main__':
     main()
