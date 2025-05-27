@@ -13,6 +13,49 @@ from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import pytz
 
+# Topic filter definitions (whitelist and blacklist)
+whitelist_topics = {
+    "ledenadministratie": [
+        "parochiaan", "lidmaatschap", "inschrijving", "uitschrijving", "doopregister", 
+        "SILA", "parochie", "postcode", "adreswijziging", "verhuizing", "mutatie", 
+        "kerkledenadministratie", "doopdatum", "ledenbeheer", "registratie"
+    ],
+    "exact_online_boekhouding_financien": [
+        "boekhouding", "financiën", "kerkbijdrage", "factuur", "betaling", "budget", 
+        "financieel beheer", "Exact Online", "administratie", "rekening", "kosten", 
+        "inkomsten", "uitgaven", "begraafplaatsadministratie", "donatie"
+    ],
+    "rooms_katholieke_kerk_administratief": [
+        "parochiebeheer", "bisdom", "kerkprovincie", "kerkelijke administratie", 
+        "parochieblad", "vrijwilligers", "functionaris gegevensbescherming", 
+        "verwerkersovereenkomst", "AVG-compliance", "statuten"
+    ]
+}
+
+blacklist_categories = [
+    "politiek", "religie", "persoonlijke gegevens", "gezondheid", "gokken", 
+    "adult content", "geweld", "haatzaaiende taal", "desinformatie",
+    "geloofsovertuiging", "medische gegevens", "strafrechtelijk verleden", 
+    "seksuele inhoud", "complottheorie", "nepnieuws", "discriminatie", 
+    "racisme", "extremisme", "godsdienstige leer", "persoonlijke overtuiging"
+]
+
+def filter_chatbot_topics(message: str) -> (bool, str):
+    # Check blacklist
+    for blocked in blacklist_categories:
+        if re.search(r'' + re.escape(blocked) + r'', message, re.IGNORECASE):
+            return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
+    # Check whitelist keywords
+    mod = st.session_state.selected_module or ''
+    # Allow if any whitelist_keywords in message and module context
+    for category, keywords in whitelist_topics.items():
+        if category.lower() in mod.lower():
+            for kw in keywords:
+                if re.search(r'' + re.escape(kw) + r'', message, re.IGNORECASE):
+                    return True, ''
+    return False, '⚠️ Geen geldig onderwerp voor AI-ondersteuning'
+
+
 # Laad omgevingsvariabelen
 dotenv_path = '.env'
 if os.path.exists(dotenv_path):
