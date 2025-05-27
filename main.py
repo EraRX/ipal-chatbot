@@ -238,7 +238,7 @@ def get_answer(text: str) -> str:
     # 3) Anders geen antwoord
     return reason
 
-# -------------------- Hoofdapplicatie --------------------
+# -------------------- Hoofdapplicatie-------------------- --------------------
 def main():
     if st.session_state.reset_triggered:
         on_reset()
