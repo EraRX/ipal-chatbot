@@ -216,11 +216,12 @@ def get_answer(text: str) -> str:
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
     # 1b) Module definition fallback
-    mod = (mod_sel or '').lower()
+    mod = (mod_sel or '').lower().strip()
     if text.strip().lower() == mod:
         try:
             ai_resp = get_ai_answer(text)
-return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
         except Exception as e:
             logging.error(f"AI-definition fallback mislukt: {e}")
             return "⚠️ Fout tijdens AI-fallback"
@@ -237,7 +238,7 @@ return f"IPAL-Helpdesk antwoord:\n{ai_resp}"
     # 3) Anders geen antwoord
     return reason
 
-# -------------------- Hoofdapplicatie-------------------- --------------------
+# -------------------- Hoofdapplicatie ---------------------------------------- --------------------
 def main():
     if st.session_state.reset_triggered:
         on_reset()
