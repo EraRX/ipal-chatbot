@@ -57,10 +57,17 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
         return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
     try:
         df = pd.read_excel(path)
-        required_columns = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing', 'Afbeelding']
-        if not all(col in df.columns for col in required_columns):
-            st.error(f"FAQ-bestand mist kolommen: {required_columns}")
+        required_columns = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
+        optional_columns = ['Afbeelding']
+
+        missing_required = [col for col in required_columns if col not in df.columns]
+        if missing_required:
+            st.error(f"FAQ-bestand mist vereiste kolommen: {missing_required}")
             return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
+
+        for col in optional_columns:
+            if col not in df.columns:
+                df[col] = None
 
         def convert_hyperlink(text):
             if isinstance(text, str) and text.startswith('=HYPERLINK'):
@@ -71,9 +78,9 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
             return text
 
         df['Antwoord of oplossing'] = df['Antwoord of oplossing'].apply(convert_hyperlink)
-        search_columns = [col for col in required_columns if col not in ['Antwoord of oplossing', 'Afbeelding']]
-        df['combined'] = df[search_columns].fillna('').agg(' '.join, axis=1)
+        df['combined'] = df[required_columns].fillna('').agg(' '.join, axis=1)
         return df
+
     except Exception as e:
         st.error(f"Fout bij laden FAQ: {str(e)}")
         return pd.DataFrame(columns=['combined', 'Antwoord of oplossing'])
