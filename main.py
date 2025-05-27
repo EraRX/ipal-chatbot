@@ -1,9 +1,14 @@
+# main.py
+"""
+IPAL Chatbox voor oudere vrijwilligers
+- Python 3, Streamlit
+- Groot lettertype, eenvoudige bediening
+- Antwoorden uit FAQ aangevuld met AI voor whitelisted modules
+- Topicfiltering (whitelist/blacklist)
+- Logging en foutafhandeling
 
-### Corrected `main.py`
-
-Below is the corrected `main.py`, based on your original code, with the f-string fix (from line 223) applied and all stray text/curly quotes removed. I’ve included safeguards (e.g., type checking, robust error handling) and ensured compatibility with Streamlit Cloud. This version should match the functionality of your original `main.py` but with the f-string issue resolved and no syntax errors.
-
-```python
+Geschatte lengte: ~230 regels
+"""
 import os
 import re
 import sys
@@ -23,106 +28,100 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[logging.StreamHandler(sys.stdout)]
 )
-logger = logging.getLogger(__name__)
 
 # -------------------- Topic Filtering --------------------
 WHITELIST_TOPICS = {
-    'ledenadministratie': [
-        'parochiaan', 'lidmaatschap', 'inschrijving', 'uitschrijving', 'doopregister',
-        'sila', 'parochie', 'postcode', 'adreswijziging', 'verhuizing', 'mutatie',
-        'kerkledenadministratie', 'doopdatum', 'ledenbeheer', 'registratie'
+    "ledenadministratie": [
+        "parochiaan", "lidmaatschap", "inschrijving", "uitschrijving", "doopregister",
+        "sila", "parochie", "postcode", "adreswijziging", "verhuizing", "mutatie",
+        "kerkledenadministratie", "doopdatum", "ledenbeheer", "registratie"
     ],
-    'exact_online_boekhouding_financien': [
-        'boekhouding', 'financien', 'kerkbijdrage', 'factuur', 'betaling', 'budget',
-        'financieel beheer', 'exact online', 'administratie', 'rekening', 'kosten',
-        'inkomsten', 'uitgaven', 'begraafplaatsadministratie', 'donatie'
+    "exact_online_boekhouding_financien": [
+        "boekhouding", "financiën", "kerkbijdrage", "factuur", "betaling", "budget",
+        "financieel beheer", "exact online", "administratie", "rekening", "kosten",
+        "inkomsten", "uitgaven", "begraafplaatsadministratie", "donatie"
     ],
-    'rooms_katholieke_kerk_administratief': [
-        'parochiebeheer', 'bisdom', 'kerkprovincie', 'kerkelijke administratie',
-        'parochieblad', 'vrijwilligers', 'functionaris gegevensbescherming',
-        'verwerkersovereenkomst', 'avg-compliance', 'statuten'
+    "rooms_katholieke_kerk_administratief": [
+        "parochiebeheer", "bisdom", "kerkprovincie", "kerkelijke administratie",
+        "parochieblad", "vrijwilligers", "functionaris gegevensbescherming",
+        "verwerkersovereenkomst", "avg-compliance", "statuten"
     ]
 }
 BLACKLIST_CATEGORIES = [
-    'politiek', 'religie', 'persoonlijke gegevens', 'gezondheid', 'gokken',
-    'adult content', 'geweld', 'haatzaaiende taal', 'desinformatie',
-    'geloofsovertuiging', 'medische gegevens', 'strafrechtelijk verleden',
-    'seksuele inhoud', 'complottheorie', 'nepnieuws', 'discriminatie',
-    'racisme', 'extremisme', 'godsdienstige leer', 'persoonlijke overtuiging'
+    "politiek", "religie", "persoonlijke gegevens", "gezondheid", "gokken",
+    "adult content", "geweld", "haatzaaiende taal", "desinformatie",
+    "geloofsovertuiging", "medische gegevens", "strafrechtelijk verleden",
+    "seksuele inhoud", "complottheorie", "nepnieuws", "discriminatie",
+    "racisme", "extremisme", "godsdienstige leer", "persoonlijke overtuiging"
 ]
 
-def filter_chatbot_topics(message: str) -> tuple[bool, str]:
-    """Check if the message is allowed based on whitelist and blacklist."""
-    if not isinstance(message, str):
-        logger.error('Invalid message type: expected string')
-        return False, '⚠️ Ongeldige invoer: geen tekst'
+def filter_chatbot_topics(message: str) -> (bool, str):
+    """
+    Controleer op blacklist en whitelist.
+    """
     text = message.lower()
     # Blacklist check
     for blocked in BLACKLIST_CATEGORIES:
-        if re.search(rf'\b{re.escape(blocked)}\b', text):
+        if re.search(rf"\b{re.escape(blocked)}\b", text):
             return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
     # Whitelist check in module context
     mod = (st.session_state.get('selected_module') or '').lower().replace(' ', '_')
     if mod in WHITELIST_TOPICS:
         for kw in WHITELIST_TOPICS[mod]:
-            if re.search(rf'\b{re.escape(kw)}\b', text):
+            if re.search(rf"\b{re.escape(kw)}\b", text):
                 return True, ''
         return False, '⚠️ Geen geldig onderwerp voor AI-ondersteuning'
     return False, '⚠️ AI-fallback niet toegestaan voor dit onderwerp'
 
-# -------------------- Configuration --------------------
+# -------------------- Configuratie --------------------
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
-# Styling for elderly users
-st.markdown("""
+# Styling
+st.markdown('''
 <style>
-  html, body, [class*="css"] { font-size: 20px; font-family: Arial, sans-serif; }
+  html, body, [class*="css"] { font-size: 20px; }
   button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
-  .stTextInput > div > input { font-size: 20px; }
 </style>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
-# -------------------- Validation --------------------
+# -------------------- Validatie --------------------
 def validate_api_key():
-    """Validate OpenAI API key."""
     if not openai.api_key:
-        logger.error('No API key found')
+        logging.error("Geen API-sleutel gevonden")
         st.error('⚠️ Stel uw OPENAI_API_KEY in via .env-bestand')
         st.stop()
     try:
         openai.models.list()
     except openai.AuthenticationError:
-        logger.error('Invalid API key')
+        logging.error("Ongeldige API-sleutel")
         st.error('⚠️ Ongeldige API-sleutel')
         st.stop()
     except Exception as e:
-        logger.error(f'API validation error: {e}')
+        logging.error(f"API-validatie fout: {e}")
         st.error('⚠️ Fout bij API-validatie')
         st.stop()
-
 validate_api_key()
 
-# -------------------- FAQ Loading --------------------
+# -------------------- FAQ Laden --------------------
 @st.cache_data
 def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
-    """Load FAQ from Excel file."""
     if not os.path.exists(path):
-        logger.error(f'FAQ file not found: {path}')
+        logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     try:
         df = pd.read_excel(path)
     except Exception as e:
-        logger.error(f'Error reading FAQ: {e}')
+        logging.error(f"Fout bij lezen FAQ: {e}")
         st.error('⚠️ Kan FAQ niet laden')
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     required = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
     missing = [c for c in required if c not in df.columns]
     if missing:
-        logger.error(f'FAQ missing columns: {missing}')
+        logging.error(f"FAQ mist kolommen: {missing}")
         st.error(f"FAQ mist kolommen: {missing}")
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     if 'Afbeelding' not in df.columns:
@@ -130,7 +129,6 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[required].fillna('').agg(' '.join, axis=1)
     return df
-
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 subthema_dict = {
@@ -138,9 +136,8 @@ subthema_dict = {
     for p in producten
 }
 
-# -------------------- Session State --------------------
+# -------------------- Sessiestatus --------------------
 def init_session():
-    """Initialize session state."""
     defaults = {
         'history': [],
         'selected_product': None,
@@ -149,75 +146,58 @@ def init_session():
     }
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
-
 init_session()
 timezone = pytz.timezone('Europe/Amsterdam')
 
 # -------------------- Chat Helpers --------------------
 def add_message(role: str, content: str):
-    """Add a message to the chat history."""
-    if not isinstance(content, str):
-        logger.error('Invalid content type for message: expected string')
-        content = str(content)
     ts = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
     st.session_state.history.append({'role': role, 'content': content, 'time': ts})
     if len(st.session_state.history) > 100:
         st.session_state.history = st.session_state.history[-100:]
 
+
 def render_chat():
-    """Render chat history in Streamlit."""
     for msg in st.session_state.history:
         avatar = Image.open('aichatbox.jpg').resize((64,64)) if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg') else '🙂'
         st.chat_message(msg['role'], avatar=avatar).markdown(
             f"{msg['content']}\n\n_{msg['time']}_"
         )
 
+
 def on_reset():
-    """Reset session state."""
     init_session()
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def rewrite_answer(text: str) -> str:
-    """Rewrite answer to be simple and friendly."""
-    if not isinstance(text, str):
-        logger.error('Invalid input for rewrite_answer: expected string')
-        return '⚠️ Ongeldige invoer voor herschrijven'
     resp = openai.chat.completions.create(
         model=MODEL,
         messages=[
             {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
             {'role': 'user', 'content': text}
         ],
-        temperature=0.2,
-        max_tokens=300
+        temperature=0.2, max_tokens=300
     )
     return resp.choices[0].message.content.strip()
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def get_ai_answer(text: str) -> str:
-    """Get AI-generated answer for whitelisted topics."""
-    if not isinstance(text, str):
-        logger.error('Invalid input for get_ai_answer: expected string')
-        return '⚠️ Ongeldige invoer voor AI'
-    messages = [{'role': 'system', 'content': 'You are IPAL Chatbox, a helpful Dutch helpdesk assistant.'}]
+    messages = [{'role': 'system', 'content': 'You are IPAL Chatbox, helpful Dutch helpdesk assistant.'}]
     messages += [{'role': m['role'], 'content': m['content']} for m in st.session_state.history[-10:]]
     messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
     resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=300)
     return resp.choices[0].message.content.strip()
 
-# -------------------- Answer Logic --------------------
+# -------------------- Antwoordlogica --------------------
 def get_answer(text: str) -> str:
     """
-    Answer the question:
-    1) Search FAQ under selected module.
-    1b) Module definition via AI if only module name is asked.
-    2) AI fallback for whitelisted topics.
-    3) Otherwise return block reason.
+    Beantwoord de vraag:
+    1) Zoek in FAQ onder geselecteerde module.
+    1b) Definitie van module via AI als alleen module naam is gevraagd.
+    2) AI-fallback op whitelisted topics.
+    3) Anders geef blokkade-reden terug.
     """
-    if not isinstance(text, str):
-        logger.error('Invalid input for get_answer: expected string')
-        return '⚠️ Ongeldige invoer'
     # 1) FAQ lookup
     mod_sel = st.session_state.get('selected_module')
     if mod_sel and not faq_df.empty:
@@ -231,7 +211,7 @@ def get_answer(text: str) -> str:
             try:
                 ans = rewrite_answer(ans)
             except Exception as e:
-                logger.warning(f'Rewrite failed: {e}')
+                logging.warning(f"Herschrijf mislukt: {e}")
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
@@ -240,30 +220,31 @@ def get_answer(text: str) -> str:
     if text.strip().lower() == mod:
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"  # Fixed f-string
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
         except Exception as e:
-            logger.error(f'AI definition fallback failed: {e}')
-            return '⚠️ Fout tijdens AI-fallback'
-    # 2) AI fallback for whitelist
+            logging.error(f"AI-definition fallback mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+    # 2) AI-fallback op whitelist
     allowed, reason = filter_chatbot_topics(text)
     if allowed:
         try:
             ai_resp = get_ai_answer(text)
-            return f"IPAL-Helpdesk antwoord:\n{ai_resp}"  # Fixed f-string
+            return f"IPAL-Helpdesk antwoord:
+{ai_resp}"
         except Exception as e:
-            logger.error(f'AI call failed: {e}')
-            return '⚠️ Fout tijdens AI-fallback'
-    # 3) Otherwise return block reason
+            logging.error(f"AI-aanroep mislukt: {e}")
+            return "⚠️ Fout tijdens AI-fallback"
+    # 3) Anders geen antwoord
     return reason
 
-# -------------------- Main Application --------------------
+# -------------------- Hoofdapplicatie-------------------- --------------------
 def main():
-    """Main Streamlit application."""
     if st.session_state.reset_triggered:
         on_reset()
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
 
-    # Select product
+    # Kies product
     if not st.session_state.selected_product:
         st.header('Welkom bij de IPAL Chatbox')
         st.write('Klik op het systeem:')
@@ -279,7 +260,7 @@ def main():
         render_chat()
         return
 
-    # Select module
+    # Kies module
     if not st.session_state.selected_module:
         opties = subthema_dict.get(st.session_state.selected_product, [])
         keuze = st.selectbox('Kies onderwerp:', ['(Kies)'] + opties)
@@ -290,7 +271,7 @@ def main():
         render_chat()
         return
 
-    # Chat interaction
+    # Chat interactie
     render_chat()
     vraag = st.chat_input('Stel hier uw vraag:')
     if vraag:
