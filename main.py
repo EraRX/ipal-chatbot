@@ -114,8 +114,14 @@ def add_message(role: str, content: str):
 
 def render_chat():
     for msg in st.session_state.history:
-        avatar = '🤖' if msg['role'] == 'assistant' else '🙂'
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+        if msg['role'] == 'assistant' and os.path.exists("aichatbox.jpg"):
+            avatar_img = Image.open("aichatbox.jpg")
+            avatar = avatar_img.resize((64, 64))
+        else:
+            avatar = '🙂'
+        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}
+
+_{msg['time']}_")
 
 def on_reset():
     st.session_state.reset_triggered = True
