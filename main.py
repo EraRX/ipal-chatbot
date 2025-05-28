@@ -91,7 +91,6 @@ faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in producten}
 
-
 def validate_api_key():
     if not openai.api_key:
         logging.error("Geen API-sleutel gevonden")
@@ -149,7 +148,6 @@ def render_chat():
 def on_reset():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    st.session_state.reset_triggered = False
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def rewrite_answer(text: str) -> str:
@@ -192,12 +190,9 @@ def get_answer(text: str) -> str:
         return "⚠️ Fout tijdens AI-fallback"
 
 def main():
-    if st.session_state.get('reset_triggered', False):
+    if st.sidebar.button('🔄 Nieuw gesprek'):
         on_reset()
         st.rerun()
-
-    if st.sidebar.button('🔄 Nieuw gesprek'):
-        st.session_state.reset_triggered = True
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
