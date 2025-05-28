@@ -159,7 +159,7 @@ def rewrite_answer(text: str) -> str:
             {'role': 'system', 'content': 'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
             {'role': 'user', 'content': text}
         ],
-        temperature=0.2, max_tokens=300
+        temperature=0.2, max_tokens=800
     )
     return resp.choices[0].message.content.strip()
 
@@ -168,7 +168,7 @@ def get_ai_answer(text: str) -> str:
     messages = [{'role': 'system', 'content': 'Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent.'}]
     messages += [{'role': m['role'], 'content': m['content']} for m in st.session_state.history[-10:]]
     messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
-    resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=300)
+    resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=800)
     return resp.choices[0].message.content.strip()
 
 def get_answer(text: str) -> str:
