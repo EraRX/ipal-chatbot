@@ -124,8 +124,8 @@ def render_chat():
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
-    st.session_state.clear()
-    st.rerun()
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
@@ -171,8 +171,9 @@ def get_answer(text: str) -> str:
 
 # -------------------- Hoofdapplicatie --------------------
 def main():
-    if st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset):
-        return
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        on_reset()
+        st.experimental_rerun()
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
