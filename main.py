@@ -41,7 +41,7 @@ BLACKLIST_CATEGORIES = [
 def filter_chatbot_topics(message: str) -> (bool, str):
     text = message.lower()
     for blocked in BLACKLIST_CATEGORIES:
-        if re.search(rf"\\b{re.escape(blocked)}\\b", text):
+        if re.search(rf"\b{re.escape(blocked)}\b", text):
             return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
     return True, ''
 
@@ -126,6 +126,7 @@ def render_chat():
 def on_reset():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
+    st.session_state.reset_triggered = False
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
@@ -171,9 +172,12 @@ def get_answer(text: str) -> str:
 
 # -------------------- Hoofdapplicatie --------------------
 def main():
-    if st.sidebar.button('🔄 Nieuw gesprek'):
+    if st.session_state.get('reset_triggered', False):
         on_reset()
-        st.experimental_rerun()
+        st.rerun()
+
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        st.session_state.reset_triggered = True
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
