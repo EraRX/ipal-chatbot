@@ -125,7 +125,6 @@ def render_chat():
 
 def on_reset():
     st.session_state.clear()
-    st.query_params.clear()
     st.rerun()
 
 # -------------------- AI Interaction --------------------
@@ -172,8 +171,8 @@ def get_answer(text: str) -> str:
 
 # -------------------- Hoofdapplicatie --------------------
 def main():
-    if st.sidebar.button('🔄 Nieuw gesprek'):
-        on_reset()
+    if st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset):
+        return
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
