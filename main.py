@@ -120,7 +120,7 @@ subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().u
 
 # -------------------- Sessiestatus --------------------
 def init_session():
-    defaults = {'history': [], 'selected_product': None, 'selected_module': None}
+    defaults = {'history': [], 'selected_product': None, 'selected_module': None, 'reset_triggered': False}
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
 init_session()
@@ -141,7 +141,8 @@ def on_reset():
     for key in ['history', 'selected_product', 'selected_module']:
         if key in st.session_state:
             del st.session_state[key]
-    st.rerun()
+    st.session_state.clear()
+    st.experimental_set_query_params()
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
@@ -187,7 +188,10 @@ def get_answer(text: str) -> str:
 
 # -------------------- Hoofdapplicatie --------------------
 def main():
-    st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        on_reset()
+        st.rerun()
+
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
         c1, c2 = st.columns(2)
@@ -200,6 +204,7 @@ def main():
             add_message('assistant', 'Gekozen: Exact')
             st.rerun()
         render_chat(); return
+
     if not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
@@ -208,6 +213,7 @@ def main():
             add_message('assistant', f"Gekozen: {sel}")
             st.rerun()
         render_chat(); return
+
     render_chat()
     vraag = st.chat_input('Stel hier uw vraag:')
     if vraag:
