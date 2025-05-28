@@ -29,20 +29,58 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-# -------------------- Topic Filtering --------------------
+# -------------------- Uitgebreide Blacklist --------------------
 BLACKLIST_CATEGORIES = [
-    "politiek", "religie", "persoonlijke gegevens", "gezondheid", "gokken",
-    "adult content", "geweld", "haatzaaiende taal", "desinformatie",
-    "geloofsovertuiging", "medische gegevens", "strafrechtelijk verleden",
-    "seksuele inhoud", "complottheorie", "nepnieuws", "discriminatie",
-    "racisme", "extremisme", "godsdienstige leer", "persoonlijke overtuiging"
+    # Persoonlijke en gevoelige gegevens (AVG-gerelateerd)
+    "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
+    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
+    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
+    "seksuele geaardheid", "etniciteit", "nationaliteit",
+
+    # Inhoud gerelateerd aan discriminatie en haat
+    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
+    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
+    "stereotypering",
+
+    # Religie en geloof
+    "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
+    "sekten", "godslastering",
+
+    # Politiek en extremisme
+    "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
+
+    # Seksuele inhoud
+    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
+    "seksualiteit", "erotiek", "prostitutie",
+
+    # Geweld en criminaliteit
+    "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld", "oorlog",
+    "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
+
+    # Desinformatie en complotten
+    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
+
+    # Gokken en verslaving
+    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
+
+    # Andere maatschappelijk gevoelige onderwerpen
+    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
+    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
+
+    # Cybergerelateerde risico's
+    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
+    "identiteitsdiefstal",
+
+    # Overige
+    "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud", "gruwelijke inhoud",
+    "sensatiezucht", "privacy schending"
 ]
 
 def filter_chatbot_topics(message: str) -> (bool, str):
     text = message.lower()
     for blocked in BLACKLIST_CATEGORIES:
-        if re.search(rf"\b{re.escape(blocked)}\b", text):
-            return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
+        if blocked in text:
+            return False, f"⚠️ AI-fallback niet toegestaan voor dit onderwerp"
     return True, ''
 
 # -------------------- Configuratie --------------------
