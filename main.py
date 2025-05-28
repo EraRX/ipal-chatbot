@@ -58,9 +58,9 @@ BLACKLIST_CATEGORIES = [
 def filter_chatbot_topics(message: str) -> (bool, str):
     text = message.lower()
     for blocked in BLACKLIST_CATEGORIES:
-        if re.search(rf"\\b{re.escape(blocked)}\\b", text):
+        if blocked in text:
             return False, f"Geblokkeerd: bevat verboden onderwerp '{blocked}'"
-    return True, ''  # AI fallback altijd toegestaan tenzij blacklist
+    return True, ''
 
 # -------------------- Configuratie --------------------
 load_dotenv()
