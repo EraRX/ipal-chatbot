@@ -30,23 +30,6 @@ logging.basicConfig(
 )
 
 # -------------------- Topic Filtering --------------------
-WHITELIST_TOPICS = {
-    "ledenadministratie": [
-        "parochiaan", "lidmaatschap", "inschrijving", "uitschrijving", "doopregister",
-        "sila", "parochie", "postcode", "adreswijziging", "verhuizing", "mutatie",
-        "kerkledenadministratie", "doopdatum", "ledenbeheer", "registratie"
-    ],
-    "exact_online_boekhouding_financien": [
-        "boekhouding", "financiën", "kerkbijdrage", "factuur", "betaling", "budget",
-        "financieel beheer", "exact online", "administratie", "rekening", "kosten",
-        "inkomsten", "uitgaven", "begraafplaatsadministratie", "donatie"
-    ],
-    "rooms_katholieke_kerk_administratief": [
-        "parochiebeheer", "bisdom", "kerkprovincie", "kerkelijke administratie",
-        "parochieblad", "vrijwilligers", "functionaris gegevensbescherming",
-        "verwerkersovereenkomst", "avg-compliance", "statuten"
-    ]
-}
 BLACKLIST_CATEGORIES = [
     "politiek", "religie", "persoonlijke gegevens", "gezondheid", "gokken",
     "adult content", "geweld", "haatzaaiende taal", "desinformatie",
@@ -107,7 +90,10 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
         st.error('⚠️ Kan FAQ niet laden')
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     required = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
-    if any(c not in df.columns for c in required):
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        logging.error(f"FAQ mist kolommen: {missing}")
+        st.error(f"FAQ mist kolommen: {missing}")
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
@@ -138,11 +124,9 @@ def render_chat():
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
-    for key in ['history', 'selected_product', 'selected_module']:
-        if key in st.session_state:
-            del st.session_state[key]
     st.session_state.clear()
-    st.experimental_set_query_params()
+    st.query_params.clear()
+    st.rerun()
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
@@ -190,7 +174,6 @@ def get_answer(text: str) -> str:
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         on_reset()
-        st.rerun()
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
@@ -207,7 +190,7 @@ def main():
 
     if not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
+        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + list(opts))
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_message('assistant', f"Gekozen: {sel}")
