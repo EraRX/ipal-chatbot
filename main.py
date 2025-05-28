@@ -172,7 +172,7 @@ def get_ai_answer(text: str) -> str:
 def get_answer(text: str) -> str:
     mod_sel = st.session_state.get('selected_module')
     if mod_sel and not faq_df.empty:
-        dfm = faq_df[faq_df['Subthema'] == mod_sel]
+        dfm = faq_df[faq_df['Subthema'].str.lower() == mod_sel.lower()]
         matches = dfm[dfm['combined'].str.contains(re.escape(text), case=False, na=False)]
         if not matches.empty:
             row = matches.iloc[0]
