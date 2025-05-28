@@ -120,7 +120,7 @@ subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().u
 
 # -------------------- Sessiestatus --------------------
 def init_session():
-    defaults = {'history': [], 'selected_product': None, 'selected_module': None, 'reset_triggered': False}
+    defaults = {'history': [], 'selected_product': None, 'selected_module': None}
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
 init_session()
@@ -138,8 +138,10 @@ def render_chat():
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
-    init_session()
-    st.experimental_rerun()
+    for key in ['history', 'selected_product', 'selected_module']:
+        if key in st.session_state:
+            del st.session_state[key]
+    st.rerun()
 
 # -------------------- AI Interaction --------------------
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
@@ -185,7 +187,6 @@ def get_answer(text: str) -> str:
 
 # -------------------- Hoofdapplicatie --------------------
 def main():
-    if st.session_state.reset_triggered: on_reset()
     st.sidebar.button('🔄 Nieuw gesprek', on_click=on_reset)
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
