@@ -2,8 +2,10 @@ streamlit
 openai
 pandas
 pillow
-python-dotenv
 tenacity
+scikit-learn
+python-dotenv
 openpyxl
 requests
 beautifulsoup4
+
