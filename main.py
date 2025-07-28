@@ -1,4 +1,5 @@
-# main.py
+python
+
 """
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
@@ -7,6 +8,7 @@ IPAL Chatbox voor oudere vrijwilligers
 - Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
 - Logging en foutafhandeling
 - PDF download functionaliteit toegevoegd
+- Algemeen optie toegevoegd voor brede vragen
 """
 import os
 import re
@@ -92,8 +94,8 @@ def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     return df
 
 faq_df = load_faq()
-producten = ['Exact', 'DocBase']
-subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in producten}
+producten = ['Algemeen', 'Exact', 'DocBase']  # Added Algemeen
+subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in ['Exact', 'DocBase']}
 
 def validate_api_key():
     if not openai.api_key:
@@ -197,13 +199,17 @@ def rewrite_answer(text: str) -> str:
 def get_ai_answer(text: str) -> str:
     messages = [{'role': 'system', 'content': 'Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent.'}]
     messages += [{'role': m['role'], 'content': m['content']} for m in st.session_state.history[-10:]]
-    messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
+    if st.session_state.selected_module:
+        messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
+    else:
+        messages.append({'role': 'user', 'content': text})
     resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=800)
     return resp.choices[0].message.content.strip()
 
 def get_answer(text: str) -> str:
     mod_sel = st.session_state.get('selected_module')
-    if mod_sel and not faq_df.empty:
+    # Skip FAQ lookup for Algemeen
+    if mod_sel and st.session_state.selected_product != 'Algemeen' and not faq_df.empty:
         dfm = faq_df[faq_df['Subthema'].str.lower() == mod_sel.lower()]
         matches = dfm[dfm['combined'].str.contains(re.escape(text), case=False, na=False)]
         if not matches.empty:
@@ -235,18 +241,23 @@ def main():
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
-        c1, c2 = st.columns(2)
-        if c1.button('DocBase', use_container_width=True):
+        c1, c2, c3 = st.columns(3)  # Adjusted for three options
+        if c1.button('Algemeen', use_container_width=True):
+            st.session_state.selected_product = 'Algemeen'
+            st.session_state.selected_module = 'Algemeen'  # Set module directly for Algemeen
+            add_message('assistant', 'Gekozen: Algemeen')
+            st.rerun()
+        if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_message('assistant', 'Gekozen: DocBase')
             st.rerun()
-        if c2.button('Exact', use_container_width=True):
+        if c3.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_message('assistant', 'Gekozen: Exact')
             st.rerun()
         render_chat(); return
 
-    if not st.session_state.selected_module:
+    if not st.session_state.selected_module and st.session_state.selected_product != 'Algemeen':
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + list(opts))
         if sel != '(Kies)':
@@ -270,3 +281,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
