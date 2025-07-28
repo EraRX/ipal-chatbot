@@ -233,7 +233,8 @@ def main():
             try: ans = rewrite_answer(ans)
             except: pass
             img = row.get("Afbeelding")
-            if img and os.path.exists(img): st.image(img,caption="Voorbeeld",use_column_width=True)
+if isinstance(img, str) and img and os.path.exists(img):
+    st.image(img, caption="Voorbeeld", use_column_width=True)            
             add_message("assistant", ans)
         else:
             try:
