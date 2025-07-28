@@ -6,6 +6,7 @@ IPAL Chatbox voor oudere vrijwilligers
 - Antwoorden uit FAQ aangevuld met AI voor specifieke modules
 - Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
 - Logging en foutafhandeling
+- Antwoorden downloaden als PDF
 
 Geschatte lengte: ~300+ lijnen
 """
@@ -25,6 +26,7 @@ import pytz
 import io
 from fpdf import FPDF
 
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -132,7 +134,9 @@ def render_chat():
             avatar = Image.open('aichatbox.jpg').resize((64, 64))
         elif msg['role'] == 'user' and os.path.exists('parochie.jpg'):
             avatar = Image.open('parochie.jpg').resize((64, 64))
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}
+
+_{msg['time']}_")
 
 def on_reset():
     for key in list(st.session_state.keys()):
@@ -173,7 +177,8 @@ def get_answer(text: str) -> str:
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
     try:
-        return f"IPAL-Helpdesk antwoord:\n{get_ai_answer(text)}"
+        return f"IPAL-Helpdesk antwoord:
+{get_ai_answer(text)}"
     except Exception as e:
         logging.error(f"AI-call mislukt: {e}")
         return "⚠️ Fout tijdens AI-fallback"
@@ -182,7 +187,8 @@ def genereer_pdf(tekst):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for lijn in tekst.split('\n'):
+    for lijn in tekst.split('
+'):
         pdf.multi_cell(0, 10, lijn)
     buffer = io.BytesIO()
     pdf.output(buffer)
@@ -194,6 +200,7 @@ def main():
         on_reset()
         st.rerun()
 
+    # Laatste antwoord exporteren naar PDF
     if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
         laatste_antwoord = st.session_state.history[-1]['content']
         if st.download_button('📄 Download antwoord als PDF', data=genereer_pdf(laatste_antwoord), file_name='IPAL-antwoord.pdf', mime='application/pdf'):
