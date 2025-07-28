@@ -11,10 +11,9 @@ import textwrap
 import streamlit as st
 import pandas as pd
 import pytz
-from PIL import Image
+from PIL import Image as PILImage
 from dotenv import load_dotenv
 
-# — Use the new v1 OpenAI client interface —
 from openai import OpenAI
 try:
     from openai.error import RateLimitError
@@ -50,10 +49,7 @@ OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
     st.sidebar.error("🔑 Voeg je OpenAI API key toe in .env of Streamlit Secrets.")
     st.stop()
-
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
-
-# — Instantiate the OpenAI client —
 client = OpenAI(api_key=OPENAI_KEY)
 
 # — Retry wrapper for RateLimitError —
@@ -153,7 +149,7 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# — PDF export with wrapping —
+# — PDF export with logo & wrapping —
 def genereer_pdf(tekst: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -163,12 +159,29 @@ def genereer_pdf(tekst: str) -> bytes:
     right_margin = 40
     usable_width = width - left_margin - right_margin
 
-    text_obj = c.beginText(left_margin, height - 50)
+    # Draw logo if available
+    logo_path = "logo.png"
+    logo_height = 50
+    if os.path.exists(logo_path):
+        img = PILImage.open(logo_path)
+        aspect = img.width / img.height
+        logo_width = logo_height * aspect
+        c.drawImage(
+            logo_path,
+            left_margin,
+            height - logo_height - 10,
+            width=logo_width,
+            height=logo_height,
+            mask="auto"
+        )
+        text_start_y = height - logo_height - 30
+    else:
+        text_start_y = height - 50
+
+    text_obj = c.beginText(left_margin, text_start_y)
     text_obj.setFont("Helvetica", 12)
 
-    # Approximate max chars per line (12pt font ~0.6em/char)
     max_chars = int(usable_width / (12 * 0.6))
-
     for paragraph in tekst.split("\n"):
         lines = textwrap.wrap(paragraph, width=max_chars)
         if not lines:
@@ -191,7 +204,7 @@ AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 def get_avatar(role: str):
     path = AVATARS.get(role)
     if path and os.path.exists(path):
-        return Image.open(path).resize((64, 64))
+        return PILImage.open(path).resize((64, 64))
     return "🙂"
 
 def add_message(role: str, content: str):
