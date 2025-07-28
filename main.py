@@ -125,6 +125,9 @@ def add_message(role: str, content: str):
     st.session_state.history.append({'role': role, 'content': content, 'time': ts})
     st.session_state.history = st.session_state.history[-MAX_HISTORY:]
 
+import io
+from fpdf import FPDF
+
 def render_chat():
     for msg in st.session_state.history:
         avatar = '🙂'
@@ -178,10 +181,28 @@ def get_answer(text: str) -> str:
         logging.error(f"AI-call mislukt: {e}")
         return "⚠️ Fout tijdens AI-fallback"
 
+def genereer_pdf(tekst):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    for lijn in tekst.split('
+'):
+        pdf.multi_cell(0, 10, lijn)
+    buffer = io.BytesIO()
+    pdf.output(buffer)
+    buffer.seek(0)
+    return buffer
+
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         on_reset()
         st.rerun()
+
+    # Laatste antwoord exporteren naar PDF
+    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+        laatste_antwoord = st.session_state.history[-1]['content']
+        if st.download_button('📄 Download antwoord als PDF', data=genereer_pdf(laatste_antwoord), file_name='IPAL-antwoord.pdf', mime='application/pdf'):
+            pass
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
