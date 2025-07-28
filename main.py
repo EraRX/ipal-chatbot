@@ -1,5 +1,4 @@
 python
-
 """
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
