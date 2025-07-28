@@ -101,15 +101,7 @@ if not openai.api_key:
     else:
         st.sidebar.warning('Geen API-sleutel gevonden. Vul uw sleutel in om verder te gaan.')
         st.stop()
-try:
-    openai.models.list()
-except openai.AuthenticationError:
-    st.sidebar.error('⚠️ Ongeldige API-sleutel. Probeer opnieuw.')
-    st.stop()
-except Exception as e:
-    logging.error(f"API-validatie fout: {e}")
-    st.sidebar.error('⚠️ Fout bij API-validatie. Zie logs.')
-    st.stop()
+# Note: skipping explicit API validation to avoid connection issues
 
 def check_blacklist(text: str) -> list[str]:
     return [term for term in BLACKLIST_CATEGORIES if term in text.lower()]
