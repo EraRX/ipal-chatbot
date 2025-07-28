@@ -181,8 +181,8 @@ def genereer_pdf(tekst: str) -> bytes:
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for lijn in tekst.split("
-"):
+        for lijn in tekst.split('
+'):
         # Ensure unicode characters are handled; unsupported chars will be ignored
         pdf.multi_cell(0, 10, lijn)
     # Generate PDF as string, then encode to bytes, ignoring any encode errors
