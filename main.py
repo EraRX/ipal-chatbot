@@ -17,36 +17,44 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-# — Logging config —
+# — Page config & styling —
+st.set_page_config(page_title="IPAL Chatbox", layout="centered")
+st.markdown(
+    """
+    <style>
+      html, body, [class*="css"] { font-size: 20px; }
+      button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# — Logging setup —
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 
-# — Load OpenAI API key —
+# — Load OpenAI key & model —
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API key toe in .env of Streamlit Secrets.")
     st.stop()
 
-# — RateLimitError fallback import —
+MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+
+# — Tenacity retry wrapper for RateLimitError —
 try:
     from openai.error import RateLimitError
 except ImportError:
-    try:
-        RateLimitError = openai.RateLimitError
-    except AttributeError:
-        RateLimitError = Exception
-
-# — OpenAI helper met retry —
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    RateLimitError = getattr(openai, "RateLimitError", Exception)
 
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(min=1, max=10),
-    retry=retry_if_exception_type(RateLimitError)
+    retry=retry_if_exception_type(RateLimitError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
     resp = openai.ChatCompletion.create(
@@ -62,16 +70,13 @@ def rewrite_answer(text: str) -> str:
     return openai_chat(
         [
             {"role": "system", "content": system},
-            {"role": "user",   "content": text}
+            {"role": "user",   "content": text},
         ],
         temperature=0.2,
         max_tokens=800,
     )
 
 def get_ai_answer(prompt: str) -> str:
-    """
-    Fallback AI-antwoord: neem alleen role+content uit de laatste 10 berichten.
-    """
     system = "Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."
     history_msgs = [
         {"role": m["role"], "content": m["content"]}
@@ -104,22 +109,14 @@ BLACKLIST_CATEGORIES = [
 ]
 
 def check_blacklist(message: str) -> list[str]:
-    """
-    Return all blacklist-terms that occur as whole words in the message.
-    """
     found = []
-    msg = message.lower()
+    text = message.lower()
     for term in BLACKLIST_CATEGORIES:
-        pattern = rf"\b{re.escape(term.lower())}\b"
-        if re.search(pattern, msg):
+        if re.search(rf"\b{re.escape(term.lower())}\b", text):
             found.append(term)
     return found
 
 def filter_chatbot_topics(message: str) -> tuple[bool, str]:
-    """
-    If any blacklist-terms are found, return (False, warning).
-    Otherwise (True, "").
-    """
     found = check_blacklist(message)
     if not found:
         return True, ""
@@ -130,7 +127,7 @@ def filter_chatbot_topics(message: str) -> tuple[bool, str]:
     )
     return False, warning
 
-# — FAQ loader —
+# — Load FAQ —
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
@@ -150,8 +147,13 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     return df
 
 faq_df = load_faq()
+PRODUCTS = ["Exact", "DocBase", "Algemeen"]
+subthema_dict = {
+    p: sorted(faq_df[faq_df["Systeem"] == p]["Subthema"].dropna().unique())
+    for p in ["Exact", "DocBase"]
+}
 
-# — PDF-generator —
+# — PDF generator —
 def genereer_pdf(tekst: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -166,21 +168,21 @@ def genereer_pdf(tekst: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# — UI & session helpers —
+# — Session & UI helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
+AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
     if path and os.path.exists(path):
-        return Image.open(path).resize((64,64))
+        return Image.open(path).resize((64, 64))
     return "🙂"
 
 def add_message(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (
-        st.session_state.history + [{"role":role,"content":content,"time":ts}]
+        st.session_state.history + [{"role": role, "content": content, "time": ts}]
     )[-MAX_HISTORY:]
 
 def render_chat():
@@ -189,21 +191,20 @@ def render_chat():
             f"{msg['content']}\n\n_{msg['time']}_"
         )
 
-# — Initialize session state —
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
     st.session_state.selected_module = None
 
-# — Main app —
+# — Main app logic —
 def main():
-    # Nieuw gesprek
+    # Reset conversation
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
-    # Download PDF knop
+    # PDF-download for last assistant reply
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
@@ -213,17 +214,17 @@ def main():
             mime="application/pdf"
         )
 
-    # Product-selectie
+    # Product selection
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
-        if c1.button("DocBase", use_container_width=True):
-            st.session_state.selected_product = "DocBase"
-            add_message("assistant", "Gekozen: DocBase")
-            st.rerun()
-        if c2.button("Exact", use_container_width=True):
+        if c1.button("Exact", use_container_width=True):
             st.session_state.selected_product = "Exact"
             add_message("assistant", "Gekozen: Exact")
+            st.rerun()
+        if c2.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_message("assistant", "Gekozen: DocBase")
             st.rerun()
         if c3.button("Algemeen", use_container_width=True):
             st.session_state.selected_product = "Algemeen"
@@ -233,13 +234,10 @@ def main():
         render_chat()
         return
 
-    # Module-selectie voor DocBase/Exact
+    # Module selection for Exact/DocBase
     if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
-        opties = sorted(
-            faq_df[faq_df["Systeem"] == st.session_state.selected_product]["Subthema"]
-            .dropna().unique()
-        )
-        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opties)
+        opts = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
         if sel != "(Kies)":
             st.session_state.selected_module = sel
             add_message("assistant", f"Gekozen: {sel}")
@@ -247,7 +245,7 @@ def main():
         render_chat()
         return
 
-    # Chat-interface
+    # Chat interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
@@ -260,7 +258,7 @@ def main():
         st.rerun()
 
     with st.spinner("Even zoeken..."):
-        # Zoek in FAQ
+        # Determine FAQ subset
         if st.session_state.selected_product == "Algemeen":
             dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
         else:
@@ -274,7 +272,7 @@ def main():
             ans = row["Antwoord"]
             try:
                 ans = rewrite_answer(ans)
-            except:
+            except Exception:
                 pass
 
             img = row.get("Afbeelding")
@@ -283,7 +281,6 @@ def main():
 
             add_message("assistant", ans)
         else:
-            # AI-fallback with visible error
             prompt = (
                 vraag
                 if st.session_state.selected_product == "Algemeen"
@@ -293,10 +290,12 @@ def main():
                 ai_ans = get_ai_answer(prompt)
                 add_message("assistant", f"IPAL-Helpdesk antwoord:\n{ai_ans}")
             except Exception as e:
-                logging.exception("AI-fallback mislukt")
-                st.error(f"AI-fallback mislukt: {e}")
-                add_message("assistant", "⚠️ Fout tijdens AI-fallback")
-
+                logging.exception("AI-fallback mislukt:")
+                # Show exactly what went wrong
+                add_message(
+                    "assistant",
+                    f"⚠️ AI-fallback mislukt: {type(e).__name__}: {e}"
+                )
     st.rerun()
 
 if __name__ == "__main__":
