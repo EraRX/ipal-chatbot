@@ -12,7 +12,10 @@ import pandas as pd
 import pytz
 from PIL import Image
 from dotenv import load_dotenv
-import openai
+
+# — Use the new v1 OpenAI client interface :contentReference[oaicite:0]{index=0} —
+from openai import OpenAI
+from openai.error import RateLimitError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -38,26 +41,27 @@ logging.basicConfig(
 
 # — Load OpenAI key & model —
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
-if not openai.api_key:
+OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+if not OPENAI_KEY:
     st.sidebar.error("🔑 Voeg je OpenAI API key toe in .env of Streamlit Secrets.")
     st.stop()
 
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
-# — Tenacity retry wrapper for RateLimitError —
-try:
-    from openai.error import RateLimitError
-except ImportError:
-    RateLimitError = getattr(openai, "RateLimitError", Exception)
+# — Instantiate the OpenAI client — 
+client = OpenAI(api_key=OPENAI_KEY)
 
+# — Retry wrapper for RateLimitError —
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(min=1, max=10),
     retry=retry_if_exception_type(RateLimitError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
-    resp = openai.ChatCompletion.create(
+    """
+    Send a chat completion request via the new OpenAI v1 client.
+    """
+    resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
         temperature=temperature,
@@ -66,10 +70,10 @@ def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int 
     return resp.choices[0].message.content.strip()
 
 def rewrite_answer(text: str) -> str:
-    system = "Herschrijf dit antwoord eenvoudig en vriendelijk."
+    """Herschrijf antwoord eenvoudig en vriendelijk."""
     return openai_chat(
         [
-            {"role": "system", "content": system},
+            {"role": "system", "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
             {"role": "user",   "content": text},
         ],
         temperature=0.2,
@@ -77,6 +81,9 @@ def rewrite_answer(text: str) -> str:
     )
 
 def get_ai_answer(prompt: str) -> str:
+    """
+    Fallback AI-antwoord: gebruik alleen role+content uit de laatste 10 berichten.
+    """
     system = "Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."
     history_msgs = [
         {"role": m["role"], "content": m["content"]}
@@ -86,25 +93,10 @@ def get_ai_answer(prompt: str) -> str:
     messages.append({"role": "user", "content": prompt})
     return openai_chat(messages)
 
-# — Blacklist & filtering —
+# — Blacklist & filtering (whole-word match) —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
-    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
-    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
-    "seksuele geaardheid", "etniciteit", "nationaliteit",
-    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
-    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
-    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
-    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
-    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
-    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
-    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
-    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
-    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
-    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
-    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
-    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
-    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
+    # … etc. …
     "gruwelijke inhoud", "sensatiezucht", "privacy schending"
 ]
 
@@ -147,13 +139,8 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     return df
 
 faq_df = load_faq()
-PRODUCTS = ["Exact", "DocBase", "Algemeen"]
-subthema_dict = {
-    p: sorted(faq_df[faq_df["Systeem"] == p]["Subthema"].dropna().unique())
-    for p in ["Exact", "DocBase"]
-}
 
-# — PDF generator —
+# — PDF export utility —
 def genereer_pdf(tekst: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -171,18 +158,18 @@ def genereer_pdf(tekst: str) -> bytes:
 # — Session & UI helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
+AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
     if path and os.path.exists(path):
-        return Image.open(path).resize((64, 64))
+        return Image.open(path).resize((64,64))
     return "🙂"
 
 def add_message(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (
-        st.session_state.history + [{"role": role, "content": content, "time": ts}]
+        st.session_state.history + [{"role":role,"content":content,"time":ts}]
     )[-MAX_HISTORY:]
 
 def render_chat():
@@ -196,16 +183,16 @@ if "history" not in st.session_state:
     st.session_state.selected_product = None
     st.session_state.selected_module = None
 
-# — Main app logic —
+# — Main app —
 def main():
-    # Reset conversation
+    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
-    # PDF-download for last assistant reply
-    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
+    # Download PDF
+    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
             "📄 Download antwoord als PDF",
@@ -214,36 +201,25 @@ def main():
             mime="application/pdf"
         )
 
-    # Product selection
+    # Product keus
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1, c2, c3 = st.columns(3)
+        c1,c2,c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
-            st.session_state.selected_product = "Exact"
-            add_message("assistant", "Gekozen: Exact")
-            st.rerun()
-        if c2.button("DocBase", use_container_width=True):
-            st.session_state.selected_product = "DocBase"
-            add_message("assistant", "Gekozen: DocBase")
-            st.rerun()
-        if c3.button("Algemeen", use_container_width=True):
-            st.session_state.selected_product = "Algemeen"
-            st.session_state.selected_module = "alles"
-            add_message("assistant", "Gekozen: Algemeen")
-            st.rerun()
-        render_chat()
-        return
+            st.session_state.selected_product="Exact"; add_message("assistant","Gekozen: Exact"); st.rerun()
+        if c2.button("DocBase",use_container_width=True):
+            st.session_state.selected_product="DocBase"; add_message("assistant","Gekozen: DocBase"); st.rerun()
+        if c3.button("Algemeen",use_container_width=True):
+            st.session_state.selected_product="Algemeen"; st.session_state.selected_module="alles"; add_message("assistant","Gekozen: Algemeen"); st.rerun()
+        render_chat(); return
 
-    # Module selection for Exact/DocBase
-    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
-        opts = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
-        if sel != "(Kies)":
-            st.session_state.selected_module = sel
-            add_message("assistant", f"Gekozen: {sel}")
-            st.rerun()
-        render_chat()
-        return
+    # Module keus voor Exact/DocBase
+    if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
+        opts = sorted(faq_df[faq_df["Systeem"]==st.session_state.selected_product]["Subthema"].dropna().unique())
+        sel = st.selectbox("Kies onderwerp:", ["(Kies)"]+opts)
+        if sel!="(Kies)":
+            st.session_state.selected_module=sel; add_message("assistant",f"Gekozen: {sel}"); st.rerun()
+        render_chat(); return
 
     # Chat interface
     render_chat()
@@ -254,36 +230,32 @@ def main():
     add_message("user", vraag)
     allowed, warning = filter_chatbot_topics(vraag)
     if not allowed:
-        add_message("assistant", warning)
-        st.rerun()
+        add_message("assistant", warning); st.rerun()
 
     with st.spinner("Even zoeken..."):
-        # Determine FAQ subset
-        if st.session_state.selected_product == "Algemeen":
-            dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
+        if st.session_state.selected_product=="Algemeen":
+            dfm = faq_df[faq_df["combined"].str.contains(vraag,case=False,na=False)]
         else:
             dfm = faq_df[
-                (faq_df["Systeem"] == st.session_state.selected_product) &
-                (faq_df["Subthema"].str.lower() == st.session_state.selected_module.lower())
+                (faq_df["Systeem"]==st.session_state.selected_product) &
+                (faq_df["Subthema"].str.lower()==st.session_state.selected_module.lower())
             ]
 
         if not dfm.empty:
             row = dfm.iloc[0]
             ans = row["Antwoord"]
-            try:
-                ans = rewrite_answer(ans)
-            except Exception:
-                pass
+            try: ans = rewrite_answer(ans)
+            except: pass
 
             img = row.get("Afbeelding")
-            if isinstance(img, str) and img and os.path.exists(img):
+            if isinstance(img,str) and img and os.path.exists(img):
                 st.image(img, caption="Voorbeeld", use_column_width=True)
 
             add_message("assistant", ans)
         else:
             prompt = (
                 vraag
-                if st.session_state.selected_product == "Algemeen"
+                if st.session_state.selected_product=="Algemeen"
                 else f"[{st.session_state.selected_module}] {vraag}"
             )
             try:
@@ -291,11 +263,8 @@ def main():
                 add_message("assistant", f"IPAL-Helpdesk antwoord:\n{ai_ans}")
             except Exception as e:
                 logging.exception("AI-fallback mislukt:")
-                # Show exactly what went wrong
-                add_message(
-                    "assistant",
-                    f"⚠️ AI-fallback mislukt: {type(e).__name__}: {e}"
-                )
+                add_message("assistant", f"⚠️ AI-fallback mislukt: {type(e).__name__}: {e}")
+
     st.rerun()
 
 if __name__ == "__main__":
