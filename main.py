@@ -183,8 +183,7 @@ def genereer_pdf(tekst: str) -> bytes:
     width, height = A4
     text_obj = c.beginText(40, height - 50)
     text_obj.setFont("Helvetica", 12)
-    for line in tekst.split('
-'):
+    for line in tekst.split('\n'):
         text_obj.textLine(line)
     c.drawText(text_obj)
     c.showPage()
