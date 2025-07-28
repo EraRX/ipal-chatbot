@@ -95,14 +95,12 @@ subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().u
 
 # Validate or input OpenAI key
 if not openai.api_key:
-    # Prompt user to enter API key if not set
     api_key_input = st.sidebar.text_input('🔑 Voer uw OpenAI API-sleutel in:', type='password')
     if api_key_input:
         openai.api_key = api_key_input
     else:
         st.sidebar.warning('Geen API-sleutel gevonden. Vul uw sleutel in om verder te gaan.')
         st.stop()
-# Optional validation of API key
 try:
     openai.models.list()
 except openai.AuthenticationError:
@@ -111,23 +109,7 @@ except openai.AuthenticationError:
 except Exception as e:
     logging.error(f"API-validatie fout: {e}")
     st.sidebar.error('⚠️ Fout bij API-validatie. Zie logs.')
-    st.stop():
-    if not openai.api_key:
-        logging.error("Geen API-sleutel gevonden")
-        st.error('⚠️ Stel uw OPENAI_API_KEY in via .env-bestand')
-        st.stop()
-    try:
-        openai.models.list()
-    except openai.AuthenticationError:
-        logging.error("Ongeldige API-sleutel")
-        st.error('⚠️ Ongeldige API-sleutel')
-        st.stop()
-    except Exception as e:
-        logging.error(f"API-validatie fout: {e}")
-        st.error('⚠️ Fout bij API-validatie')
-        st.stop()
-
-validate_api_key()
+    st.stop()
 
 def check_blacklist(text: str) -> list[str]:
     return [term for term in BLACKLIST_CATEGORIES if term in text.lower()]
