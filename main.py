@@ -178,12 +178,15 @@ def get_answer(text: str) -> str:
         return "⚠️ Fout tijdens AI-fallback"
 
 def genereer_pdf(tekst: str) -> bytes:
-    pdf=FPDF()
+    pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial",size=12)
-    for lijn in tekst.split("\n"):
-        pdf.multi_cell(0,10,lijn)
-    return pdf.output(dest='S').encode('latin-1')
+    pdf.set_font("Arial", size=12)
+    for lijn in tekst.split("
+"):
+        # Ensure unicode characters are handled; unsupported chars will be ignored
+        pdf.multi_cell(0, 10, lijn)
+    # Generate PDF as string, then encode to bytes, ignoring any encode errors
+    return pdf.output(dest='S').encode('latin-1', 'ignore')
 
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
