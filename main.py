@@ -6,6 +6,7 @@ import sys
 import logging
 from datetime import datetime
 import io
+import textwrap
 
 import streamlit as st
 import pandas as pd
@@ -15,7 +16,6 @@ from dotenv import load_dotenv
 
 # — Use the new v1 OpenAI client interface —
 from openai import OpenAI
-# Fallback if openai.error doesn’t exist
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -94,7 +94,22 @@ def get_ai_answer(prompt: str) -> str:
 # — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
-    # … etc. …
+    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
+    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
+    "seksuele geaardheid", "etniciteit", "nationaliteit",
+    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
+    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
+    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
+    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
+    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
+    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
+    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
+    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
+    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
+    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
+    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
+    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
+    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
     "gruwelijke inhoud", "sensatiezucht", "privacy schending"
 ]
 
@@ -138,36 +153,51 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
 
 faq_df = load_faq()
 
-# — PDF export utility —
+# — PDF export with wrapping —
 def genereer_pdf(tekst: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
-    text_obj = c.beginText(40, height - 50)
+
+    left_margin = 40
+    right_margin = 40
+    usable_width = width - left_margin - right_margin
+
+    text_obj = c.beginText(left_margin, height - 50)
     text_obj.setFont("Helvetica", 12)
-    for line in tekst.split("\n"):
-        text_obj.textLine(line)
+
+    # Approximate max chars per line (12pt font ~0.6em/char)
+    max_chars = int(usable_width / (12 * 0.6))
+
+    for paragraph in tekst.split("\n"):
+        lines = textwrap.wrap(paragraph, width=max_chars)
+        if not lines:
+            text_obj.textLine("")
+        else:
+            for line in lines:
+                text_obj.textLine(line)
+
     c.drawText(text_obj)
     c.showPage()
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
 
-# — Session & UI helpers —
+# — UI & session helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
+AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
     if path and os.path.exists(path):
-        return Image.open(path).resize((64,64))
+        return Image.open(path).resize((64, 64))
     return "🙂"
 
 def add_message(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (
-        st.session_state.history + [{"role":role,"content":content,"time":ts}]
+        st.session_state.history + [{"role": role, "content": content, "time": ts}]
     )[-MAX_HISTORY:]
 
 def render_chat():
@@ -183,11 +213,13 @@ if "history" not in st.session_state:
 
 # — Main app —
 def main():
+    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
+    # PDF-download for last assistant reply
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
@@ -197,24 +229,41 @@ def main():
             mime="application/pdf"
         )
 
+    # Product-selectie
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1,c2,c3 = st.columns(3)
+        c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
-            st.session_state.selected_product="Exact"; add_message("assistant","Gekozen: Exact"); st.rerun()
-        if c2.button("DocBase",use_container_width=True):
-            st.session_state.selected_product="DocBase"; add_message("assistant","Gekozen: DocBase"); st.rerun()
-        if c3.button("Algemeen",use_container_width=True):
-            st.session_state.selected_product="Algemeen"; st.session_state.selected_module="alles"; add_message("assistant","Gekozen: Algemeen"); st.rerun()
-        render_chat(); return
+            st.session_state.selected_product = "Exact"
+            add_message("assistant", "Gekozen: Exact")
+            st.rerun()
+        if c2.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_message("assistant", "Gekozen: DocBase")
+            st.rerun()
+        if c3.button("Algemeen", use_container_width=True):
+            st.session_state.selected_product = "Algemeen"
+            st.session_state.selected_module = "alles"
+            add_message("assistant", "Gekozen: Algemeen")
+            st.rerun()
+        render_chat()
+        return
 
-    if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
-        opts = sorted(faq_df[faq_df["Systeem"]==st.session_state.selected_product]["Subthema"].dropna().unique())
-        sel = st.selectbox("Kies onderwerp:",["(Kies)"]+opts)
-        if sel!="(Kies)":
-            st.session_state.selected_module=sel; add_message("assistant",f"Gekozen: {sel}"); st.rerun()
-        render_chat(); return
+    # Module-selectie voor Exact/DocBase
+    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
+        opts = sorted(
+            faq_df[faq_df["Systeem"] == st.session_state.selected_product]["Subthema"]
+            .dropna().unique()
+        )
+        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
+        if sel != "(Kies)":
+            st.session_state.selected_module = sel
+            add_message("assistant", f"Gekozen: {sel}")
+            st.rerun()
+        render_chat()
+        return
 
+    # Chat interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
@@ -223,32 +272,35 @@ def main():
     add_message("user", vraag)
     allowed, warning = filter_chatbot_topics(vraag)
     if not allowed:
-        add_message("assistant", warning); st.rerun()
+        add_message("assistant", warning)
+        st.rerun()
 
     with st.spinner("Even zoeken..."):
-        if st.session_state.selected_product=="Algemeen":
-            dfm = faq_df[faq_df["combined"].str.contains(vraag,case=False,na=False)]
+        if st.session_state.selected_product == "Algemeen":
+            dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
         else:
             dfm = faq_df[
-                (faq_df["Systeem"]==st.session_state.selected_product) &
-                (faq_df["Subthema"].str.lower()==st.session_state.selected_module.lower())
+                (faq_df["Systeem"] == st.session_state.selected_product) &
+                (faq_df["Subthema"].str.lower() == st.session_state.selected_module.lower())
             ]
 
         if not dfm.empty:
             row = dfm.iloc[0]
             ans = row["Antwoord"]
-            try: ans = rewrite_answer(ans)
-            except: pass
+            try:
+                ans = rewrite_answer(ans)
+            except:
+                pass
 
             img = row.get("Afbeelding")
-            if isinstance(img,str) and img and os.path.exists(img):
+            if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption="Voorbeeld", use_column_width=True)
 
             add_message("assistant", ans)
         else:
             prompt = (
                 vraag
-                if st.session_state.selected_product=="Algemeen"
+                if st.session_state.selected_product == "Algemeen"
                 else f"[{st.session_state.selected_module}] {vraag}"
             )
             try:
