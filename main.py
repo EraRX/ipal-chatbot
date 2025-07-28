@@ -83,21 +83,52 @@ def get_ai_answer(prompt: str) -> str:
 
 # — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
-    # … jouw volledige lijst …
+    "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
+    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
+    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
+    "seksuele geaardheid", "etniciteit", "nationaliteit",
+    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
+    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
+    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
+    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
+    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
+    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
+    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
+    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
+    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
+    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
+    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
+    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
+    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
+    "gruwelijke inhoud", "sensatiezucht", "privacy schending"
 ]
-BLACKLIST_PATTERN = re.compile(
-    r"\b(" + "|".join(map(re.escape, BLACKLIST_CATEGORIES)) + r")\b",
-    flags=re.IGNORECASE
-)
+
+def check_blacklist(message: str) -> list[str]:
+    """
+    Return all blacklist-terms that occur as whole words in the message.
+    """
+    found = []
+    msg = message.lower()
+    for term in BLACKLIST_CATEGORIES:
+        pattern = rf"\b{re.escape(term.lower())}\b"
+        if re.search(pattern, msg):
+            found.append(term)
+    return found
 
 def filter_chatbot_topics(message: str) -> tuple[bool, str]:
-    found = [m.group(0).lower() for m in BLACKLIST_PATTERN.finditer(message)]
+    """
+    If any blacklist-terms are found, return (False, warning).
+    Otherwise (True, "").
+    """
+    found = check_blacklist(message)
     if not found:
         return True, ""
-    return False, (
-        "Je bericht bevat inhoud die niet voldoet aan onze richtlijnen. "
-        "Vermijd gevoelige onderwerpen en probeer het opnieuw."
+    logging.info(f"Blacklist terms flagged: {found} in message: {message!r}")
+    warning = (
+        f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}. "
+        "Vermijd deze onderwerpen en probeer het opnieuw."
     )
+    return False, warning
 
 # — FAQ loader —
 @st.cache_data(show_spinner=False)
@@ -172,8 +203,8 @@ def main():
             del st.session_state[k]
         st.rerun()
 
-    # PDF-downloadknop
-    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
+    # Download PDF knop
+    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
             "📄 Download antwoord als PDF",
@@ -182,32 +213,36 @@ def main():
             mime="application/pdf"
         )
 
-    # Productselectie
+    # Product-selectie
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1,c2,c3 = st.columns(3)
-        if c1.button("DocBase"): 
-            st.session_state.selected_product="DocBase"; add_message("assistant","Gekozen: DocBase"); st.rerun()
-        if c2.button("Exact"):   
-            st.session_state.selected_product="Exact";  add_message("assistant","Gekozen: Exact");   st.rerun()
-        if c3.button("Algemeen"):
-            st.session_state.selected_product="Algemeen"
+        c1, c2, c3 = st.columns(3)
+        if c1.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_message("assistant", "Gekozen: DocBase")
+            st.rerun()
+        if c2.button("Exact", use_container_width=True):
+            st.session_state.selected_product = "Exact"
+            add_message("assistant", "Gekozen: Exact")
+            st.rerun()
+        if c3.button("Algemeen", use_container_width=True):
+            st.session_state.selected_product = "Algemeen"
             st.session_state.selected_module = "alles"
-            add_message("assistant","Gekozen: Algemeen")
+            add_message("assistant", "Gekozen: Algemeen")
             st.rerun()
         render_chat()
         return
 
-    # Moduleselectie voor DocBase/Exact
-    if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
+    # Module-selectie voor DocBase/Exact
+    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
         opties = sorted(
             faq_df[faq_df["Systeem"] == st.session_state.selected_product]["Subthema"]
             .dropna().unique()
         )
-        sel = st.selectbox("Kies onderwerp:",["(Kies)"]+opties)
-        if sel!="(Kies)":
-            st.session_state.selected_module=sel
-            add_message("assistant",f"Gekozen: {sel}")
+        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opties)
+        if sel != "(Kies)":
+            st.session_state.selected_module = sel
+            add_message("assistant", f"Gekozen: {sel}")
             st.rerun()
         render_chat()
         return
@@ -219,38 +254,39 @@ def main():
         return
 
     add_message("user", vraag)
-    ok, warn = filter_chatbot_topics(vraag)
-    if not ok:
-        add_message("assistant", warn)
+    allowed, warning = filter_chatbot_topics(vraag)
+    if not allowed:
+        add_message("assistant", warning)
         st.rerun()
 
     with st.spinner("Even zoeken..."):
         # Zoek in FAQ
-        if st.session_state.selected_product=="Algemeen":
-            dfm = faq_df[faq_df["combined"].str.contains(vraag,case=False,na=False)]
+        if st.session_state.selected_product == "Algemeen":
+            dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
         else:
             dfm = faq_df[
-                (faq_df["Systeem"]==st.session_state.selected_product) &
-                (faq_df["Subthema"].str.lower()==st.session_state.selected_module.lower())
+                (faq_df["Systeem"] == st.session_state.selected_product) &
+                (faq_df["Subthema"].str.lower() == st.session_state.selected_module.lower())
             ]
 
         if not dfm.empty:
             row = dfm.iloc[0]
             ans = row["Antwoord"]
-            try: ans = rewrite_answer(ans)
-            except: pass
+            try:
+                ans = rewrite_answer(ans)
+            except:
+                pass
 
             img = row.get("Afbeelding")
-            if isinstance(img,str) and img and os.path.exists(img):
-                st.image(img,caption="Voorbeeld",use_column_width=True)
+            if isinstance(img, str) and img and os.path.exists(img):
+                st.image(img, caption="Voorbeeld", use_column_width=True)
 
             add_message("assistant", ans)
-
         else:
-            # AI-fallback: nu met zichtbare foutmelding
+            # AI-fallback with visible error
             prompt = (
                 vraag
-                if st.session_state.selected_product=="Algemeen"
+                if st.session_state.selected_product == "Algemeen"
                 else f"[{st.session_state.selected_module}] {vraag}"
             )
             try:
@@ -258,7 +294,7 @@ def main():
                 add_message("assistant", f"IPAL-Helpdesk antwoord:\n{ai_ans}")
             except Exception as e:
                 logging.exception("AI-fallback mislukt")
-                st.error(f"AI-fallback mislukt: {e}")  # laat de fout zien in de UI
+                st.error(f"AI-fallback mislukt: {e}")
                 add_message("assistant", "⚠️ Fout tijdens AI-fallback")
 
     st.rerun()
