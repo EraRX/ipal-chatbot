@@ -24,14 +24,14 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 
-# — Load API key —
+# — Load OpenAI API key —
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API key toe in .env of Streamlit Secrets.")
     st.stop()
 
-# — RateLimitError import fallback —
+# — RateLimitError fallback import —
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -68,17 +68,39 @@ def rewrite_answer(text: str) -> str:
         max_tokens=800,
     )
 
-def get_ai_answer(prompt: str, history: list[dict]) -> str:
+def get_ai_answer(prompt: str) -> str:
+    """
+    Fallback AI-antwoord: gebruik de laatste 10 berichten (role+content) uit de sessie.
+    """
     system = "Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."
-    messages = [{"role": "system", "content": system}] + history
+    history_msgs = [
+        {"role": m["role"], "content": m["content"]}
+        for m in st.session_state.history[-10:]
+    ]
+    messages = [{"role": "system", "content": system}] + history_msgs
     messages.append({"role": "user", "content": prompt})
     return openai_chat(messages)
 
 # — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
-    # … rest van je categorieën …
-    "schokkende inhoud", "gruwelijke inhoud", "privacy schending"
+    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
+    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
+    "seksuele geaardheid", "etniciteit", "nationaliteit",
+    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
+    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
+    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
+    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
+    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
+    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
+    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
+    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
+    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
+    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
+    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
+    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
+    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
+    "gruwelijke inhoud", "sensatiezucht", "privacy schending"
 ]
 BLACKLIST_PATTERN = re.compile(
     r"\b(" + "|".join(map(re.escape, BLACKLIST_CATEGORIES)) + r")\b",
@@ -104,7 +126,7 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=["Systeem","Subthema","combined","Antwoord","Afbeelding"])
     try:
-        df = pd.read_excel(path)
+        df = pd.read_excel(path, engine="openpyxl")
     except Exception as e:
         logging.error(f"Fout bij laden FAQ: {e}")
         st.error("⚠️ Kan FAQ niet laden.")
@@ -133,18 +155,15 @@ def genereer_pdf(tekst: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# — Session & UI helpers —
+# — UI & session helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-AVATARS = {
-    "assistant": "aichatbox.jpg",
-    "user": "parochie.jpg"
-}
+AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
     if path and os.path.exists(path):
-        return Image.open(path).resize((64,64))
+        return Image.open(path).resize((64, 64))
     return "🙂"
 
 def add_message(role: str, content: str):
@@ -173,7 +192,7 @@ def main():
             del st.session_state[k]
         st.rerun()
 
-    # Download PDF-knop
+    # Download PDF knop
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
@@ -222,15 +241,15 @@ def main():
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
         return
-    add_message("user", vraag)
 
+    add_message("user", vraag)
     allowed, warning = filter_chatbot_topics(vraag)
     if not allowed:
         add_message("assistant", warning)
         st.rerun()
 
     with st.spinner("Even zoeken..."):
-        # Kies juiste subset FAQ
+        # Bepaal subset FAQ
         if st.session_state.selected_product == "Algemeen":
             dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
         else:
@@ -248,7 +267,6 @@ def main():
                 pass
 
             img = row.get("Afbeelding")
-            # Veilig checken of img een pad-string is
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption="Voorbeeld", use_column_width=True)
 
@@ -260,11 +278,11 @@ def main():
                     if st.session_state.selected_product == "Algemeen"
                     else f"[{st.session_state.selected_module}] {vraag}"
                 )
-                ai_ans = get_ai_answer(prompt, st.session_state.history[-10:])
+                ai_ans = get_ai_answer(prompt)
                 add_message("assistant", f"IPAL-Helpdesk antwoord:\n{ai_ans}")
             except Exception as e:
-                logging.error(f"AI-fallback mislukt: {e}")
-                add_message("assistant", "⚠️ Fout tijdens AI-fallback")
+                logging.exception("AI-fallback mislukt")
+                add_message("assistant", "⚠️ Fout tijdens AI-fallback (zie serverlogs)")
 
     st.rerun()
 
