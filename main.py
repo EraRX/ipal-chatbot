@@ -62,8 +62,10 @@ BLACKLIST_CATEGORIES = [
 
 MAX_HISTORY = 20
 
-# Load environment variables
+# Load environment variables and disable proxies
 load_dotenv()
+os.environ.pop('HTTP_PROXY', None)  # Disable HTTP proxy
+os.environ.pop('HTTPS_PROXY', None)  # Disable HTTPS proxy
 openai.api_key = os.getenv('OPENAI_API_KEY')
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
@@ -109,10 +111,11 @@ def validate_api_key():
         st.error('⚠️ Stel uw OPENAI_API_KEY in via .env-bestand of Streamlit secrets')
         st.stop()
     try:
-        openai.models.list()
+        client = openai.OpenAI(api_key=openai.api_key)  # Explicit client initialization
+        client.models.list()
         logging.info("OpenAI API-sleutel succesvol gevalideerd")
     except openai.AuthenticationError as e:
-        logging.error(f"Ongeldige API-sleutel: {e}")
+        logging.error(f"Ongeldige API-sleutel: {str(e)}")
         st.error('⚠️ Ongeldige API-sleutel')
         st.stop()
     except Exception as e:
@@ -216,7 +219,7 @@ def get_ai_answer(text: str) -> str:
     """Get AI-generated answer."""
     messages = [{'role': 'system', 'content': 'Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent.'}]
     messages += [{'role': m['role'], 'content': m['content']} for m in st.session_state.history[-10:]]
-    if st.session_state.selected_module:
+    if st.session_state.selected_module and st.session_state.selected_product != 'Algemeen':
         messages.append({'role': 'user', 'content': f"[{st.session_state.selected_module}] {text}"})
     else:
         messages.append({'role': 'user', 'content': text})
