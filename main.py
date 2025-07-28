@@ -181,15 +181,12 @@ def genereer_pdf(tekst: str) -> bytes:
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
+    # Split text on literal newline characters
     for lijn in tekst.split('
 '):
         pdf.multi_cell(0, 10, lijn)
-    return pdf.output(dest='S').encode('latin-1', 'ignore')
-                                
-        # Ensure unicode characters are handled; unsupported chars will be ignored
-        pdf.multi_cell(0, 10, lijn)
-    # Generate PDF as string, then encode to bytes, ignoring any encode errors
-    return pdf.output(dest='S').encode('latin-1', 'ignore')
+    # Output PDF as bytes, ignoring encoding errors
+    return pdf.output(dest='S').encode('latin-1', 'ignore')(dest='S').encode('latin-1', 'ignore')
 
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
