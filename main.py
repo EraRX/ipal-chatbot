@@ -24,7 +24,8 @@ from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import pytz
 import io
-from fpdf import FPDF
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 # Configure logging
 logging.basicConfig(
@@ -177,12 +178,19 @@ def get_answer(text: str) -> str:
         return "⚠️ Fout tijdens AI-fallback"
 
 def genereer_pdf(tekst: str) -> bytes:
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    for lijn in tekst.split('\n'):
-        pdf.multi_cell(0, 10, lijn)
-    return pdf.output(dest='S').encode('latin-1', 'ignore')
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    text_obj = c.beginText(40, height - 50)
+    text_obj.setFont("Helvetica", 12)
+    for line in tekst.split('
+'):
+        text_obj.textLine(line)
+    c.drawText(text_obj)
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer.getvalue()
 
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
