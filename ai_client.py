@@ -2,12 +2,21 @@
 
 import os
 import openai
-from openai.error import RateLimitError
 from tenacity import (
     retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 )
 
-# Haal het model uit de omgeving (defaults naar gpt-4o-mini)
+# Probeer RateLimitError uit de submodule te importeren, anders uit de top-level
+try:
+    from openai.error import RateLimitError
+except ImportError:
+    try:
+        RateLimitError = openai.RateLimitError  # fallback als package structuur anders is
+    except AttributeError:
+        # laatste fallback: vang alle exceptions
+        RateLimitError = Exception
+
+# Model vanuit ENV, default gpt-4o-mini
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(
@@ -30,20 +39,12 @@ def rewrite_answer(text: str) -> str:
     system = "Herschrijf dit antwoord eenvoudig en vriendelijk."
     return openai_chat(
         [{"role": "system", "content": system},
-         {"role": "user", "content": text}],
+         {"role": "user",   "content": text}],
         temperature=0.2,
         max_tokens=800,
     )
 
-def get_ai_answer(prefix: str, history: list[dict], question: str) -> str:
+def get_ai_answer(prompt: str) -> str:
     """
     Vraag een antwoord aan de AI.
-    - prefix: b.v. naam van module of systeemprompt
-    - history: recente chatgeschiedenis (role/content)
-    - question: de vraag van de gebruiker
-    """
-    system = "Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."
-    messages = [{"role": "system", "content": system}]
-    messages += history
-    messages.append({"role": "user", "content": f"[{prefix}] {question}"})
-    return openai_chat(messages)
+    - prompt: een volledige user prompt (inclusief module-prefix indien gew
