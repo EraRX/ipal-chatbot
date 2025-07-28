@@ -9,6 +9,7 @@ IPAL Chatbox voor oudere vrijwilligers
 
 Geschatte lengte: ~300+ lijnen
 """
+
 import os
 import re
 import sys
@@ -36,22 +37,18 @@ BLACKLIST_CATEGORIES = [
     "seksuele geaardheid", "etniciteit", "nationaliteit",
     "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
     "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
-    "stereotypering",
-    "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
-    "sekten", "godslastering",
-    "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
+    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
+    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
     "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
-    "seksualiteit", "erotiek", "prostitutie",
-    "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld", "oorlog",
-    "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
+    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
+    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
     "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
     "gokken", "kansspelen", "verslaving", "online gokken", "casino",
     "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
     "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
     "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
-    "identiteitsdiefstal",
-    "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud", "gruwelijke inhoud",
-    "sensatiezucht", "privacy schending"
+    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
+    "gruwelijke inhoud", "sensatiezucht", "privacy schending"
 ]
 
 MAX_HISTORY = 20
@@ -61,12 +58,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
 
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
-st.markdown('''
-    <style>
-      html, body, [class*="css"] { font-size: 20px; }
-      button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
-    </style>
-''', unsafe_allow_html=True)
+st.markdown('''<style> html, body, [class*="css"] { font-size: 20px; } button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; } </style>''', unsafe_allow_html=True)
 
 @st.cache_data
 def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
@@ -91,6 +83,7 @@ faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in producten}
 
+
 def validate_api_key():
     if not openai.api_key:
         logging.error("Geen API-sleutel gevonden")
@@ -106,32 +99,24 @@ def validate_api_key():
         logging.error(f"API-validatie fout: {e}")
         st.error('⚠️ Fout bij API-validatie')
         st.stop()
+
 validate_api_key()
 
 def check_blacklist(text):
-    found_terms = []
-    text = text.lower()
-    for term in BLACKLIST_CATEGORIES:
-        if term in text:
-            found_terms.append(term)
-    return found_terms
+    return [term for term in BLACKLIST_CATEGORIES if term in text.lower()]
 
 def generate_warning(found_terms):
-    if found_terms:
-        return ("Je bericht bevat inhoud die niet voldoet aan onze richtlijnen. "
-                "Vermijd gevoelige onderwerpen en probeer het opnieuw.")
-    return ""
+    return ("Je bericht bevat inhoud die niet voldoet aan onze richtlijnen. Vermijd gevoelige onderwerpen en probeer het opnieuw." if found_terms else "")
 
-def filter_chatbot_topics(message: str) -> (bool, str):
+def filter_chatbot_topics(message: str):
     found = check_blacklist(message)
-    if found:
-        return False, generate_warning(found)
-    return True, ''
+    return (False, generate_warning(found)) if found else (True, '')
 
 def init_session():
     defaults = {'history': [], 'selected_product': None, 'selected_module': None, 'reset_triggered': False}
     for k, v in defaults.items():
         st.session_state.setdefault(k, v)
+
 init_session()
 timezone = pytz.timezone('Europe/Amsterdam')
 
@@ -142,12 +127,11 @@ def add_message(role: str, content: str):
 
 def render_chat():
     for msg in st.session_state.history:
+        avatar = '🙂'
         if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg'):
             avatar = Image.open('aichatbox.jpg').resize((64, 64))
         elif msg['role'] == 'user' and os.path.exists('parochie.jpg'):
             avatar = Image.open('parochie.jpg').resize((64, 64))
-        else:
-            avatar = '🙂'
         st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
@@ -184,7 +168,7 @@ def get_answer(text: str) -> str:
             ans = row['Antwoord']
             img = row.get('Afbeelding')
             try: ans = rewrite_answer(ans)
-            except Exception as e: logging.warning(f"Herschrijf mislukt: {e}")
+            except: pass
             if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
@@ -201,7 +185,7 @@ def main():
 
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
-        c1, c2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
         if c1.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_message('assistant', 'Gekozen: DocBase')
@@ -210,9 +194,14 @@ def main():
             st.session_state.selected_product = 'Exact'
             add_message('assistant', 'Gekozen: Exact')
             st.rerun()
+        if c3.button('Algemeen', use_container_width=True):
+            st.session_state.selected_product = 'Algemeen'
+            st.session_state.selected_module = 'alles'
+            add_message('assistant', 'Gekozen: Algemeen')
+            st.rerun()
         render_chat(); return
 
-    if not st.session_state.selected_module:
+    if st.session_state.selected_product != 'Algemeen' and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + list(opts))
         if sel != '(Kies)':
@@ -230,8 +219,27 @@ def main():
             add_message('assistant', reason)
             st.rerun()
         with st.spinner('Even zoeken...'):
-            antwoord = get_answer(vraag)
-            add_message('assistant', antwoord)
+            if st.session_state.selected_product == 'Algemeen':
+                matches = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
+                if not matches.empty:
+                    row = matches.iloc[0]
+                    ans = row['Antwoord']
+                    img = row.get('Afbeelding')
+                    try: ans = rewrite_answer(ans)
+                    except: pass
+                    if isinstance(img, str) and img and os.path.exists(img):
+                        st.image(img, caption='Voorbeeld', use_column_width=True)
+                    add_message('assistant', ans)
+                else:
+                    try:
+                        antwoord = get_ai_answer(vraag)
+                        add_message('assistant', antwoord)
+                    except Exception as e:
+                        logging.error(f"AI-call mislukt: {e}")
+                        add_message('assistant', '⚠️ Fout tijdens AI-fallback')
+            else:
+                antwoord = get_answer(vraag)
+                add_message('assistant', antwoord)
         st.rerun()
 
 if __name__ == '__main__':
