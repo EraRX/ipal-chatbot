@@ -1,4 +1,4 @@
-python
+# main.py
 """
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
