@@ -1,5 +1,3 @@
-werkende main.py
-
 # main.py
 """
 IPAL Chatbox voor oudere vrijwilligers
