@@ -13,9 +13,14 @@ import pytz
 from PIL import Image
 from dotenv import load_dotenv
 
-# — Use the new v1 OpenAI client interface :contentReference[oaicite:0]{index=0} —
+# — Use the new v1 OpenAI client interface —
 from openai import OpenAI
-from openai.error import RateLimitError
+# Fallback if openai.error doesn’t exist
+try:
+    from openai.error import RateLimitError
+except ImportError:
+    RateLimitError = Exception
+
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -48,7 +53,7 @@ if not OPENAI_KEY:
 
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
-# — Instantiate the OpenAI client — 
+# — Instantiate the OpenAI client —
 client = OpenAI(api_key=OPENAI_KEY)
 
 # — Retry wrapper for RateLimitError —
@@ -58,9 +63,6 @@ client = OpenAI(api_key=OPENAI_KEY)
     retry=retry_if_exception_type(RateLimitError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
-    """
-    Send a chat completion request via the new OpenAI v1 client.
-    """
     resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -70,7 +72,6 @@ def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int 
     return resp.choices[0].message.content.strip()
 
 def rewrite_answer(text: str) -> str:
-    """Herschrijf antwoord eenvoudig en vriendelijk."""
     return openai_chat(
         [
             {"role": "system", "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
@@ -81,9 +82,6 @@ def rewrite_answer(text: str) -> str:
     )
 
 def get_ai_answer(prompt: str) -> str:
-    """
-    Fallback AI-antwoord: gebruik alleen role+content uit de laatste 10 berichten.
-    """
     system = "Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."
     history_msgs = [
         {"role": m["role"], "content": m["content"]}
@@ -93,7 +91,7 @@ def get_ai_answer(prompt: str) -> str:
     messages.append({"role": "user", "content": prompt})
     return openai_chat(messages)
 
-# — Blacklist & filtering (whole-word match) —
+# — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
     # … etc. …
@@ -185,14 +183,12 @@ if "history" not in st.session_state:
 
 # — Main app —
 def main():
-    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
-    # Download PDF
-    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
+    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
             "📄 Download antwoord als PDF",
@@ -201,7 +197,6 @@ def main():
             mime="application/pdf"
         )
 
-    # Product keus
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1,c2,c3 = st.columns(3)
@@ -213,15 +208,13 @@ def main():
             st.session_state.selected_product="Algemeen"; st.session_state.selected_module="alles"; add_message("assistant","Gekozen: Algemeen"); st.rerun()
         render_chat(); return
 
-    # Module keus voor Exact/DocBase
     if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
         opts = sorted(faq_df[faq_df["Systeem"]==st.session_state.selected_product]["Subthema"].dropna().unique())
-        sel = st.selectbox("Kies onderwerp:", ["(Kies)"]+opts)
+        sel = st.selectbox("Kies onderwerp:",["(Kies)"]+opts)
         if sel!="(Kies)":
             st.session_state.selected_module=sel; add_message("assistant",f"Gekozen: {sel}"); st.rerun()
         render_chat(); return
 
-    # Chat interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
