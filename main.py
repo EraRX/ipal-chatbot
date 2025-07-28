@@ -183,7 +183,8 @@ def genereer_pdf(tekst: str) -> bytes:
     width, height = A4
     text_obj = c.beginText(40, height - 50)
     text_obj.setFont("Helvetica", 12)
-    for line in tekst.split('\n'):
+    for line in tekst.split('
+'):
         text_obj.textLine(line)
     c.drawText(text_obj)
     c.showPage()
@@ -242,7 +243,7 @@ def main():
         with st.spinner('Even zoeken...'):
             if st.session_state.selected_product == 'Algemeen':
                 matches = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
-                if matches.any():
+                if not matches.empty:
                     row = matches.iloc[0]
                     ans = row['Antwoord']
                     img = row.get('Afbeelding')
