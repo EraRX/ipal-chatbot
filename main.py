@@ -134,9 +134,7 @@ def render_chat():
             avatar = Image.open('aichatbox.jpg').resize((64, 64))
         elif msg['role'] == 'user' and os.path.exists('parochie.jpg'):
             avatar = Image.open('parochie.jpg').resize((64, 64))
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}
-
-_{msg['time']}_")
+        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
 
 def on_reset():
     for key in list(st.session_state.keys()):
@@ -177,8 +175,7 @@ def get_answer(text: str) -> str:
                 st.image(img, caption='Voorbeeld', use_column_width=True)
             return ans
     try:
-        return f"IPAL-Helpdesk antwoord:
-{get_ai_answer(text)}"
+        return f"IPAL-Helpdesk antwoord:\n{get_ai_answer(text)}"
     except Exception as e:
         logging.error(f"AI-call mislukt: {e}")
         return "⚠️ Fout tijdens AI-fallback"
@@ -187,8 +184,7 @@ def genereer_pdf(tekst):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for lijn in tekst.split('
-'):
+    for lijn in tekst.split('\n'):
         pdf.multi_cell(0, 10, lijn)
     buffer = io.BytesIO()
     pdf.output(buffer)
