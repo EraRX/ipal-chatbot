@@ -101,21 +101,23 @@ faq_df = load_faq()
 producten = ['Algemeen', 'Exact', 'DocBase']
 subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in ['Exact', 'DocBase']}
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type((openai.RateLimitError, openai.APIConnectionError)))
 def validate_api_key():
-    """Validate OpenAI API key."""
+    """Validate OpenAI API key with retries."""
     if not openai.api_key:
         logging.error("Geen API-sleutel gevonden")
-        st.error('⚠️ Stel uw OPENAI_API_KEY in via .env-bestand')
+        st.error('⚠️ Stel uw OPENAI_API_KEY in via .env-bestand of Streamlit secrets')
         st.stop()
     try:
         openai.models.list()
-    except openai.AuthenticationError:
-        logging.error("Ongeldige API-sleutel")
+        logging.info("OpenAI API-sleutel succesvol gevalideerd")
+    except openai.AuthenticationError as e:
+        logging.error(f"Ongeldige API-sleutel: {e}")
         st.error('⚠️ Ongeldige API-sleutel')
         st.stop()
     except Exception as e:
-        logging.error(f"API-validatie fout: {e}")
-        st.error('⚠️ Fout bij API-validatie')
+        logging.error(f"API-validatie fout: {str(e)}")
+        st.error(f'⚠️ Fout bij API-validatie: {str(e)}')
         st.stop()
 
 validate_api_key()
@@ -304,4 +306,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
