@@ -185,8 +185,7 @@ def genereer_pdf(tekst):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for lijn in tekst.split('
-'):
+    for lijn in tekst.split('\n'):'):
         pdf.multi_cell(0, 10, lijn)
     buffer = io.BytesIO()
     pdf.output(buffer)
