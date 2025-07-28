@@ -22,8 +22,9 @@ from dotenv import load_dotenv
 from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import pytz
+import io
+from fpdf import FPDF
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -83,7 +84,6 @@ faq_df = load_faq()
 producten = ['Exact', 'DocBase']
 subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in producten}
 
-
 def validate_api_key():
     if not openai.api_key:
         logging.error("Geen API-sleutel gevonden")
@@ -124,9 +124,6 @@ def add_message(role: str, content: str):
     ts = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
     st.session_state.history.append({'role': role, 'content': content, 'time': ts})
     st.session_state.history = st.session_state.history[-MAX_HISTORY:]
-
-import io
-from fpdf import FPDF
 
 def render_chat():
     for msg in st.session_state.history:
@@ -185,8 +182,7 @@ def genereer_pdf(tekst):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    for lijn in tekst.split('
-'):'):
+    for lijn in tekst.split('\n'):
         pdf.multi_cell(0, 10, lijn)
     buffer = io.BytesIO()
     pdf.output(buffer)
@@ -198,7 +194,6 @@ def main():
         on_reset()
         st.rerun()
 
-    # Laatste antwoord exporteren naar PDF
     if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
         laatste_antwoord = st.session_state.history[-1]['content']
         if st.download_button('📄 Download antwoord als PDF', data=genereer_pdf(laatste_antwoord), file_name='IPAL-antwoord.pdf', mime='application/pdf'):
