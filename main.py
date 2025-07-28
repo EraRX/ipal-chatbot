@@ -148,7 +148,7 @@ def rewrite_answer(text: str) -> str:
     )
     return resp.choices[0].message.content.strip()
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry_if_exception_type(openai.RateLimitError))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
 def get_ai_answer(text: str) -> str:
     messages = [{'role':'system','content':'Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent.'}]
     messages += [{'role':m['role'],'content':m['content']} for m in st.session_state.history[-10:]]
