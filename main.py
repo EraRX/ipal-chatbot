@@ -183,7 +183,6 @@ def genereer_pdf(tekst: str) -> bytes:
     width, height = A4
     text_obj = c.beginText(40, height - 50)
     text_obj.setFont("Helvetica", 12)
-    # Correctly split on newline characters
     for line in tekst.split('\n'):
         text_obj.textLine(line)
     c.drawText(text_obj)
@@ -191,6 +190,80 @@ def genereer_pdf(tekst: str) -> bytes:
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def main():
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        on_reset()
+        st.rerun()
+
+    # Download last assistant message as PDF
+    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+        laatste = st.session_state.history[-1]['content']
+        st.download_button('📄 Download antwoord als PDF', data=genereer_pdf(laatste), file_name='antwoord.pdf', mime='application/pdf')
+
+    if not st.session_state.selected_product:
+        st.header('Welkom bij IPAL Chatbox')
+        c1, c2, c3 = st.columns(3)
+        if c1.button('DocBase', use_container_width=True):
+            add_message('assistant', 'Gekozen: DocBase')
+            st.session_state.selected_product = 'DocBase'
+            st.rerun()
+        if c2.button('Exact', use_container_width=True):
+            add_message('assistant', 'Gekozen: Exact')
+            st.session_state.selected_product = 'Exact'
+            st.rerun()
+        if c3.button('Algemeen', use_container_width=True):
+            add_message('assistant', 'Gekozen: Algemeen')
+            st.session_state.selected_product = 'Algemeen'
+            st.session_state.selected_module = 'alles'
+            st.rerun()
+        render_chat()
+        return
+
+    if st.session_state.selected_product != 'Algemeen' and not st.session_state.selected_module:
+        opts = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
+        if sel != '(Kies)':
+            st.session_state.selected_module = sel
+            add_message('assistant', f"Gekozen: {sel}")
+            st.rerun()
+        render_chat()
+        return
+
+    render_chat()
+    vraag = st.chat_input('Stel uw vraag:')
+    if vraag:
+        add_message('user', vraag)
+        allowed, reason = filter_chatbot_topics(vraag)
+        if not allowed:
+            add_message('assistant', reason)
+            st.rerun()
+        with st.spinner('Even zoeken...'):
+            if st.session_state.selected_product == 'Algemeen':
+                matches = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
+                if matches.any():
+                    row = matches.iloc[0]
+                    ans = row['Antwoord']
+                    img = row.get('Afbeelding')
+                    try:
+                        ans = rewrite_answer(ans)
+                    except:
+                        pass
+                    if img and isinstance(img, str) and os.path.exists(img):
+                        st.image(img, caption='Voorbeeld', use_column_width=True)
+                    add_message('assistant', ans)
+                else:
+                    try:
+                        ant = get_ai_answer(vraag)
+                        add_message('assistant', ant)
+                    except Exception as e:
+                        logging.error(f"AI-call mislukt: {e}")
+                        add_message('assistant', '⚠️ Fout tijdens AI-fallback')
+            else:
+                ant = get_answer(vraag)
+                add_message('assistant', ant)
+        st.rerun()
 
 if __name__ == '__main__':
     main()
