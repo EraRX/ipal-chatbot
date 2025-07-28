@@ -1,269 +1,202 @@
 # main.py
-"""
-IPAL Chatbox voor oudere vrijwilligers
-- Python 3, Streamlit
-- Groot lettertype, eenvoudige bediening
-- Antwoorden uit FAQ aangevuld met AI voor specifieke modules
-- Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
-- Logging en foutafhandeling
-- Antwoorden downloaden als PDF
-
-Geschatte lengte: ~300+ lijnen
-"""
 
 import os
-import re
 import sys
 import logging
 from datetime import datetime
-import streamlit as st
-import openai
-import pandas as pd
-from dotenv import load_dotenv
-from PIL import Image
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-import pytz
 import io
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
+
+import streamlit as st
+import pandas as pd
+import pytz
+from PIL import Image
+from dotenv import load_dotenv
+import openai
+
+from faq import load_faq
+from ai_client import get_ai_answer, rewrite_answer
+from filters import filter_chatbot_topics
+from pdf_utils import genereer_pdf
+
+# — Constants & Config —
+MAX_HISTORY = 20
+TIMEZONE = pytz.timezone("Europe/Amsterdam")
+AVATARS = {
+    "assistant": "aichatbox.jpg",
+    "user": "parochie.jpg"
+}
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 
-BLACKLIST_CATEGORIES = [
-    "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
-    "financiële gegevens", "biometrische gegevens", "geboortedatum", "adresgegevens",
-    "identiteitsbewijs", "burgerservicenummer", "persoonlijke overtuiging",
-    "seksuele geaardheid", "etniciteit", "nationaliteit",
-    "discriminatie", "racisme", "haatzaaiende taal", "xenofobie", "seksisme",
-    "homofobie", "transfobie", "antisemitisme", "islamofobie", "vooroordelen",
-    "stereotypering", "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
-    "sekten", "godslastering", "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
-    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
-    "seksualiteit", "erotiek", "prostitutie", "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld",
-    "oorlog", "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
-    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
-    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
-    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
-    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
-    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
-    "identiteitsdiefstal", "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud",
-    "gruwelijke inhoud", "sensatiezucht", "privacy schending"
-]
-
-MAX_HISTORY = 20
-
-# Load environment and API key
+# Load env & API key (fallback to Streamlit secrets)
 load_dotenv()
-openai.api_key = os.getenv('OPENAI_API_KEY')
-MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+openai_api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+if not openai_api_key:
+    st.sidebar.error("🔑 OpenAI API key niet gevonden. Voeg toe aan .env of Streamlit Secrets.")
+    st.stop()
+openai.api_key = openai_api_key
 
-# Streamlit page config
-st.set_page_config(page_title='IPAL Chatbox', layout='centered')
-st.markdown(
-    '''<style>
-      html, body, [class*="css"] { font-size: 20px; }
-      button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
-    </style>''', unsafe_allow_html=True)
+# — Load & cache FAQ —
+@st.cache_data(show_spinner=False)
+def get_faq_data(path: str = "faq.xlsx") -> pd.DataFrame:
+    return load_faq(path)
 
-# Input API key if missing
-if not openai.api_key:
-    api_key_input = st.sidebar.text_input('🔑 Voer uw OpenAI API-sleutel in:', type='password')
-    if api_key_input:
-        openai.api_key = api_key_input
-    else:
-        st.sidebar.warning('Geen API-sleutel gevonden. Vul uw sleutel in om verder te gaan.')
-        st.stop()
+faq_df = get_faq_data()
 
-@st.cache_data
-def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
-    if not os.path.exists(path):
-        logging.error(f"FAQ niet gevonden: {path}")
-        st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=['combined', 'Antwoord'])
-    try:
-        df = pd.read_excel(path)
-    except Exception as e:
-        logging.error(f"Fout bij laden FAQ: {e}")
-        st.error('⚠️ Kan FAQ niet laden')
-        return pd.DataFrame(columns=['combined', 'Antwoord'])
-    required = ['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding', 'Antwoord of oplossing']
-    if 'Afbeelding' not in df.columns:
-        df['Afbeelding'] = None
-    df['Antwoord'] = df['Antwoord of oplossing']
-    df['combined'] = df[required].fillna('').agg(' '.join, axis=1)
-    return df
+# Build product/module lookup
+PRODUCTS = ["DocBase", "Exact", "Algemeen"]
+subthema_dict = {
+    p: sorted(faq_df[faq_df["Systeem"] == p]["Subthema"].dropna().unique())
+    for p in PRODUCTS
+}
 
-faq_df = load_faq()
-producten = ['Exact', 'DocBase']
-subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().unique()) for p in producten}
-
-# Blacklist & topic filter
-def check_blacklist(text: str) -> list[str]:
-    return [term for term in BLACKLIST_CATEGORIES if term in text.lower()]
-
-def generate_warning(found_terms: list[str]) -> str:
-    return ("Je bericht bevat inhoud die niet voldoet aan onze richtlijnen. Vermijd gevoelige onderwerpen en probeer het opnieuw." if found_terms else "")
-
-def filter_chatbot_topics(message: str) -> tuple[bool, str]:
-    found = check_blacklist(message)
-    return (False, generate_warning(found)) if found else (True, '')
-
-# Session init
+# — Session state initialization —
 def init_session():
-    defaults = {'history': [], 'selected_product': None, 'selected_module': None}
-    for k, v in defaults.items():
-        st.session_state.setdefault(k, v)
+    defaults = {
+        "history": [],
+        "selected_product": None,
+        "selected_module": None
+    }
+    for key, value in defaults.items():
+        st.session_state.setdefault(key, value)
+
 init_session()
-timezone = pytz.timezone('Europe/Amsterdam')
+
+# — Helper functions — 
+def get_avatar(role: str):
+    path = AVATARS.get(role)
+    if path and os.path.exists(path):
+        return Image.open(path).resize((64, 64))
+    return "🙂"
 
 def add_message(role: str, content: str):
-    ts = datetime.now(timezone).strftime('%d-%m-%Y %H:%M')
-    st.session_state.history.append({'role': role, 'content': content, 'time': ts})
-    st.session_state.history = st.session_state.history[-MAX_HISTORY:]
+    ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
+    st.session_state.history = (
+        st.session_state.history + [{"role": role, "content": content, "time": ts}]
+    )[-MAX_HISTORY:]
 
 def render_chat():
     for msg in st.session_state.history:
-        avatar = '🙂'
-        if msg['role'] == 'assistant' and os.path.exists('aichatbox.jpg'):
-            avatar = Image.open('aichatbox.jpg').resize((64,64))
-        elif msg['role'] == 'user' and os.path.exists('parochie.jpg'):
-            avatar = Image.open('parochie.jpg').resize((64,64))
-        st.chat_message(msg['role'], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+        avatar = get_avatar(msg["role"])
+        st.chat_message(msg["role"], avatar=avatar).markdown(
+            f"{msg['content']}\n\n_{msg['time']}_"
+        )
 
-def on_reset():
+def reset_session():
     for key in list(st.session_state.keys()):
         del st.session_state[key]
+    st.experimental_rerun()
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
-def rewrite_answer(text: str) -> str:
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=[{'role':'system','content':'Herschrijf dit antwoord eenvoudig en vriendelijk.'},
-                  {'role':'user','content':text}],
-        temperature=0.2, max_tokens=800
-    )
-    return resp.choices[0].message.content.strip()
-
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), retry=retry_if_exception_type(openai.RateLimitError))
-def get_ai_answer(text: str) -> str:
-    messages = [{'role':'system','content':'Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent.'}]
-    messages += [{'role':m['role'],'content':m['content']} for m in st.session_state.history[-10:]]
-    messages.append({'role':'user','content':f"[{st.session_state.selected_module}] {text}"})
-    resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=800)
-    return resp.choices[0].message.content.strip()
-
-def get_answer(text: str) -> str:
-    mod_sel = st.session_state.get('selected_module')
-    if mod_sel and not faq_df.empty:
-        dfm = faq_df[faq_df['Subthema'].str.lower()==mod_sel.lower()]
-        matches = dfm[dfm['combined'].str.contains(re.escape(text),case=False,na=False)]
-        if not matches.empty:
-            row = matches.iloc[0]
-            ans = row['Antwoord']
-            img = row.get('Afbeelding')
-            try: ans = rewrite_answer(ans)
-            except: pass
-            if img and isinstance(img,str) and os.path.exists(img):
-                st.image(img,caption='Voorbeeld',use_column_width=True)
-            return ans
-    try:
-        return f"IPAL-Helpdesk antwoord:\n{get_ai_answer(text)}"
-    except Exception as e:
-        logging.error(f"AI-call mislukt: {e}")
-        return "⚠️ Fout tijdens AI-fallback"
-
-def genereer_pdf(tekst: str) -> bytes:
-    buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
-    text_obj = c.beginText(40, height - 50)
-    text_obj.setFont("Helvetica", 12)
-    for line in tekst.split('\\n'):
-        text_obj.textLine(line)
-    c.drawText(text_obj)
-    c.showPage()
-    c.save()
-    buffer.seek(0)
-    return buffer.getvalue()
-
-
+# — Main app —
 def main():
-    if st.sidebar.button('🔄 Nieuw gesprek'):
-        on_reset()
-        st.rerun()
+    # Sidebar controls
+    if st.sidebar.button("🔄 Nieuw gesprek"):
+        reset_session()
 
-    # Download last assistant message as PDF
-    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
-        laatste = st.session_state.history[-1]['content']
-        st.download_button('📄 Download antwoord als PDF', data=genereer_pdf(laatste), file_name='antwoord.pdf', mime='application/pdf')
+    # Download last assistant reply as PDF
+    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
+        laatste = st.session_state.history[-1]["content"]
+        pdf_bytes = genereer_pdf(laatste)
+        st.sidebar.download_button(
+            "📄 Download laatste antwoord als PDF",
+            data=pdf_bytes,
+            file_name="antwoord.pdf",
+            mime="application/pdf"
+        )
 
+    # Product selection screen
     if not st.session_state.selected_product:
-        st.header('Welkom bij IPAL Chatbox')
+        st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
-        if c1.button('DocBase', use_container_width=True):
-            add_message('assistant', 'Gekozen: DocBase')
-            st.session_state.selected_product = 'DocBase'
-            st.rerun()
-        if c2.button('Exact', use_container_width=True):
-            add_message('assistant', 'Gekozen: Exact')
-            st.session_state.selected_product = 'Exact'
-            st.rerun()
-        if c3.button('Algemeen', use_container_width=True):
-            add_message('assistant', 'Gekozen: Algemeen')
-            st.session_state.selected_product = 'Algemeen'
-            st.session_state.selected_module = 'alles'
-            st.rerun()
+        if c1.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_message("assistant", "Gekozen: DocBase")
+            st.experimental_rerun()
+        if c2.button("Exact", use_container_width=True):
+            st.session_state.selected_product = "Exact"
+            add_message("assistant", "Gekozen: Exact")
+            st.experimental_rerun()
+        if c3.button("Algemeen", use_container_width=True):
+            st.session_state.selected_product = "Algemeen"
+            st.session_state.selected_module = "alles"
+            add_message("assistant", "Gekozen: Algemeen")
+            st.experimental_rerun()
         render_chat()
         return
 
-    if st.session_state.selected_product != 'Algemeen' and not st.session_state.selected_module:
+    # Module selection for non-Algemeen products
+    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
-        if sel != '(Kies)':
-            st.session_state.selected_module = sel
-            add_message('assistant', f"Gekozen: {sel}")
-            st.rerun()
+        choice = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
+        if choice != "(Kies)":
+            st.session_state.selected_module = choice
+            add_message("assistant", f"Gekozen: {choice}")
+            st.experimental_rerun()
         render_chat()
         return
 
+    # Chat interface
     render_chat()
-    vraag = st.chat_input('Stel uw vraag:')
-    if vraag:
-        add_message('user', vraag)
-        allowed, reason = filter_chatbot_topics(vraag)
-        if not allowed:
-            add_message('assistant', reason)
-            st.rerun()
-        with st.spinner('Even zoeken...'):
-            if st.session_state.selected_product == 'Algemeen':
-                matches = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
-                if not matches.empty:
-                    row = matches.iloc[0]
-                    ans = row['Antwoord']
-                    img = row.get('Afbeelding')
-                    try:
-                        ans = rewrite_answer(ans)
-                    except:
-                        pass
-                    if img and isinstance(img, str) and os.path.exists(img):
-                        st.image(img, caption='Voorbeeld', use_column_width=True)
-                    add_message('assistant', ans)
-                else:
-                    try:
-                        ant = get_ai_answer(vraag)
-                        add_message('assistant', ant)
-                    except Exception as e:
-                        logging.error(f"AI-call mislukt: {e}")
-                        add_message('assistant', '⚠️ Fout tijdens AI-fallback')
-            else:
-                ant = get_answer(vraag)
-                add_message('assistant', ant)
-        st.rerun()
+    vraag = st.chat_input("Stel uw vraag:")
+    if not vraag:
+        return
 
-if __name__ == '__main__':
+    add_message("user", vraag)
+    allowed, warning = filter_chatbot_topics(vraag)
+    if not allowed:
+        add_message("assistant", warning)
+        st.experimental_rerun()
+
+    with st.spinner("Even zoeken..."):
+        # Algemene FAQ lookup
+        if st.session_state.selected_product == "Algemeen":
+            dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
+            if not dfm.empty:
+                row = dfm.iloc[0]
+                ans = row["Antwoord"]
+                try:
+                    ans = rewrite_answer(ans)
+                except:
+                    pass
+                img = row.get("Afbeelding")
+                if img and os.path.exists(img):
+                    st.image(img, caption="Voorbeeld", use_column_width=True)
+                add_message("assistant", ans)
+            else:
+                try:
+                    ans = get_ai_answer(vraag)
+                    add_message("assistant", ans)
+                except Exception as e:
+                    logging.error(f"AI-fallback mislukt: {e}")
+                    add_message("assistant", "⚠️ Fout tijdens AI-fallback")
+        # Product-specific FAQ & AI
+        else:
+            dfm = faq_df[faq_df["Subthema"].str.lower() == st.session_state.selected_module.lower()]
+            matches = dfm[dfm["combined"].str.contains(vraag, case=False, na=False)]
+            if not matches.empty:
+                row = matches.iloc[0]
+                ans = row["Antwoord"]
+                try:
+                    ans = rewrite_answer(ans)
+                except:
+                    pass
+                img = row.get("Afbeelding")
+                if img and os.path.exists(img):
+                    st.image(img, caption="Voorbeeld", use_column_width=True)
+                add_message("assistant", ans)
+            else:
+                try:
+                    ai_ans = get_ai_answer(f"[{st.session_state.selected_module}] {vraag}")
+                    add_message("assistant", f"IPAL-Helpdesk antwoord:\n{ai_ans}")
+                except Exception as e:
+                    logging.error(f"AI-fallback mislukt: {e}")
+                    add_message("assistant", "⚠️ Fout tijdens AI-fallback")
+    st.experimental_rerun()
+
+if __name__ == "__main__":
     main()
