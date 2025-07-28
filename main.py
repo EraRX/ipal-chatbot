@@ -1,5 +1,4 @@
 python
-
 """
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
@@ -316,4 +315,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
