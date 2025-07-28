@@ -3,7 +3,7 @@ python
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
 - Groot lettertype, eenvoudige bediening
-- Antwoorden uit FAQ aangevuld met AI voor specifieke modules
+- Antwoorden uit FAQ aangevuld met AI voor specifieke middelen
 - Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
 - Logging en foutafhandeling
 - PDF download functionaliteit toegevoegd
@@ -45,24 +45,19 @@ BLACKLIST_CATEGORIES = [
     "stereotypering",
     "religie", "geloofsovertuiging", "godsdienstige leer", "religieuze extremisme",
     "sekten", "godslastering",
-    "politiek", "politieke extremisme", "radicalisering", "terrorisme", "propaganda",
-    "seksuele inhoud", "adult content", "pornografie", "seks", "sex", "seksueel",
-    "seksualiteit", "erotiek", "prostitutie",
-    "geweld", "fysiek geweld", "psychologisch geweld", "huiselijk geweld", "oorlog",
-    "mishandeling", "misdaad", "illegale activiteiten", "drugs", "wapens", "smokkel",
-    "desinformatie", "nepnieuws", "complottheorie", "misleiding", "fake news", "hoax",
-    "gokken", "kansspelen", "verslaving", "online gokken", "casino",
-    "zelfbeschadiging", "zelfmoord", "eetstoornissen", "kindermisbruik",
-    "dierenmishandeling", "milieuschade", "exploitatie", "mensenhandel",
-    "phishing", "malware", "hacking", "cybercriminaliteit", "doxing",
-    "identiteitsdiefstal",
-    "obsceniteit", "aanstootgevende inhoud", "schokkende inhoud", "gruwelijke inhoud",
-    "sensatiezucht", "privacy schending"
+    "politiek", "politieke extremisme", "radicalisering",
+    "seksuele inhoud", "adult content",
+    "geweld", "fysiek geweld", "psychologisch geweld",
+    "desinformatie", "nepnieuws", "complottheorie",
+    "gokken", "kansspelen", "verslaving",
+    "phishing", "malware", "hacking"
 ]
 
 MAX_HISTORY = 20
 
 # Disable proxy environment variables
+os.environ.pop('http_proxy', None)
+os.environ.pop('https_proxy', None)
 os.environ.pop('HTTP_PROXY', None)
 os.environ.pop('HTTPS_PROXY', None)
 logging.info(f"Proxy settings: HTTP_PROXY={os.environ.get('HTTP_PROXY', 'None')}, HTTPS_PROXY={os.environ.get('HTTPS_PROXY', 'None')}")
@@ -71,7 +66,7 @@ logging.info(f"Proxy settings: HTTP_PROXY={os.environ.get('HTTP_PROXY', 'None')}
 load_dotenv()
 openai_api_key = os.getenv('OPENAI_API_KEY')
 if not openai_api_key:
-    logging.error("Geen OPENAI_API_KEY gevonden in omgeving")
+    logging.error("Geen OPENAI_API_KEY gevonden")
     st.error('⚠️ Stel uw OPENAI_API_KEY in via Streamlit secrets of .env-bestand')
     st.stop()
 MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
@@ -81,7 +76,7 @@ st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown('''
     <style>
       html, body, [class*="css"] { font-size: 20px; }
-      button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
+      button[kind="primary"] { font-size: 22px !important; padding: 10px 20px; }
     </style>
 ''', unsafe_allow_html=True)
 
@@ -89,7 +84,7 @@ st.markdown('''
 def load_faq(path: str = 'faq.xlsx') -> pd.DataFrame:
     """Load FAQ from Excel file."""
     if not os.path.exists(path):
-        logging.error(f"FAQ niet gevonden: {path}")
+        logging.error(f"FAQ niet aanwezig: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=['combined', 'Antwoord'])
     try:
@@ -114,7 +109,7 @@ subthema_dict = {p: sorted(faq_df[faq_df['Systeem'] == p]['Subthema'].dropna().u
 def validate_api_key():
     """Validate OpenAI API key with retries."""
     try:
-        client = openai.OpenAI(api_key=openai_api_key, http_client=None)  # Explicitly disable http_client to avoid proxies
+        client = openai.OpenAI(api_key=openai_api_key, http_client=None)
         client.models.list()
         logging.info("OpenAI API-sleutel succesvol gevalideerd")
     except openai.AuthenticationError as e:
