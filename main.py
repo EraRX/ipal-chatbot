@@ -23,8 +23,13 @@ except ImportError:
     RateLimitError = Exception
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from reportlab.pdfgen import canvas
+
+# ReportLab imports for Platypus PDF generation
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
@@ -36,27 +41,98 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# --- OpenAI setup ---
+# --- OpenAI Setup ---
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
        retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages, temperature=0.3, max_tokens=800):
     resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens
+        model=MODEL, messages=messages,
+        temperature=temperature, max_tokens=max_tokens
     )
     return resp.choices[0].message.content.strip()
+
+# --- Register Calibri if available ---
+if os.path.exists("Calibri.ttf"):
+    pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
+else:
+    logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
+
+# --- PDF Generation using Platypus ---
+def make_pdf(question: str, answer: str) -> bytes:
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4,
+                            leftMargin=2*cm, rightMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+
+    styles = getSampleStyleSheet()
+    normal = styles["Normal"]
+    font_name = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
+    normal.fontName = font_name
+    normal.fontSize = 11
+    normal.alignment = TA_JUSTIFY
+
+    h_bold = styles["Heading4"]
+    h_bold.fontName = font_name
+    h_bold.fontSize = 11
+    h_bold.leading = 14
+
+    # Fixed prepend text
+    prepend1 = (
+        "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
+        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
+        "informatie te controleren via officiële bronnen."
+    )
+    prepend2 = (
+        "2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
+        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
+        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
+        "Dit document vindt u op onze site."
+    )
+    faq_tip = (
+        "<b>Waarom de FAQ gebruiken?</b><br/>"
+        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op "
+        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.<br/><br/>"
+        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:<br/>"
+        "– Veel gestelde vragen Docbase nieuw 2024<br/>"
+        "– Veel gestelde vragen Exact Online<br/><br/>"
+        "Kan het FAQ-document geen hulp bieden, maakt u dan een ticket aan door onderaan op <b>JA</b> te klikken."
+    )
+    instructie = (
+        "<b>Instructie: Ticket aanmaken in DocBase</b><br/>"
+        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:<br/>"
+        "• Beschrijf het probleem zo gedetailleerd mogelijk.<br/>"
+        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.<br/>"
+        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
+    )
+
+    # Build document
+    story = []
+    story.append(Paragraph(f"<b>Vraag:</b> {question}", h_bold))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<b>Antwoord:</b>", h_bold))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(prepend1, normal))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(prepend2, normal))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(faq_tip, normal))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(instructie, normal))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(answer, normal))
+
+    doc.build(story)
+    buf.seek(0)
+    return buf.getvalue()
 
 # --- FAQ Loader ---
 @st.cache_data
@@ -79,72 +155,6 @@ BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy s
 def filter_topics(msg):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
-
-# --- PDF Export with Calibri 11 Prepend ---
-# Register Calibri if available
-if os.path.exists("Calibri.ttf"):
-    pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
-else:
-    logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
-
-def make_pdf(answer_text: str) -> bytes:
-    buf = io.BytesIO()
-    c = canvas.Canvas(buf, pagesize=A4)
-    width, height = A4
-    margin = 40
-    usable_w = width - 2 * margin
-
-    # Logo
-    y = height - margin
-    if os.path.exists("logo.png"):
-        img = PILImage.open("logo.png")
-        ar = img.width / img.height
-        logo_h = 50
-        c.drawImage("logo.png", margin, y - logo_h, width=logo_h*ar, height=logo_h, mask="auto")
-        y -= (logo_h + 10)
-    else:
-        y -= 10
-
-    # Set font
-    font_name = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
-    c.setFont(font_name, 11)
-
-    # Prepend text
-    prepend = (
-        "1. Dit is het AI antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
-        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
-        "informatie te controleren via officiële bronnen.\n\n"
-        "2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
-        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
-        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
-        "Dit document vindt u op onze site.\n\n"
-        "Waarom de FAQ gebruiken?\nIn het document met veelgestelde vragen vindt u snel en eenvoudig "
-        "antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n\n"
-        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:\n"
-        "– Veel gestelde vragen Docbase nieuw 2024\n"
-        "– Veel gestelde vragen Exact Online\n\n"
-        "Kan het FAQ document geen hulp bieden, maakt u dan een ticket aan door onderaan op JA te klikken.\n\n"
-        "Instructie: Ticket aanmaken in DocBase\n"
-        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:\n\n"
-        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
-        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
-        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.\n\n"
-    )
-
-    full_text = prepend + answer_text
-
-    text_obj = c.beginText(margin, y)
-    text_obj.setFont(font_name, 11)
-    max_chars = int(usable_w / (11 * 0.6))
-    for para in full_text.split("\n"):
-        for line in textwrap.wrap(para, width=max_chars):
-            text_obj.textLine(line)
-
-    c.drawText(text_obj)
-    c.showPage()
-    c.save()
-    buf.seek(0)
-    return buf.getvalue()
 
 # --- RKK Scraping ---
 def fetch_bishop_from_rkkerk(loc):
@@ -177,19 +187,19 @@ def fetch_bishop_from_rkk_online(loc):
 def fetch_all_bishops_nl():
     dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden",
                 "’s-Hertogenbosch","Roermond","Breda"]
-    result = {}
+    res = {}
     for d in dioceses:
         name = fetch_bishop_from_rkkerk(d) or fetch_bishop_from_rkk_online(d)
         if name:
-            result[d] = name
-    return result
+            res[d] = name
+    return res
 
-# --- Avatars & Chat Helpers ---
+# --- Avatars & Helpers ---
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role):
-    path = AVATARS.get(role)
-    if path and os.path.exists(path):
-        return PILImage.open(path).resize((64,64))
+    p = AVATARS.get(role)
+    if p and os.path.exists(p):
+        return PILImage.open(p).resize((64,64))
     return "🙂"
 
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
@@ -199,15 +209,16 @@ def add_msg(role, content):
     st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
 
 def render_chat():
-    for msg in st.session_state.history:
-        st.chat_message(msg["role"], avatar=get_avatar(msg["role"])).markdown(
-            f"{msg['content']}\n\n_{msg['time']}_"
+    for m in st.session_state.history:
+        st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(
+            f"{m['content']}\n\n_{m['time']}_"
         )
 
-# Initialize session state
+# --- Session init ---
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
+    st.session_state.last_question = None
 
 # --- Main app ---
 def main():
@@ -218,7 +229,10 @@ def main():
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         st.sidebar.download_button(
             "📄 Download PDF",
-            data=make_pdf(st.session_state.history[-1]["content"]),
+            data=make_pdf(
+                question=st.session_state.last_question or "",
+                answer=st.session_state.history[-1]["content"]
+            ),
             file_name="antwoord.pdf",
             mime="application/pdf"
         )
@@ -228,31 +242,30 @@ def main():
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
             st.session_state.selected_product = "Exact"
-            add_msg("assistant", "Gekozen: Exact")
-            st.rerun()
+            add_msg("assistant","Gekozen: Exact"); st.rerun()
         if c2.button("DocBase", use_container_width=True):
             st.session_state.selected_product = "DocBase"
-            add_msg("assistant", "Gekozen: DocBase")
-            st.rerun()
+            add_msg("assistant","Gekozen: DocBase"); st.rerun()
         if c3.button("Algemeen", use_container_width=True):
             st.session_state.selected_product = "Algemeen"
-            add_msg("assistant", "Gekozen: Algemeen")
-            st.rerun()
-        render_chat()
-        return
+            add_msg("assistant","Gekozen: Algemeen"); st.rerun()
+        render_chat(); return
 
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
         return
 
+    # Store last question for PDF
+    st.session_state.last_question = vraag
     add_msg("user", vraag)
+
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg("assistant", warn)
         st.rerun()
 
-    # 1) Specific bishop question
+    # 1) Specific bishop query
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)\?*', vraag)
     if m:
         loc = m.group(1).strip()
@@ -270,10 +283,9 @@ def main():
             st.rerun()
 
     # 3) FAQ lookup
-    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
+    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
     if not dfm.empty:
-        row = dfm.iloc[0]
-        ans = row["Antwoord"]
+        row = dfm.iloc[0]; ans = row["Antwoord"]
         try:
             ans = chatgpt([
                 {"role":"system","content":"Herschrijf dit eenvoudig en vriendelijk."},
