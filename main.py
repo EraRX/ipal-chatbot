@@ -24,7 +24,7 @@ except ImportError:
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 # ReportLab imports for PDF generation
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
@@ -69,7 +69,7 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation (only this section changed) ---
+# === 1) PDF Generation: aangepaste layout ===
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -77,6 +77,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         leftMargin=2*cm, rightMargin=2*cm,
         topMargin=2*cm, bottomMargin=2*cm
     )
+    # Stijlen
     styles = getSampleStyleSheet()
     normal = ParagraphStyle(
         "normal",
@@ -95,7 +96,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         spaceAfter=6
     )
 
-    # Static AI-info paragraphs
+    # AI-info vaste paragrafen
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -124,7 +125,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     )
 
     story = []
-    # Logo
+
+    # Logo linksboven (width=124, height=52)
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
@@ -134,9 +136,20 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord
+    # Antwoord als genummerde lijst
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Paragraph(answer, normal))
+    story.append(Spacer(1, 4))
+    # Zoek alle “N. **Naam** – beschrijving” items
+    pattern = r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)"
+    matches = re.findall(pattern, answer, flags=re.S)
+    if matches:
+        items = []
+        for num, name, desc in matches:
+            text = f"<b>{num}. {name}</b> – {desc.strip().replace(chr(10), ' ')}"
+            items.append(ListItem(Paragraph(text, normal), leftIndent=12))
+        story.append(ListFlowable(items, bulletType=""))
+    else:
+        story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
 
     # AI-Antwoord Info
@@ -156,6 +169,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
+# === einde make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
@@ -247,7 +261,7 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # PDF download button
+    # === 2) Download-knop met nieuwe PDF layout ===
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         pdf_data = make_pdf(
             question=st.session_state.last_question,
@@ -255,24 +269,27 @@ def main():
             ai_info=st.session_state.history[-1]["content"]
         )
         st.sidebar.download_button(
-            "📄 Download PDF", data=pdf_data,
-            file_name="antwoord.pdf", mime="application/pdf"
+            "📄 Download PDF",
+            data=pdf_data,
+            file_name="antwoord.pdf",
+            mime="application/pdf"
         )
 
+    # rest of the chat logic unchanged…
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
-            st.session_state.selected_product = "Exact"
             add_msg("assistant", "Gekozen: Exact")
+            st.session_state.selected_product = "Exact"
             st.rerun()
         if c2.button("DocBase", use_container_width=True):
-            st.session_state.selected_product = "DocBase"
             add_msg("assistant", "Gekozen: DocBase")
+            st.session_state.selected_product = "DocBase"
             st.rerun()
         if c3.button("Algemeen", use_container_width=True):
-            st.session_state.selected_product = "Algemeen"
             add_msg("assistant", "Gekozen: Algemeen")
+            st.session_state.selected_product = "Algemeen"
             st.rerun()
         render_chat()
         return
@@ -282,7 +299,6 @@ def main():
     if not vraag:
         return
 
-    # Store last question
     st.session_state.last_question = vraag
     add_msg("user", vraag)
 
@@ -291,42 +307,39 @@ def main():
         add_msg("assistant", warn)
         st.rerun()
 
-    # 1) Specific bishop
-    m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
-    if m:
-        loc = m.group(1).strip()
-        bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-        if bishop:
-            add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
+    with st.spinner("Even zoeken..."):
+        # bishop, FAQ, fallback logic unchanged…
+        m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
+        if m:
+            loc = m.group(1).strip()
+            bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
+            if bishop:
+                add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
+                st.rerun()
+
+        if re.search(r'(?i)bisschoppen nederland', vraag):
+            allb = fetch_all_bishops_nl()
+            if allb:
+                lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
+                add_msg("assistant", "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
+                st.rerun()
+
+        dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
+        if not dfm.empty:
+            row = dfm.iloc[0]
+            ans = row["Antwoord"]
+            try:
+                ans = chatgpt([
+                    {"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
+                    {"role":"user","content":ans}
+                ], temperature=0.2)
+            except:
+                pass
+            if img := row["Afbeelding"]:
+                st.image(img, caption="Voorbeeld", use_column_width=True)
+            add_msg("assistant", ans)
             st.rerun()
 
-    # 2) All NL bishops
-    if re.search(r'(?i)bisschoppen nederland', vraag):
-        allb = fetch_all_bishops_nl()
-        if allb:
-            lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-            add_msg("assistant", "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
-            st.rerun()
-
-    # 3) FAQ lookup
-    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
-    if not dfm.empty:
-        row = dfm.iloc[0]
-        ans = row["Antwoord"]
-        try:
-            ans = chatgpt([
-                {"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
-                {"role":"user","content":ans}
-            ], temperature=0.2)
-        except:
-            pass
-        if img := row["Afbeelding"]:
-            st.image(img, caption="Voorbeeld", use_column_width=True)
-        add_msg("assistant", ans)
-        st.rerun()
-
-    # 4) AI fallback
-    with st.spinner("ChatGPT even aan het werk…"):
         try:
             ai = chatgpt([
                 {"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
