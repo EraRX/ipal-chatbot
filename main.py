@@ -70,25 +70,27 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation (only this section changed) ---
-def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
+# === 1) PDF Generation: aangepast voor logo + vetkopjes + nummering ===
+def make_pdf(question: str, answer: str) -> bytes:
     buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4,
-                            leftMargin=2*cm, rightMargin=2*cm,
-                            topMargin=2*cm, bottomMargin=2*cm)
+    doc = SimpleDocTemplate(
+        buf, pagesize=A4,
+        leftMargin=2*cm, rightMargin=2*cm,
+        topMargin=2*cm, bottomMargin=2*cm
+    )
     styles = getSampleStyleSheet()
     normal = styles["Normal"]
-    font = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
-    normal.fontName = font
+    font_name = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
+    normal.fontName = font_name
     normal.fontSize = 11
     normal.alignment = TA_JUSTIFY
 
     h_bold = styles["Heading4"]
-    h_bold.fontName = font
+    h_bold.fontName = font_name
     h_bold.fontSize = 11
     h_bold.leading = 14
 
-    # AI info paragraphs
+    # AI-info paragrafen
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -117,9 +119,10 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     )
 
     story = []
-    # Logo
+
+    # Logo links boven
     if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=247, height=104))
+        story.append(Image("logo.png", width=100, height=100))
         story.append(Spacer(1, 12))
 
     # Vraag
@@ -148,6 +151,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
+# === einde make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
@@ -243,8 +247,7 @@ def main():
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         pdf_data = make_pdf(
             question=st.session_state.last_question,
-            answer=st.session_state.history[-1]["content"],
-            ai_info=st.session_state.history[-1]["content"]
+            answer=st.session_state.history[-1]["content"]
         )
         st.sidebar.download_button(
             "📄 Download PDF", data=pdf_data,
