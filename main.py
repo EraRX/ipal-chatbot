@@ -23,7 +23,9 @@ except ImportError:
     RateLimitError = Exception
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
+# ReportLab Platypus imports
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_JUSTIFY
@@ -83,49 +85,56 @@ def make_pdf(question: str, answer: str) -> bytes:
     h_bold.fontSize = 11
     h_bold.leading = 14
 
-    prepend1 = (
-        "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
-        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
-        "informatie te controleren via officiële bronnen."
-    )
-    prepend2 = (
-        "2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
-        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
-        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
-        "Dit document vindt u op onze site."
-    )
-    faq_tip = (
-        "<b>Waarom de FAQ gebruiken?</b><br/>"
-        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op "
-        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.<br/><br/>"
-        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:<br/>"
-        "– Veel gestelde vragen Docbase nieuw 2024<br/>"
-        "– Veel gestelde vragen Exact Online<br/><br/>"
-        "Kan het FAQ-document geen hulp bieden, maakt u dan een ticket aan door onderaan op <b>JA</b> te klikken."
-    )
-    instructie = (
-        "<b>Instructie: Ticket aanmaken in DocBase</b><br/>"
-        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:<br/>"
-        "• Beschrijf het probleem zo gedetailleerd mogelijk.<br/>"
-        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.<br/>"
-        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
+    # Fixed AI-prepend text
+    ai_block = (
+        "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan\n"
+        "   Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om\n"
+        "   de meest recente informatie te controleren via officiële bronnen.\n\n"
+        "2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door\n"
+        "   een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige\n"
+        "   tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit\n"
+        "   document vindt u op onze site.\n\n"
+        "Waarom de FAQ gebruiken?\n"
+        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op\n"
+        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n\n"
+        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:\n"
+        "– Veel gestelde vragen Docbase nieuw 2024\n"
+        "– Veel gestelde vragen Exact Online\n\n"
+        "Kan het FAQ-document geen hulp bieden, maakt u dan een ticket aan door onderaan op JA te\n"
+        "klikken.\n\n"
+        "Instructie: Ticket aanmaken in DocBase\n"
+        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:\n"
+        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
+        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
+        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u\n"
+        "  kan opnemen.\n"
     )
 
-    story = [
-        Paragraph(f"<b>Vraag:</b> {question}", h_bold),
-        Spacer(1, 6),
-        Paragraph("<b>Antwoord:</b>", h_bold),
-        Spacer(1, 6),
-        Paragraph(prepend1, normal),
-        Spacer(1, 6),
-        Paragraph(prepend2, normal),
-        Spacer(1, 6),
-        Paragraph(faq_tip, normal),
-        Spacer(1, 6),
-        Paragraph(instructie, normal),
-        Spacer(1, 12),
-        Paragraph(answer, normal),
-    ]
+    story = []
+
+    # Logo if exists
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=4*cm, height=4*cm))
+        story.append(Spacer(1, 12))
+
+    # Vraag
+    story.append(Paragraph("<b>Vraag:</b>", h_bold))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph(question, normal))
+    story.append(Spacer(1, 8))
+
+    # Antwoord
+    story.append(Paragraph("<b>Antwoord:</b>", h_bold))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph(answer, normal))
+    story.append(Spacer(1, 8))
+
+    # AI-antwoord block
+    story.append(Paragraph("<b>AI-Antwoord:</b>", h_bold))
+    story.append(Spacer(1, 4))
+    for line in ai_block.split("\n"):
+        story.append(Paragraph(line, normal))
+    story.append(Spacer(1, 12))
 
     doc.build(story)
     buf.seek(0)
