@@ -4,12 +4,12 @@
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
 - Groot lettertype, eenvoudige bediening
-- Keuze tussen Exact, DocBase en Algemeen (algemene FAQ)
+- Keuze tussen Exact, DocBase en Algemeen
 - Antwoorden uit FAQ, aangevuld met AI voor niet-FAQ vragen
 - Topicfiltering via complete-word blacklist
-- Retry-logica voor OpenAI-calls bij rate-limits
-- Real-time context uit Wikipedia REST-API voor ambtvragen (president, paus)
-- Fallback naar NL-/EN-Wikipedia samenvatting voor alle andere queries
+- Retry-logica voor OpenAI-calls bij rate limits
+- Real-time context uit Wikipedia REST-API voor ambtvragen
+- Fallback naar Wikipedia-samenvatting voor alle andere queries
 - Globaal openai-object (ChatCompletion.create)
 - PDF-export met logo en automatische tekst-wrapping
 - Avatar-ondersteuning, logging en foutafhandeling
@@ -32,7 +32,12 @@ from dotenv import load_dotenv
 import wikipedia  # pip install wikipedia==1.4.0
 
 import openai
-from openai.error import RateLimitError
+# Veilig RateLimitError importeren
+try:
+    from openai.error import RateLimitError
+except ImportError:
+    RateLimitError = Exception
+
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -56,7 +61,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 
-# — OpenAI API key & model (globaal object) — 
+# — OpenAI API key & model (globaal object) —
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -82,8 +87,8 @@ def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int 
 
 def rewrite_answer(text: str) -> str:
     return openai_chat([
-        {"role": "system", "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
-        {"role": "user",   "content": text},
+        {"role": "system",  "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
+        {"role": "user",    "content": text},
     ], temperature=0.2, max_tokens=800)
 
 # — FAQ loader uit Excel —
@@ -106,7 +111,6 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     return df
 
 faq_df = load_faq()
-PRODUCTS = ["Exact", "DocBase", "Algemeen"]
 subthema_dict = {
     p: sorted(faq_df[faq_df["Systeem"] == p]["Subthema"].dropna().unique())
     for p in ["Exact", "DocBase"]
@@ -115,7 +119,7 @@ subthema_dict = {
 # — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens","medische gegevens","gezondheid","strafrechtelijk verleden",
-    # … vul verder naar behoefte aan …
+    # vul verder naar behoefte aan…
     "privacy schending"
 ]
 
@@ -130,10 +134,8 @@ def check_blacklist(msg: str) -> list[str]:
 def filter_chatbot_topics(msg: str) -> tuple[bool, str]:
     found = check_blacklist(msg)
     if found:
-        warning = (
-            f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}. "
-            "Vermijd deze onderwerpen en probeer het opnieuw."
-        )
+        warning = (f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}. "
+                   "Vermijd deze onderwerpen en probeer het opnieuw.")
         logging.info(f"Blacklist flagged: {found}")
         return False, warning
     return True, ""
@@ -150,20 +152,20 @@ def genereer_pdf(text: str) -> bytes:
     if os.path.exists(logo_path):
         img = PILImage.open(logo_path)
         ar = img.width / img.height
-        c.drawImage(logo_path, lm, h-logo_h-10,
-                    width=logo_h*ar, height=logo_h, mask="auto")
+        c.drawImage(logo_path, lm, h - logo_h - 10,
+                    width=logo_h * ar, height=logo_h, mask="auto")
         y0 = h - logo_h - 30
     else:
         y0 = h - 50
 
-    text_obj = c.beginText(lm, y0)
-    text_obj.setFont("Helvetica", 12)
+    txt = c.beginText(lm, y0)
+    txt.setFont("Helvetica", 12)
     max_chars = int(usable_w / (12 * 0.6))
     for para in text.split("\n"):
         for line in textwrap.wrap(para, width=max_chars):
-            text_obj.textLine(line)
+            txt.textLine(line)
 
-    c.drawText(text_obj)
+    c.drawText(txt)
     c.showPage()
     c.save()
     buffer.seek(0)
@@ -177,9 +179,7 @@ def fetch_incumbent(office_page: str, lang: str = "en") -> str | None:
         return None
     extract = r.json().get("extract", "")
     m = re.search(r"(?i)(?:current|huidige)\s+\S+\s+is\s+([A-Z][\w\s\-']+)", extract)
-    if m:
-        return m.group(1).strip()
-    return None
+    return m.group(1).strip() if m else None
 
 def extract_wiki_topic(prompt: str) -> str:
     m = re.match(r'(?i)wie (?:is|zijn) (?:de |het |een )?(.+)\?*$', prompt.strip())
@@ -210,11 +210,9 @@ def get_ai_answer(prompt: str) -> str:
             return f"De huidige paus is {holder}."
     topic = extract_wiki_topic(prompt)
     summary = fetch_wikipedia_summary(topic)
-    context = (
-        {"role": "system",
-         "content": f"Volgens Wikipedia (jul 2025) over '{topic}':\n{summary}"}
-        if summary else {"role": "system", "content": ""}
-    )
+    context = ({"role": "system",
+                "content": f"Volgens Wikipedia (jul 2025) over '{topic}':\n{summary}"}
+               if summary else {"role": "system", "content": ""})
     history = [{"role": m["role"], "content": m["content"]}
                for m in st.session_state.history[-10:]]
     messages = [context] + history + [{"role": "user", "content": prompt}]
@@ -227,14 +225,13 @@ AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
-    if path and os.path.exists(path):
-        return PILImage.open(path).resize((64,64))
-    return "🙂"
+    return (PILImage.open(path).resize((64,64)) if path and os.path.exists(path)
+            else "🙂")
 
 def add_message(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (
-        st.session_state.history + [{"role":role,"content":content,"time":ts}]
+        st.session_state.history + [{"role": role, "content": content, "time": ts}]
     )[-MAX_HISTORY:]
 
 def render_chat():
@@ -255,16 +252,15 @@ def main():
             del st.session_state[k]
         st.rerun()
 
-    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
-        last = st.session_state.history[-1]["content"]
+    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
+        laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
             "📄 Download antwoord als PDF",
-            data=genereer_pdf(last),
+            data=genereer_pdf(laatste),
             file_name="antwoord.pdf",
             mime="application/pdf"
         )
 
-    # Product-selectie
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
@@ -284,18 +280,16 @@ def main():
         render_chat()
         return
 
-    # Module-selectie voor Exact/DocBase
-    if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
+    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
-        if sel!="(Kies)":
+        if sel != "(Kies)":
             st.session_state.selected_module = sel
             add_message("assistant", f"Gekozen: {sel}")
             st.rerun()
         render_chat()
         return
 
-    # Chat-interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
@@ -308,12 +302,12 @@ def main():
         st.rerun()
 
     with st.spinner("Even zoeken..."):
-        if st.session_state.selected_product=="Algemeen":
-            dfm = faq_df[faq_df["combined"].str.contains(vraag,case=False,na=False)]
+        if st.session_state.selected_product == "Algemeen":
+            dfm = faq_df[faq_df["combined"].str.contains(vraag, case=False, na=False)]
         else:
             dfm = faq_df[
-                (faq_df["Systeem"]==st.session_state.selected_product)&
-                (faq_df["Subthema"].str.lower()==st.session_state.selected_module.lower())
+                (faq_df["Systeem"] == st.session_state.selected_product) &
+                (faq_df["Subthema"].str.lower() == st.session_state.selected_module.lower())
             ]
         if not dfm.empty:
             row = dfm.iloc[0]
@@ -323,7 +317,7 @@ def main():
             except:
                 pass
             img = row.get("Afbeelding")
-            if isinstance(img,str) and img and os.path.exists(img):
+            if isinstance(img, str) and img and os.path.exists(img):
                 st.image(img, caption="Voorbeeld", use_column_width=True)
             add_message("assistant", ans)
         else:
