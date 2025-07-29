@@ -119,7 +119,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story = []
     # Logo
     if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=50, height=50))
+        story.append(Image("logo.png", width=247, height=104))
         story.append(Spacer(1, 12))
 
     # Vraag
