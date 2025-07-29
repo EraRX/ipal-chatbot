@@ -16,7 +16,7 @@ from PIL import Image as PILImage
 from dotenv import load_dotenv
 import openai
 
-# Voor RateLimitError fallback
+# Fallback import voor RateLimitError
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -24,7 +24,7 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-# ReportLab Platypus imports
+# ReportLab imports voor Platypus PDF
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -33,7 +33,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# --- Page config & styling ---
+# — Streamlit config & styling —
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown("""
   <style>
@@ -41,9 +41,10 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# --- OpenAI Setup ---
+# — OpenAI setup —
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
@@ -60,32 +61,31 @@ def chatgpt(messages, temperature=0.3, max_tokens=800):
     )
     return resp.choices[0].message.content.strip()
 
-# --- Register Calibri if available ---
+# — Register Calibri als beschikbaar —
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation ---
-def make_pdf(question: str, answer: str, ai_answer: str) -> bytes:
+# — PDF-functie met exacte opmaak —
+def make_pdf(question: str, answer: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
                             leftMargin=2*cm, rightMargin=2*cm,
                             topMargin=2*cm, bottomMargin=2*cm)
-
     styles = getSampleStyleSheet()
     normal = styles["Normal"]
-    font_name = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
-    normal.fontName = font_name
+    font = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
+    normal.fontName = font
     normal.fontSize = 11
     normal.alignment = TA_JUSTIFY
 
     h_bold = styles["Heading4"]
-    h_bold.fontName = font_name
+    h_bold.fontName = font
     h_bold.fontSize = 11
     h_bold.leading = 14
 
-    # Your two numbered paragraphs
+    # Vaste punten
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -114,26 +114,25 @@ def make_pdf(question: str, answer: str, ai_answer: str) -> bytes:
     )
 
     story = []
-
-    # Logo (links boven)
+    # Logo linksboven
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=50, height=50))
         story.append(Spacer(1, 12))
 
-    # Vraag
-    story.append(Paragraph(f"<b>Vraag:</b>", h_bold))
+    # Vraag (vet) + inhoud
+    story.append(Paragraph("<b>Vraag:</b>", h_bold))
     story.append(Spacer(1, 4))
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord
-    story.append(Paragraph(f"<b>Antwoord:</b>", h_bold))
+    # Antwoord (vet) + inhoud
+    story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
     story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
 
-    # AI-Antwoord blok
-    story.append(Paragraph(f"<b>AI-Antwoord Info:</b>", h_bold))
+    # AI-Antwoord Info (vet) + vaste tekst
+    story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Spacer(1, 4))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
@@ -147,7 +146,7 @@ def make_pdf(question: str, answer: str, ai_answer: str) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-# --- FAQ Loader ---
+# — FAQ loader —  
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
@@ -163,46 +162,47 @@ def load_faq(path="faq.xlsx"):
 
 faq_df = load_faq()
 
-# --- Blacklist ---
+# — Blacklist —  
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
 def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-# --- RKK Scraping omitted for brevity (same as before) ---
-def fetch_bishop_from_rkkerk(loc): ...
-def fetch_bishop_from_rkk_online(loc): ...
+# — RKK scraping (zoals eerder) —  
+def fetch_bishop_from_rkkerk(loc: str): ...
+def fetch_bishop_from_rkk_online(loc: str): ...
 def fetch_all_bishops_nl(): ...
 
-# --- Avatars & Helpers ---
+# — Avatars & helpers —  
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
-def get_avatar(role): ...
-TIMEZONE = pytz.timezone("Europe/Amsterdam")
-MAX_HISTORY = 20
-def add_msg(role,content): ...
+def get_avatar(role: str): ...
+def add_msg(role: str, content: str): ...
 def render_chat(): ...
 
-# Initialize session
+# — Session init —  
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
     st.session_state.last_question = ""
 
-# --- Main app ---
+# — Main app —  
 def main():
-    # Nieuw gesprek, PDF-knop enz. (idem als voorheen)…
-    # Bij het downloaden:
-    pdf_data = make_pdf(
-        question=st.session_state.last_question,
-        answer=st.session_state.history[-1]["content"],
-        ai_answer=st.session_state.history[-1]["content"]
-    )
-    st.sidebar.download_button("📄 Download PDF", data=pdf_data,
-        file_name="antwoord.pdf", mime="application/pdf")
+    if st.sidebar.button("🔄 Nieuw gesprek"):
+        st.session_state.clear()
+        st.rerun()
 
-    # Rest van je chatflow (zelfde code: productselectie, FAQ lookup, scraping, fallback…)
-    # Vergeet bij iedere vraag:
-    st.session_state.last_question = vraag
+    # PDF-downloadknop
+    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
+        pdf_data = make_pdf(
+            question=st.session_state.last_question,
+            answer=st.session_state.history[-1]["content"]
+        )
+        st.sidebar.download_button("📄 Download PDF", data=pdf_data,
+            file_name="antwoord.pdf", mime="application/pdf")
+
+    # Chatflow (productselectie, vraag input, FAQ lookup, scraping, fallback…)
+    # Onthoud na elke input:
+    #   st.session_state.last_question = vraag
 
 if __name__=="__main__":
     main()
