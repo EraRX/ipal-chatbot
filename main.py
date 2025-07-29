@@ -8,9 +8,10 @@ IPAL Chatbox voor oudere vrijwilligers
 - Antwoorden uit FAQ, aangevuld met AI voor niet-FAQ vragen
 - Topicfiltering via complete-word blacklist
 - Retry-logica voor OpenAI-calls bij rate-limits
-- Real-time context uit Wikipedia (NL→EN) vóór AI request voor alle personen/begrippen
+- Real-time context uit Wikipedia REST-API voor ambtvragen (president, paus)
+- Fallback naar NL-/EN-Wikipedia samenvatting voor alle andere queries
 - OpenAI Python v1 client interface
-- PDF-export met logo (logo.png) en tekst-wrapping
+- PDF-export met logo (logo.png) en automatische tekst-wrapping
 - Avatar-ondersteuning, logging en foutafhandeling
 """
 
@@ -25,8 +26,11 @@ import textwrap
 import streamlit as st
 import pandas as pd
 import pytz
+import requests
 from PIL import Image as PILImage
 from dotenv import load_dotenv
+
+# Wikipedia package voor samenvattingen
 import wikipedia  # pip install wikipedia==1.4.0
 
 from openai import OpenAI
@@ -84,81 +88,9 @@ def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int 
 
 def rewrite_answer(text: str) -> str:
     return openai_chat([
-        {"role": "system",  "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
-        {"role": "user",    "content": text},
+        {"role": "system", "content": "Herschrijf dit antwoord eenvoudig en vriendelijk."},
+        {"role": "user",   "content": text},
     ], temperature=0.2, max_tokens=800)
-
-# — Wikipedia helpers — 
-def extract_wiki_topic(prompt: str) -> str:
-    """
-    Haal de zoekterm uit vragen als 'wie is X' of 'wie zijn X',
-    anders gebruik de hele prompt.
-    """
-    m = re.match(r'(?i)wie (?:is|zijn) (?:de |het |een )?(.+)\?*$', prompt.strip())
-    return m.group(1) if m else prompt
-
-def fetch_wikipedia_summary(topic: str) -> str | None:
-    """
-    Zoek eerst in NL-Wikipedia, val daarna terug op EN-Wikipedia.
-    Retourneer tot 2 zinnen samenvatting.
-    """
-    for lang in ("nl", "en"):
-        try:
-            wikipedia.set_lang(lang)
-            results = wikipedia.search(topic, results=1, auto_suggest=False)
-            if not results:
-                continue
-            return wikipedia.summary(results[0], sentences=2,
-                                     auto_suggest=False, redirect=True)
-        except Exception:
-            continue
-    return None
-
-def get_ai_answer(prompt: str) -> str:
-    """
-    Genereer AI-antwoord met voorafgaande Wikipedia-context
-    voor alle personen/onderwerpen.
-    """
-    topic = extract_wiki_topic(prompt)
-    summary = fetch_wikipedia_summary(topic)
-    if summary:
-        context = {
-            "role":    "system",
-            "content": f"Volgens Wikipedia (laatst bijgewerkt juli 2025) over '{topic}':\n{summary}"
-        }
-    else:
-        context = {"role": "system", "content": ""}
-    history_msgs = [
-        {"role": m["role"], "content": m["content"]}
-        for m in st.session_state.history[-10:]
-    ]
-    messages = [context] + history_msgs + [{"role": "user", "content": prompt}]
-    return openai_chat(messages)
-
-# — Blacklist & filtering —
-BLACKLIST_CATEGORIES = [
-    "persoonlijke gegevens","medische gegevens","gezondheid","strafrechtelijk verleden",
-    # … vul de rest van je lijst aan …
-    "gruwelijke inhoud","sensatiezucht","privacy schending"
-]
-def check_blacklist(msg: str) -> list[str]:
-    found = []
-    low = msg.lower()
-    for term in BLACKLIST_CATEGORIES:
-        if re.search(rf"\b{re.escape(term.lower())}\b", low):
-            found.append(term)
-    return found
-
-def filter_chatbot_topics(msg: str) -> tuple[bool, str]:
-    found = check_blacklist(msg)
-    if found:
-        warning = (
-            f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}. "
-            "Vermijd deze onderwerpen en probeer het opnieuw."
-        )
-        logging.info(f"Blacklist terms flagged: {found}")
-        return False, warning
-    return True, ""
 
 # — FAQ loader uit Excel —
 @st.cache_data(show_spinner=False)
@@ -180,6 +112,36 @@ def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     return df
 
 faq_df = load_faq()
+PRODUCTS = ["Exact", "DocBase", "Algemeen"]
+subthema_dict = {
+    p: sorted(faq_df[faq_df["Systeem"]==p]["Subthema"].dropna().unique())
+    for p in ["Exact", "DocBase"]
+}
+
+# — Blacklist & filtering —
+BLACKLIST_CATEGORIES = [
+    "persoonlijke gegevens","medische gegevens","gezondheid","strafrechtelijk verleden",
+    # … vul verder naar behoefte aan …
+    "privacy schending"
+]
+def check_blacklist(msg: str) -> list[str]:
+    found = []
+    low = msg.lower()
+    for term in BLACKLIST_CATEGORIES:
+        if re.search(rf"\b{re.escape(term.lower())}\b", low):
+            found.append(term)
+    return found
+
+def filter_chatbot_topics(msg: str) -> tuple[bool, str]:
+    found = check_blacklist(msg)
+    if found:
+        warning = (
+            f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}. "
+            "Vermijd deze onderwerpen en probeer het opnieuw."
+        )
+        logging.info(f"Blacklist flagged: {found}")
+        return False, warning
+    return True, ""
 
 # — PDF-export met logo & wrapping —
 def genereer_pdf(text: str) -> bytes:
@@ -189,29 +151,87 @@ def genereer_pdf(text: str) -> bytes:
     lm, rm = 40, 40
     usable_w = w - lm - rm
 
-    # logo
-    logo, logo_h = "logo.png", 50
-    if os.path.exists(logo):
-        img = PILImage.open(logo)
+    # Logo
+    logo_path, logo_h = "logo.png", 50
+    if os.path.exists(logo_path):
+        img = PILImage.open(logo_path)
         ar = img.width / img.height
-        c.drawImage(logo, lm, h - logo_h - 10,
-                    width=logo_h * ar, height=logo_h, mask="auto")
+        c.drawImage(logo_path, lm, h-logo_h-10,
+                    width=logo_h*ar, height=logo_h, mask="auto")
         y0 = h - logo_h - 30
     else:
         y0 = h - 50
 
-    txt = c.beginText(lm, y0)
-    txt.setFont("Helvetica", 12)
+    text_obj = c.beginText(lm, y0)
+    text_obj.setFont("Helvetica", 12)
     max_chars = int(usable_w / (12 * 0.6))
     for para in text.split("\n"):
         for line in textwrap.wrap(para, width=max_chars):
-            txt.textLine(line)
+            text_obj.textLine(line)
 
-    c.drawText(txt)
+    c.drawText(text_obj)
     c.showPage()
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
+
+# — Wikipedia REST-API voor ambtvragen —
+def fetch_incumbent(office_page: str, lang: str = "en") -> str | None:
+    """
+    Haalt huidige functionaris op via Wikipedia REST summary endpoint.
+    """
+    url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{office_page}"
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    extract = r.json().get("extract", "")
+    # Zoek naar patroon "current ... is NAME"
+    m = re.search(r"(?i)(?:current|huidige)\s+\S+\s+is\s+([A-Z][\w\s\-']+)", extract)
+    if m:
+        return m.group(1).strip()
+    return None
+
+def extract_wiki_topic(prompt: str) -> str:
+    m = re.match(r'(?i)wie (?:is|zijn) (?:de |het |een )?(.+)\?*$', prompt.strip())
+    return m.group(1) if m else prompt
+
+def fetch_wikipedia_summary(topic: str) -> str | None:
+    for lang in ("nl", "en"):
+        try:
+            wikipedia.set_lang(lang)
+            results = wikipedia.search(topic, results=1, auto_suggest=False)
+            if not results:
+                continue
+            return wikipedia.summary(results[0], sentences=2,
+                                     auto_suggest=False, redirect=True)
+        except Exception:
+            continue
+    return None
+
+def get_ai_answer(prompt: str) -> str:
+    low = prompt.lower()
+    # President USA
+    if low.startswith("wie is") and "president" in low:
+        holder = fetch_incumbent("President_of_the_United_States", lang="en")
+        if holder:
+            return f"De huidige president van de Verenigde Staten is {holder}."
+    # Paus
+    if low.startswith("wie is") and ("paus" in low or "pope" in low):
+        holder = fetch_incumbent("Pope", lang="en")
+        if holder:
+            return f"De huidige paus is {holder}."
+    # Fallback: Wikipedia-summary + AI
+    topic = extract_wiki_topic(prompt)
+    summary = fetch_wikipedia_summary(topic)
+    context = (
+        {"role":"system",
+         "content":f"Volgens Wikipedia (jul 2025) over '{topic}':\n{summary}"}
+        if summary else {"role":"system","content":""}
+    )
+    history = [{"role":m["role"],"content":m["content"]} 
+               for m in st.session_state.history[-10:]]
+    messages = [context] + history + [{"role":"user","content":prompt}]
+    return openai_chat(messages)
 
 # — UI & session helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
@@ -220,8 +240,9 @@ AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
-    return (PILImage.open(path).resize((64,64)) if path and os.path.exists(path)
-            else "🙂")
+    if path and os.path.exists(path):
+        return PILImage.open(path).resize((64,64))
+    return "🙂"
 
 def add_message(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
@@ -240,7 +261,7 @@ if "history" not in st.session_state:
     st.session_state.selected_product = None
     st.session_state.selected_module = None
 
-# — Hoofd-applicatie —
+# — Main app —
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
@@ -256,24 +277,27 @@ def main():
             mime="application/pdf"
         )
 
+    # Product-keuze
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1, c2, c3 = st.columns(3)
+        c1,c2,c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
             st.session_state.selected_product="Exact"; add_message("assistant","Gekozen: Exact"); st.rerun()
-        if c2.button("DocBase", use_container_width=True):
+        if c2.button("DocBase",use_container_width=True):
             st.session_state.selected_product="DocBase"; add_message("assistant","Gekozen: DocBase"); st.rerun()
-        if c3.button("Algemeen", use_container_width=True):
+        if c3.button("Algemeen",use_container_width=True):
             st.session_state.selected_product="Algemeen"; st.session_state.selected_module="alles"; add_message("assistant","Gekozen: Algemeen"); st.rerun()
         render_chat(); return
 
+    # Module-keuze voor Exact/DocBase
     if st.session_state.selected_product!="Algemeen" and not st.session_state.selected_module:
-        opts = sorted(faq_df[faq_df["Systeem"]==st.session_state.selected_product]["Subthema"].dropna().unique())
-        sel = st.selectbox("Kies onderwerp:",["(Kies)"]+opts)
+        opts = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox("Kies onderwerp:", ["(Kies)"]+opts)
         if sel!="(Kies)":
             st.session_state.selected_module=sel; add_message("assistant",f"Gekozen: {sel}"); st.rerun()
         render_chat(); return
 
+    # Chat-interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
@@ -297,7 +321,8 @@ def main():
             try: ans = rewrite_answer(ans)
             except: pass
             img = row.get("Afbeelding")
-            if isinstance(img,str) and img and os.path.exists(img): st.image(img,caption="Voorbeeld",use_column_width=True)
+            if isinstance(img,str) and img and os.path.exists(img):
+                st.image(img, caption="Voorbeeld", use_column_width=True)
             add_message("assistant", ans)
         else:
             try:
