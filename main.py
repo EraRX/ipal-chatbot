@@ -6,13 +6,13 @@ IPAL Chatbox voor oudere vrijwilligers
 - Groot lettertype, eenvoudige bediening
 - Keuze tussen Exact, DocBase en Algemeen
 - Antwoorden uit FAQ, aangevuld met AI voor niet-FAQ vragen
-- Topicfiltering via complete-word blacklist
-- Retry-logica bij rate-limits via tenacity
-- Real-time context uit Wikipedia REST-API voor ambtvragen
-- Fallback naar Wikipedia-samenvatting voor overige queries
+- Topicfiltering via complete‐word blacklist
+- Retry‐logica bij rate‐limits via tenacity
+- Real‐time context uit Wikipedia REST‐API voor ambtvragen (president, paus, bisschop)
+- Fallback naar NL/EN‐Wikipedia samenvatting voor overige queries
 - Directe OpenAI Chat Completions API via requests
-- PDF-export met logo en automatische tekst-wrapping
-- Avatar-ondersteuning, logging en foutafhandeling
+- PDF‐export met logo en automatische tekst‐wrapping
+- Avatar‐ondersteuning, logging en foutafhandeling
 """
 
 import os
@@ -34,7 +34,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-# — Streamlit pagina-configuratie & styling —
+# — Streamlit page config & styling —
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown(
     """
@@ -53,7 +53,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
-# — Laad OpenAI-sleutel & model uit env/secrets —
+# — Load OpenAI key & model —
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -61,7 +61,7 @@ if not OPENAI_KEY:
     st.stop()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
-# — Helper: AI chat via OpenAI REST API — 
+# — OpenAI REST endpoint & headers —
 API_URL = "https://api.openai.com/v1/chat/completions"
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_KEY}",
@@ -74,7 +74,7 @@ HEADERS = {
     retry=retry_if_exception_type(requests.exceptions.HTTPError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
-    """Roep OpenAI Chat Completions REST API aan met retry bij HTTP errors."""
+    """Call OpenAI Chat Completions REST API with retry."""
     payload = {
         "model": MODEL,
         "messages": messages,
@@ -92,7 +92,7 @@ def rewrite_answer(text: str) -> str:
         {"role": "user",   "content": text},
     ], temperature=0.2, max_tokens=800)
 
-# — FAQ loader uit Excel —
+# — Load FAQ from Excel —
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
@@ -143,7 +143,7 @@ def filter_chatbot_topics(msg: str) -> tuple[bool, str]:
         return False, warning
     return True, ""
 
-# — PDF-export met logo & wrapping —
+# — PDF export with logo & wrapping —
 def genereer_pdf(text: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -151,30 +151,31 @@ def genereer_pdf(text: str) -> bytes:
     lm, rm = 40, 40
     usable_w = w - lm - rm
 
+    # Draw logo if present
     logo_path, logo_h = "logo.png", 50
     if os.path.exists(logo_path):
         img = PILImage.open(logo_path)
         ar = img.width / img.height
-        c.drawImage(logo_path, lm, h-logo_h-10,
-                    width=logo_h*ar, height=logo_h, mask="auto")
+        c.drawImage(logo_path, lm, h - logo_h - 10,
+                    width=logo_h * ar, height=logo_h, mask="auto")
         y0 = h - logo_h - 30
     else:
         y0 = h - 50
 
-    text_obj = c.beginText(lm, y0)
-    text_obj.setFont("Helvetica", 12)
+    txt = c.beginText(lm, y0)
+    txt.setFont("Helvetica", 12)
     max_chars = int(usable_w / (12 * 0.6))
     for para in text.split("\n"):
         for line in textwrap.wrap(para, width=max_chars):
-            text_obj.textLine(line)
+            txt.textLine(line)
 
-    c.drawText(text_obj)
+    c.drawText(txt)
     c.showPage()
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
 
-# — Wikipedia REST-API voor ambtvragen —
+# — Wikipedia REST API for current office holders —
 def fetch_incumbent(office_page: str, lang: str = "en") -> str | None:
     url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{office_page}"
     r = requests.get(url, timeout=10)
@@ -203,17 +204,32 @@ def fetch_wikipedia_summary(topic: str) -> str | None:
 
 def get_ai_answer(prompt: str) -> str:
     low = prompt.lower()
-    # President USA
+
+    # President VS
     if low.startswith("wie is") and "president" in low:
         holder = fetch_incumbent("President_of_the_United_States", lang="en")
         if holder:
-            return f"De huidige president van de VS is {holder}."
+            return f"De huidige president van de Verenigde Staten is {holder}."
+
     # Paus
     if low.startswith("wie is") and ("paus" in low or "pope" in low):
         holder = fetch_incumbent("Pope", lang="en")
         if holder:
             return f"De huidige paus is {holder}."
-    # Fallback: Wikipedia-summary + AI
+
+    # Bisschop van X
+    if low.startswith("wie is") and "bisschop" in low:
+        m = re.search(r'(?i)bisschop(?: van)?\s+([\w\s\-]+)', prompt)
+        if m:
+            loc = m.group(1).strip()
+            # Wikipedia page for diocese
+            office_page = f"Roman_Catholic_Diocese_of_{loc.replace(' ', '_')}"
+            holder = (fetch_incumbent(office_page, lang="nl")
+                      or fetch_incumbent(office_page, lang="en"))
+            if holder:
+                return f"De huidige bisschop van {loc} is {holder}."
+
+    # Fallback: Wikipedia summary + AI
     topic = extract_wiki_topic(prompt)
     summary = fetch_wikipedia_summary(topic)
     context = (
@@ -248,6 +264,7 @@ def render_chat():
             f"{msg['content']}\n\n_{msg['time']}_"
         )
 
+# Init session state
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
@@ -255,11 +272,13 @@ if "history" not in st.session_state:
 
 # — Main app —
 def main():
+    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
+    # PDF-downloadknop voor laatste AI-antwoord
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
@@ -269,6 +288,7 @@ def main():
             mime="application/pdf"
         )
 
+    # Product-selectie
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
@@ -288,6 +308,7 @@ def main():
         render_chat()
         return
 
+    # Module-selectie voor Exact/DocBase
     if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
@@ -298,6 +319,7 @@ def main():
         render_chat()
         return
 
+    # Chat-interface
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
