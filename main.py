@@ -8,8 +8,9 @@ IPAL Chatbox voor oudere vrijwilligers
 - Antwoorden uit FAQ, aangevuld met AI voor niet-FAQ vragen
 - Topicfiltering via complete‐word blacklist
 - Retry‐logica bij rate‐limits via tenacity
-- Real‐time context uit Wikipedia REST‐API voor ambtvragen (president, paus, bisschop)
-- Fallback naar NL/EN‐Wikipedia samenvatting voor overige queries
+- Real‐time context uit Wikipedia REST‐API voor ambtvragen (president, paus)
+- Scraping officiële RKK-website voor bisschoppen in Nederland
+- Fallback naar Wikipedia‐samenvatting voor overige queries
 - Directe OpenAI Chat Completions API via requests
 - PDF‐export met logo en automatische tekst‐wrapping
 - Avatar‐ondersteuning, logging en foutafhandeling
@@ -26,6 +27,7 @@ import streamlit as st
 import pandas as pd
 import pytz
 import requests
+from bs4 import BeautifulSoup
 from PIL import Image as PILImage
 from dotenv import load_dotenv
 import wikipedia  # pip install wikipedia==1.4.0
@@ -34,7 +36,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-# — Streamlit page config & styling —
+# — Streamlit pagina‐configuratie & styling —
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown(
     """
@@ -53,11 +55,11 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
-# — Load OpenAI key & model —
+# — Laad OpenAI‐sleutel & model uit env/secrets —
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
-    st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Streamlit Secrets.")
+    st.sidebar.error("🔑 Voeg je OpenAI API‐key toe in .env of Streamlit Secrets.")
     st.stop()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
@@ -74,7 +76,7 @@ HEADERS = {
     retry=retry_if_exception_type(requests.exceptions.HTTPError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
-    """Call OpenAI Chat Completions REST API with retry."""
+    """Roep OpenAI Chat Completions REST API aan met retry bij HTTP errors."""
     payload = {
         "model": MODEL,
         "messages": messages,
@@ -96,7 +98,7 @@ def rewrite_answer(text: str) -> str:
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
-        st.error(f"FAQ-bestand '{path}' niet gevonden.")
+        st.error(f"FAQ‐bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=["Systeem","Subthema","combined","Antwoord","Afbeelding"])
     try:
         df = pd.read_excel(path, engine="openpyxl")
@@ -143,7 +145,7 @@ def filter_chatbot_topics(msg: str) -> tuple[bool, str]:
         return False, warning
     return True, ""
 
-# — PDF export with logo & wrapping —
+# — PDF‐export met logo & wrapping —
 def genereer_pdf(text: str) -> bytes:
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -151,39 +153,66 @@ def genereer_pdf(text: str) -> bytes:
     lm, rm = 40, 40
     usable_w = w - lm - rm
 
-    # Draw logo if present
+    # Logo tekenen als aanwezig
     logo_path, logo_h = "logo.png", 50
     if os.path.exists(logo_path):
         img = PILImage.open(logo_path)
         ar = img.width / img.height
-        c.drawImage(logo_path, lm, h - logo_h - 10,
-                    width=logo_h * ar, height=logo_h, mask="auto")
+        c.drawImage(logo_path, lm, h-logo_h-10,
+                    width=logo_h*ar, height=logo_h, mask="auto")
         y0 = h - logo_h - 30
     else:
         y0 = h - 50
 
-    txt = c.beginText(lm, y0)
-    txt.setFont("Helvetica", 12)
+    text_obj = c.beginText(lm, y0)
+    text_obj.setFont("Helvetica", 12)
     max_chars = int(usable_w / (12 * 0.6))
     for para in text.split("\n"):
         for line in textwrap.wrap(para, width=max_chars):
-            txt.textLine(line)
+            text_obj.textLine(line)
 
-    c.drawText(txt)
+    c.drawText(text_obj)
     c.showPage()
     c.save()
     buffer.seek(0)
     return buffer.getvalue()
 
-# — Wikipedia REST API for current office holders —
+# — Officiële RKK‐website scraping voor bisschoppen —
+def fetch_bishop_from_rkkerk(loc: str) -> str | None:
+    """
+    Scrape rkkerk.nl voor bisschop van een diocese
+    loc: 'Roermond', 'Utrecht', etc.
+    """
+    slug = loc.lower().replace(" ", "-")
+    url = f"https://www.rkkerk.nl/bisdom-{slug}/"
+    try:
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        # veronderstel dat bisschopsnaam in <h1> of eerste <p> staat
+        h1 = soup.find("h1")
+        if h1 and "bisschop" in h1.text.lower():
+            # tekst als 'Mgr. dr. C.F.M. van den Hout — Bisschop van Roermond'
+            return h1.text.strip().split("—")[0].strip()
+        # fallback: zoek eerste paragraaf met 'Mgr'
+        p = soup.find("p", string=re.compile(r"Mgr\."))
+        if p:
+            return p.text.strip().split(",")[0]
+    except Exception:
+        pass
+    return None
+
+# — Wikipedia REST‐API voor ambtvragen (president, paus) —
 def fetch_incumbent(office_page: str, lang: str = "en") -> str | None:
     url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{office_page}"
-    r = requests.get(url, timeout=10)
-    if r.status_code != 200:
+    try:
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        extract = r.json().get("extract", "")
+        m = re.search(r"(?i)(?:current|huidige)\s+\S+\s+is\s+([A-Z][\w\s\-']+)", extract)
+        return m.group(1).strip() if m else None
+    except Exception:
         return None
-    extract = r.json().get("extract", "")
-    m = re.search(r"(?i)(?:current|huidige)\s+\S+\s+is\s+([A-Z][\w\s\-']+)", extract)
-    return m.group(1).strip() if m else None
 
 def extract_wiki_topic(prompt: str) -> str:
     m = re.match(r'(?i)wie (?:is|zijn) (?:de |het |een )?(.+)\?*$', prompt.strip())
@@ -219,17 +248,13 @@ def get_ai_answer(prompt: str) -> str:
 
     # Bisschop van X
     if low.startswith("wie is") and "bisschop" in low:
-        m = re.search(r'(?i)bisschop(?: van)?\s+([\w\s\-]+)', prompt)
-        if m:
-            loc = m.group(1).strip()
-            # Wikipedia page for diocese
-            office_page = f"Roman_Catholic_Diocese_of_{loc.replace(' ', '_')}"
-            holder = (fetch_incumbent(office_page, lang="nl")
-                      or fetch_incumbent(office_page, lang="en"))
-            if holder:
-                return f"De huidige bisschop van {loc} is {holder}."
-
-    # Fallback: Wikipedia summary + AI
+        loc_match = re.search(r'bisschop(?: van)?\s+([\w\s\-]+)', prompt, re.I)
+        if loc_match:
+            loc = loc_match.group(1).strip()
+            bishop = fetch_bishop_from_rkkerk(loc)
+            if bishop:
+                return f"De huidige bisschop van {loc} is {bishop}."
+    # Fallback: Wikipedia‐samenvatting + AI
     topic = extract_wiki_topic(prompt)
     summary = fetch_wikipedia_summary(topic)
     context = (
@@ -264,7 +289,7 @@ def render_chat():
             f"{msg['content']}\n\n_{msg['time']}_"
         )
 
-# Init session state
+# Init sessiestate
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
@@ -272,13 +297,11 @@ if "history" not in st.session_state:
 
 # — Main app —
 def main():
-    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
 
-    # PDF-downloadknop voor laatste AI-antwoord
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
@@ -308,7 +331,7 @@ def main():
         render_chat()
         return
 
-    # Module-selectie voor Exact/DocBase
+    # Module-selectie
     if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
