@@ -24,7 +24,7 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-# ReportLab imports for Platypus PDF generation
+# ReportLab Platypus imports
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -66,7 +66,7 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation using Platypus ---
+# --- PDF Generation ---
 def make_pdf(question: str, answer: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
@@ -85,7 +85,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     h_bold.fontSize = 11
     h_bold.leading = 14
 
-    # Fixed prepend text
+    # Prepend text blocks
     prepend1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -114,7 +114,6 @@ def make_pdf(question: str, answer: str) -> bytes:
         "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
     )
 
-    # Build document
     story = []
     story.append(Paragraph(f"<b>Vraag:</b> {question}", h_bold))
     story.append(Spacer(1, 6))
@@ -141,8 +140,7 @@ def load_faq(path="faq.xlsx"):
         st.error(f"⚠️ FAQ '{path}' niet gevonden")
         return pd.DataFrame(columns=["combined","Antwoord","Afbeelding"])
     df = pd.read_excel(path, engine="openpyxl")
-    if "Afbeelding" not in df.columns:
-        df["Afbeelding"] = None
+    df.setdefault("Afbeelding", None)
     keys = ["Systeem","Subthema","Omschrijving melding","Toelichting melding"]
     df["combined"] = df[keys].fillna("").agg(" ".join, axis=1)
     df["Antwoord"] = df["Antwoord of oplossing"]
@@ -187,23 +185,22 @@ def fetch_bishop_from_rkk_online(loc):
 def fetch_all_bishops_nl():
     dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden",
                 "’s-Hertogenbosch","Roermond","Breda"]
-    res = {}
+    result = {}
     for d in dioceses:
         name = fetch_bishop_from_rkkerk(d) or fetch_bishop_from_rkk_online(d)
         if name:
-            res[d] = name
-    return res
+            result[d] = name
+    return result
 
 # --- Avatars & Helpers ---
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role):
     p = AVATARS.get(role)
-    if p and os.path.exists(p):
-        return PILImage.open(p).resize((64,64))
-    return "🙂"
+    return PILImage.open(p).resize((64,64)) if p and os.path.exists(p) else "🙂"
 
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
+
 def add_msg(role, content):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
@@ -218,7 +215,7 @@ def render_chat():
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
-    st.session_state.last_question = None
+    st.session_state.last_question = ""
 
 # --- Main app ---
 def main():
@@ -226,11 +223,12 @@ def main():
         st.session_state.clear()
         st.rerun()
 
+    # PDF download button if assistant answered
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         st.sidebar.download_button(
             "📄 Download PDF",
             data=make_pdf(
-                question=st.session_state.last_question or "",
+                question=st.session_state.last_question,
                 answer=st.session_state.history[-1]["content"]
             ),
             file_name="antwoord.pdf",
@@ -242,21 +240,25 @@ def main():
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
             st.session_state.selected_product = "Exact"
-            add_msg("assistant","Gekozen: Exact"); st.rerun()
+            add_msg("assistant", "Gekozen: Exact")
+            st.rerun()
         if c2.button("DocBase", use_container_width=True):
             st.session_state.selected_product = "DocBase"
-            add_msg("assistant","Gekozen: DocBase"); st.rerun()
+            add_msg("assistant", "Gekozen: DocBase")
+            st.rerun()
         if c3.button("Algemeen", use_container_width=True):
             st.session_state.selected_product = "Algemeen"
-            add_msg("assistant","Gekozen: Algemeen"); st.rerun()
-        render_chat(); return
+            add_msg("assistant", "Gekozen: Algemeen")
+            st.rerun()
+        render_chat()
+        return
 
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
         return
 
-    # Store last question for PDF
+    # Store last question
     st.session_state.last_question = vraag
     add_msg("user", vraag)
 
@@ -265,7 +267,7 @@ def main():
         add_msg("assistant", warn)
         st.rerun()
 
-    # 1) Specific bishop query
+    # 1) Specific bishop of X
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)\?*', vraag)
     if m:
         loc = m.group(1).strip()
@@ -283,9 +285,10 @@ def main():
             st.rerun()
 
     # 3) FAQ lookup
-    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
+    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
     if not dfm.empty:
-        row = dfm.iloc[0]; ans = row["Antwoord"]
+        row = dfm.iloc[0]
+        ans = row["Antwoord"]
         try:
             ans = chatgpt([
                 {"role":"system","content":"Herschrijf dit eenvoudig en vriendelijk."},
