@@ -1,16 +1,5 @@
 # main.py
 
-"""
-IPAL Chatbox voor oudere vrijwilligers
-- Python 3, Streamlit
-- Groot lettertype, eenvoudige bediening
-- Gebruik van FAQ uit faq.xlsx
-- Fallback naar ChatGPT (gpt-4o of wat je in OPENAI_MODEL zet)
-- Topicfiltering via blacklist
-- Retry-logica OpenAI bij rate-limits
-- Download PDF met logo en tekst-wrapping
-"""
-
 import os
 import re
 import logging
@@ -23,9 +12,9 @@ import pandas as pd
 import pytz
 from dotenv import load_dotenv
 from PIL import Image as PILImage
-
 import openai
-# Veilig RateLimitError importeren, of fallback naar Exception
+
+# Fallback import for RateLimitError
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -35,17 +24,15 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-# — Config & styling —
+# — Page config & styling —
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
-st.markdown(
-    """
+st.markdown("""
     <style>
       html, body, [class*="css"] { font-size: 20px; }
       button[kind="primary"] { font-size: 22px !important; padding: 0.75em 1.5em; }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # — OpenAI setup —
@@ -56,18 +43,12 @@ if not openai.api_key:
     st.stop()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
-# — Retry-wrapper voor ChatGPT calls —
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(min=1, max=10),
-    retry=retry_if_exception_type(RateLimitError),
-)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10),
+       retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages: list[dict], temperature=0.3, max_tokens=800) -> str:
     resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
+        model=MODEL, messages=messages,
+        temperature=temperature, max_tokens=max_tokens
     )
     return resp.choices[0].message.content.strip()
 
@@ -77,7 +58,7 @@ def rewrite(text: str) -> str:
         {"role":"user","content":text},
     ], temperature=0.2, max_tokens=800)
 
-# — FAQ loader —
+# — Load FAQ —
 @st.cache_data
 def load_faq(path="faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
@@ -101,27 +82,27 @@ def filter_topics(msg: str) -> tuple[bool,str]:
         return False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}."
     return True, ""
 
-# — PDF-export met logo & wrapping —
+# — PDF export with logo & wrapping —
 def make_pdf(text: str) -> bytes:
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4)
-    w,h = A4
+    w, h = A4
     margin = 40
     usable_w = w - 2*margin
 
     logo = "logo.png"
     if os.path.exists(logo):
         img = PILImage.open(logo)
-        ar = img.width/img.height
-        height_logo = 50
-        c.drawImage(logo, margin, h-height_logo-10, width=height_logo*ar, height=height_logo, mask="auto")
-        y = h-height_logo-30
+        ar = img.width / img.height
+        logo_h = 50
+        c.drawImage(logo, margin, h-logo_h-10, width=logo_h*ar, height=logo_h, mask="auto")
+        y = h-logo_h-30
     else:
         y = h-50
 
     text_obj = c.beginText(margin, y)
     text_obj.setFont("Helvetica", 12)
-    max_chars = int(usable_w/(12*0.6))
+    max_chars = int(usable_w / (12 * 0.6))
     for para in text.split("\n"):
         for line in textwrap.wrap(para, width=max_chars):
             text_obj.textLine(line)
@@ -131,19 +112,30 @@ def make_pdf(text: str) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-# — UI helpers —
+# — Avatars & render helpers —
+AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
+def get_avatar(role: str):
+    path = AVATARS.get(role)
+    if path and os.path.exists(path):
+        return PILImage.open(path).resize((64,64))
+    return "🙂"
+
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
 
-def add_msg(role,content):
+def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
-    st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
+    st.session_state.history = (
+        st.session_state.history + [{"role":role,"content":content,"time":ts}]
+    )[-MAX_HISTORY:]
 
-def render():
+def render_chat():
     for m in st.session_state.history:
-        st.chat_message(m["role"]).markdown(f"{m['content']}\n\n_{m['time']}_")
+        st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(
+            f"{m['content']}\n\n_{m['time']}_"
+        )
 
-# Initialize session
+# — Init session state —
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
@@ -163,23 +155,23 @@ def main():
 
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1,c2,c3 = st.columns(3)
-        if c1.button("Exact"):
+        c1, c2, c3 = st.columns(3)
+        if c1.button("Exact", use_container_width=True):
             st.session_state.selected_product="Exact"
             add_msg("assistant","Gekozen: Exact")
             st.rerun()
-        if c2.button("DocBase"):
+        if c2.button("DocBase", use_container_width=True):
             st.session_state.selected_product="DocBase"
             add_msg("assistant","Gekozen: DocBase")
             st.rerun()
-        if c3.button("Algemeen"):
+        if c3.button("Algemeen", use_container_width=True):
             st.session_state.selected_product="Algemeen"
             add_msg("assistant","Gekozen: Algemeen")
             st.rerun()
-        render()
+        render_chat()
         return
 
-    render()
+    render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
         return
@@ -200,7 +192,7 @@ def main():
         except:
             pass
         if img := row["Afbeelding"]:
-            st.image(img, caption="Voorbeeld", use_column_width=True)
+            st.image(img, caption="Voorbeeld", use_container_width=True)
         add_msg("assistant", ans)
         st.rerun()
 
@@ -218,5 +210,5 @@ def main():
 
     st.rerun()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
