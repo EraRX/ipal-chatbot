@@ -23,8 +23,6 @@ except ImportError:
     RateLimitError = Exception
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-
-# ReportLab Platypus imports
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -85,7 +83,6 @@ def make_pdf(question: str, answer: str) -> bytes:
     h_bold.fontSize = 11
     h_bold.leading = 14
 
-    # Prepend text blocks
     prepend1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -114,20 +111,21 @@ def make_pdf(question: str, answer: str) -> bytes:
         "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
     )
 
-    story = []
-    story.append(Paragraph(f"<b>Vraag:</b> {question}", h_bold))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(prepend1, normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(prepend2, normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(faq_tip, normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(instructie, normal))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(answer, normal))
+    story = [
+        Paragraph(f"<b>Vraag:</b> {question}", h_bold),
+        Spacer(1, 6),
+        Paragraph("<b>Antwoord:</b>", h_bold),
+        Spacer(1, 6),
+        Paragraph(prepend1, normal),
+        Spacer(1, 6),
+        Paragraph(prepend2, normal),
+        Spacer(1, 6),
+        Paragraph(faq_tip, normal),
+        Spacer(1, 6),
+        Paragraph(instructie, normal),
+        Spacer(1, 12),
+        Paragraph(answer, normal),
+    ]
 
     doc.build(story)
     buf.seek(0)
@@ -140,7 +138,8 @@ def load_faq(path="faq.xlsx"):
         st.error(f"⚠️ FAQ '{path}' niet gevonden")
         return pd.DataFrame(columns=["combined","Antwoord","Afbeelding"])
     df = pd.read_excel(path, engine="openpyxl")
-    df.setdefault("Afbeelding", None)
+    if "Afbeelding" not in df.columns:
+        df["Afbeelding"] = None
     keys = ["Systeem","Subthema","Omschrijving melding","Toelichting melding"]
     df["combined"] = df[keys].fillna("").agg(" ".join, axis=1)
     df["Antwoord"] = df["Antwoord of oplossing"]
@@ -150,12 +149,12 @@ faq_df = load_faq()
 
 # --- Blacklist ---
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
-def filter_topics(msg):
+def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
 # --- RKK Scraping ---
-def fetch_bishop_from_rkkerk(loc):
+def fetch_bishop_from_rkkerk(loc: str):
     slug = loc.lower().replace(" ", "-")
     url = f"https://www.rkkerk.nl/bisdom-{slug}/"
     try:
@@ -168,7 +167,7 @@ def fetch_bishop_from_rkkerk(loc):
         pass
     return None
 
-def fetch_bishop_from_rkk_online(loc):
+def fetch_bishop_from_rkk_online(loc: str):
     query = loc.replace(" ", "+")
     url = f"https://www.rkk-online.nl/?s={query}"
     try:
@@ -194,14 +193,15 @@ def fetch_all_bishops_nl():
 
 # --- Avatars & Helpers ---
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
-def get_avatar(role):
-    p = AVATARS.get(role)
-    return PILImage.open(p).resize((64,64)) if p and os.path.exists(p) else "🙂"
+def get_avatar(role: str):
+    path = AVATARS.get(role)
+    if path and os.path.exists(path):
+        return PILImage.open(path).resize((64,64))
+    return "🙂"
 
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-
-def add_msg(role, content):
+def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
 
@@ -223,7 +223,6 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # PDF download button if assistant answered
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         st.sidebar.download_button(
             "📄 Download PDF",
@@ -258,7 +257,6 @@ def main():
     if not vraag:
         return
 
-    # Store last question
     st.session_state.last_question = vraag
     add_msg("user", vraag)
 
@@ -267,7 +265,7 @@ def main():
         add_msg("assistant", warn)
         st.rerun()
 
-    # 1) Specific bishop of X
+    # 1) Specific bishop?
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)\?*', vraag)
     if m:
         loc = m.group(1).strip()
@@ -276,7 +274,7 @@ def main():
             add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
             st.rerun()
 
-    # 2) All Dutch bishops
+    # 2) All NL bishops
     if re.search(r'(?i)bisschoppen nederland', vraag):
         allb = fetch_all_bishops_nl()
         if allb:
