@@ -7,17 +7,16 @@ IPAL Chatbox voor oudere vrijwilligers
 - Keuze tussen Exact, DocBase en Algemeen
 - Antwoorden uit FAQ, aangevuld met AI voor niet-FAQ vragen
 - Topicfiltering via complete-word blacklist
-- Retry-logica voor OpenAI-calls bij rate-limits
+- Retry-logica bij rate-limits via tenacity
 - Real-time context uit Wikipedia REST-API voor ambtvragen
 - Fallback naar Wikipedia-samenvatting voor overige queries
-- OpenAI Python API v1 via openai.chat.completions.create
+- Directe OpenAI Chat Completions API via requests
 - PDF-export met logo en automatische tekst-wrapping
 - Avatar-ondersteuning, logging en foutafhandeling
 """
 
 import os
 import re
-import sys
 import logging
 from datetime import datetime
 import io
@@ -30,13 +29,6 @@ import requests
 from PIL import Image as PILImage
 from dotenv import load_dotenv
 import wikipedia  # pip install wikipedia==1.4.0
-
-import openai
-# Veilig RateLimitError importeren
-try:
-    from openai.error import RateLimitError
-except ImportError:
-    RateLimitError = Exception
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from reportlab.pdfgen import canvas
@@ -58,36 +50,41 @@ st.markdown(
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
+    handlers=[logging.StreamHandler()]
 )
 
-# — OpenAI API-sleutel & model instellen (globaal object) —
+# — Laad OpenAI-sleutel & model uit env/secrets —
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Streamlit Secrets.")
     st.stop()
-openai.api_key = OPENAI_KEY
 MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 
-# — Retry-wrapper voor RateLimitError —
+# — Helper: AI chat via OpenAI REST API — 
+API_URL = "https://api.openai.com/v1/chat/completions"
+HEADERS = {
+    "Authorization": f"Bearer {OPENAI_KEY}",
+    "Content-Type": "application/json",
+}
+
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(min=1, max=10),
-    retry=retry_if_exception_type(RateLimitError),
+    retry=retry_if_exception_type(requests.exceptions.HTTPError),
 )
 def openai_chat(messages: list[dict], temperature: float = 0.3, max_tokens: int = 800) -> str:
-    """
-    Vervang oude ChatCompletion door nieuwe v1-interface:
-    openai.chat.completions.create(...)
-    """
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    return resp.choices[0].message.content.strip()
+    """Roep OpenAI Chat Completions REST API aan met retry bij HTTP errors."""
+    payload = {
+        "model": MODEL,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    resp = requests.post(API_URL, headers=HEADERS, json=payload, timeout=20)
+    resp.raise_for_status()
+    data = resp.json()
+    return data["choices"][0]["message"]["content"].strip()
 
 def rewrite_answer(text: str) -> str:
     return openai_chat([
@@ -123,7 +120,7 @@ subthema_dict = {
 # — Blacklist & filtering —
 BLACKLIST_CATEGORIES = [
     "persoonlijke gegevens","medische gegevens","gezondheid","strafrechtelijk verleden",
-    # vul verder aan indien nodig…
+    # … vul verder aan …
     "privacy schending"
 ]
 
@@ -158,8 +155,8 @@ def genereer_pdf(text: str) -> bytes:
     if os.path.exists(logo_path):
         img = PILImage.open(logo_path)
         ar = img.width / img.height
-        c.drawImage(logo_path, lm, h - logo_h - 10,
-                    width=logo_h * ar, height=logo_h, mask="auto")
+        c.drawImage(logo_path, lm, h-logo_h-10,
+                    width=logo_h*ar, height=logo_h, mask="auto")
         y0 = h - logo_h - 30
     else:
         y0 = h - 50
@@ -180,7 +177,7 @@ def genereer_pdf(text: str) -> bytes:
 # — Wikipedia REST-API voor ambtvragen —
 def fetch_incumbent(office_page: str, lang: str = "en") -> str | None:
     url = f"https://{lang}.wikipedia.org/api/rest_v1/page/summary/{office_page}"
-    r = requests.get(url)
+    r = requests.get(url, timeout=10)
     if r.status_code != 200:
         return None
     extract = r.json().get("extract", "")
@@ -206,17 +203,17 @@ def fetch_wikipedia_summary(topic: str) -> str | None:
 
 def get_ai_answer(prompt: str) -> str:
     low = prompt.lower()
-    # president USA
+    # President USA
     if low.startswith("wie is") and "president" in low:
         holder = fetch_incumbent("President_of_the_United_States", lang="en")
         if holder:
-            return f"De huidige president van de Verenigde Staten is {holder}."
-    # paus
+            return f"De huidige president van de VS is {holder}."
+    # Paus
     if low.startswith("wie is") and ("paus" in low or "pope" in low):
         holder = fetch_incumbent("Pope", lang="en")
         if holder:
             return f"De huidige paus is {holder}."
-    # fallback: wiki + AI
+    # Fallback: Wikipedia-summary + AI
     topic = extract_wiki_topic(prompt)
     summary = fetch_wikipedia_summary(topic)
     context = (
@@ -264,10 +261,10 @@ def main():
         st.rerun()
 
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
-        last = st.session_state.history[-1]["content"]
+        laatste = st.session_state.history[-1]["content"]
         st.sidebar.download_button(
             "📄 Download antwoord als PDF",
-            data=genereer_pdf(last),
+            data=genereer_pdf(laatste),
             file_name="antwoord.pdf",
             mime="application/pdf"
         )
