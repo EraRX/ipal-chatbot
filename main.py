@@ -125,17 +125,27 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1,12))
 
-    # Antwoord as numbered list with bold names
+    # Antwoord as numbered list with bullets left-aligned
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1,4))
-    # parse items like "1. **Name** - desc"
+
+    # Parse items like "1. **Name** - description"
     items = []
     for match in re.finditer(r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)", answer, re.S):
         num, name, desc = match.groups()
         text = f"<b>{num}. {name}</b> - {desc.strip().replace(chr(10),' ')}"
-        items.append(ListItem(Paragraph(text, normal), leftIndent=12))
+        items.append(ListItem(Paragraph(text, normal), leftIndent=0))
+
     if items:
-        story.append(ListFlowable(items, bulletType=""))
+        story.append(ListFlowable(
+            items,
+            bulletType="bullet",
+            start="•",
+            leftIndent=0,
+            bulletFontName=normal.fontName,
+            bulletFontSize=11,
+            bulletIndent=0
+        ))
     else:
         story.append(Paragraph(answer, normal))
     story.append(Spacer(1,12))
@@ -249,7 +259,7 @@ def main():
         st.session_state.clear(); st.rerun()
 
     # PDF download button
-    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
+    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         pdf_data = make_pdf(
             question=st.session_state.last_question,
             answer=st.session_state.history[-1]["content"],
