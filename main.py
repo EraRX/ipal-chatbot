@@ -25,7 +25,12 @@ from dotenv import load_dotenv
 from PIL import Image as PILImage
 
 import openai
-from openai.error import RateLimitError
+# Veilig RateLimitError importeren, of fallback naar Exception
+try:
+    from openai.error import RateLimitError
+except ImportError:
+    RateLimitError = Exception
+
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -77,11 +82,10 @@ def rewrite(text: str) -> str:
 def load_faq(path="faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
         st.error(f"⚠️ FAQ '{path}' niet gevonden")
-        return pd.DataFrame(columns=["combined","Antwoord"])
+        return pd.DataFrame(columns=["combined","Antwoord","Afbeelding"])
     df = pd.read_excel(path, engine="openpyxl")
     if "Afbeelding" not in df.columns:
         df["Afbeelding"] = None
-    # combineer relevante kolommen voor zoektekst
     keys = ["Systeem","Subthema","Omschrijving melding","Toelichting melding"]
     df["combined"] = df[keys].fillna("").agg(" ".join, axis=1)
     df["Antwoord"] = df["Antwoord of oplossing"]
@@ -105,7 +109,6 @@ def make_pdf(text: str) -> bytes:
     margin = 40
     usable_w = w - 2*margin
 
-    # logo
     logo = "logo.png"
     if os.path.exists(logo):
         img = PILImage.open(logo)
@@ -128,9 +131,10 @@ def make_pdf(text: str) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-# — Helpers voor UI —
+# — UI helpers —
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
+
 def add_msg(role,content):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
@@ -139,25 +143,24 @@ def render():
     for m in st.session_state.history:
         st.chat_message(m["role"]).markdown(f"{m['content']}\n\n_{m['time']}_")
 
+# Initialize session
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
-    st.session_state.selected_module = None
 
-# — Main —
+# — Main app —
 def main():
-    # Nieuw gesprek
     if st.sidebar.button("🔄 Nieuw gesprek"):
         st.session_state.clear()
         st.experimental_rerun()
 
-    # PDF-download voor laatste assistant
     if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
-        st.sidebar.download_button("📄 Download als PDF",
+        st.sidebar.download_button(
+            "📄 Download PDF",
             data=make_pdf(st.session_state.history[-1]["content"]),
-            file_name="antwoord.pdf", mime="application/pdf")
+            file_name="antwoord.pdf", mime="application/pdf"
+        )
 
-    # Product-keuze
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1,c2,c3 = st.columns(3)
@@ -166,10 +169,9 @@ def main():
         if c2.button("DocBase"):
             st.session_state.selected_product="DocBase"; add_msg("assistant","Gekozen: DocBase"); st.experimental_rerun()
         if c3.button("Algemeen"):
-            st.session_state.selected_product="Algemeen"; st.experimental_rerun()
+            st.session_state.selected_product="Algemeen"; add_msg("assistant","Gekozen: Algemeen"); st.experimental_rerun()
         render(); return
 
-    # Render en vraag
     render()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
@@ -181,12 +183,11 @@ def main():
         add_msg("assistant", warn)
         st.experimental_rerun()
 
-    # Zoek in FAQ
+    # FAQ lookup
     dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
     if not dfm.empty:
         row = dfm.iloc[0]
         ans = row["Antwoord"]
-        # herschrijf voor leesbaarheid
         try:
             ans = rewrite(ans)
         except:
@@ -196,11 +197,13 @@ def main():
         add_msg("assistant", ans)
         st.experimental_rerun()
 
-    # Fallback naar ChatGPT
+    # ChatGPT fallback
     with st.spinner("ChatGPT even aan het werk…"):
         try:
-            ai = chatgpt([{"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
-                          {"role":"user","content":vraag}])
+            ai = chatgpt([
+                {"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
+                {"role":"user","content":vraag}
+            ])
             add_msg("assistant", ai)
         except Exception as e:
             logging.exception("AI-fallback mislukt")
