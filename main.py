@@ -52,7 +52,7 @@ if not openai.api_key:
     st.stop()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1, 10),
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
        retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages, temperature=0.3, max_tokens=800):
     resp = openai.chat.completions.create(
@@ -67,15 +67,12 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-
-# --- PDF Generation (points 1 & 2 changed only) ---
+# === 1 & 2) make_pdf aangepast voor echte bullet‐lijst links uitgelijnd ===
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=2*cm, rightMargin=2*cm,
-        topMargin=2*cm, bottomMargin=2*cm
-    )
+    doc = SimpleDocTemplate(buf, pagesize=A4,
+                            leftMargin=2*cm, rightMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
     normal = ParagraphStyle(
         "normal", parent=styles["BodyText"],
@@ -87,7 +84,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # AI info paragraphs
+    # Voorgeprogrammeerde paragrafen
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -117,7 +114,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story = []
 
-    # Logo top left
+    # Logo linksboven
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
@@ -127,17 +124,24 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord: numbered bullet list, left-aligned
+    # Antwoord: zet om naar bullet‐lijst
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
-    items = []
-    for num, name, desc in re.findall(
-        r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)", answer, flags=re.S
-    ):
-        text = f"<b>{num}. {name}</b> - {desc.strip().replace(chr(10), ' ')}"
-        items.append(ListItem(Paragraph(text, normal), leftIndent=0, bulletIndent=0))
-    if items:
+    # Splits eerste zin van de lijst
+    if ":" in answer and re.search(r"\d+\.", answer):
+        intro, rest = answer.split(":", 1)
+        story.append(Paragraph(intro + ":", normal))
+        # vind alle items "1. **Naam**" of gewoon "1. Naam"
+        parts = re.split(r"(?=\d+\.)", rest.strip())
+        items = []
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            # verwijder dubbele newlines
+            text = part.replace("\n", " ").strip()
+            items.append(ListItem(Paragraph(text, normal), leftIndent=0, bulletIndent=0))
         story.append(ListFlowable(
             items,
             bulletType="bullet",
@@ -147,6 +151,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ))
     else:
         story.append(Paragraph(answer, normal))
+
     story.append(Spacer(1, 12))
 
     # AI-Antwoord Info
@@ -166,7 +171,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-# --- end make_pdf ---
+# === einde make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
@@ -257,7 +262,6 @@ def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
         st.session_state.clear(); st.rerun()
 
-    # PDF download button
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         pdf_data = make_pdf(
             question=st.session_state.last_question,
@@ -271,14 +275,11 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
-            st.session_state.selected_product = "Exact"
-            add_msg("assistant", "Gekozen: Exact"); st.rerun()
+            st.session_state.selected_product = "Exact"; add_msg("assistant","Gekozen: Exact"); st.rerun()
         if c2.button("DocBase", use_container_width=True):
-            st.session_state.selected_product = "DocBase"
-            add_msg("assistant", "Gekozen: DocBase"); st.rerun()
+            st.session_state.selected_product = "DocBase"; add_msg("assistant","Gekozen: DocBase"); st.rerun()
         if c3.button("Algemeen", use_container_width=True):
-            st.session_state.selected_product = "Algemeen"
-            add_msg("assistant", "Gekozen: Algemeen"); st.rerun()
+            st.session_state.selected_product = "Algemeen"; add_msg("assistant","Gekozen: Algemeen"); st.rerun()
         render_chat(); return
 
     render_chat()
@@ -287,16 +288,14 @@ def main():
 
     st.session_state.last_question = vraag; add_msg("user", vraag)
     ok, warn = filter_topics(vraag)
-    if not ok:
-        add_msg("assistant", warn); st.rerun()
+    if not ok: add_msg("assistant", warn); st.rerun()
 
     # 1) Specific bishop
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
         loc = m.group(1).strip()
         bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-        if bishop:
-            add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}."); st.rerun()
+        if bishop: add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}."); st.rerun()
 
     # 2) All NL bishops
     if re.search(r'(?i)bisschoppen nederland', vraag):
