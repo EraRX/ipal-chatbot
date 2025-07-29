@@ -7,3 +7,4 @@ tenacity
 pytz
 reportlab
 openpyxl
+wikipedia==1.4.0
