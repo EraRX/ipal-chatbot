@@ -24,7 +24,9 @@ except ImportError:
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 # ReportLab imports for PDF generation
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+)
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
@@ -40,7 +42,6 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # --- OpenAI setup ---
@@ -49,17 +50,14 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
-
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1, 10),
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
        retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages, temperature=0.3, max_tokens=800):
     resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens
+        model=MODEL, messages=messages,
+        temperature=temperature, max_tokens=max_tokens
     )
     return resp.choices[0].message.content.strip()
 
@@ -69,34 +67,25 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# === 1) PDF Generation: aangepaste layout ===
+
+# === 1 & 2) ONLY this make_pdf is changed ===
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=2*cm, rightMargin=2*cm,
-        topMargin=2*cm, bottomMargin=2*cm
-    )
-    # Stijlen
+    doc = SimpleDocTemplate(buf, pagesize=A4,
+                            leftMargin=2*cm, rightMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
     normal = ParagraphStyle(
-        "normal",
-        parent=styles["BodyText"],
+        "normal", parent=styles["BodyText"],
         fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
-        fontSize=11,
-        leading=14,
-        alignment=TA_JUSTIFY
+        fontSize=11, leading=14, alignment=TA_JUSTIFY
     )
     h_bold = ParagraphStyle(
-        "h_bold",
-        parent=styles["Heading4"],
-        fontName=normal.fontName,
-        fontSize=11,
-        leading=14,
-        spaceAfter=6
+        "h_bold", parent=styles["Heading4"],
+        fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # AI-info vaste paragrafen
+    # Static AI-info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -126,42 +115,41 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story = []
 
-    # Logo linksboven (width=124, height=52)
+    # Logo at 124×52
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
+        story.append(Spacer(1,12))
 
     # Vraag
     story.append(Paragraph("<b>Vraag:</b>", h_bold))
     story.append(Paragraph(question, normal))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1,12))
 
-    # Antwoord als genummerde lijst
+    # Antwoord as numbered list with bold names
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Spacer(1, 4))
-    # Zoek alle “N. **Naam** – beschrijving” items
-    pattern = r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)"
-    matches = re.findall(pattern, answer, flags=re.S)
-    if matches:
-        items = []
-        for num, name, desc in matches:
-            text = f"<b>{num}. {name}</b> – {desc.strip().replace(chr(10), ' ')}"
-            items.append(ListItem(Paragraph(text, normal), leftIndent=12))
+    story.append(Spacer(1,4))
+    # parse items like "1. **Name** - desc"
+    items = []
+    for match in re.finditer(r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)", answer, re.S):
+        num, name, desc = match.groups()
+        text = f"<b>{num}. {name}</b> - {desc.strip().replace(chr(10),' ')}"
+        items.append(ListItem(Paragraph(text, normal), leftIndent=12))
+    if items:
         story.append(ListFlowable(items, bulletType=""))
     else:
         story.append(Paragraph(answer, normal))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1,12))
 
     # AI-Antwoord Info
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1,6))
     story.append(Paragraph(para2, normal))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1,6))
     story.append(Paragraph(f"<b>{faq_heading}</b>", normal))
     for line in faq_text.split("\n"):
         story.append(Paragraph(line, normal))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1,6))
     story.append(Paragraph(f"<b>{instr_heading}</b>", normal))
     for line in instr_text.split("\n"):
         story.append(Paragraph(line, normal))
@@ -169,7 +157,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-# === einde make_pdf ===
+# === end make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
@@ -258,98 +246,71 @@ if "history" not in st.session_state:
 # --- Main app ---
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
-        st.session_state.clear()
-        st.rerun()
+        st.session_state.clear(); st.rerun()
 
-    # === 2) Download-knop met nieuwe PDF layout ===
-    if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
+    # PDF download button
+    if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
         pdf_data = make_pdf(
             question=st.session_state.last_question,
             answer=st.session_state.history[-1]["content"],
             ai_info=st.session_state.history[-1]["content"]
         )
-        st.sidebar.download_button(
-            "📄 Download PDF",
-            data=pdf_data,
-            file_name="antwoord.pdf",
-            mime="application/pdf"
-        )
+        st.sidebar.download_button("📄 Download PDF", data=pdf_data,
+                                   file_name="antwoord.pdf", mime="application/pdf")
 
-    # rest of the chat logic unchanged…
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1, c2, c3 = st.columns(3)
-        if c1.button("Exact", use_container_width=True):
-            add_msg("assistant", "Gekozen: Exact")
-            st.session_state.selected_product = "Exact"
-            st.rerun()
-        if c2.button("DocBase", use_container_width=True):
-            add_msg("assistant", "Gekozen: DocBase")
-            st.session_state.selected_product = "DocBase"
-            st.rerun()
-        if c3.button("Algemeen", use_container_width=True):
-            add_msg("assistant", "Gekozen: Algemeen")
-            st.session_state.selected_product = "Algemeen"
-            st.rerun()
-        render_chat()
-        return
+        c1,c2,c3 = st.columns(3)
+        if c1.button("Exact",use_container_width=True):
+            st.session_state.selected_product="Exact"; add_msg("assistant","Gekozen: Exact"); st.rerun()
+        if c2.button("DocBase",use_container_width=True):
+            st.session_state.selected_product="DocBase"; add_msg("assistant","Gekozen: DocBase"); st.rerun()
+        if c3.button("Algemeen",use_container_width=True):
+            st.session_state.selected_product="Algemeen"; add_msg("assistant","Gekozen: Algemeen"); st.rerun()
+        render_chat(); return
 
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
-    if not vraag:
-        return
+    if not vraag: return
 
-    st.session_state.last_question = vraag
-    add_msg("user", vraag)
+    st.session_state.last_question=vraag; add_msg("user",vraag)
+    ok,warn=filter_topics(vraag)
+    if not ok: add_msg("assistant",warn); st.rerun()
 
-    ok, warn = filter_topics(vraag)
-    if not ok:
-        add_msg("assistant", warn)
-        st.rerun()
+    # 1) Specific bishop
+    m=re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)',vraag)
+    if m:
+        loc=m.group(1).strip()
+        bishop=fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
+        if bishop: add_msg("assistant",f"De huidige bisschop van {loc} is {bishop}."); st.rerun()
 
-    with st.spinner("Even zoeken..."):
-        # bishop, FAQ, fallback logic unchanged…
-        m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
-        if m:
-            loc = m.group(1).strip()
-            bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-            if bishop:
-                add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
-                st.rerun()
+    # 2) All NL bishops
+    if re.search(r'(?i)bisschoppen nederland',vraag):
+        allb=fetch_all_bishops_nl()
+        if allb:
+            lines=[f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
+            add_msg("assistant","Huidige Nederlandse bisschoppen:\n"+ "\n".join(lines)); st.rerun()
 
-        if re.search(r'(?i)bisschoppen nederland', vraag):
-            allb = fetch_all_bishops_nl()
-            if allb:
-                lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-                add_msg("assistant", "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
-                st.rerun()
+    # 3) FAQ lookup
+    dfm=faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
+    if not dfm.empty:
+        row=dfm.iloc[0]; ans=row["Antwoord"]
+        try: ans=chatgpt([{"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
+                          {"role":"user","content":ans}],temperature=0.2)
+        except: pass
+        if img:=row["Afbeelding"]: st.image(img,caption="Voorbeeld",use_column_width=True)
+        add_msg("assistant",ans); st.rerun()
 
-        dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
-        if not dfm.empty:
-            row = dfm.iloc[0]
-            ans = row["Antwoord"]
-            try:
-                ans = chatgpt([
-                    {"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
-                    {"role":"user","content":ans}
-                ], temperature=0.2)
-            except:
-                pass
-            if img := row["Afbeelding"]:
-                st.image(img, caption="Voorbeeld", use_column_width=True)
-            add_msg("assistant", ans)
-            st.rerun()
-
+    # 4) AI fallback
+    with st.spinner("ChatGPT even aan het werk…"):
         try:
-            ai = chatgpt([
-                {"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
-                {"role":"user","content":vraag}
-            ])
-            add_msg("assistant", ai)
+            ai=chatgpt([{"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
+                        {"role":"user","content":vraag}])
+            add_msg("assistant",ai)
         except Exception as e:
             logging.exception("AI-fallback mislukt")
-            add_msg("assistant", f"⚠️ AI-fallback mislukt: {e}")
+            add_msg("assistant",f"⚠️ AI-fallback mislukt: {e}")
     st.rerun()
 
-if __name__ == "__main__":
+if __name__=="__main__":
     main()
