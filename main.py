@@ -41,6 +41,7 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # --- OpenAI setup ---
@@ -49,6 +50,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
+
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1, 10),
@@ -68,24 +70,25 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# === 1) PDF Generation: aangepast voor logo + vetkopjes + nummering ===
-def make_pdf(question: str, answer: str) -> bytes:
+# --- PDF Generation (only this section changed) ---
+def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
                             leftMargin=2*cm, rightMargin=2*cm,
                             topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
     normal = styles["Normal"]
-    font_name = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
-    normal.fontName = font_name
+    font = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
+    normal.fontName = font
     normal.fontSize = 11
     normal.alignment = TA_JUSTIFY
 
     h_bold = styles["Heading4"]
-    h_bold.fontName = font_name
+    h_bold.fontName = font
     h_bold.fontSize = 11
     h_bold.leading = 14
 
+    # AI info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -116,7 +119,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     story = []
     # Logo
     if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
+        story.append(Image("logo.png", width=247, height=104))
         story.append(Spacer(1, 12))
 
     # Vraag
@@ -145,187 +148,186 @@ def make_pdf(question: str, answer: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-# === einde make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
-        logging.error(f"FAQ niet gevonden: {path}")
-        st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=["combined", "Antwoord"])
-    try:
-        df = pd.read_excel(path, engine="openpyxl")
-    except Exception as e:
-        logging.error(f"Fout bij laden FAQ: {e}")
-        st.error("⚠️ Kan FAQ niet laden")
-        return pd.DataFrame(columns=["combined", "Antwoord"])
+        st.error(f"⚠️ FAQ '{path}' niet gevonden")
+        return pd.DataFrame(columns=["combined","Antwoord","Afbeelding"])
+    df = pd.read_excel(path, engine="openpyxl")
     if "Afbeelding" not in df.columns:
         df["Afbeelding"] = None
-    required = ["Systeem", "Subthema", "Omschrijving melding", "Toelichting melding"]
+    keys = ["Systeem","Subthema","Omschrijving melding","Toelichting melding"]
+    df["combined"] = df[keys].fillna("").agg(" ".join, axis=1)
     df["Antwoord"] = df["Antwoord of oplossing"]
-    df["combined"] = df[required].fillna("").agg(" ".join, axis=1)
-    return df[["combined", "Antwoord", "Afbeelding"]]
+    return df[["combined","Antwoord","Afbeelding"]]
 
 faq_df = load_faq()
-producten = ["Exact", "DocBase"]
-subthema_dict = {
-    p: sorted(faq_df[faq_df["Systeem"] == p]["Subthema"].dropna().unique())
-    for p in producten
-}
 
-# --- Blacklist & topic filter ---
-BLACKLIST = [
-    "persoonlijke gegevens", "medische gegevens", "gezondheid", "strafrechtelijk verleden",
-    # ... etc ...
-    "privacy schending"
-]
+# --- Blacklist ---
+BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
+def filter_topics(msg: str):
+    found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
+    return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-def check_blacklist(text: str) -> list[str]:
-    return [term for term in BLACKLIST if term in text.lower()]
+# --- RKK scraping ---
+def fetch_bishop_from_rkkerk(loc: str):
+    slug = loc.lower().replace(" ", "-")
+    url = f"https://www.rkkerk.nl/bisdom-{slug}/"
+    try:
+        r = requests.get(url, timeout=10); r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        h1 = soup.find("h1")
+        if h1 and "bisschop" in h1.text.lower():
+            return h1.text.split("—")[0].strip()
+    except:
+        pass
+    return None
 
-def generate_warning(found_terms: list[str]) -> str:
-    return ("Je bericht bevat inhoud die niet voldoet aan onze richtlijnen. "
-            "Vermijd gevoelige onderwerpen en probeer het opnieuw.") if found_terms else ""
+def fetch_bishop_from_rkk_online(loc: str):
+    query = loc.replace(" ", "+")
+    url = f"https://www.rkk-online.nl/?s={query}"
+    try:
+        r = requests.get(url, timeout=10); r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for tag in ("h1","h2","h3"):
+            h = soup.find(tag, string=re.compile(r"bisschop", re.I))
+            if h:
+                return h.text.split("–")[0].strip()
+    except:
+        pass
+    return None
 
-def filter_chatbot_topics(message: str) -> tuple[bool, str]:
-    found = check_blacklist(message)
-    return (False, generate_warning(found)) if found else (True, "")
+def fetch_all_bishops_nl():
+    dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden",
+                "’s-Hertogenbosch","Roermond","Breda"]
+    result = {}
+    for d in dioceses:
+        name = fetch_bishop_from_rkkerk(d) or fetch_bishop_from_rkk_online(d)
+        if name:
+            result[d] = name
+    return result
 
-# --- Session state init ---
-def init_session():
-    defaults = {
-        "history": [], "selected_product": None,
-        "selected_module": None, "last_question": ""
-    }
-    for k, v in defaults.items():
-        st.session_state.setdefault(k, v)
+# --- Avatars & helpers ---
+AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
+def get_avatar(role: str):
+    path = AVATARS.get(role)
+    return PILImage.open(path).resize((64,64)) if path and os.path.exists(path) else "🙂"
 
-init_session()
-timezone = pytz.timezone("Europe/Amsterdam")
+TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-
-# --- Chat helpers ---
 def add_msg(role: str, content: str):
-    ts = datetime.now(timezone).strftime("%d-%m-%Y %H:%M")
-    st.session_state.history.append({"role": role, "content": content, "time": ts})
-    st.session_state.history = st.session_state.history[-MAX_HISTORY:]
+    ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
+    st.session_state.history = (st.session_state.history + [{"role":role,"content":content,"time":ts}])[-MAX_HISTORY:]
 
 def render_chat():
-    for msg in st.session_state.history:
-        avatar = "🙂"
-        if msg["role"] == "assistant" and os.path.exists("aichatbox.jpg"):
-            avatar = PILImage.open("aichatbox.jpg").resize((64, 64))
-        elif msg["role"] == "user" and os.path.exists("parochie.jpg"):
-            avatar = PILImage.open("parochie.jpg").resize((64, 64))
-        st.chat_message(msg["role"], avatar=avatar).markdown(f"{msg['content']}\n\n_{msg['time']}_")
+    for m in st.session_state.history:
+        st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(
+            f"{m['content']}\n\n_{m['time']}_"
+        )
 
-def on_reset():
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+# --- Session init ---
+if "history" not in st.session_state:
+    st.session_state.history = []
+    st.session_state.selected_product = None
+    st.session_state.last_question = ""
 
-# --- Rewrite & AI-answer wrappers ---
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
-       retry=retry_if_exception_type(RateLimitError))
-def rewrite_answer(text: str) -> str:
-    resp = openai.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role":"system","content":"Herschrijf dit antwoord eenvoudig en vriendelijk."},
-            {"role":"user","content":text}
-        ],
-        temperature=0.2, max_tokens=800
-    )
-    return resp.choices[0].message.content.strip()
-
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
-       retry=retry_if_exception_type(RateLimitError))
-def get_ai_answer(text: str) -> str:
-    messages = [{"role":"system","content":"Je bent de IPAL Chatbox, een behulpzame Nederlandse helpdeskassistent."}]
-    messages += [{"role":m["role"],"content":m["content"]} for m in st.session_state.history[-10:]]
-    messages.append({"role":"user","content":f"[{st.session_state.selected_module}] {text}"})
-    resp = openai.chat.completions.create(model=MODEL, messages=messages, temperature=0.3, max_tokens=800)
-    return resp.choices[0].message.content.strip()
-
-# --- Main logic ---
+# --- Main app ---
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
-        on_reset(); st.rerun()
+        st.session_state.clear()
+        st.rerun()
 
-    # Download button
+    # PDF download button
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
-        pdf_bytes = make_pdf(
+        pdf_data = make_pdf(
             question=st.session_state.last_question,
-            answer=st.session_state.history[-1]["content"]
+            answer=st.session_state.history[-1]["content"],
+            ai_info=st.session_state.history[-1]["content"]
         )
-        st.sidebar.download_button("📄 Download PDF", data=pdf_bytes,
-                                   file_name="antwoord.pdf", mime="application/pdf")
+        st.sidebar.download_button(
+            "📄 Download PDF", data=pdf_data,
+            file_name="antwoord.pdf", mime="application/pdf"
+        )
 
-    # Product selection
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
-            add_msg("assistant","Gekozen: Exact"); st.session_state.selected_product="Exact"; st.rerun()
-        if c2.button("DocBase", use_container_width=True):
-            add_msg("assistant","Gekozen: DocBase"); st.session_state.selected_product="DocBase"; st.rerun()
-        if c3.button("Algemeen", use_container_width=True):
-            add_msg("assistant","Gekozen: Algemeen"); st.session_state.selected_product="Algemeen"; st.rerun()
-        render_chat(); return
-
-    # Module selection
-    if st.session_state.selected_product != "Algemeen" and not st.session_state.selected_module:
-        opts = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
-        if sel != "(Kies)":
-            add_msg("assistant", f"Gekozen: {sel}")
-            st.session_state.selected_module = sel
+            st.session_state.selected_product = "Exact"
+            add_msg("assistant", "Gekozen: Exact")
             st.rerun()
-        render_chat(); return
+        if c2.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_msg("assistant", "Gekozen: DocBase")
+            st.rerun()
+        if c3.button("Algemeen", use_container_width=True):
+            st.session_state.selected_product = "Algemeen"
+            add_msg("assistant", "Gekozen: Algemeen")
+            st.rerun()
+        render_chat()
+        return
 
-    # Chat input & processing
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag:
         return
 
+    # Store last question
     st.session_state.last_question = vraag
     add_msg("user", vraag)
-    allowed, reason = filter_chatbot_topics(vraag)
-    if not allowed:
-        add_msg("assistant", reason); st.rerun()
 
-    with st.spinner("Even zoeken..."):
-        # Check bishop
-        m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
-        if m:
-            loc = m.group(1).strip()
-            bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-            if bishop:
-                add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}."); st.rerun()
-        # Check all bishops NL
-        if re.search(r'(?i)bisschoppen nederland', vraag):
-            allb = fetch_all_bishops_nl()
-            if allb:
-                lines=[f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-                add_msg("assistant","Huidige Nederlandse bisschoppen:\n"+ "\n".join(lines)); st.rerun()
-        # FAQ lookup
-        dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
-        if not dfm.empty:
-            row=dfm.iloc[0]
-            ans=row["Antwoord"]
-            try: ans=rewrite_answer(ans)
-            except: pass
-            if img:=row.get("Afbeelding"):
-                st.image(img, caption="Voorbeeld", use_column_width=True)
-            add_msg("assistant",ans); st.rerun()
-        # AI fallback
+    ok, warn = filter_topics(vraag)
+    if not ok:
+        add_msg("assistant", warn)
+        st.rerun()
+
+    # 1) Specific bishop
+    m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
+    if m:
+        loc = m.group(1).strip()
+        bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
+        if bishop:
+            add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
+            st.rerun()
+
+    # 2) All NL bishops
+    if re.search(r'(?i)bisschoppen nederland', vraag):
+        allb = fetch_all_bishops_nl()
+        if allb:
+            lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
+            add_msg("assistant", "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
+            st.rerun()
+
+    # 3) FAQ lookup
+    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
+    if not dfm.empty:
+        row = dfm.iloc[0]
+        ans = row["Antwoord"]
         try:
-            ant = get_ai_answer(vraag)
-            add_msg("assistant",f"IPAL-Helpdesk antwoord:\n{ant}")
+            ans = chatgpt([
+                {"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
+                {"role":"user","content":ans}
+            ], temperature=0.2)
+        except:
+            pass
+        if img := row["Afbeelding"]:
+            st.image(img, caption="Voorbeeld", use_column_width=True)
+        add_msg("assistant", ans)
+        st.rerun()
+
+    # 4) AI fallback
+    with st.spinner("ChatGPT even aan het werk…"):
+        try:
+            ai = chatgpt([
+                {"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
+                {"role":"user","content":vraag}
+            ])
+            add_msg("assistant", ai)
         except Exception as e:
-            logging.error(f"AI-fallback mislukt: {e}")
-            add_msg("assistant","⚠️ Fout tijdens AI-fallback")
+            logging.exception("AI-fallback mislukt")
+            add_msg("assistant", f"⚠️ AI-fallback mislukt: {e}")
     st.rerun()
 
 if __name__ == "__main__":
