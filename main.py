@@ -42,6 +42,7 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # --- OpenAI setup ---
@@ -50,6 +51,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not openai.api_key:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
+
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1, 10),
@@ -67,8 +69,7 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-
-# --- PDF Generation (alleen deze functie is aangepast) ---
+# === PDF Generation (points 1 & 2 changed only) ===
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -87,7 +88,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # AI-info tekst (onveranderd)
+    # Static AI-info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -117,7 +118,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story = []
 
-    # Logo linkboven
+    # Logo top-left
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
@@ -127,27 +128,23 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord als genummerde bullets, links uitgelijnd
+    # Antwoord as numbered bullet list, left-aligned
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
     items = []
     for num, name, desc in re.findall(
-        r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)", answer, flags=re.S
+        r"(\d+)\.\s\*\*(.*?)\*\*\s*-\s*(.*?)(?=\n\d+\.|\Z)", answer, re.S
     ):
-        text = f"<b>{num}. {name}</b> – {desc.strip().replace(chr(10), ' ')}"
-        items.append(
-            ListItem(Paragraph(text, normal), leftIndent=0, bulletIndent=0)
-        )
+        text = f"<b>{num}. {name}</b> - {desc.strip().replace(chr(10), ' ')}"
+        items.append(ListItem(Paragraph(text, normal), leftIndent=0, bulletIndent=0))
     if items:
         story.append(ListFlowable(
             items,
             bulletType="bullet",
             start=None,
             leftIndent=0,
-            bulletIndent=0,
-            bulletFontName=normal.fontName,
-            bulletFontSize=11
+            bulletIndent=0
         ))
     else:
         story.append(Paragraph(answer, normal))
@@ -170,23 +167,20 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-# --- einde make_pdf ---
-
+# === end make_pdf ===
 
 # --- FAQ loader ---
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
         st.error(f"⚠️ FAQ '{path}' niet gevonden")
-        return pd.DataFrame(columns=["combined","Antwoord","Afbeelding"])
+        return pd.DataFrame(columns=["combined","Antwoord","Afbeelding","Systeem","Subthema"])
     df = pd.read_excel(path, engine="openpyxl")
     if "Afbeelding" not in df.columns:
         df["Afbeelding"] = None
-    keys = ["Systeem","Subthema","Omschrijving melding","Toelichting melding"]
-    df["combined"] = df[keys].fillna("").agg(" ".join, axis=1)
     df["Antwoord"] = df["Antwoord of oplossing"]
-    return df[["combined","Antwoord","Afbeelding"]]
-
+    df["combined"] = df[["Systeem","Subthema","Omschrijving melding","Toelichting melding"]].fillna("").agg(" ".join, axis=1)
+    return df
 faq_df = load_faq()
 
 # --- Build subthema_dict ---
@@ -310,7 +304,7 @@ def main():
     st.session_state.last_question = vraag
     add_msg("user", vraag)
 
-    ok, warn = filter_topics(vraag)
+    ok,warn = filter_topics(vraag)
     if not ok:
         add_msg("assistant", warn); st.rerun()
 
