@@ -8,7 +8,7 @@ IPAL Chatbox voor oudere vrijwilligers
 - Fallback naar ChatGPT (gpt-4o of wat je in OPENAI_MODEL zet)
 - Topicfiltering via blacklist
 - Retry-logica OpenAI bij rate-limits
-- Download PDF met logo en tekst‐wrapping
+- Download PDF met logo en tekst-wrapping
 """
 
 import os
@@ -152,7 +152,7 @@ if "history" not in st.session_state:
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()
 
     if st.session_state.history and st.session_state.history[-1]["role"]=="assistant":
         st.sidebar.download_button(
@@ -165,12 +165,19 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1,c2,c3 = st.columns(3)
         if c1.button("Exact"):
-            st.session_state.selected_product="Exact"; add_msg("assistant","Gekozen: Exact"); st.experimental_rerun()
+            st.session_state.selected_product="Exact"
+            add_msg("assistant","Gekozen: Exact")
+            st.rerun()
         if c2.button("DocBase"):
-            st.session_state.selected_product="DocBase"; add_msg("assistant","Gekozen: DocBase"); st.experimental_rerun()
+            st.session_state.selected_product="DocBase"
+            add_msg("assistant","Gekozen: DocBase")
+            st.rerun()
         if c3.button("Algemeen"):
-            st.session_state.selected_product="Algemeen"; add_msg("assistant","Gekozen: Algemeen"); st.experimental_rerun()
-        render(); return
+            st.session_state.selected_product="Algemeen"
+            add_msg("assistant","Gekozen: Algemeen")
+            st.rerun()
+        render()
+        return
 
     render()
     vraag = st.chat_input("Stel uw vraag:")
@@ -181,7 +188,7 @@ def main():
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg("assistant", warn)
-        st.experimental_rerun()
+        st.rerun()
 
     # FAQ lookup
     dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
@@ -195,7 +202,7 @@ def main():
         if img := row["Afbeelding"]:
             st.image(img, caption="Voorbeeld", use_column_width=True)
         add_msg("assistant", ans)
-        st.experimental_rerun()
+        st.rerun()
 
     # ChatGPT fallback
     with st.spinner("ChatGPT even aan het werk…"):
@@ -209,7 +216,7 @@ def main():
             logging.exception("AI-fallback mislukt")
             add_msg("assistant", f"⚠️ AI-fallback mislukt: {e}")
 
-    st.experimental_rerun()
+    st.rerun()
 
 if __name__=="__main__":
     main()
