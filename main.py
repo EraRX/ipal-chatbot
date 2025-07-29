@@ -5,7 +5,6 @@ import re
 import logging
 import io
 from datetime import datetime
-import textwrap
 
 import streamlit as st
 import pandas as pd
@@ -27,7 +26,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 # ReportLab imports for PDF generation
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
@@ -73,22 +72,30 @@ else:
 # --- PDF Generation (only this section changed) ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4,
-                            leftMargin=2*cm, rightMargin=2*cm,
-                            topMargin=2*cm, bottomMargin=2*cm)
+    doc = SimpleDocTemplate(
+        buf, pagesize=A4,
+        leftMargin=2*cm, rightMargin=2*cm,
+        topMargin=2*cm, bottomMargin=2*cm
+    )
     styles = getSampleStyleSheet()
-    normal = styles["Normal"]
-    font = "Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica"
-    normal.fontName = font
-    normal.fontSize = 11
-    normal.alignment = TA_JUSTIFY
+    normal = ParagraphStyle(
+        "normal",
+        parent=styles["BodyText"],
+        fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
+        fontSize=11,
+        leading=14,
+        alignment=TA_JUSTIFY
+    )
+    h_bold = ParagraphStyle(
+        "h_bold",
+        parent=styles["Heading4"],
+        fontName=normal.fontName,
+        fontSize=11,
+        leading=14,
+        spaceAfter=6
+    )
 
-    h_bold = styles["Heading4"]
-    h_bold.fontName = font
-    h_bold.fontSize = 11
-    h_bold.leading = 14
-
-    # AI info paragraphs
+    # Static AI-info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -100,50 +107,51 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
         "Dit document vindt u op onze site."
     )
-    faq_tip = (
-        "<b>Waarom de FAQ gebruiken?</b><br/>"
+    faq_heading = "Waarom de FAQ gebruiken?"
+    faq_text = (
         "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op "
-        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.<br/><br/>"
-        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:<br/>"
-        "– Veel gestelde vragen Docbase nieuw 2024<br/>"
+        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n"
+        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:\n"
+        "– Veel gestelde vragen Docbase nieuw 2024\n"
         "– Veel gestelde vragen Exact Online"
     )
-    instructie = (
-        "<b>Instructie: Ticket aanmaken in DocBase</b><br/>"
-        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:<br/>"
-        "• Beschrijf het probleem zo gedetailleerd mogelijk.<br/>"
-        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.<br/>"
+    instr_heading = "Instructie: Ticket aanmaken in DocBase"
+    instr_text = (
+        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:\n"
+        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
+        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
         "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
     )
 
     story = []
     # Logo
     if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=247, height=104))
+        story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
 
     # Vraag
     story.append(Paragraph("<b>Vraag:</b>", h_bold))
-    story.append(Spacer(1, 4))
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
     # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Spacer(1, 4))
     story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
 
     # AI-Antwoord Info
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
-    story.append(Spacer(1, 4))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
     story.append(Paragraph(para2, normal))
     story.append(Spacer(1, 6))
-    story.append(Paragraph(faq_tip, normal))
+    story.append(Paragraph(f"<b>{faq_heading}</b>", normal))
+    for line in faq_text.split("\n"):
+        story.append(Paragraph(line, normal))
     story.append(Spacer(1, 6))
-    story.append(Paragraph(instructie, normal))
+    story.append(Paragraph(f"<b>{instr_heading}</b>", normal))
+    for line in instr_text.split("\n"):
+        story.append(Paragraph(line, normal))
 
     doc.build(story)
     buf.seek(0)
