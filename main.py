@@ -86,6 +86,10 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ]))
         story.append(logo_table)
 
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=124, height=52))
+        story.append(Spacer(1, 12))
+
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
@@ -103,6 +107,33 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
             story.append(Paragraph(line, body_style))
 
     doc.build(story)
+
+    story.append(Paragraph("<b>AI-Antwoord Info:</b>", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<b>2. Heeft u hulp nodig met DocBase of Exact?</b> Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<b>Waarom de FAQ gebruiken?</b>", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("– Veel gestelde vragen Docbase nieuw 2024", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("– Veel gestelde vragen Exact Online", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("<b>Instructie: Ticket aanmaken in DocBase</b>", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("Dat is eenvoudig! Zorg ervoor dat uw melding duidelijk is:", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("• Beschrijf het probleem zo gedetailleerd mogelijk.", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.", body_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.", body_style))
+    story.append(Spacer(1, 6))
     buffer.seek(0)
     return buffer.getvalue()
 
