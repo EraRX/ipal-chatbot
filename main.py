@@ -44,7 +44,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# --- OpenAI setup (aangepast) ---
+# --- OpenAI setup ---
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -118,17 +118,14 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story = []
 
-    # Logo
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
 
-    # Vraag
     story.append(Paragraph("<b>Vraag:</b>", h_bold))
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
@@ -136,8 +133,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     blocks = []
     current = None
     for line in lines:
-        striped = line.strip()
-        striped = re.sub(r"\*\*(.*?)\*\*", r"\1", striped)
+        striped = re.sub(r"\*\*(.*?)\*\*", r"\1", line.strip())
         m = re.match(r"^(\d+)\.\s*(.*)", striped)
         if m:
             if current:
@@ -154,13 +150,10 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     items = []
     for blk in blocks:
-        # gebruik automatisch nummeren, geen handmatige stapprefix
         main_text = blk["text"]
         if blk["subs"]:
-            sub_items = [
-                ListItem(Paragraph(sub, normal), leftIndent=12, bulletIndent=0)
-                for sub in blk["subs"]
-            ]
+            sub_items = [ListItem(Paragraph(sub, normal), leftIndent=12, bulletIndent=0)
+                         for sub in blk["subs"]]
             nested = ListFlowable(
                 sub_items, bulletType="bullet", leftIndent=12, bulletIndent=0,
                 bulletFontName=normal.fontName, bulletFontSize=11
@@ -170,24 +163,15 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
             items.append(ListItem(Paragraph(main_text, normal), leftIndent=0, bulletIndent=0))
 
     if items:
-       story.append(ListFlowable(
-           items, bulletType="1", leftIndent=0, bulletIndent=12,
-          bulletFontName=normal.fontName, bulletFontSize=11
-       ))
         story.append(ListFlowable(
-            items,
-            bulletType="1",       # genummerde lijst: 1,2,3…
-            start='1',            # begin bij 1
-            leftIndent=0,         # geen inspringing van de hele lijst
-            bulletIndent=0,       # cijfers direct aan de linkerkant
-            bulletFontName=normal.fontName,
-            bulletFontSize=11
+            items, bulletType="1", start='1',
+            leftIndent=0, bulletIndent=0,
+            bulletFontName=normal.fontName, bulletFontSize=11
         ))
     else:
         story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
 
-    # AI-Antwoord Info
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
@@ -205,7 +189,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-# --- FAQ loader ---
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
@@ -216,9 +199,7 @@ def load_faq(path="faq.xlsx"):
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
-    df['combined'] = df[[
-        'Systeem','Subthema','Omschrijving melding','Toelichting melding'
-    ]].fillna('').agg(' '.join, axis=1)
+    df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
     return df
 
 faq_df = load_faq()
