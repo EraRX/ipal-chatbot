@@ -194,7 +194,7 @@ def main():
     if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
         st.session_state.history[-1]['content'] += '''
 
-Paragraph("AI-Antwoord Info:", heading_style)
+story.append(Paragraph("AI-Antwoord Info:", heading_style))
 **1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 **2. Heeft u hulp nodig met DocBase of Exact?** Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.  
 
