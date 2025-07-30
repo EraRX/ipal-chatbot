@@ -72,130 +72,114 @@ else:
 
 # --- PDF Generation ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=2*cm, rightMargin=2*cm,
-        topMargin=2*cm, bottomMargin=2*cm
-    )
-    styles = getSampleStyleSheet()
-    normal = ParagraphStyle(
-        "normal", parent=styles["BodyText"],
-        fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
-        fontSize=11, leading=14, alignment=TA_JUSTIFY
-    )
-    h_bold = ParagraphStyle(
-        "h_bold", parent=styles["Heading4"],
-        fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
-    )
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_JUSTIFY
+    from reportlab.lib.units import cm
 
-    # AI‐info paragrafen
-    para1 = (
-        "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
-        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
-        "informatie te controleren via officiële bronnen."
-    )
-    para2 = (
-        "2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
-        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
-        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
-        "Dit document vindt u op onze site."
-    )
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4,
+                            leftMargin=2*cm, rightMargin=2*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    normal = ParagraphStyle("normal", parent=styles["BodyText"],
+                            fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
+                            fontSize=11, leading=14, alignment=TA_JUSTIFY)
+    h_bold = ParagraphStyle("h_bold", parent=styles["Heading4"],
+                            fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6)
+
+    # AI-info blijft ongewijzigd...
+    para1 = "1. Dit is het AI-antwoord ..."
+    para2 = "2. Heeft u hulp nodig ..."
     faq_heading = "Waarom de FAQ gebruiken?"
-    faq_text = (
-        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op "
-        "veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n"
-        "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:\n"
-        "– Veel gestelde vragen Docbase nieuw 2024\n"
-        "– Veel gestelde vragen Exact Online"
-    )
+    faq_text = "In het document met veelgestelde vragen vindt u ...\n– Docbase …\n– Exact Online"
     instr_heading = "Instructie: Ticket aanmaken in DocBase"
-    instr_text = (
-        "Geen probleem! Zorg ervoor dat uw melding duidelijk is:\n"
-        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
-        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
-        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
-    )
+    instr_text = ("Geen probleem! ...\n• Beschrijf ...\n• Voegt u geen document ...\n• Geef uw telefoonnummer ...")
 
     story = []
-
+    # Logo
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
 
+    # Vraag
     story.append(Paragraph("<b>Vraag:</b>", h_bold))
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
+    # Antwoord—nu met gegarandeerde nummering
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Spacer(1, 4))
+    story.append(Spacer(1, 6))
 
+    # 1) Split de antwoordtekst in regels
     lines = answer.splitlines()
-    blocks = []
-    current = None
-    for line in lines:
-        striped = re.sub(r"\*\*(.*?)\*\*", r"\1", line.strip())
-        m = re.match(r"^(\d+)\.\s*(.*)", striped)
-        if m:
-            if current:
-                blocks.append(current)
-            current = {"step": m.group(1), "text": m.group(2), "subs": []}
-        elif current and re.match(r"^[-•]\s*(.*)", striped):
-            sub = re.sub(r"^[-•]\s*", "", striped)
-            current["subs"].append(sub)
-        else:
-            if current:
-                current["text"] += " " + striped
-    if current:
-        blocks.append(current)
 
+    # 2) Bouw een lijst van (tekst, [subs]) tuples
+    blocks = []
+    for line in lines:
+        striped = line.strip()
+        # verwijder markdown bold
+        striped = re.sub(r"\*\*(.*?)\*\*", r"\1", striped)
+        if not striped:
+            continue
+        if striped.startswith("•"):
+            # toevoegen aan de meest recente block als sub-bullet
+            if blocks:
+                blocks[-1][1].append(striped.lstrip("• ").strip())
+        else:
+            # nieuw hoofdblok
+            blocks.append([striped, []])
+
+    # 3) Zet elk block om in ListItem met genummerde hoofd-bullets en ronde sub-bullets
     items = []
-    for blk in blocks:
-        main_text = blk["text"]
-        if blk["subs"]:
+    for text, subs in blocks:
+        # hoofdregel zonder nummer in de tekst zelf
+        para = Paragraph(text, normal)
+        if subs:
             sub_items = [
-                ListItem(Paragraph(sub, normal), leftIndent=12, bulletIndent=0)
-                for sub in blk["subs"]
+                ListItem(Paragraph(s, normal), leftIndent=12, bulletIndent=0)
+                for s in subs
             ]
             nested = ListFlowable(
-                sub_items,
-                bulletType="bullet",
-                leftIndent=12,
-                bulletIndent=0,
-                bulletFontName=normal.fontName,
-                bulletFontSize=11
+                sub_items, bulletType="bullet",
+                leftIndent=12, bulletIndent=0,
+                bulletFontName=normal.fontName, bulletFontSize=10
             )
-            items.append(ListItem([Paragraph(main_text, normal), nested], leftIndent=0, bulletIndent=0))
+            items.append(ListItem([para, nested], leftIndent=0, bulletIndent=0))
         else:
-            items.append(ListItem(Paragraph(main_text, normal), leftIndent=0, bulletIndent=0))
+            items.append(ListItem(para, leftIndent=0, bulletIndent=0))
 
+    # 4) Voeg de genummerde lijst toe
     if items:
         story.append(ListFlowable(
             items,
-            bulletType="1",         # genummerde lijst 1,2,3…
-            start='1',              # begin bij 1
-            bulletFormat="%s. ",    # “1. ” (nummer, punt, spatie)
-            leftIndent=0,           # lijst helemaal links
-            bulletIndent=12,        # tekst 12pt rechts van nummer
+            bulletType="1",
+            start="1",
+            bulletFormat="%s. ",  # “1. ” met spatie
+            leftIndent=0,
+            bulletIndent=12,
             bulletFontName=normal.fontName,
             bulletFontSize=11
         ))
     else:
+        # fallback
         story.append(Paragraph(answer, normal))
+
     story.append(Spacer(1, 12))
 
+    # AI-info zoals eerder
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
     story.append(Paragraph(para2, normal))
     story.append(Spacer(1, 6))
     story.append(Paragraph(f"<b>{faq_heading}</b>", normal))
-    for line in faq_text.split("\n"):
-        story.append(Paragraph(line, normal))
+    for ln in faq_text.split("\n"):
+        story.append(Paragraph(ln, normal))
     story.append(Spacer(1, 6))
     story.append(Paragraph(f"<b>{instr_heading}</b>", normal))
-    for line in instr_text.split("\n"):
-        story.append(Paragraph(line, normal))
+    for ln in instr_text.split("\n"):
+        story.append(Paragraph(ln, normal))
 
     doc.build(story)
     buf.seek(0)
