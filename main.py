@@ -1,4 +1,3 @@
-
 # main.py
 
 import os
@@ -32,7 +31,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Streamlit setup
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
@@ -41,7 +39,6 @@ st.markdown(
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# OpenAI config
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -60,7 +57,6 @@ def chatgpt(messages, temperature=0.3, max_tokens=800):
     )
     return resp.choices[0].message.content.strip()
 
-# Font registration
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
@@ -76,6 +72,9 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
     story = []
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=124, height=52))
+        story.append(Spacer(1, 12))
 
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
@@ -101,7 +100,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# Load FAQ Excel
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
@@ -170,6 +168,9 @@ MAX_HISTORY = 20
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
     st.session_state.history = (st.session_state.history + [{'role':role,'content':content,'time':ts}])[-MAX_HISTORY:]
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=124, height=52))
+        story.append(Spacer(1, 12))
 
 def render_chat():
     for m in st.session_state.history:
@@ -177,6 +178,9 @@ def render_chat():
 
 if 'history' not in st.session_state:
     st.session_state.history = []
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=124, height=52))
+        story.append(Spacer(1, 12))
     st.session_state.selected_product = None
     st.session_state.selected_module = None
     st.session_state.last_question = ''
