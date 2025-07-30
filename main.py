@@ -13,9 +13,9 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image as PILImage
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI  # nieuwe client import
 
-# Safe import for RateLimitError
+# Safe import voor RateLimitError
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -23,7 +23,7 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-# ReportLab imports for PDF generation
+# ReportLab imports voor PDF generatie
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
 )
@@ -44,31 +44,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# --- OpenAI setup ---
+# --- OpenAI setup (aangepast) ---
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
-if not openai.api_key:
+OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+if not OPENAI_KEY:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
+client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
        retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages, temperature=0.3, max_tokens=800):
-    resp = openai.ChatCompletion.create(
-        model=MODEL, messages=messages,
-        temperature=temperature, max_tokens=max_tokens
+    resp = client.chat.completions.create(
+        model=MODEL,
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens
     )
     return resp.choices[0].message.content.strip()
 
-# --- Register Calibri if available ---
+# --- Register Calibri if beschikbaar ---
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-
-# --- PDF Generation (only this function changed previously) ---
+# --- PDF Generation ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -87,7 +89,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # AI‐info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -116,18 +117,14 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     )
 
     story = []
-
-    # Logo top-left
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
 
-    # Vraag
     story.append(Paragraph("<b>Vraag:</b>", h_bold))
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
@@ -138,14 +135,16 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         striped = line.strip()
         m = re.match(r"^(\d+)\.\s*(.*)", striped)
         if m:
-            if current: blocks.append(current)
+            if current:
+                blocks.append(current)
             current = {"step": m.group(1), "text": m.group(2), "subs": []}
         elif current and re.match(r"^[-•]\s*(.*)", striped):
             current["subs"].append(re.sub(r"^[-•]\s*", "", striped))
         else:
             if current:
                 current["text"] += " " + striped
-    if current: blocks.append(current)
+    if current:
+        blocks.append(current)
 
     items = []
     for blk in blocks:
@@ -172,7 +171,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
 
-    # AI-Antwoord Info
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
@@ -189,10 +187,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-# --- end make_pdf ---
 
 
-# --- FAQ loader ---
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
@@ -209,23 +205,19 @@ def load_faq(path="faq.xlsx"):
 
 faq_df = load_faq()
 
-# --- Build subthema_dict ---
 producten = ["Exact","DocBase"]
 subthema_dict = {
     p: sorted(
-        faq_df.loc[faq_df["Systeem"] == p, "Subthema"]
-              .dropna().unique()
+        faq_df.loc[faq_df["Systeem"] == p, "Subthema"].dropna().unique()
     )
     for p in producten
 }
 
-# --- Blacklist & filter ---
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
 def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-# --- RKK scraping (unchanged) ---
 def fetch_bishop_from_rkkerk(loc: str):
     slug = loc.lower().replace(" ", "-")
     url = f"https://www.rkkerk.nl/bisdom-{slug}/"
@@ -263,7 +255,6 @@ def fetch_all_bishops_nl():
             result[d] = name
     return result
 
-# --- Avatars & helpers ---
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role: str):
     path = AVATARS.get(role)
@@ -281,17 +272,16 @@ def render_chat():
             f"{m['content']}\n\n_{m['time']}_"
         )
 
-# --- Session init ---
 if "history" not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
     st.session_state.selected_module = None
     st.session_state.last_question = ""
 
-# --- Main app ---
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
-        st.session_state.clear(); st.rerun()
+        st.session_state.clear()
+        st.rerun()
 
     if st.session_state.history and st.session_state.history[-1]["role"] == "assistant":
         pdf_data = make_pdf(
@@ -304,43 +294,62 @@ def main():
 
     if not st.session_state.selected_product:
         st.header("Welkom bij IPAL Chatbox")
-        c1,c2,c3 = st.columns(3)
-        if c1.button("Exact",use_container_width=True):
-            st.session_state.selected_product="Exact"; add_msg("assistant","Gekozen: Exact"); st.rerun()
-        if c2.button("DocBase",use_container_width=True):
-            st.session_state.selected_product="DocBase"; add_msg("assistant","Gekozen: DocBase"); st.rerun()
-        if c3.button("Algemeen",use_container_width=True):
-            st.session_state.selected_product="Algemeen"; st.session_state.selected_module="alles"; add_msg("assistant","Gekozen: Algemeen"); st.rerun()
-        render_chat(); return
+        c1, c2, c3 = st.columns(3)
+        if c1.button("Exact", use_container_width=True):
+            st.session_state.selected_product = "Exact"
+            add_msg("assistant", "Gekozen: Exact")
+            st.rerun()
+        if c2.button("DocBase", use_container_width=True):
+            st.session_state.selected_product = "DocBase"
+            add_msg("assistant", "Gekozen: DocBase")
+            st.rerun()
+        if c3.button("Algemeen", use_container_width=True):
+            st.session_state.selected_product = "Algemeen"
+            st.session_state.selected_module = "alles"
+            add_msg("assistant", "Gekozen: Algemeen")
+            st.rerun()
+        render_chat()
+        return
 
     if st.session_state.selected_product in ["Exact","DocBase"] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox("Kies onderwerp:", ["(Kies)"] + opts)
         if sel != "(Kies)":
-            st.session_state.selected_module = sel; add_msg("assistant",f"Gekozen: {sel}"); st.rerun()
-        render_chat(); return
+            st.session_state.selected_module = sel
+            add_msg("assistant", f"Gekozen: {sel}")
+            st.rerun()
+        render_chat()
+        return
 
     render_chat()
     vraag = st.chat_input("Stel uw vraag:")
-    if not vraag: return
+    if not vraag:
+        return
 
-    st.session_state.last_question=vraag; add_msg("user",vraag)
-    ok,warn = filter_topics(vraag)
-    if not ok: add_msg("assistant",warn); st.rerun()
+    st.session_state.last_question = vraag
+    add_msg("user", vraag)
+
+    ok, warn = filter_topics(vraag)
+    if not ok:
+        add_msg("assistant", warn)
+        st.rerun()
 
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
-        loc=m.group(1).strip()
-        bishop=fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-        if bishop: add_msg("assistant",f"De huidige bisschop van {loc} is {bishop}."); st.rerun()
+        loc = m.group(1).strip()
+        bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
+        if bishop:
+            add_msg("assistant", f"De huidige bisschop van {loc} is {bishop}.")
+            st.rerun()
 
     if re.search(r'(?i)bisschoppen nederland', vraag):
-        allb=fetch_all_bishops_nl()
+        allb = fetch_all_bishops_nl()
         if allb:
-            lines=[f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-            add_msg("assistant","Huidige Nederlandse bisschoppen:\n"+ "\n".join(lines)); st.rerun()
+            lines = [f"Mgr. {n} – Bisschop van {d}" for d, n in allb.items()]
+            add_msg("assistant", "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
+            st.rerun()
 
-    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
+    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag), case=False, na=False)]
     if not dfm.empty:
         row = dfm.iloc[0]
         ans = row["Antwoord"]
@@ -351,7 +360,6 @@ def main():
             ], temperature=0.2)
         except:
             pass
-        # Guard against invalid image data:
         if isinstance(row["Afbeelding"], str) and os.path.exists(row["Afbeelding"]):
             st.image(PILImage.open(row["Afbeelding"]), caption="Voorbeeld", use_column_width=True)
         add_msg("assistant", ans)
