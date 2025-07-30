@@ -72,31 +72,47 @@ else:
 
 # --- PDF Generation ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+    import os, io, re
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+    )
+    from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_JUSTIFY
     from reportlab.lib.units import cm
+    from reportlab.pdfbase import pdfmetrics
 
+    # Document instellen
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4,
                             leftMargin=2*cm, rightMargin=2*cm,
                             topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
-    normal = ParagraphStyle("normal", parent=styles["BodyText"],
-                            fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
-                            fontSize=11, leading=14, alignment=TA_JUSTIFY)
-    h_bold = ParagraphStyle("h_bold", parent=styles["Heading4"],
-                            fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6)
+    normal = ParagraphStyle(
+        "normal", parent=styles["BodyText"],
+        fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
+        fontSize=11, leading=14, alignment=TA_JUSTIFY
+    )
+    h_bold = ParagraphStyle(
+        "h_bold", parent=styles["Heading4"],
+        fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
+    )
 
-    # AI-info blijft ongewijzigd...
-    para1 = "1. Dit is het AI-antwoord ..."
-    para2 = "2. Heeft u hulp nodig ..."
+    # AI-info (ongewijzigd)
+    para1 = ("1. Dit is het AI-antwoord vanuit ... officiële bronnen.")
+    para2 = ("2. Heeft u hulp nodig met DocBase ... op onze site.")
     faq_heading = "Waarom de FAQ gebruiken?"
-    faq_text = "In het document met veelgestelde vragen vindt u ...\n– Docbase …\n– Exact Online"
+    faq_text = ("In het document met veelgestelde vragen ...\n"
+                "– Veel gestelde vragen Docbase nieuw 2024\n"
+                "– Veel gestelde vragen Exact Online")
     instr_heading = "Instructie: Ticket aanmaken in DocBase"
-    instr_text = ("Geen probleem! ...\n• Beschrijf ...\n• Voegt u geen document ...\n• Geef uw telefoonnummer ...")
+    instr_text = ("Geen probleem! Zorg ervoor dat uw melding duidelijk is:\n"
+                  "• Beschrijf het probleem ...\n"
+                  "• Voegt u geen document ...\n"
+                  "• Geef uw telefoonnummer ...")
 
     story = []
+
     # Logo
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
@@ -107,67 +123,91 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord—nu met gegarandeerde nummering
+    # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 6))
 
-    # 1) Split de antwoordtekst in regels
-    lines = answer.splitlines()
+    # 1) Split het antwoord in niet-lege regels
+    lines = [ln for ln in answer.splitlines() if ln.strip() != ""]
+    if not lines:
+        lines = [""]
 
-    # 2) Bouw een lijst van (tekst, [subs]) tuples
-    blocks = []
-    for line in lines:
-        striped = line.strip()
-        # verwijder markdown bold
-        striped = re.sub(r"\*\*(.*?)\*\*", r"\1", striped)
-        if not striped:
-            continue
-        if striped.startswith("•"):
-            # toevoegen aan de meest recente block als sub-bullet
-            if blocks:
-                blocks[-1][1].append(striped.lstrip("• ").strip())
+    # 2) Eerste regel als intro
+    intro = re.sub(r"\*\*(.*?)\*\*", r"\1", lines[0].strip())
+    story.append(Paragraph(intro, normal))
+    story.append(Spacer(1, 12))
+
+    # 3) Verwerk de rest van de regels
+    rest = lines[1:]
+    # Verzamel blocks: elke genummerde of bullet als lijst; anders aparte paragraaf
+    list_items = []
+    for ln in rest:
+        txt = ln.strip()
+        txt = re.sub(r"\*\*(.*?)\*\*", r"\1", txt)
+        # genummerde regel (1. ..., etc)
+        m_num = re.match(r"^(\d+)\.\s*(.*)", txt)
+        if m_num:
+            # nieuwe genummerde ListItem
+            list_items.append(("numbered", m_num.group(2)))
+        elif txt.startswith(("•", "-")):
+            # sub-bullet
+            list_items.append(("bullet", txt.lstrip("•- ").strip()))
         else:
-            # nieuw hoofdblok
-            blocks.append([striped, []])
+            # losse alinea
+            story.append(Paragraph(txt, normal))
+            story.append(Spacer(1, 6))
 
-    # 3) Zet elk block om in ListItem met genummerde hoofd-bullets en ronde sub-bullets
-    items = []
-    for text, subs in blocks:
-        # hoofdregel zonder nummer in de tekst zelf
-        para = Paragraph(text, normal)
-        if subs:
-            sub_items = [
-                ListItem(Paragraph(s, normal), leftIndent=12, bulletIndent=0)
-                for s in subs
-            ]
-            nested = ListFlowable(
-                sub_items, bulletType="bullet",
-                leftIndent=12, bulletIndent=0,
-                bulletFontName=normal.fontName, bulletFontSize=10
-            )
-            items.append(ListItem([para, nested], leftIndent=0, bulletIndent=0))
-        else:
-            items.append(ListItem(para, leftIndent=0, bulletIndent=0))
+    # 4) Als er genummerde items zijn, zet ze in een genummerde lijst
+    if any(kind == "numbered" for kind, _ in list_items):
+        numbered = []
+        sub = []
+        for kind, text in list_items:
+            if kind == "numbered":
+                # flush vorige sublijst
+                if sub:
+                    # voeg sub als nested bullet to genummerd item
+                    numbered[-1] = (numbered[-1], sub)
+                    sub = []
+                numbered.append((text, []))
+            else:  # sub-bullet
+                if not numbered:
+                    # sub zonder nummer—fallback als losse alinea
+                    story.append(Paragraph("• " + text, normal))
+                    story.append(Spacer(1, 6))
+                else:
+                    sub.append(text)
+        # voeg overgebleven sub
+        if sub and numbered:
+            numbered[-1] = (numbered[-1][0], sub)
 
-    # 4) Voeg de genummerde lijst toe
-    if items:
+        # Bouw ListFlowable
+        items = []
+        for text, subs in numbered:
+            p = Paragraph(text, normal)
+            if subs:
+                sub_items = [ListItem(Paragraph(s, normal), leftIndent=12, bulletIndent=0)
+                             for s in subs]
+                nested = ListFlowable(
+                    sub_items, bulletType="bullet", leftIndent=12, bulletIndent=0,
+                    bulletFontName=normal.fontName, bulletFontSize=10
+                )
+                items.append(ListItem([p, nested], leftIndent=0, bulletIndent=0))
+            else:
+                items.append(ListItem(p, leftIndent=0, bulletIndent=0))
+
         story.append(ListFlowable(
             items,
-            bulletType="1",
+            bulletType="1",          # genummerde 1,2,3...
             start="1",
-            bulletFormat="%s. ",  # “1. ” met spatie
+            bulletFormat="%s. ",     # “1. ” (nummer, punt, space)
             leftIndent=0,
             bulletIndent=12,
             bulletFontName=normal.fontName,
             bulletFontSize=11
         ))
-    else:
-        # fallback
-        story.append(Paragraph(answer, normal))
+        story.append(Spacer(1, 12))
 
-    story.append(Spacer(1, 12))
-
-    # AI-info zoals eerder
+    # 5) Voeg AI-info sectie toe
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
@@ -181,6 +221,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     for ln in instr_text.split("\n"):
         story.append(Paragraph(ln, normal))
 
+    # Build PDF
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
