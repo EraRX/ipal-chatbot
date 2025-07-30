@@ -126,7 +126,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Spacer(1, 6))
     story.append(Paragraph("• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.", body_style))
     story.append(Spacer(1, 6))
-    story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen. STEL HIER UW VRAAG:", body_style))
+    story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.", body_style))
     story.append(Spacer(1, 6))
     buffer.seek(0)
     return buffer.getvalue()
@@ -233,6 +233,7 @@ Dat is eenvoudig! Zorg ervoor dat uw melding duidelijk is:
 • Beschrijf het probleem zo gedetailleerd mogelijk.  
 • Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.  
 • Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.
+•  STEL HIER UW VRAAG:
 '''
         pdf_data = make_pdf(
             question=st.session_state.last_question,
