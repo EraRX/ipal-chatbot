@@ -197,25 +197,13 @@ def main():
 story.append(Spacer(1, 12))
 story.append(Paragraph("AI-Antwoord Info:", heading_style))
 
-story.append(Paragraph(
-    "<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> "
-    "Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.",
-    body_style))
+story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
 
-story.append(Paragraph(
-    "<b>2. Heeft u hulp nodig met DocBase of Exact?</b> "
-    "Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. "
-    "Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
-    "Dit document vindt u op onze site.",
-    body_style))
+story.append(Paragraph("<b>2. Heeft u hulp nodig met DocBase of Exact?</b> Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.", body_style))
 
 story.append(Paragraph("<b>Waarom de FAQ gebruiken?</b>", body_style))
-story.append(Paragraph(
-    "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.",
-    body_style))
-story.append(Paragraph(
-    "Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:",
-    body_style))
+story.append(Paragraph("In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.", body_style))
+story.append(Paragraph("Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:", body_style))
 story.append(Paragraph("– Veel gestelde vragen Docbase nieuw 2024", body_style))
 story.append(Paragraph("– Veel gestelde vragen Exact Online", body_style))
 
