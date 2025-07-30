@@ -82,13 +82,15 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     from reportlab.lib.units import cm
     from reportlab.pdfbase import pdfmetrics
 
-    # Helper om input netjes te maken voor Paragraph
-    def _clean_text(txt):
-        return str(txt).replace('\u00A0', ' ')
+    # Helper om Markdown-sterretjes en NBSP te verwijderen
+    def _clean_text(txt: str) -> str:
+        s = str(txt).replace('\u00A0', ' ')
+        return re.sub(r"\*\*(.*?)\*\*", r"\1", s)
 
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
-        buf, pagesize=A4,
+        buf,
+        pagesize=A4,
         leftMargin=2*cm, rightMargin=2*cm,
         topMargin=2*cm, bottomMargin=2*cm
     )
@@ -104,13 +106,22 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # AI‐info (ongewijzigd)
-    para1 = "1. Dit is het AI-antwoord vanuit de IPAL chatbox …"
-    para2 = "2. Heeft u hulp nodig met DocBase of Exact? …"
-    faq_heading = "Waarom de FAQ gebruiken?"
-    faq_text = "In het document met veelgestelde vragen …\n– Docbase …\n– Exact Online"
-    instr_heading = "Instructie: Ticket aanmaken in DocBase"
-    instr_text = "Geen probleem! …\n• Beschrijf …\n• Voeg …\n• Geef …"
+    # AI-info (stek kort hier; je kunt je volledige teksten hier invullen)
+    para1 = _clean_text("1. Dit is het AI-antwoord vanuit de IPAL chatbox …")
+    para2 = _clean_text("2. Heeft u hulp nodig met DocBase of Exact? …")
+    faq_heading = _clean_text("Waarom de FAQ gebruiken?")
+    faq_text = _clean_text(
+        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n"
+        "– Veel gestelde vragen Docbase nieuw 2024\n"
+        "– Veel gestelde vragen Exact Online"
+    )
+    instr_heading = _clean_text("Instructie: Ticket aanmaken in DocBase")
+    instr_text = _clean_text(
+        "Geen probleem! …\n"
+        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
+        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
+        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
+    )
 
     story = []
 
@@ -124,11 +135,11 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(_clean_text(question), normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord
+    # Antwoord-intro
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 6))
 
-    # Split in niet-lege regels
+    # Splits niet-lege lijnen
     lines = [ln for ln in answer.splitlines() if ln.strip()]
     intro = lines[0] if lines else ""
     rest  = lines[1:] if len(lines) > 1 else []
@@ -138,11 +149,11 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         story.append(Paragraph(_clean_text(intro), normal))
         story.append(Spacer(1, 12))
 
-    # Blocks voor lijst
+    # Verzamel blocks (hoofdregels vs sub-bullets)
     blocks = []
     for ln in rest:
         txt = _clean_text(ln.strip())
-        if txt.startswith("•") or txt.startswith("-"):
+        if txt.startswith(("•", "-")):
             if blocks:
                 blocks[-1][1].append(txt.lstrip("•- ").strip())
         else:
@@ -151,22 +162,25 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     # Bouw ListItems
     items = []
     for text, subs in blocks:
-        p = Paragraph(text, normal)
+        p = Paragraph(_clean_text(text), normal)
         if subs:
             sub_items = [
                 ListItem(Paragraph(_clean_text(s), normal), leftIndent=12, bulletIndent=0)
                 for s in subs
             ]
             nested = ListFlowable(
-                sub_items, bulletType="bullet",
-                leftIndent=12, bulletIndent=0,
-                bulletFontName=normal.fontName, bulletFontSize=10
+                sub_items,
+                bulletType="bullet",
+                leftIndent=12,
+                bulletIndent=0,
+                bulletFontName=normal.fontName,
+                bulletFontSize=10
             )
             items.append(ListItem([p, nested], leftIndent=0, bulletIndent=0))
         else:
             items.append(ListItem(p, leftIndent=0, bulletIndent=0))
 
-    # Genummerde lijst als er items zijn
+    # Genummerde lijst
     if items:
         story.append(ListFlowable(
             items,
@@ -180,7 +194,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ))
         story.append(Spacer(1, 12))
 
-    # AI‐Antwoord Info
+    # AI-Antwoord Info
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
     story.append(Paragraph(para1, normal))
     story.append(Spacer(1, 6))
@@ -194,10 +208,10 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     for ln in instr_text.split("\n"):
         story.append(Paragraph(_clean_text(ln), normal))
 
+    # Build PDF
     doc.build(story)
     buf.seek(0)
     return buf.getvalue()
-
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
