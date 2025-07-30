@@ -172,11 +172,11 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     if items:
         story.append(ListFlowable(
             items,
-            bulletType="1",
-            start='1',
-            bulletFormat="%s\u00A0",   # nummer + non-breaking space, zonder punt
-            leftIndent=0,
-            bulletIndent=0,
+            bulletType="1",         # genummerde lijst 1,2,3…
+            start='1',              # begin bij 1
+            bulletFormat="%s. ",    # “1. ” (nummer, punt, spatie)
+            leftIndent=0,           # lijst helemaal links
+            bulletIndent=12,        # tekst 12pt rechts van nummer
             bulletFontName=normal.fontName,
             bulletFontSize=11
         ))
