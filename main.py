@@ -107,8 +107,13 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     )
 
     # AI-info (stek kort hier; je kunt je volledige teksten hier invullen)
-    para1 = _clean_text("1. Dit is het AI-antwoord vanuit de IPAL chatbox …")
-    para2 = _clean_text("2. Heeft u hulp nodig met DocBase of Exact? …")
+    para1 = _clean_text("1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
+        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
+        "informatie te controleren via officiële bronnen.")
+    para2 = _clean_text("Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
+        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
+        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
+        "Dit document vindt u op onze site.")
     faq_heading = _clean_text("Waarom de FAQ gebruiken?")
     faq_text = _clean_text(
         "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n"
