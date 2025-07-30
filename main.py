@@ -104,7 +104,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     doc.build(story)
 
-    story.append(Paragraph("AI-Antwoord Info:", heading_style))
+    story.append(Paragraph("Antwoord:", heading_style))
+    
     story.append(Spacer(1, 6))
     story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
     story.append(Spacer(1, 6))
