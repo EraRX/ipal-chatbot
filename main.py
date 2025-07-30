@@ -170,19 +170,19 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
             items.append(ListItem(Paragraph(main_text, normal), leftIndent=0, bulletIndent=0))
 
     if items:
--        story.append(ListFlowable(
--            items, bulletType="1", leftIndent=0, bulletIndent=12,
--            bulletFontName=normal.fontName, bulletFontSize=11
--        ))
-+        story.append(ListFlowable(
-+            items,
-+            bulletType="1",       # genummerde lijst: 1,2,3…
-+            start='1',            # begin bij 1
-+            leftIndent=0,         # geen inspringing van de hele lijst
-+            bulletIndent=0,       # cijfers direct aan de linkerkant
-+            bulletFontName=normal.fontName,
-+            bulletFontSize=11
-+        ))
+       story.append(ListFlowable(
+           items, bulletType="1", leftIndent=0, bulletIndent=12,
+          bulletFontName=normal.fontName, bulletFontSize=11
+       ))
+        story.append(ListFlowable(
+            items,
+            bulletType="1",       # genummerde lijst: 1,2,3…
+            start='1',            # begin bij 1
+            leftIndent=0,         # geen inspringing van de hele lijst
+            bulletIndent=0,       # cijfers direct aan de linkerkant
+            bulletFontName=normal.fontName,
+            bulletFontSize=11
+        ))
     else:
         story.append(Paragraph(answer, normal))
     story.append(Spacer(1, 12))
