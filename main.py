@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image as PILImage
 from dotenv import load_dotenv
-from openai import OpenAI  # ← nieuwe client import
+from openai import OpenAI  # nieuwe client import
 
 # Safe import voor RateLimitError
 try:
@@ -70,7 +70,7 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation (alleen deze functie is aangepast) ---
+# --- PDF Generation ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -89,7 +89,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # Statistische AI-info paragrafen
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -119,7 +118,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story = []
 
-    # Logo bovenaan links
+    # Logo
     if os.path.exists("logo.png"):
         story.append(Image("logo.png", width=124, height=52))
         story.append(Spacer(1, 12))
@@ -129,7 +128,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord: detecteer genummerde stappen en sub-bullets
+    # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
@@ -138,7 +137,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     current = None
     for line in lines:
         striped = line.strip()
-        # strip markdown-bold markers:
         striped = re.sub(r"\*\*(.*?)\*\*", r"\1", striped)
         m = re.match(r"^(\d+)\.\s*(.*)", striped)
         if m:
@@ -156,7 +154,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     items = []
     for blk in blocks:
-        main_text = f"<b>{blk['step']}.</b> {blk['text']}"
+        # gebruik automatisch nummeren, geen handmatige stapprefix
+        main_text = blk["text"]
         if blk["subs"]:
             sub_items = [
                 ListItem(Paragraph(sub, normal), leftIndent=12, bulletIndent=0)
@@ -172,7 +171,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     if items:
         story.append(ListFlowable(
-            items, bulletType="bullet", leftIndent=0, bulletIndent=0,
+            items, bulletType="1", leftIndent=0, bulletIndent=12,
             bulletFontName=normal.fontName, bulletFontSize=11
         ))
     else:
@@ -288,7 +287,6 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # PDF download
     if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
         pdf_data = make_pdf(
             question=st.session_state.last_question,
@@ -297,10 +295,9 @@ def main():
         )
         st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
-    # Productkeuze
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
-        c1,c2,c3 = st.columns(3)
+        c1, c2, c3 = st.columns(3)
         if c1.button('Exact',use_container_width=True):
             st.session_state.selected_product='Exact'; add_msg('assistant','Gekozen: Exact'); st.rerun()
         if c2.button('DocBase',use_container_width=True):
@@ -309,7 +306,6 @@ def main():
             st.session_state.selected_product='Algemeen'; st.session_state.selected_module='alles'; add_msg('assistant','Gekozen: Algemeen'); st.rerun()
         render_chat(); return
 
-    # Modulekeuze
     if st.session_state.selected_product in ['Exact','DocBase'] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product,[])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
@@ -317,14 +313,13 @@ def main():
             st.session_state.selected_module=sel; add_msg('assistant',f'Gekozen: {sel}'); st.rerun()
         render_chat(); return
 
-    # Chatflow
     render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
         return
 
     st.session_state.last_question=vraag; add_msg('user',vraag)
-    ok, warn = filter_topics(vraag)
+    ok,warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant',warn); st.rerun()
 
@@ -343,12 +338,12 @@ def main():
 
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag),case=False,na=False)]
     if not dfm.empty:
-        row=dfm.iloc[0]; ans=row['Antwoord']
+        row = dfm.iloc[0]; ans = row['Antwoord']
         try:
-            ans=chatgpt([
+            ans = chatgpt([
                 {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
                 {'role':'user','content':ans}
-            ],temperature=0.2)
+            ], temperature=0.2)
         except:
             pass
         if isinstance(row['Afbeelding'],str) and os.path.exists(row['Afbeelding']):
@@ -357,7 +352,7 @@ def main():
 
     with st.spinner('ChatGPT even aan het werk…'):
         try:
-            ai=chatgpt([
+            ai = chatgpt([
                 {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
                 {'role':'user','content':vraag}
             ])
