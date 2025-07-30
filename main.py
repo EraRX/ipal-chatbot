@@ -72,16 +72,11 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
             ('TOPPADDING', (0, 0), (-1, -1), 0),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
         ]))
-        story.append(logo_table)
     if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
-        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
-        story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
     lines = answer.split("\n")
     if lines:
@@ -96,38 +91,22 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
             story.append(bullets)
         elif line:
             story.append(Paragraph(line, body_style))
-    for line in answer.split("\n")[1:]:
-    for line in answer.split("\n")[1:]:
-        line = line.strip()
+    if lines:
+    for line in lines[1:]:
         if line.startswith("•") or line.startswith("-"):
-            bullets = ListFlowable(
                 [ListItem(Paragraph(line[1:].strip(), bullet_style))],
                 bulletType="bullet"
             )
-            story.append(bullets)
         elif line:
-            story.append(Paragraph(line, body_style))
-        line = line.strip()
-            bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
-            story.append(bullets)
+    for line in answer.split("\n")[1:]:
+    for line in answer.split("\n")[1:]:
+        if line.startswith("•") or line.startswith("-"):
+                [ListItem(Paragraph(line[1:].strip(), bullet_style))],
+                bulletType="bullet"
+            )
         elif line:
-            story.append(Paragraph(line, body_style))
+        elif line:
     doc.build(story)
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.", body_style))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("Dat is eenvoudig! Zorg ervoor dat uw melding duidelijk is:", body_style))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
-    story.append(Spacer(1, 6))
     buffer.seek(0)
     return buffer.getvalue()
 @st.cache_data
@@ -285,7 +264,6 @@ In het FAQ-document vindt u snel antwoorden op veelvoorkomende vragen:
     if re.search(r'(?i)bisschoppen nederland', vraag):
         allb = fetch_all_bishops_nl()
         if allb:
-            lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
             add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
             st.rerun()
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
