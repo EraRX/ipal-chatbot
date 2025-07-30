@@ -1,5 +1,6 @@
 # main.py
 
+
 import os
 import re
 import logging
@@ -168,9 +169,6 @@ MAX_HISTORY = 20
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
     st.session_state.history = (st.session_state.history + [{'role':role,'content':content,'time':ts}])[-MAX_HISTORY:]
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
 
 def render_chat():
     for m in st.session_state.history:
@@ -178,9 +176,6 @@ def render_chat():
 
 if 'history' not in st.session_state:
     st.session_state.history = []
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
     st.session_state.selected_product = None
     st.session_state.selected_module = None
     st.session_state.last_question = ''
