@@ -68,7 +68,7 @@ else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
 
-# --- PDF Generation (only this function is changed) ---
+# --- PDF Generation (only this function changed previously) ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -87,7 +87,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
     )
 
-    # Static AI-info paragraphs
+    # AI‐info paragraphs
     para1 = (
         "1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
         "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
@@ -115,7 +115,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
     )
 
-    # Build the story
     story = []
 
     # Logo top-left
@@ -128,7 +127,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Paragraph(question, normal))
     story.append(Spacer(1, 12))
 
-    # Antwoord: detect numbered steps and their sub-bullets
+    # Antwoord
     story.append(Paragraph("<b>Antwoord:</b>", h_bold))
     story.append(Spacer(1, 4))
 
@@ -139,17 +138,14 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         striped = line.strip()
         m = re.match(r"^(\d+)\.\s*(.*)", striped)
         if m:
-            if current:
-                blocks.append(current)
+            if current: blocks.append(current)
             current = {"step": m.group(1), "text": m.group(2), "subs": []}
         elif current and re.match(r"^[-•]\s*(.*)", striped):
-            sub = re.sub(r"^[-•]\s*", "", striped)
-            current["subs"].append(sub)
+            current["subs"].append(re.sub(r"^[-•]\s*", "", striped))
         else:
             if current:
                 current["text"] += " " + striped
-    if current:
-        blocks.append(current)
+    if current: blocks.append(current)
 
     items = []
     for blk in blocks:
@@ -160,9 +156,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
                 for sub in blk["subs"]
             ]
             nested = ListFlowable(
-                sub_items,
-                bulletType="bullet", start=None,
-                leftIndent=12, bulletIndent=0,
+                sub_items, bulletType="bullet", leftIndent=12, bulletIndent=0,
                 bulletFontName=normal.fontName, bulletFontSize=11
             )
             items.append(ListItem([Paragraph(main_text, normal), nested], leftIndent=0, bulletIndent=0))
@@ -171,14 +165,11 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     if items:
         story.append(ListFlowable(
-            items,
-            bulletType="bullet", start=None,
-            leftIndent=0, bulletIndent=0,
+            items, bulletType="bullet", leftIndent=0, bulletIndent=0,
             bulletFontName=normal.fontName, bulletFontSize=11
         ))
     else:
         story.append(Paragraph(answer, normal))
-
     story.append(Spacer(1, 12))
 
     # AI-Antwoord Info
@@ -223,8 +214,7 @@ producten = ["Exact","DocBase"]
 subthema_dict = {
     p: sorted(
         faq_df.loc[faq_df["Systeem"] == p, "Subthema"]
-              .dropna()
-              .unique()
+              .dropna().unique()
     )
     for p in producten
 }
@@ -235,7 +225,7 @@ def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-# --- RKK scraping functions (unchanged) ---
+# --- RKK scraping (unchanged) ---
 def fetch_bishop_from_rkkerk(loc: str):
     slug = loc.lower().replace(" ", "-")
     url = f"https://www.rkkerk.nl/bisdom-{slug}/"
@@ -273,7 +263,7 @@ def fetch_all_bishops_nl():
             result[d] = name
     return result
 
-# --- Avatars & helpers (unchanged) ---
+# --- Avatars & helpers ---
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role: str):
     path = AVATARS.get(role)
@@ -298,7 +288,7 @@ if "history" not in st.session_state:
     st.session_state.selected_module = None
     st.session_state.last_question = ""
 
-# --- Main app (unchanged) ---
+# --- Main app ---
 def main():
     if st.sidebar.button("🔄 Nieuw gesprek"):
         st.session_state.clear(); st.rerun()
@@ -334,7 +324,7 @@ def main():
     vraag = st.chat_input("Stel uw vraag:")
     if not vraag: return
 
-    st.session_state.last_question = vraag; add_msg("user",vraag)
+    st.session_state.last_question=vraag; add_msg("user",vraag)
     ok,warn = filter_topics(vraag)
     if not ok: add_msg("assistant",warn); st.rerun()
 
@@ -350,31 +340,34 @@ def main():
             lines=[f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
             add_msg("assistant","Huidige Nederlandse bisschoppen:\n"+ "\n".join(lines)); st.rerun()
 
-    dfm=faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
+    dfm = faq_df[faq_df["combined"].str.contains(re.escape(vraag),case=False,na=False)]
     if not dfm.empty:
-        row=dfm.iloc[0]; ans=row["Antwoord"]
+        row = dfm.iloc[0]
+        ans = row["Antwoord"]
         try:
-            ans=chatgpt([
+            ans = chatgpt([
                 {"role":"system","content":"Herschrijf eenvoudig en vriendelijk."},
                 {"role":"user","content":ans}
             ], temperature=0.2)
         except:
             pass
-        if img:=row["Afbeelding"]:
-            st.image(img,caption="Voorbeeld",use_column_width=True)
-        add_msg("assistant",ans); st.rerun()
+        # Guard against invalid image data:
+        if isinstance(row["Afbeelding"], str) and os.path.exists(row["Afbeelding"]):
+            st.image(PILImage.open(row["Afbeelding"]), caption="Voorbeeld", use_column_width=True)
+        add_msg("assistant", ans)
+        st.rerun()
 
     with st.spinner("ChatGPT even aan het werk…"):
         try:
-            ai=chatgpt([
+            ai = chatgpt([
                 {"role":"system","content":"Je bent een behulpzame Nederlandse assistent."},
                 {"role":"user","content":vraag}
             ])
-            add_msg("assistant",ai)
+            add_msg("assistant", ai)
         except Exception as e:
             logging.exception("AI-fallback mislukt")
-            add_msg("assistant",f"⚠️ AI-fallback mislukt: {e}")
+            add_msg("assistant", f"⚠️ AI-fallback mislukt: {e}")
     st.rerun()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
