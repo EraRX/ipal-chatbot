@@ -222,18 +222,6 @@ def main():
 **1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 **2. Heeft u hulp nodig met DocBase of Exact?** Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.  
 
-**Waarom de FAQ gebruiken?**  
-In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.  
-Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:  
-– Veel gestelde vragen Docbase nieuw 2024  
-– Veel gestelde vragen Exact Online  
-
-**Instructie: Ticket aanmaken in DocBase**  
-Dat is eenvoudig! Zorg ervoor dat uw melding duidelijk is:  
-• Beschrijf het probleem zo gedetailleerd mogelijk.  
-• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.  
-• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.
-
 Stel hieronder uw vraag:
 '''
         pdf_data = make_pdf(
