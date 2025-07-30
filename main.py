@@ -13,9 +13,8 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image as PILImage
 from dotenv import load_dotenv
-from openai import OpenAI  # nieuwe client import
+from openai import OpenAI
 
-# Safe import voor RateLimitError
 try:
     from openai.error import RateLimitError
 except ImportError:
@@ -23,18 +22,15 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-# ReportLab imports voor PDF generatie
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
-)
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, Table, TableStyle
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.units import cm
+from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# --- Streamlit config & styling ---
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown("""
   <style>
@@ -42,9 +38,9 @@ st.markdown("""
     button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
   </style>
 """, unsafe_allow_html=True)
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# --- OpenAI setup ---
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -53,8 +49,7 @@ if not OPENAI_KEY:
 client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10),
-       retry=retry_if_exception_type(RateLimitError))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
 def chatgpt(messages, temperature=0.3, max_tokens=800):
     resp = client.chat.completions.create(
         model=MODEL,
@@ -64,184 +59,63 @@ def chatgpt(messages, temperature=0.3, max_tokens=800):
     )
     return resp.choices[0].message.content.strip()
 
-# --- Register Calibri if beschikbaar ---
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# --- PDF Generation ---
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
-    import os, io, re
-    from reportlab.platypus import (
-        SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
-    )
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_JUSTIFY
-    from reportlab.lib.units import cm
-    from reportlab.pdfbase import pdfmetrics
-
-    # Helper om Markdown-sterretjes en NBSP te verwijderen
-    def _clean_text(txt: str) -> str:
-        s = str(txt).replace('\u00A0', ' ')
-        return re.sub(r"\*\*(.*?)\*\*", r"\1", s)
-
-    buf = io.BytesIO()
+    buffer = io.BytesIO()
     doc = SimpleDocTemplate(
-        buf,
-        pagesize=A4,
+        buffer, pagesize=A4,
         leftMargin=2*cm, rightMargin=2*cm,
         topMargin=2*cm, bottomMargin=2*cm
     )
 
     styles = getSampleStyleSheet()
-    normal = ParagraphStyle(
-        "normal", parent=styles["BodyText"],
-        fontName="Calibri" if "Calibri" in pdfmetrics.getRegisteredFontNames() else "Helvetica",
-        fontSize=11, leading=14, alignment=TA_JUSTIFY
-    )
-    h_bold = ParagraphStyle(
-        "h_bold", parent=styles["Heading4"],
-        fontName=normal.fontName, fontSize=11, leading=14, spaceAfter=6
-    )
-
-    # AI-info (stek kort hier; je kunt je volledige teksten hier invullen)
-    para1 = _clean_text("1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform "
-        "Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente "
-        "informatie te controleren via officiële bronnen.")
-    para2 = _clean_text("Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door "
-        "een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een "
-        "handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). "
-        "Dit document vindt u op onze site.")
-    faq_heading = _clean_text("Waarom de FAQ gebruiken?")
-    faq_text = _clean_text(
-        "In het document met veelgestelde vragen vindt u snel en eenvoudig antwoorden op veelvoorkomende vragen, zonder dat u hoeft te wachten op hulp.\n"
-        "– Veel gestelde vragen Docbase nieuw 2024\n"
-        "– Veel gestelde vragen Exact Online"
-    )
-    instr_heading = _clean_text("Instructie: Ticket aanmaken in DocBase")
-    instr_text = _clean_text(
-        "Geen probleem! …\n"
-        "• Beschrijf het probleem zo gedetailleerd mogelijk.\n"
-        "• Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.\n"
-        "• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen."
-    )
+    body_style = ParagraphStyle("Body", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT)
+    heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333333"), spaceBefore=12, spaceAfter=6)
+    bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
     story = []
 
-    # Logo
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
+    avatar_path = "aichatbox.jpg"
+    if os.path.exists(avatar_path):
+        avatar = Image(avatar_path, width=30, height=30)
+        intro_text = Paragraph(answer.split("\n")[0], body_style)
+        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
         story.append(Spacer(1, 12))
 
-    # Vraag
-    story.append(Paragraph("<b>Vraag:</b>", h_bold))
-    story.append(Paragraph(_clean_text(question), normal))
-    story.append(Spacer(1, 12))
+    story.append(Paragraph("Antwoord:", heading_style))
+    for line in answer.split("\n")[1:]:
+        line = line.strip()
+        if line.startswith("•") or line.startswith("-"):
+            bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+            story.append(bullets)
+        elif line:
+            story.append(Paragraph(line, body_style))
 
-    # Antwoord-intro
-    story.append(Paragraph("<b>Antwoord:</b>", h_bold))
-    story.append(Spacer(1, 6))
-
-    # Splits niet-lege lijnen
-    lines = [ln for ln in answer.splitlines() if ln.strip()]
-    intro = lines[0] if lines else ""
-    rest  = lines[1:] if len(lines) > 1 else []
-
-    # Intro als alinea
-    if intro:
-        story.append(Paragraph(_clean_text(intro), normal))
-        story.append(Spacer(1, 12))
-
-    # Verzamel blocks (hoofdregels vs sub-bullets)
-    blocks = []
-    for ln in rest:
-        txt = _clean_text(ln.strip())
-        if txt.startswith(("•", "-")):
-            if blocks:
-                blocks[-1][1].append(txt.lstrip("•- ").strip())
-        else:
-            blocks.append([txt, []])
-
-    # Bouw ListItems
-    items = []
-    for text, subs in blocks:
-        p = Paragraph(_clean_text(text), normal)
-        if subs:
-            sub_items = [
-                ListItem(Paragraph(_clean_text(s), normal), leftIndent=12, bulletIndent=0)
-                for s in subs
-            ]
-            nested = ListFlowable(
-                sub_items,
-                bulletType="bullet",
-                leftIndent=12,
-                bulletIndent=0,
-                bulletFontName=normal.fontName,
-                bulletFontSize=10
-            )
-            items.append(ListItem([p, nested], leftIndent=0, bulletIndent=0))
-        else:
-            items.append(ListItem(p, leftIndent=0, bulletIndent=0))
-
-    # Genummerde lijst
-    if items:
-        story.append(ListFlowable(
-            items,
-            bulletType="1",
-            start="1",
-            bulletFormat="%s. ",
-            leftIndent=0,
-            bulletIndent=12,
-            bulletFontName=normal.fontName,
-            bulletFontSize=11
-        ))
-        story.append(Spacer(1, 12))
-
-    # AI-Antwoord Info
-    story.append(Paragraph("<b>AI-Antwoord Info:</b>", h_bold))
-    story.append(Paragraph(para1, normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(para2, normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(f"<b>{faq_heading}</b>", normal))
-    for ln in faq_text.split("\n"):
-        story.append(Paragraph(_clean_text(ln), normal))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph(f"<b>{instr_heading}</b>", normal))
-    for ln in instr_text.split("\n"):
-        story.append(Paragraph(_clean_text(ln), normal))
-
-    # Build PDF
     doc.build(story)
-    buf.seek(0)
-    return buf.getvalue()
+    buffer.seek(0)
+    return buffer.getvalue()
+
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=[
-            'Systeem','Subthema','Omschrijving melding',
-            'Toelichting melding','Antwoord of oplossing','Afbeelding'
-        ])
+        return pd.DataFrame(columns=['Systeem','Subthema','Omschrijving melding','Toelichting melding','Antwoord of oplossing','Afbeelding'])
     df = pd.read_excel(path, engine="openpyxl")
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
-    df['combined'] = df[
-        ['Systeem','Subthema','Omschrijving melding','Toelichting melding']
-    ].fillna('').agg(' '.join, axis=1)
+    df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
     return df
 
 faq_df = load_faq()
 
 producten = ['Exact','DocBase']
-subthema_dict = {
-    p: sorted(faq_df.loc[faq_df['Systeem']==p,'Subthema'].dropna().unique())
-    for p in producten
-}
+subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem']==p,'Subthema'].dropna().unique()) for p in producten}
 
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
 def filter_topics(msg: str):
@@ -276,10 +150,7 @@ def fetch_bishop_from_rkk_online(loc: str):
     return None
 
 def fetch_all_bishops_nl():
-    dioceses = [
-        "Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden",
-        "’s-Hertogenbosch","Roermond","Breda"
-    ]
+    dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden","’s-Hertogenbosch","Roermond","Breda"]
     result = {}
     for d in dioceses:
         name = fetch_bishop_from_rkkerk(d) or fetch_bishop_from_rkk_online(d)
@@ -296,15 +167,11 @@ TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
-    st.session_state.history = (st.session_state.history + [{
-        'role':role,'content':content,'time':ts
-    }])[-MAX_HISTORY:]
+    st.session_state.history = (st.session_state.history + [{'role':role,'content':content,'time':ts}])[-MAX_HISTORY:]
 
 def render_chat():
     for m in st.session_state.history:
-        st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(
-            f"{m['content']}\n\n_{m['time']}_"
-        )
+        st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
 
 if 'history' not in st.session_state:
     st.session_state.history = []
@@ -317,19 +184,14 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # PDF download
     if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
         pdf_data = make_pdf(
             question=st.session_state.last_question,
             answer=st.session_state.history[-1]['content'],
             ai_info=st.session_state.history[-1]['content']
         )
-        st.sidebar.download_button(
-            '📄 Download PDF', data=pdf_data,
-            file_name='antwoord.pdf', mime='application/pdf'
-        )
+        st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
-    # Keuze product
     if not st.session_state.selected_product:
         st.header('Welkom bij IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
@@ -349,7 +211,6 @@ def main():
         render_chat()
         return
 
-    # Keuze module
     if st.session_state.selected_product in ['Exact','DocBase'] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product,[])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
@@ -360,7 +221,6 @@ def main():
         render_chat()
         return
 
-    # Laat chat zien
     render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
@@ -374,7 +234,6 @@ def main():
         add_msg('assistant', warn)
         st.rerun()
 
-    # Specifieke bisschop
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
         loc = m.group(1).strip()
@@ -383,17 +242,13 @@ def main():
             add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.")
             st.rerun()
 
-    # Alle NL bisschoppen
     if re.search(r'(?i)bisschoppen nederland', vraag):
         allb = fetch_all_bishops_nl()
         if allb:
             lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-            add_msg('assistant',
-                "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines)
-            )
+            add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
             st.rerun()
 
-    # FAQ lookup
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
     if not dfm.empty:
         row = dfm.iloc[0]
@@ -406,12 +261,10 @@ def main():
         except:
             pass
         if isinstance(row['Afbeelding'], str) and os.path.exists(row['Afbeelding']):
-            st.image(PILImage.open(row['Afbeelding']),
-                     caption='Voorbeeld', use_column_width=True)
+            st.image(PILImage.open(row['Afbeelding']), caption='Voorbeeld', use_column_width=True)
         add_msg('assistant', ans)
         st.rerun()
 
-    # AI-fallback
     with st.spinner('ChatGPT even aan het werk…'):
         try:
             ai = chatgpt([
