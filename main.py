@@ -86,10 +86,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ]))
         story.append(logo_table)
 
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
-
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
@@ -108,7 +104,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     doc.build(story)
 
-    story.append(Paragraph("<b>AI-Antwoord Info:</b>", body_style))
+    story.append(Paragraph("<b>AI-Antwoord Info:</b>", heading_style))
     story.append(Spacer(1, 6))
     story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
     story.append(Spacer(1, 6))
