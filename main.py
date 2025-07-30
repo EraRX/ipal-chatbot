@@ -233,7 +233,7 @@ Dat is eenvoudig! Zorg ervoor dat uw melding duidelijk is:
 • Beschrijf het probleem zo gedetailleerd mogelijk.  
 • Voegt u geen document toe, zet dan het documentformaat in het ticket op “geen bijlage”.  
 • Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.
-•  STEL HIER UW VRAAG:
+• Stel hier uw vraag:
 '''
         pdf_data = make_pdf(
             question=st.session_state.last_question,
