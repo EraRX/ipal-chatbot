@@ -99,6 +99,16 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
 
     story.append(Paragraph("Antwoord:", heading_style))
     for line in answer.split("\n")[1:]:
+    for line in answer.split("\n")[1:]:
+        line = line.strip()
+        if line.startswith("•") or line.startswith("-"):
+            bullets = ListFlowable(
+                [ListItem(Paragraph(line[1:].strip(), bullet_style))],
+                bulletType="bullet"
+            )
+            story.append(bullets)
+        elif line:
+            story.append(Paragraph(line, body_style))
         line = line.strip()
             bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
             story.append(bullets)
