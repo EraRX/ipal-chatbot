@@ -86,10 +86,6 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ]))
         story.append(logo_table)
 
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
-
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
