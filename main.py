@@ -128,7 +128,9 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Spacer(1, 6))
     story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.", body_style))
     story.append(Spacer(1, 6))
-    buffer.seek(0)
+    story.append(Paragraph("• Stel hier uw vraag:", body_style))
+    story.append(Spacer(1, 6))
+        buffer.seek(0)
     return buffer.getvalue()
 
 @st.cache_data
