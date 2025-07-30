@@ -166,6 +166,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         story.append(ListFlowable(
             items, bulletType="1", start='1',
             leftIndent=0, bulletIndent=0,
+            leftIndent=0,        # lijst begint helemaal links
+            bulletIndent=6,      # voeg 6 punten inspringing toe na het nummer
             bulletFontName=normal.fontName, bulletFontSize=11
         ))
     else:
