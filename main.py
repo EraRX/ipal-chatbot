@@ -72,10 +72,20 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333333"), spaceBefore=12, spaceAfter=6)
     bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
-    story = []
-    if os.path.exists("logo.png"):
-        story.append(Image("logo.png", width=124, height=52))
-        story.append(Spacer(1, 12))
+story = []
+
+if os.path.exists("logo.png"):
+    logo = Image("logo.png", width=124, height=52)
+    logo_table = Table([[logo]], colWidths=[124])
+    logo_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 0),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+        ('TOPPADDING', (0, 0), (-1, -1), 0),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+    ]))
+    story.append(logo_table)
 
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
