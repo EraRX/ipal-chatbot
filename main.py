@@ -97,7 +97,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
         story.append(Spacer(1, 12))
 
-        story.append(Paragraph("Antwoord:", heading_style))
+    story.append(Paragraph("Antwoord:", heading_style))
     for line in answer.split("\n")[1:]:
     for line in answer.split("\n")[1:]:
         line = line.strip()
