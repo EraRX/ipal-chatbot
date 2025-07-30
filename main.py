@@ -32,16 +32,16 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-st.set_page_config(page_title="IPAL Chatbox", layout="centered")
-st.markdown("""
-  <style>
-    html, body, [class*="css"] { font-size:20px; }
-    button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
-  </style>
-""", unsafe_allow_html=True)
+# Streamlit setup
+st.set_page_config(page_title='IPAL Chatbox', layout='centered')
+st.markdown(
+    '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
+    unsafe_allow_html=True
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# OpenAI config
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
@@ -60,25 +60,26 @@ def chatgpt(messages, temperature=0.3, max_tokens=800):
     )
     return resp.choices[0].message.content.strip()
 
+# Font registration
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
+# PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        leftMargin=2*cm, rightMargin=2*cm,
-        topMargin=2*cm, bottomMargin=2*cm
-    )
-
+    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
     body_style = ParagraphStyle("Body", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT)
     heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333333"), spaceBefore=12, spaceAfter=6)
     bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
     story = []
+
+    if os.path.exists("logo.png"):
+        story.append(Image("logo.png", width=124, height=52))
+        story.append(Spacer(1, 12))
 
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
@@ -100,6 +101,7 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
+# Load FAQ Excel
 @st.cache_data
 def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
@@ -114,11 +116,10 @@ def load_faq(path="faq.xlsx"):
     return df
 
 faq_df = load_faq()
-
 producten = ['Exact','DocBase']
 subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem']==p,'Subthema'].dropna().unique()) for p in producten}
-
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
+
 def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
