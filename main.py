@@ -2,7 +2,7 @@
 IPAL Chatbox voor oudere vrijwilligers
 - Python 3, Streamlit
 - Groot lettertype, eenvoudige bediening
-- Antwoorden uit FAQ aangevuld met AI voor specifieke modules
+- Antwoorden uit FAQ, Exact Online, DocBase, rkkerk.nl, rkk-online.nl, en AI
 - Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
 - Logging en foutafhandeling
 - Antwoorden downloaden als PDF
@@ -150,6 +150,45 @@ def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
+def fetch_bishop_info(loc: str):
+    bishops = {
+        "Utrecht": "Willem Jacobus Eijk",
+        "Groningen-Leeuwarden": "Ron van den Hout",
+        "Haarlem-Amsterdam": "Jan Hendriks",
+        "Roermond": "Hendrikus Smeets",
+        "Rotterdam": "Hans van den Hende",
+        "'s-Hertogenbosch": "Gerard de Korte",
+        "Breda": "Jan Liesen",
+        "Militair Ordinariaat": "Geen bisschop, geleid door een diocesaan administrator"
+    }
+    loc = loc.lower().replace(" ", "-").replace("’s-hertogenbosch", "'s-hertogenbosch")
+    for diocese, bishop in bishops.items():
+        if diocese.lower().replace(" ", "-") == loc:
+            return bishop
+    # Fallback to web scraping if not found
+    query = loc.replace("-", "+")
+    for url in [f"https://www.rkk-online.nl/?s={query}", f"https://www.rkkerk.nl/?s={query}"]:
+        try:
+            r = requests.get(url, timeout=10)
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, "html.parser")
+            for tag in ("h1", "h2", "h3"):
+                h = soup.find(tag, string=re.compile(r"bisschop", re.I))
+                if h:
+                    return h.text.split("–")[0].strip()
+        except Exception as e:
+            logging.info(f"Kon {url} niet ophalen: {e}")
+    return None
+
+def fetch_all_bishops_nl():
+    dioceses = ["Utrecht", "Groningen-Leeuwarden", "Haarlem-Amsterdam", "Roermond", "Rotterdam", "'s-Hertogenbosch", "Breda", "Militair Ordinariaat"]
+    result = {}
+    for d in dioceses:
+        name = fetch_bishop_info(d)
+        if name:
+            result[d] = name
+    return result
+
 def fetch_web_info(query: str):
     result = []
     
@@ -165,7 +204,7 @@ def fetch_web_info(query: str):
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
-        if text:
+        if text and query.lower() in text.lower():
             result.append(f"Vanuit docbase.nl: {text[:200]}... (verkort)")
     except Exception as e:
         logging.info(f"Kon docbase.nl niet ophalen: {e}")
@@ -176,43 +215,12 @@ def fetch_web_info(query: str):
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
-        if text:
+        if text and query.lower() in text.lower():
             result.append(f"Vanuit Exact Online Knowledge Base: {text[:200]}... (verkort)")
     except Exception as e:
         logging.info(f"Kon Exact Online Knowledge Base niet ophalen: {e}")
 
-    # Scrape rkk-online.nl
-    try:
-        r = requests.get(f"https://www.rkk-online.nl/?s={query.replace(' ', '+')}", timeout=10)
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
-        if text:
-            result.append(f"Vanuit rkk-online.nl: {text[:200]}... (verkort)")
-    except Exception as e:
-        logging.info(f"Kon rkk-online.nl niet ophalen: {e}")
-
-    # Scrape rkkerk.nl
-    try:
-        r = requests.get(f"https://www.rkkerk.nl/?s={query}", timeout=10)
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
-        if text:
-            result.append(f"Vanuit rkkerk.nl: {text[:200]}... (verkort)")
-    except Exception as e:
-        logging.info(f"Kon rkkerk.nl niet ophalen: {e}")
-
     return '\n'.join(result) if result else None
-
-def fetch_all_bishops_nl():
-    dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden","’s-Hertogenbosch","Roermond","Breda"]
-    result = {}
-    for d in dioceses:
-        info = fetch_web_info(d)
-        if info:
-            result[d] = info
-    return result
 
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role: str):
@@ -294,22 +302,22 @@ def main():
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
         loc = m.group(1).strip()
-        info = fetch_web_info(loc)
-        if info:
-            add_msg('assistant', f"Informatie over {loc}:\n{info}\n\n{AI_INFO}")
+        bishop = fetch_bishop_info(loc)
+        if bishop:
+            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
             st.rerun()
         else:
-            add_msg('assistant', f"Geen informatie gevonden voor {loc}.\n\n{AI_INFO}")
+            add_msg('assistant', f"Geen bisschop gevonden voor {loc}.\n\n{AI_INFO}")
             st.rerun()
 
-    if re.search(r'(?i)bisschoppen nederland', vraag):
-        all_info = fetch_all_bishops_nl()
-        if all_info:
-            lines = [f"Informatie voor {d}:\n{n}" for d,n in all_info.items()]
-            add_msg('assistant', "Informatie over Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
+    if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
+        all_bishops = fetch_all_bishops_nl()
+        if all_bishops:
+            lines = [f"Mgr. {name} – {diocese}" for diocese, name in all_bishops.items()]
+            add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
             st.rerun()
         else:
-            add_msg('assistant', "Geen informatie gevonden over Nederlandse bisdommen.\n\n{AI_INFO}")
+            add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
             st.rerun()
 
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
