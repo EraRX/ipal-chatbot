@@ -71,13 +71,16 @@ else:
 
 # AI-Antwoord Info
 AI_INFO = """
-**AI-Antwoord Info:**  
-**1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
-**2. Heeft u hulp nodig met DocBase of Exact?** Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
+AI-Antwoord Info:  
+1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
+2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
 """
 
 # PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str) -> bytes:
+    # Strip Markdown symbols (** and ###) from answer
+    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
+    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
@@ -313,7 +316,7 @@ def main():
     if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
         all_bishops = fetch_all_bishops_nl()
         if all_bishops:
-            lines = [f"Mgr. {name} – {diocese}" for diocese, name in all_bishops.items()]
+            lines = [f"Mgr. {name} - {diocese}" for diocese, name in all_bishops.items()]
             add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
             st.rerun()
         else:
@@ -349,6 +352,9 @@ def main():
                     {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
                     {'role':'user','content':vraag}
                 ])
+            # Strip Markdown from AI response
+            ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
+            ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
             add_msg('assistant', ai + f"\n\n{AI_INFO}")
         except Exception as e:
             logging.exception('AI-fallback mislukt')
