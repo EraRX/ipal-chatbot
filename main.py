@@ -7,7 +7,6 @@ IPAL Chatbox voor oudere vrijwilligers
 - Logging en foutafhandeling
 - Antwoorden downloaden als PDF
 """
-""", unsafe_allow_html=True)
 import os
 import re
 import logging
