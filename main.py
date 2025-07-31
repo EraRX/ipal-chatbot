@@ -247,6 +247,8 @@ def main():
         st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
     if not st.session_state.selected_product:
+        if os.path.exists("logo.png"):
+            st.image("logo.png", width=124)
         st.header('Welkom bij IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
