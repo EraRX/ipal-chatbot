@@ -1,9 +1,17 @@
+# Improvements applied:
+# - Fixed PDF generation: moved AI info paragraphs before doc.build()
+# - Added error handling and logging in chatgpt calls
+# - Simplified and clarified some code comments
+# - Used st.experimental_memo instead of deprecated st.cache_data for load_faq
+# - Added type hints where missing
+# - Minor style fixes for readability
 
 import os
 import re
 import logging
 import io
 from datetime import datetime
+from typing import Tuple, Optional, Dict
 
 import streamlit as st
 import pandas as pd
@@ -47,21 +55,24 @@ client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
-def chatgpt(messages, temperature=0.3, max_tokens=800):
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens
-    )
-    return resp.choices[0].message.content.strip()
+def chatgpt(messages: list, temperature: float = 0.3, max_tokens: int = 800) -> str:
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception as e:
+        logging.error(f"OpenAI API call failed: {e}")
+        raise
 
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
-# PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
@@ -100,8 +111,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         elif line:
             story.append(Paragraph(line, body_style))
 
-    doc.build(story)
-
+    # Add AI info paragraphs BEFORE building the document
+    story.append(Spacer(1, 12))
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", body_style))
     story.append(Spacer(1, 6))
     story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
@@ -128,11 +139,13 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Spacer(1, 6))
     story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.", body_style))
     story.append(Spacer(1, 6))
+
+    doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
 
-@st.cache_data
-def load_faq(path="faq.xlsx"):
+@st.experimental_memo(show_spinner=False)
+def load_faq(path: str = "faq.xlsx") -> pd.DataFrame:
     if not os.path.exists(path):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
@@ -149,38 +162,42 @@ producten = ['Exact','DocBase']
 subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem']==p,'Subthema'].dropna().unique()) for p in producten}
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
 
-def filter_topics(msg: str):
+def filter_topics(msg: str) -> Tuple[bool, str]:
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
-    return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
+    if found:
+        return False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}."
+    return True, ""
 
-def fetch_bishop_from_rkkerk(loc: str):
+def fetch_bishop_from_rkkerk(loc: str) -> Optional[str]:
     slug = loc.lower().replace(" ", "-")
     url = f"https://www.rkkerk.nl/bisdom-{slug}/"
     try:
-        r = requests.get(url, timeout=10); r.raise_for_status()
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         h1 = soup.find("h1")
         if h1 and "bisschop" in h1.text.lower():
             return h1.text.split("—")[0].strip()
-    except:
-        pass
+    except Exception as e:
+        logging.debug(f"fetch_bishop_from_rkkerk failed for {loc}: {e}")
     return None
 
-def fetch_bishop_from_rkk_online(loc: str):
+def fetch_bishop_from_rkk_online(loc: str) -> Optional[str]:
     query = loc.replace(" ", "+")
     url = f"https://www.rkk-online.nl/?s={query}"
     try:
-        r = requests.get(url, timeout=10); r.raise_for_status()
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for tag in ("h1","h2","h3"):
             h = soup.find(tag, string=re.compile(r"bisschop", re.I))
             if h:
                 return h.text.split("–")[0].strip()
-    except:
-        pass
+    except Exception as e:
+        logging.debug(f"fetch_bishop_from_rkk_online failed for {loc}: {e}")
     return None
 
-def fetch_all_bishops_nl():
+def fetch_all_bishops_nl() -> Dict[str, str]:
     dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden","’s-Hertogenbosch","Roermond","Breda"]
     result = {}
     for d in dioceses:
@@ -192,15 +209,20 @@ def fetch_all_bishops_nl():
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role: str):
     path = AVATARS.get(role)
-    return PILImage.open(path).resize((64,64)) if path and os.path.exists(path) else "🙂"
+    if path and os.path.exists(path):
+        try:
+            return PILImage.open(path).resize((64,64))
+        except Exception as e:
+            logging.debug(f"Failed to load avatar {path}: {e}")
+    return "🙂"
 
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
-def add_msg(role: str, content: str):
+def add_msg(role: str, content: str) -> None:
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
     st.session_state.history = (st.session_state.history + [{'role':role,'content':content,'time':ts}])[-MAX_HISTORY:]
 
-def render_chat():
+def render_chat() -> None:
     for m in st.session_state.history:
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
 
@@ -213,10 +235,12 @@ if 'history' not in st.session_state:
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         st.session_state.clear()
-        st.rerun()
+        st.experimental_rerun()
 
     if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
-        st.session_state.history[-1]['content'] += '''
+        # Append AI-Antwoord Info only once
+        if "**AI-Antwoord Info:**" not in st.session_state.history[-1]['content']:
+            st.session_state.history[-1]['content'] += '''
 
 **AI-Antwoord Info:**  
 **1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
@@ -237,16 +261,16 @@ Stel hieronder uw vraag:
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product='Exact'
             add_msg('assistant','Gekozen: Exact')
-            st.rerun()
+            st.experimental_rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product='DocBase'
             add_msg('assistant','Gekozen: DocBase')
-            st.rerun()
+            st.experimental_rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product='Algemeen'
             st.session_state.selected_module='alles'
             add_msg('assistant','Gekozen: Algemeen')
-            st.rerun()
+            st.experimental_rerun()
         render_chat()
         return
 
@@ -256,7 +280,7 @@ Stel hieronder uw vraag:
         if sel!='(Kies)':
             st.session_state.selected_module=sel
             add_msg('assistant',f'Gekozen: {sel}')
-            st.rerun()
+            st.experimental_rerun()
         render_chat()
         return
 
@@ -271,7 +295,7 @@ Stel hieronder uw vraag:
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.rerun()
+        st.experimental_rerun()
 
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
@@ -279,14 +303,14 @@ Stel hieronder uw vraag:
         bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
         if bishop:
             add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.")
-            st.rerun()
+            st.experimental_rerun()
 
     if re.search(r'(?i)bisschoppen nederland', vraag):
         allb = fetch_all_bishops_nl()
         if allb:
             lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
             add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
-            st.rerun()
+            st.experimental_rerun()
 
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
     if not dfm.empty:
@@ -297,12 +321,12 @@ Stel hieronder uw vraag:
                 {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
                 {'role':'user','content':ans}
             ], temperature=0.2)
-        except:
-            pass
+        except Exception as e:
+            logging.warning(f"ChatGPT rewrite failed: {e}")
         if isinstance(row['Afbeelding'], str) and os.path.exists(row['Afbeelding']):
             st.image(PILImage.open(row['Afbeelding']), caption='Voorbeeld', use_column_width=True)
         add_msg('assistant', ans)
-        st.rerun()
+        st.experimental_rerun()
 
     with st.spinner('ChatGPT even aan het werk…'):
         try:
@@ -314,7 +338,7 @@ Stel hieronder uw vraag:
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-    st.rerun()
+    st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
