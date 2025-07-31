@@ -1,4 +1,12 @@
-
+"""
+IPAL Chatbox voor oudere vrijwilligers
+- Python 3, Streamlit
+- Groot lettertype, eenvoudige bediening
+- Antwoorden uit FAQ aangevuld met AI voor specifieke modules
+- Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
+- Logging en foutafhandeling
+- Antwoorden downloaden als PDF
+"""
 import os
 import re
 import logging
@@ -61,8 +69,15 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
+# AI-Antwoord Info
+AI_INFO = """
+**AI-Antwoord Info:**  
+**1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
+**2. Heeft u hulp nodig met DocBase of Exact?** Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
+"""
+
 # PDF generation with chat-style layout and logo top-left
-def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
+def make_pdf(question: str, answer: str) -> bytes:
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
@@ -84,26 +99,33 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
         ]))
         story.append(logo_table)
 
+    story.append(Paragraph(f"Vraag: {question}", heading_style))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph("Antwoord:", heading_style))
     avatar_path = "aichatbox.jpg"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
         story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
         story.append(Spacer(1, 12))
+        for line in answer.split("\n")[1:]:
+            line = line.strip()
+            if line.startswith("•") or line.startswith("-"):
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+                story.append(bullets)
+            elif line:
+                story.append(Paragraph(line, body_style))
+    else:
+        for line in answer.split("\n"):
+            line = line.strip()
+            if line.startswith("•") or line.startswith("-"):
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+                story.append(bullets)
+            elif line:
+                story.append(Paragraph(line, body_style))
 
-    story.append(Paragraph("Antwoord:", heading_style))
-    for line in answer.split("\n")[1:]:
-        line = line.strip()
-        if line.startswith("•") or line.startswith("-"):
-            bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
-            story.append(bullets)
-        elif line:
-            story.append(Paragraph(line, body_style))
-
-    doc.build(story)
-
+    story.append(Spacer(1, 12))
     story.append(Paragraph("<b>AI-Antwoord Info:</b>", body_style))
-    story.append(Spacer(1, 6))
     story.append(Paragraph("<b>1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.</b> Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.", body_style))
     story.append(Spacer(1, 6))
     story.append(Paragraph("<b>2. Heeft u hulp nodig met DocBase of Exact?</b> Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.", body_style))
@@ -128,6 +150,8 @@ def make_pdf(question: str, answer: str, ai_info: str) -> bytes:
     story.append(Spacer(1, 6))
     story.append(Paragraph("• Geef uw telefoonnummer op waarop wij u kunnen bereiken, zodat de helpdesk contact met u kan opnemen.", body_style))
     story.append(Spacer(1, 6))
+
+    doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
 
@@ -216,18 +240,9 @@ def main():
         st.rerun()
 
     if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
-        st.session_state.history[-1]['content'] += '''
-
-**AI-Antwoord Info:**  
-**1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie.** Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
-**2. Heeft u hulp nodig met DocBase of Exact?** Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.  
-
-Stel hieronder uw vraag:
-'''
         pdf_data = make_pdf(
             question=st.session_state.last_question,
-            answer=st.session_state.history[-1]['content'],
-            ai_info=st.session_state.history[-1]['content']
+            answer=st.session_state.history[-1]['content']
         )
         st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
@@ -278,14 +293,14 @@ Stel hieronder uw vraag:
         loc = m.group(1).strip()
         bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
         if bishop:
-            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.")
+            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
             st.rerun()
 
     if re.search(r'(?i)bisschoppen nederland', vraag):
         allb = fetch_all_bishops_nl()
         if allb:
             lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-            add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines))
+            add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
             st.rerun()
 
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
@@ -301,7 +316,7 @@ Stel hieronder uw vraag:
             pass
         if isinstance(row['Afbeelding'], str) and os.path.exists(row['Afbeelding']):
             st.image(PILImage.open(row['Afbeelding']), caption='Voorbeeld', use_column_width=True)
-        add_msg('assistant', ans)
+        add_msg('assistant', ans + f"\n\n{AI_INFO}")
         st.rerun()
 
     with st.spinner('ChatGPT even aan het werk…'):
@@ -310,7 +325,7 @@ Stel hieronder uw vraag:
                 {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
                 {'role':'user','content':vraag}
             ])
-            add_msg('assistant', ai)
+            add_msg('assistant', ai + f"\n\n{AI_INFO}")
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
