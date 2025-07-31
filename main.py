@@ -150,40 +150,68 @@ def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-def fetch_bishop_from_rkkerk(loc: str):
-    slug = loc.lower().replace(" ", "-")
-    url = f"https://www.rkkerk.nl/bisdom-{slug}/"
-    try:
-        r = requests.get(url, timeout=10); r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        h1 = soup.find("h1")
-        if h1 and "bisschop" in h1.text.lower():
-            return h1.text.split("—")[0].strip()
-    except:
-        pass
-    return None
+def fetch_web_info(query: str):
+    result = []
+    
+    # Check faq.xlsx
+    dfm = faq_df[faq_df['combined'].str.contains(re.escape(query), case=False, na=False)]
+    if not dfm.empty:
+        row = dfm.iloc[0]
+        result.append(f"Vanuit FAQ ({row['Systeem']} - {row['Subthema']}): {row['Antwoord']}")
 
-def fetch_bishop_from_rkk_online(loc: str):
-    query = loc.replace(" ", "+")
-    url = f"https://www.rkk-online.nl/?s={query}"
+    # Scrape docbase.nl
     try:
-        r = requests.get(url, timeout=10); r.raise_for_status()
+        r = requests.get("https://docbase.nl", timeout=10)
+        r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        for tag in ("h1","h2","h3"):
-            h = soup.find(tag, string=re.compile(r"bisschop", re.I))
-            if h:
-                return h.text.split("–")[0].strip()
-    except:
-        pass
-    return None
+        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
+        if text:
+            result.append(f"Vanuit docbase.nl: {text[:200]}... (verkort)")
+    except Exception as e:
+        logging.info(f"Kon docbase.nl niet ophalen: {e}")
+
+    # Scrape support.exactonline.com
+    try:
+        r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
+        if text:
+            result.append(f"Vanuit Exact Online Knowledge Base: {text[:200]}... (verkort)")
+    except Exception as e:
+        logging.info(f"Kon Exact Online Knowledge Base niet ophalen: {e}")
+
+    # Scrape rkk-online.nl
+    try:
+        r = requests.get(f"https://www.rkk-online.nl/?s={query.replace(' ', '+')}", timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
+        if text:
+            result.append(f"Vanuit rkk-online.nl: {text[:200]}... (verkort)")
+    except Exception as e:
+        logging.info(f"Kon rkk-online.nl niet ophalen: {e}")
+
+    # Scrape rkkerk.nl
+    try:
+        r = requests.get(f"https://www.rkkerk.nl/?s={query}", timeout=10)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
+        if text:
+            result.append(f"Vanuit rkkerk.nl: {text[:200]}... (verkort)")
+    except Exception as e:
+        logging.info(f"Kon rkkerk.nl niet ophalen: {e}")
+
+    return '\n'.join(result) if result else None
 
 def fetch_all_bishops_nl():
     dioceses = ["Utrecht","Haarlem-Amsterdam","Rotterdam","Groningen-Leeuwarden","’s-Hertogenbosch","Roermond","Breda"]
     result = {}
     for d in dioceses:
-        name = fetch_bishop_from_rkkerk(d) or fetch_bishop_from_rkk_online(d)
-        if name:
-            result[d] = name
+        info = fetch_web_info(d)
+        if info:
+            result[d] = info
     return result
 
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
@@ -266,16 +294,22 @@ def main():
     m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
     if m:
         loc = m.group(1).strip()
-        bishop = fetch_bishop_from_rkkerk(loc) or fetch_bishop_from_rkk_online(loc)
-        if bishop:
-            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
+        info = fetch_web_info(loc)
+        if info:
+            add_msg('assistant', f"Informatie over {loc}:\n{info}\n\n{AI_INFO}")
+            st.rerun()
+        else:
+            add_msg('assistant', f"Geen informatie gevonden voor {loc}.\n\n{AI_INFO}")
             st.rerun()
 
     if re.search(r'(?i)bisschoppen nederland', vraag):
-        allb = fetch_all_bishops_nl()
-        if allb:
-            lines = [f"Mgr. {n} – Bisschop van {d}" for d,n in allb.items()]
-            add_msg('assistant', "Huidige Nederlandse bisschoppen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
+        all_info = fetch_all_bishops_nl()
+        if all_info:
+            lines = [f"Informatie voor {d}:\n{n}" for d,n in all_info.items()]
+            add_msg('assistant', "Informatie over Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
+            st.rerun()
+        else:
+            add_msg('assistant', "Geen informatie gevonden over Nederlandse bisdommen.\n\n{AI_INFO}")
             st.rerun()
 
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
@@ -296,10 +330,17 @@ def main():
 
     with st.spinner('ChatGPT even aan het werk…'):
         try:
-            ai = chatgpt([
-                {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
-                {'role':'user','content':vraag}
-            ])
+            web_info = fetch_web_info(vraag)
+            if web_info:
+                ai = chatgpt([
+                    {'role':'system','content':'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
+                    {'role':'user','content':vraag}
+                ])
+            else:
+                ai = chatgpt([
+                    {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
+                    {'role':'user','content':vraag}
+                ])
             add_msg('assistant', ai + f"\n\n{AI_INFO}")
         except Exception as e:
             logging.exception('AI-fallback mislukt')
