@@ -351,14 +351,13 @@ antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, 
 if antwoord:
     try:
         antwoord = chatgpt([
-            {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
-            {'role':'user','content':antwoord}
+            {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
+            {'role': 'user', 'content': antwoord}
         ], temperature=0.2)
     except:
         pass
     add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
     st.rerun()
-
         try:
             ans = chatgpt([
                 {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
@@ -395,5 +394,6 @@ if antwoord:
 
 if __name__ == '__main__':
     main()
+
 
 
