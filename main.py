@@ -137,7 +137,10 @@ def load_faq(path="faq.csv"):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=['Systeem','Subthema','Omschrijving melding','Toelichting melding','Antwoord of oplossing','Afbeelding'])
-    df = pd.read_csv(path, encoding="utf-8", sep=";")
+    try:
+        df = pd.read_csv(path, encoding="utf-8", sep=";")
+    except UnicodeDecodeError:
+        df = pd.read_csv(path, encoding="windows-1252", sep=";")
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
@@ -363,3 +366,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
