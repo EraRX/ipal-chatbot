@@ -312,6 +312,18 @@ def main():
         render_chat()
         return
 
+def vind_best_passend_antwoord(vraag, systeem, subthema):
+    df = faq_df.copy()
+    if systeem and systeem != 'alles':
+        df = df[df['Systeem'].str.lower() == systeem.lower()]
+    if subthema and subthema != 'alles':
+        df = df[df['Subthema'].str.lower() == subthema.lower()]
+    df = df[df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
+    if df.empty:
+        return None
+    row = df.iloc[0]
+    return row['Antwoord']
+
     render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
@@ -384,6 +396,7 @@ if antwoord:
 
 if __name__ == '__main__':
     main()
+
 
 
 
