@@ -358,17 +358,7 @@ if antwoord:
         pass
     add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
     st.rerun()
-        try:
-            ans = chatgpt([
-                {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
-                {'role':'user','content':ans}
-            ], temperature=0.2)
-        except:
-            pass
-        if isinstance(row['Afbeelding'], str) and os.path.exists(row['Afbeelding']):
-            st.image(PILImage.open(row['Afbeelding']), caption='Voorbeeld', use_column_width=True)
-        add_msg('assistant', ans + f"\n\n{AI_INFO}")
-        st.rerun()
+
 
     with st.spinner('ChatGPT even aan het werk…'):
         try:
@@ -394,6 +384,7 @@ if antwoord:
 
 if __name__ == '__main__':
     main()
+
 
 
 
