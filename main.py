@@ -324,12 +324,12 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
     row = df.iloc[0]
     return row['Antwoord']
 
-   def main():
+  def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         st.session_state.clear()
         st.rerun()
 
-    if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
+    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
         pdf_data = make_pdf(
             question=st.session_state.last_question,
             answer=st.session_state.history[-1]['content']
@@ -342,27 +342,27 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
         st.header('Welkom bij IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
-            st.session_state.selected_product='Exact'
-            add_msg('assistant','Gekozen: Exact')
+            st.session_state.selected_product = 'Exact'
+            add_msg('assistant', 'Gekozen: Exact')
             st.rerun()
         if c2.button('DocBase', use_container_width=True):
-            st.session_state.selected_product='DocBase'
-            add_msg('assistant','Gekozen: DocBase')
+            st.session_state.selected_product = 'DocBase'
+            add_msg('assistant', 'Gekozen: DocBase')
             st.rerun()
         if c3.button('Algemeen', use_container_width=True):
-            st.session_state.selected_product='Algemeen'
-            st.session_state.selected_module='alles'
-            add_msg('assistant','Gekozen: Algemeen')
+            st.session_state.selected_product = 'Algemeen'
+            st.session_state.selected_module = 'alles'
+            add_msg('assistant', 'Gekozen: Algemeen')
             st.rerun()
         render_chat()
         return
 
-    if st.session_state.selected_product in ['Exact','DocBase'] and not st.session_state.selected_module:
-        opts = subthema_dict.get(st.session_state.selected_product,[])
-        sel = st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
-        if sel!='(Kies)':
-            st.session_state.selected_module=sel
-            add_msg('assistant',f'Gekozen: {sel}')
+    if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
+        opts = subthema_dict.get(st.session_state.selected_product, [])
+        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
+        if sel != '(Kies)':
+            st.session_state.selected_module = sel
+            add_msg('assistant', f'Gekozen: {sel}')
             st.rerun()
         render_chat()
         return
@@ -419,14 +419,15 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
             web_info = fetch_web_info(vraag)
             if web_info:
                 ai = chatgpt([
-                    {'role':'system','content':'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
-                    {'role':'user','content':vraag}
+                    {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
+                    {'role': 'user', 'content': vraag}
                 ])
             else:
                 ai = chatgpt([
-                    {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
-                    {'role':'user','content':vraag}
+                    {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent.'},
+                    {'role': 'user', 'content': vraag}
                 ])
+            # Strip Markdown from AI response
             ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
             ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
             add_msg('assistant', ai + f"\n\n{AI_INFO}")
