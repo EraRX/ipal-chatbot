@@ -1303,3 +1303,140 @@ de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op ‘’
 kunnen gewijzigd worden door op het selectievak te klikken en vervolgens op wijzigen. Ten slotte is
 het mogelijk om correspondentie te verwijderen door de gewenste correspondentie te selecteren en
 onder “overige functies” op “verwijderen” te klikken.";
+8935;DocBase;Begraafplaatsadministratie;Graven en begravingen;1. Graven en begravingen op een graf;Video uitleg over graven en begravingen;Video uitleg;"1. Graven en begravingen op een graf
+In deze video wordt uitgelegd hoe u bij een graf kan zien wie er allemaal binnen dit graf zijn begraven.
+Omdat er in een graf meerdere begravingen verricht kunnen worden, maakt Docbase een onderscheid tussen de typen “Grafbeheer” en “Begravingen”.
+Klik allereerst op “Grafbeheer”. U bevindt zich nu op het overzicht van alle graven binnen uw parochie. Klik op “Zoek & Vind“ om de gegevens van een specifiek graf op te zoeken en te bekijken.
+Zoek naar het grafnummer dat u wilt inzien en klik op “Vind nu”.";
+8935;DocBase;Begraafplaatsadministratie;Rechthebbende;2. Rechthebbende;Video uitleg over rechthebbende;Video uitleg;"2. Rechthebbende
+In deze video worden begravingen en rechthebbende uitgelegd.
+Zodra er een graf is gekozen voor een aankomende begraving, dan is het van belang dat er eerst via de sjabloonapplicatie een grafakte wordt gemaakt. Wanneer u een grafakte maakt, dan selecteert u het bijbehorende graf. Hierdoor wordt er automatisch een grafaktenummer bij een graf gegenereerd. Zie hiervoor de video over de grafakte.
+Vul nadat u het graf selecteert de rechthebbende in, dit kan een persoon of organisatie zijn.
+Wanneer de rechthebbende een persoon is dan kunt u deze persoon eenvoudig administreren wanneer hij of zij lid is van uw parochie.
+Door middel van de tab-zoekfunctie is het mogelijk om in het ledenbestand van de parochie te zoeken.
+Stel de rechthebbende is de heer Jansen.
+Vul Jansen in het veld Achternaam in. Klik vervolgens op de tabtoets.
+U ziet de resultaten van uw zoekopdracht staan. Dit zijn alle personen met Jansen die in uw parochie wonen. Selecteer de juiste naam en klik op ok.
+Daarnaast is het ook mogelijk om via het vergrootglas de gegevens van een persoon op te zoeken.
+Via deze zoekmethode is het mogelijk om op verschillende persoonsgegevens te filteren, waardoor het mogelijk is om een persoon zodanig uniek te specificeren dat uit het gehele ledenbestand van alle parochies slechts één resultaat mogelijk is.
+Wanneer u een dergelijk uniek zoekresultaat kunt samenstellen, krijgt u toegang tot de gegevens van deze persoon. Zie voor meer informatie hierover de “zoeken; uniek resultaat”.
+Wanneer de rechthebbende niet in het lendenbestand van de RKK voorkomt, vul de lege velden dan handmatig in. Stuur vervolgens een notificatie naar de ledenadministratie om de persoon in kwestie als lokale relatie in het ledenbestand van de parochie op te nemen.
+Voeg een beschrijving toe. Selecteer leden admin bij taak voor. En selecteer grafadmin om terugkoppeling te krijgen.
+Wanneer de ledenadministratie de rechthebbende als lokaal lid heeft aangemaakt, dan moet dit lokale lid nog wel als rechthebbende gekoppeld worden aan het graf.
+Ga naar de grafkaart, klik op wijzigen en vul het rechthebbende DocBase-ID in.";
+8935;DocBase;Begraafplaatsadministratie;Belanghebbende lidstatus;3. Belanghebbende lidstatus;Video uitleg over belanghebbenden;Video uitleg;"3. Belanghebbende lidstatus
+Belanghebbenden
+Naast rechthebbende, kan het zijn dat er meerdere personen met een begraving op een graf zijn verbonden. Deze personen kunt u aan het grafkoppelen als “belanghebbende”.
+Om een belanghebbende op een graf toe te voegen gaat u naar het graf waarbij u een belanghebbende wilt toevoegen.
+Wanneer u naar de grafbeheerkaart van een graf gaat, klik dan op het tabblad belanghebbenden
+Let op
+Het is zeer gewenst om naast een rechthebbende ook belanghebbenden te administreren. Wanneer de rechthebbende komt te overlijden dan kunt u contact opnemen met de belanghebbenden. Op de grafkaart staat de relatiestatus van de belanghebbende.";
+8935;DocBase;Begraafplaatsadministratie;Belanghebbende toevoegen;4. Belanghebbende toevoegen;Video uitleg over belanghebbende toevoegen;Video uitleg;"4. Belanghebbende toevoegen
+Om een belanghebbende bij een graf toe te voegen, gaat u naar het graf waarbij u een belanghebbende wilt toevoegen.
+Wanneer u naar de grafbeheerkaart van een graf gaat, dan gaat u naar het tabblad Belanghebbenden.
+Klik op nieuw. Klik vervolgens op het vergrootglas naast RKK-Lid.
+Vul de gegevens in van het lid of de organisatie die u wilt toevoegen.
+Selecteer vervolgens de gewenste relatie en klik op ok.
+Deze manier van toevoegen geldt alleen voor relaties die al binnen DocBase staan. Voor belanghebbende die lid zijn binnen uw parochie, kunt u eenvoudig op naam zoeken waarna er een overzicht van resultaten verschijnt. Als de belanghebbende geen lid is in uw parochie, maar wel in het totale ledenbestand van de RKK staat, dan kunt u deze persoon alsnog opzoeken.
+Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts één uniek resultaat oplevert in de gehele ledenadministratie van de RKK, dan krijgt u toegang tot de gegevens van deze persoon.
+Wanneer u bijvoorbeeld de precieze naam, geboortedatum, postcode en huisnummer heeft, dan kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar één relatie in de totale ledenadministratie van de RKK aan die zoekvraag voldoet. In die situatie krijgt u toegang, ook wel leesrechten genoemd, tot de ledenkaart van de desbetreffende persoon.
+Bekijk voor meer informatie de video’s die het zoeken binnen DocBase behandelen.
+Het kan ook voorkomen dat een belanghebbende geen lid is van de Kerk. U moet dan de ledenadministratie notificeren. De ledenadministratie kan vervolgens de betreffende persoon als lokale relatie in DocBase administreren. U kunt deze persoon vervolgens als belanghebbende toevoegen.
+Wanneer u de juiste persoon heeft gevonden, selecteer deze dan en klik op ok. U heeft nu een belanghebbende toegevoegd.
+Onder relaties, staat een overzicht van alle belanghebbende. Via de zoek en vind functie kunt u zoeken binnen het overzicht van alle belanghebbende.";
+8935;DocBase;Begraafplaatsadministratie;Begraafplaatsen, grafstatus en graven;5. Begraafplaatsen, grafstatus en graven;Video uitleg over begraafplaatsen en grafstatus;Video uitleg;"5. Begraafplaatsen, grafstatus en graven
+Binnen deze video worden kort begraafplaatsen, hyperlinks, grafstatus en graven uitgelegd.
+Binnen DocBase kunt u als grafbeheerder de verschillende begraafplaatsen binnen uw parochie zien.
+Onder Relaties klikt u op het type begraafplaatsen.
+Hier staat het overzicht van alle begraafplaatsen binnen uw parochie.
+In de tweede kolom staat elke begraafplaatsnaam blauw en onderstreept, dit geeft de hyperlink functie aan.
+Klik vervolgens op de hyperlink. In deze video wordt de begraafplaats Velp als voorbeeld gebruikt. De begraafplaats wordt nu geopend met de tab “Alle graven” actief. Hier staan alle graven op deze begraafplaats.
+U bevindt zich nu binnen een overzicht van alle graven op de desbetreffende begraafplaats.
+In dit overzicht staat een aantal tabbladen: vrije graven, te ruimen graven, graven in reparatie en expiratiedatum minder dan een jaar.
+Elk tabblad geeft u een overzicht van graven met specifieke kenmerken.
+Belangrijk
+Het tabblad ‘’expiratiedatum minder dan een jaar’’ is van groot belang. Bij deze graven moet dit jaar actie ondernomen worden. Het grafrecht kan worden verlengd of het graf kan worden geruimd.
+Wanneer u als Begraafplaatsadministrateur meerdere begraafplaatsen onder uw hoede heeft, dan kan het zijn dat u een overzicht van alle graven die een expiratiedatum van binnen één jaar van alle begraafplaatsen wilt hebben. U moet hiervoor een zoekopdracht samenstellen.
+5.1. Een voorbeeld
+Klik onder relaties op het type grafbeheer.
+Klik vervolgens op Zoek en vind.
+Onderaan staat expiratiedatum grafrecht staan.
+Vul in het vak waar nu een = teken staat “Tussen“ in. Vul de huidige datum en de laatste datum van het jaar in. Deze video is op 28 mei gemaakt. De laatste datum van 2018 is 31-12-2018.
+Klik vervolgens op “Vind nu”.
+Er staat nu een overzicht van alle graven waarvan de expiratiedatum binnen het huidige jaar is.
+Klik vervolgens onder “Overige functies” op “Opslaan zoekopdracht”.
+Geef de zoekopdracht vervolgens een omschrijving en vul bij het veld “Bericht” het e-mailadres in waarop u automatisch berichten van deze zoekopdracht wilt ontvangen. Kies vervolgens of u op de hoogte wilt worden gehouden van nieuwe items in de zoekresultaten, van gewijzigde zoekresultaten of van beide. Klik hiervoor de juiste keuzevelden aan. Wanneer er geen e-mailadres wordt ingevuld, wordt u niet automatisch per e-mail op de hoogte gehouden. Druk op Ok. De zoekopdracht is nu opgeslagen.
+Binnen mijn werkplek onder mijn zoekopdrachten staat nu een directe link naar deze zoekopdracht en daarmee een overzicht van alle graven waarvan de expiratiedatum dit jaar is.
+Ga nu terug naar het gravenoverzicht van Velp.
+De hyperlinks binnen dit overzicht sturen u door naar de details van het desbetreffende graf.
+Binnen dit overzicht staan de gebruiksstatus en onderhoudsstatus van elk graf duidelijk aangegeven.
+Verder ziet u dat de status van onderhoud van graven “Goed”, “nvt” of “In reparatie” kan zijn.
+In deze video zijn een aantal overzichten binnen de rol “Begraafplaatsbeheerder” getoond.";
+8935;DocBase;Begraafplaatsadministratie;Betrokken organisaties;6. Betrokken organisaties;Video uitleg over betrokken organisaties;Video uitleg;"6. Betrokken organisaties
+In deze video worden de functie betrokken organisaties uitgelegd.
+Het kan voorkomen dat bij een graf verschillende organisaties betrokken zijn. Voorbeelden hiervan zijn begrafenisondernemers, grafdelvers, en steenhouwers. Ook kan het voorkomen dat er bij een begraving verschillende organisaties zijn betrokken. Denk hierbij aan uitvaartorganisaties en bloemisten.
+Deze organisaties kunnen bij een graf worden geadministreerd.
+Klik onder ‘’relaties’’ op het type ‘’Graf- en begravingsorganisaties’’. Hier staat een overzicht van alle organisaties.
+Belangrijk.
+Wanneer u een betrokken organisatie aan een graf wilt toevoegen, dan kunt u alleen uit organisaties kiezen die in deze lijst staan. Om een organisatie aan een graf toe te voegen die nog niet in deze lijst staat, dient u eerst de organisatie toe te voegen.
+6.1. Een Voorbeeld
+U wilt een steenhouwer als nieuwe organisatie toevoegen. Klik allereerst op nieuw.
+Vul de gegevens in van de betreffende steenhouwer en klik op ‘’ok’’. De steenhouwer staat nu in het overzicht.
+6.2. Een betrokken organisatie op een graf toevoegen
+Ga onder ‘’Relaties’’ naar ‘’Grafbeheer’’. Klik vervolgens op het betreffende grafnummer om naar de grafdetailkaart van dit graf te gaan.
+Klik binnen het grafoverzicht op het tabblad betrokken organisaties. Klik vervolgens op ‘’nieuw’’.
+Vul bij organisatienaam Rotsvast Steenhouwers in. Druk op tab.
+Docbase vult in een keer alle gegevens van de steenhouwer in.
+Ook is het mogelijk om te zoeken met het vergrootglas. Door niks in te vullen en op “vind nu” te klikken, krijgt u het totaaloverzicht van de betrokken organisaties. Kies de gewenste organisatie en klik op ok.
+Let op
+U heeft nu een betrokken organisatie aan een graf toegevoegd. Het is ook mogelijk om een betrokken organisatie op een begraving toe te voegen.";
+8935;DocBase;Begraafplaatsadministratie;Aanverwante informatie - Documenten;7. Aanverwante informatie - Documenten;Video uitleg over documenten;Video uitleg;"7. Aanverwante informatie - Documenten
+Binnen deze video wordt het tabblad documenten uitgelegd binnen een begraving.
+Binnen een graf ziet u het tabblad documenten.
+Binnen het tabblad documenten staat een overzicht van alle documenten verbonden aan het graf.
+Om een nieuw document toe te voegen, klik op nieuw.
+Voeg een bestand toe specificeer het bestand. Specificeer het bestand. De velden met het sterretje zijn verplicht.
+Voeg verdere informatie waar nodig.
+Klik op OK.
+Wanneer het graf wordt geruimd, zijn de documenten en begravingen onder de historie tabbladen te vinden.
+Let op!
+Bij het ruimen van een graf is het van belang om:
+- Het grafaktenummer te verwijderen.
+- De gebruiksstatus op “te ruimen” te zetten.
+Bij het weghalen van het grafaktenummer worden de oude documenten en begravingen automatisch verplaatst naar de historie tabbladen.
+Om een wijziging door te voeren is het niet noodzakelijk om de status naar ""In behandeling"" te zetten. Dit is alleen van belang wanneer u een wijziging niet nu gaat doorvoeren omdat de wijziging niet afkomt waardoor u er later mee verder wilt gaan. Door de wijziging in behandeling te zetten, is het gemakkelijk in de gaten te houden welke wijzigingen nog aandacht vergen.
+Tekst video’s Begraafplaatsadministratie bladzijde 9 van 10
+De voorkeursparochie kan altijd de gegevens inzien, ongeacht of er verhuisd is of niet.
+Dit zodat uw parochie met het betreffende lid in contact kan blijven.";
+8935;DocBase;Begraafplaatsadministratie;Correspondentie inzien, maken, wijzigen en verwijderen;8. Correspondentie inzien, maken, wijzigen en verwijderen;Video uitleg over correspondentie;Video uitleg;"8. Correspondentie inzien, maken, wijzigen en verwijderen
+In deze video wordt uitgelegd hoe het inzien, maken, wijzigen en verwijderen van correspondentie in DocBase werkt.
+In DocBase zijn er twee manieren om de correspondentie binnen uw parochie in te zien. Via “Documenten” of via de “ledenkaart” van een relatie. Vooral met betrekking tot een rechthebbende of belanghebbende is het bijhouden en aanmaken van correspondentie noodzakelijk.
+8.1. Inzien Correspondentie
+8.1.1. Manier 1: via documenten
+Klik onder “Documenten” op “Correspondentie”
+Hier treft u een overzicht aan van alle correspondentie binnen uw parochie. Binnen dit type is het vaak praktisch de ‘’zoek & vind’’ functie te gebruiken. Zie voor meer informatie over de zoek&vind functie de video ‘’Zoeken - eenvoudig en uitgebreid zoeken’’.
+8.1.2. Manier 2: via de Grafkaart
+Ga onder ‘’relaties’’ naar ‘’grafbeheer’’. Selecteer het graf waarvan u de correspondentie wilt inzien.
+Als het om correspondentie gaat die over het graf in zijn algemeenheid gaat, is dit te vinden onder het tabblad “documenten” of bij een vorige begraving onder “documenten historie”.
+8.1.3. Manier 3: via de ledenkaart
+Als u correspondentie specifiek bij de rechthebbende - en dus niet bij het hele graf - wil inzien, klik dan op de grafkaart op de “hyperlink” naast “Rechthebbende DocBase-ID”. Onder het tabblad “Correspondentie” is de correspondentie in te zien.
+Daarnaast kunt u correspondentie aanmerken als mijn favoriet. Ook kunt u een notificatie op een document toevoegen. Kijk hiervoor de video’s “Algemeen; Mijn werkplek favorieten” en “Algemeen; mijn werkplek - mijn notificaties”
+8.2. Nieuwe correspondentie aanmaken
+Het kan zijn dat u correspondentie met de rechthebbende van een graf wilt toevoegen.
+Ga hiervoor naar de ledenkaart van de rechthebbende en klik vervolgens op het tabblad “Correspondentie”.
+Klik binnen het tabblad op “nieuw” voor het toevoegen van nieuwe correspondentie. Klik vervolgens op het “Map icoon”. Voeg daarna het gewenste document toe.
+DocBase vult automatisch het documentformaat, de versie status en de omschrijving in.
+Vul de overige gegevens in en wijzig de automatisch ingevulde gegevens indien nodig. Klik vervolgens op “ok”.
+Tekst video’s Begraafplaatsadministratie bladzijde 10 van 10
+De correspondentie verschijnt nu zowel binnen de ledenkaart van de relatie als onder “Documenten” bij het type “Correspondentie”.
+Let op
+Correspondentie met een rechthebbende verschijnt niet onder het tabblad “documenten” van een graf.
+8.3. Wijzigen correspondentie
+Indien u ziet dat er iets veranderd moet worden aan het document, klik dan op het “selectievak” naast het te wijzigen document.
+Klik vervolgens op wijzigen. Nu is het mogelijk de gegevens binnen de correspondentie te wijzigen of extra bestanden toe te voegen. Klik na de wijzigingen op ‘’Ok’’.
+8.4. Verwijderen correspondentie
+Selecteer hiervoor de gewenste correspondentie door op het selectievak te klikken. Klik daarna op “overige functies” en op “verwijderen”. Voltooi de handeling door op “ja” te drukken.
+Let op
+Wanneer u een bestand verwijdert, is dit bestand ook écht verwijderd. Er is dus geen prullenbak waaruit de bestanden kunnen worden hersteld.
+8.5. Een resumé
+In deze video werd uitgelegd hoe correspondentie kan worden ingezien, gemaakt en gewijzigd binnen Docbase. Binnen Docbase is het mogelijk om via het type “Documenten” bij “Correspondentie” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u bestanden inzien via de grafkaart van een graf. Daarnaast is het mogelijk via de ledenkaart van bijvoorbeeld een rechthebbende correspondentie in te zien. Correspondentie wordt toegevoegd via de Ledenkaart. Bij het toevoegen van een bestand voert Docbase automatisch het documentformaat, de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op ‘’ok’’. Deze bestanden kunnen gewijzigd worden door op het selectievak te klikken en vervolgens op wijzigen. Ten slotte is het mogelijk om correspondentie te verwijderen door de gewenste correspondentie te selecteren en onder “overige functies” op “verwijderen” te klikken.";
