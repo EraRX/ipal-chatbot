@@ -320,7 +320,7 @@ def main():
     if not vraag:
         return
 
-    # Controleer eerst op het unieke codewoord
+    # Controle op uniek codewoord
     if vraag.strip().upper() == "UNIEKECODE123":
         antwoord = find_answer_by_codeword(faq_df, codeword="[UNIEKECODE123]")
         if antwoord:
@@ -339,7 +339,7 @@ def main():
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.rerun()
 
-    # Geen exacte match → ga door met reguliere logica
+    # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
     add_msg('user', vraag)
 
@@ -403,6 +403,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
