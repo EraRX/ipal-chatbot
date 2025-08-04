@@ -316,20 +316,17 @@ def main():
         return
 
     render_chat()
-vraag = st.chat_input('Stel uw vraag:')
-if not vraag:
-    return
+    vraag = st.chat_input('Stel uw vraag:')
+    if not vraag:
+        return
 
-# Hier toevoegen: check op codewoord
-if vraag.strip().upper() == "UNIEKECODE123":
-    antwoord = find_answer_by_codeword(faq_df, codeword="[UNIEKECODE123]")
-    if antwoord:
-        add_msg('user', vraag)
-        add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
-
-# Daarna ga je verder met je reguliere logica...
-
+    # Controleer eerst op het unieke codewoord
+    if vraag.strip().upper() == "UNIEKECODE123":
+        antwoord = find_answer_by_codeword(faq_df, codeword="[UNIEKECODE123]")
+        if antwoord:
+            add_msg('user', vraag)
+            add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
+            st.rerun()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -406,5 +403,6 @@ if vraag.strip().upper() == "UNIEKECODE123":
 
 if __name__ == '__main__':
     main()
+
 
 
