@@ -324,7 +324,13 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
     row = df.iloc[0]
     return row['Antwoord']
 
-  def main():
+  if 'history' not in st.session_state:
+    st.session_state.history = []
+    st.session_state.selected_product = None
+    st.session_state.selected_module = None
+    st.session_state.last_question = ''
+
+def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         st.session_state.clear()
         st.rerun()
@@ -386,20 +392,18 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
         bishop = fetch_bishop_info(loc)
         if bishop:
             add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
-            st.rerun()
         else:
             add_msg('assistant', f"Geen bisschop gevonden voor {loc}.\n\n{AI_INFO}")
-            st.rerun()
+        st.rerun()
 
     if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
         all_bishops = fetch_all_bishops_nl()
         if all_bishops:
             lines = [f"Mgr. {name} - {diocese}" for diocese, name in all_bishops.items()]
             add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
-            st.rerun()
         else:
             add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
-            st.rerun()
+        st.rerun()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -427,7 +431,6 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
                     {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent.'},
                     {'role': 'user', 'content': vraag}
                 ])
-            # Strip Markdown from AI response
             ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
             ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
             add_msg('assistant', ai + f"\n\n{AI_INFO}")
