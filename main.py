@@ -347,6 +347,14 @@ def main():
             add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
         st.rerun()
 
+# Exacte match op vraagkolom in faq_df
+exact_match = faq_df[faq_df["Omschrijving melding"].str.strip().str.lower() == vraag.strip().lower()]
+if not exact_match.empty:
+    antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
+    add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
+    st.rerun()
+
+    
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
     if antwoord:
@@ -383,3 +391,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
