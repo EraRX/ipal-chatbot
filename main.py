@@ -228,6 +228,26 @@ def fetch_web_info(query: str):
 
     return '\n'.join(result) if result else None
 
+def vind_best_passend_antwoord(vraag, systeem, subthema):
+    resultaten = faq_df[
+        (faq_df["Systeem"].str.lower() == systeem.lower()) &
+        (faq_df["Subthema"].str.lower() == subthema.lower())
+    ]
+    if resultaten.empty:
+        return None
+
+    vraag_lower = vraag.lower()
+    def score(tekst):
+        return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
+
+    resultaten["score"] = resultaten["combined"].apply(score)
+    resultaten = resultaten.sort_values("score", ascending=False)
+
+    beste = resultaten.iloc[0]
+    if beste["score"] > 0:
+        return beste["Antwoord of oplossing"]
+    return None
+
 AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
 def get_avatar(role: str):
     path = AVATARS.get(role)
@@ -326,10 +346,19 @@ def main():
             add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
             st.rerun()
 
-    dfm = faq_df[faq_df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
-    if not dfm.empty:
-        row = dfm.iloc[0]
-        ans = row['Antwoord']
+antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
+
+if antwoord:
+    try:
+        antwoord = chatgpt([
+            {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
+            {'role':'user','content':antwoord}
+        ], temperature=0.2)
+    except:
+        pass
+    add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
+    st.rerun()
+
         try:
             ans = chatgpt([
                 {'role':'system','content':'Herschrijf eenvoudig en vriendelijk.'},
@@ -366,4 +395,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
