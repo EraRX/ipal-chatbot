@@ -305,90 +305,93 @@ def main():
         render_chat()
         return
 
-    if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
-        opts = subthema_dict.get(st.session_state.selected_product, [])
-        sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
-        if sel != '(Kies)':
-            st.session_state.selected_module = sel
-            add_msg('assistant', f'Gekozen: {sel}')
-            st.rerun()
-        render_chat()
-        return
-
+if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
+    opts = subthema_dict.get(st.session_state.selected_product, [])
+    sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
+    if sel != '(Kies)':
+        st.session_state.selected_module = sel
+        add_msg('assistant', f'Gekozen: {sel}')
+        st.rerun()
     render_chat()
-    vraag = st.chat_input('Stel uw vraag:')
-    if not vraag:
-        return
+    return
 
-    st.session_state.last_question = vraag
-    add_msg('user', vraag)
+render_chat()
+vraag = st.chat_input('Stel uw vraag:')
+if not vraag:
+    return
 
-    ok, warn = filter_topics(vraag)
-    if not ok:
-        add_msg('assistant', warn)
-        st.rerun()
+# Exacte match op de vraag zoals die letterlijk in 'Omschrijving melding' staat
+vraag_normalized = vraag.strip().lower()
+faq_df["normalized"] = faq_df["Omschrijving melding"].str.strip().str.lower()
+exact_match = faq_df[faq_df["normalized"] == vraag_normalized]
 
-    m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
-    if m:
-        loc = m.group(1).strip()
-        bishop = fetch_bishop_info(loc)
-        if bishop:
-            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
-        else:
-            add_msg('assistant', f"Geen bisschop gevonden voor {loc}.\n\n{AI_INFO}")
-        st.rerun()
-
-    if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
-        all_bishops = fetch_all_bishops_nl()
-        if all_bishops:
-            lines = [f"Mgr. {name} - {diocese}" for diocese, name in all_bishops.items()]
-            add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
-        else:
-            add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
-        st.rerun()
-
-# Exacte match op vraagkolom in faq_df
-exact_match = faq_df[faq_df["Omschrijving melding"].str.strip().str.lower() == vraag.strip().lower()]
 if not exact_match.empty:
     antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
+    add_msg('user', vraag)
     add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
     st.rerun()
 
-    
-    antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
+# Geen exacte match, ga verder met reguliere verwerking
+st.session_state.last_question = vraag
+add_msg('user', vraag)
 
-    if antwoord:
-        try:
-            antwoord = chatgpt([
-                {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
-                {'role': 'user', 'content': antwoord}
-            ], temperature=0.2)
-        except:
-            pass
-        add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
+ok, warn = filter_topics(vraag)
+if not ok:
+    add_msg('assistant', warn)
+    st.rerun()
 
-    with st.spinner('ChatGPT even aan het werk…'):
-        try:
-            web_info = fetch_web_info(vraag)
-            if web_info:
-                ai = chatgpt([
-                    {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
-                    {'role': 'user', 'content': vraag}
-                ])
-            else:
-                ai = chatgpt([
-                    {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent.'},
-                    {'role': 'user', 'content': vraag}
-                ])
-            ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
-            ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
-            add_msg('assistant', ai + f"\n\n{AI_INFO}")
-        except Exception as e:
-            logging.exception('AI-fallback mislukt')
-            add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.rerun()
+m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
+if m:
+    loc = m.group(1).strip()
+    bishop = fetch_bishop_info(loc)
+    if bishop:
+        add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
+    else:
+        add_msg('assistant', f"Geen bisschop gevonden voor {loc}.\n\n{AI_INFO}")
+    st.rerun()
+
+if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
+    all_bishops = fetch_all_bishops_nl()
+    if all_bishops:
+        lines = [f"Mgr. {name} - {diocese}" for diocese, name in all_bishops.items()]
+        add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
+    else:
+        add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
+    st.rerun()
+
+antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
+
+if antwoord:
+    try:
+        antwoord = chatgpt([
+            {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
+            {'role': 'user', 'content': antwoord}
+        ], temperature=0.2)
+    except:
+        pass
+    add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
+    st.rerun()
+
+with st.spinner('ChatGPT even aan het werk…'):
+    try:
+        web_info = fetch_web_info(vraag)
+        if web_info:
+            ai = chatgpt([
+                {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
+                {'role': 'user', 'content': vraag}
+            ])
+        else:
+            ai = chatgpt([
+                {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent.'},
+                {'role': 'user', 'content': vraag}
+            ])
+        ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
+        ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
+        add_msg('assistant', ai + f"\n\n{AI_INFO}")
+    except Exception as e:
+        logging.exception('AI-fallback mislukt')
+        add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
+    st.rerun()
 
 if __name__ == '__main__':
     main()
-
