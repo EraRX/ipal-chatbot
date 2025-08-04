@@ -69,6 +69,13 @@ if os.path.exists("Calibri.ttf"):
 else:
     logging.info("Calibri.ttf niet gevonden, gebruik ingebouwde Helvetica")
 
+def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
+    match = df[df['Antwoord of oplossing'].str.contains(codeword, case=False, na=False)]
+    if not match.empty:
+        return match.iloc[0]['Antwoord of oplossing']
+    return None
+
+
 # AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
@@ -403,6 +410,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
