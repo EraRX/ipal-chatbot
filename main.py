@@ -324,6 +324,49 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
     row = df.iloc[0]
     return row['Antwoord']
 
+   def main():
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        st.session_state.clear()
+        st.rerun()
+
+    if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
+        pdf_data = make_pdf(
+            question=st.session_state.last_question,
+            answer=st.session_state.history[-1]['content']
+        )
+        st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
+
+    if not st.session_state.selected_product:
+        if os.path.exists("logo.png"):
+            st.image("logo.png", width=124)
+        st.header('Welkom bij IPAL Chatbox')
+        c1, c2, c3 = st.columns(3)
+        if c1.button('Exact', use_container_width=True):
+            st.session_state.selected_product='Exact'
+            add_msg('assistant','Gekozen: Exact')
+            st.rerun()
+        if c2.button('DocBase', use_container_width=True):
+            st.session_state.selected_product='DocBase'
+            add_msg('assistant','Gekozen: DocBase')
+            st.rerun()
+        if c3.button('Algemeen', use_container_width=True):
+            st.session_state.selected_product='Algemeen'
+            st.session_state.selected_module='alles'
+            add_msg('assistant','Gekozen: Algemeen')
+            st.rerun()
+        render_chat()
+        return
+
+    if st.session_state.selected_product in ['Exact','DocBase'] and not st.session_state.selected_module:
+        opts = subthema_dict.get(st.session_state.selected_product,[])
+        sel = st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
+        if sel!='(Kies)':
+            st.session_state.selected_module=sel
+            add_msg('assistant',f'Gekozen: {sel}')
+            st.rerun()
+        render_chat()
+        return
+
     render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
@@ -358,19 +401,18 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
             add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
             st.rerun()
 
-antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
+    antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
-if antwoord:
-    try:
-        antwoord = chatgpt([
-            {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
-            {'role': 'user', 'content': antwoord}
-        ], temperature=0.2)
-    except:
-        pass
-    add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-    st.rerun()
-
+    if antwoord:
+        try:
+            antwoord = chatgpt([
+                {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
+                {'role': 'user', 'content': antwoord}
+            ], temperature=0.2)
+        except:
+            pass
+        add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
+        st.rerun()
 
     with st.spinner('ChatGPT even aan het werk…'):
         try:
@@ -385,19 +427,13 @@ if antwoord:
                     {'role':'system','content':'Je bent een behulpzame Nederlandse assistent.'},
                     {'role':'user','content':vraag}
                 ])
-            # Strip Markdown from AI response
             ai = re.sub(r'\*\*([^\*]+)\*\*', r'\1', ai)
             ai = re.sub(r'###\s*([^\n]+)', r'\1', ai)
             add_msg('assistant', ai + f"\n\n{AI_INFO}")
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-    st.rerun()
+        st.rerun()
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
