@@ -248,83 +248,25 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
         return beste["Antwoord of oplossing"]
     return None
 
-AVATARS = {"assistant":"aichatbox.jpg","user":"parochie.jpg"}
-def get_avatar(role: str):
-    path = AVATARS.get(role)
-    return PILImage.open(path).resize((64,64)) if path and os.path.exists(path) else "🙂"
+# Vervang alles vanaf hier (regel 300+)
 
+AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
+
+def get_avatar(role: str):
+    path = AVATARS.get(role)
+    return PILImage.open(path).resize((64, 64)) if path and os.path.exists(path) else "🙂"
+
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
-    st.session_state.history = (st.session_state.history + [{'role':role,'content':content,'time':ts}])[-MAX_HISTORY:]
+    st.session_state.history = (st.session_state.history + [{'role': role, 'content': content, 'time': ts}])[-MAX_HISTORY:]
 
 def render_chat():
     for m in st.session_state.history:
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
 
 if 'history' not in st.session_state:
-    st.session_state.history = []
-    st.session_state.selected_product = None
-    st.session_state.selected_module = None
-    st.session_state.last_question = ''
-
-def main():
-    if st.sidebar.button('🔄 Nieuw gesprek'):
-        st.session_state.clear()
-        st.rerun()
-
-    if st.session_state.history and st.session_state.history[-1]['role']=='assistant':
-        pdf_data = make_pdf(
-            question=st.session_state.last_question,
-            answer=st.session_state.history[-1]['content']
-        )
-        st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
-
-    if not st.session_state.selected_product:
-        if os.path.exists("logo.png"):
-            st.image("logo.png", width=124)
-        st.header('Welkom bij IPAL Chatbox')
-        c1, c2, c3 = st.columns(3)
-        if c1.button('Exact', use_container_width=True):
-            st.session_state.selected_product='Exact'
-            add_msg('assistant','Gekozen: Exact')
-            st.rerun()
-        if c2.button('DocBase', use_container_width=True):
-            st.session_state.selected_product='DocBase'
-            add_msg('assistant','Gekozen: DocBase')
-            st.rerun()
-        if c3.button('Algemeen', use_container_width=True):
-            st.session_state.selected_product='Algemeen'
-            st.session_state.selected_module='alles'
-            add_msg('assistant','Gekozen: Algemeen')
-            st.rerun()
-        render_chat()
-        return
-
-    if st.session_state.selected_product in ['Exact','DocBase'] and not st.session_state.selected_module:
-        opts = subthema_dict.get(st.session_state.selected_product,[])
-        sel = st.selectbox('Kies onderwerp:', ['(Kies)']+opts)
-        if sel!='(Kies)':
-            st.session_state.selected_module=sel
-            add_msg('assistant',f'Gekozen: {sel}')
-            st.rerun()
-        render_chat()
-        return
-
-def vind_best_passend_antwoord(vraag, systeem, subthema):
-    df = faq_df.copy()
-    if systeem and systeem != 'alles':
-        df = df[df['Systeem'].str.lower() == systeem.lower()]
-    if subthema and subthema != 'alles':
-        df = df[df['Subthema'].str.lower() == subthema.lower()]
-    df = df[df['combined'].str.contains(re.escape(vraag), case=False, na=False)]
-    if df.empty:
-        return None
-    row = df.iloc[0]
-    return row['Antwoord']
-
-  if 'history' not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
     st.session_state.selected_module = None
