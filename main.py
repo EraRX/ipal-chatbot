@@ -132,12 +132,12 @@ def make_pdf(question: str, answer: str) -> bytes:
     return buffer.getvalue()
 
 @st.cache_data
-def load_faq(path="faq.csv"):
+def load_faq(path="faq.xlsx"):
     if not os.path.exists(path):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=['Systeem','Subthema','Omschrijving melding','Toelichting melding','Antwoord of oplossing','Afbeelding'])
-    df = pd.read_csv(path, encoding="utf-8", sep=";")
+    df = pd.read_excel(path, engine="openpyxl")
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
@@ -195,7 +195,7 @@ def fetch_all_bishops_nl():
 def fetch_web_info(query: str):
     result = []
     
-    # Check faq.csv
+    # Check faq.xlsx
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(query), case=False, na=False)]
     if not dfm.empty:
         row = dfm.iloc[0]
