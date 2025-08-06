@@ -316,7 +316,7 @@ def main():
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.rerun()
 
-    with st.spinner('ChatGPT even aan het werk…'):
+    with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
             web_info = fetch_web_info_cached(vraag)
             if web_info:
@@ -339,4 +339,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
