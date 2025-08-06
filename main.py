@@ -7,7 +7,6 @@ IPAL Chatbox voor oudere vrijwilligers
 - Logging en foutafhandeling
 - Antwoorden downloaden als PDF
 """
-
 import os
 import re
 import logging
@@ -39,6 +38,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Set page config as first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
@@ -57,7 +57,7 @@ MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
 @st.cache_data
-def chatgpt_cached(messages, temperature=0.3, max_tokens=1300):
+def chatgpt_cached(messages, temperature=0.3, max_tokens=300):
     resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -84,7 +84,7 @@ AI-Antwoord Info:
 2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
 """
 
-# PDF generation with chat-style layout and logo top-left
+# PDF generation function (on demand)
 def make_pdf(question: str, answer: str) -> bytes:
     answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
     answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
@@ -129,7 +129,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -152,7 +152,7 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
+    return df.set_index(['Systeem', 'Subthema'])  # Voor snellere lookups
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
@@ -219,15 +219,8 @@ def add_msg(role: str, content: str):
     st.session_state.history = (st.session_state.history + [{'role': role, 'content': content, 'time': ts}])[-MAX_HISTORY:]
 
 def render_chat():
-    for i, m in enumerate(st.session_state.history):
+    for m in st.session_state.history:
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # Toon PDF-downloadknop direct na laatste assistant-bericht
-        if m['role'] == 'assistant' and i == len(st.session_state.history) - 1:
-            pdf_data = make_pdf(
-                question=st.session_state.last_question,
-                answer=m['content']
-            )
-            st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
 if 'history' not in st.session_state:
     st.session_state.history = []
@@ -240,18 +233,23 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # Verwijder downloadknop sidebar (niet meer hier)
-    # if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
-    #     pdf_data = make_pdf(
-    #         question=st.session_state.last_question,
-    #         answer=st.session_state.history[-1]['content']
-    #     )
-    #     st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
+    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+        pdf_data = make_pdf(
+            question=st.session_state.last_question,
+            answer=st.session_state.history[-1]['content']
+        )
+        st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
     if not st.session_state.selected_product:
         if logo_img:
             st.image(logo_img, width=244)
-        st.header('Welkom bij de IPAL Chatbox')
+        st.header('Welkom bij IPAL Chatbox')
+
+        # Video helpdesk.mp4 afspelen als aanwezig
+        video_file = "helpdesk.mp4"
+        if os.path.exists(video_file):
+            st.video(video_file)
+
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
