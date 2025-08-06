@@ -247,13 +247,16 @@ def main():
 
         # Video helpdesk.mp4 afspelen als aanwezig
         video_file = "helpdesk.mp4"
-if os.path.exists(video_file):
-    video_html = f"""
-    <video width="640" height="360" autoplay muted loop playsinline>
-        <source src="{video_file}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    """
+    if not st.session_state.selected_product:
+        # Video tonen in plaats van logo
+        video_file = "helpdesk.mp4"
+        if os.path.exists(video_file):
+            video_html = f"""
+            <video width="640" height="360" autoplay muted loop playsinline>
+                <source src="{video_file}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            """
     st.markdown(video_html, unsafe_allow_html=True)
 
         c1, c2, c3 = st.columns(3)
@@ -352,4 +355,5 @@ if os.path.exists(video_file):
 
 if __name__ == '__main__':
     main()
+
 
