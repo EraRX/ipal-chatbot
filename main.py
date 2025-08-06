@@ -7,6 +7,9 @@ IPAL Chatbox voor oudere vrijwilligers
 - Logging en foutafhandeling
 - Antwoorden downloaden als PDF
 """
+st.header('Welkom bij de IPAL Chatbox')
+st.video("helpdesk.mp4")
+
 import os
 import re
 import logging
@@ -347,5 +350,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
