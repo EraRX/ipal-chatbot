@@ -112,7 +112,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
-    avatar_path = "aichatbox.jpg"
+    avatar_path = "aichatbox.png"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
@@ -257,7 +257,7 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
 
 # Vervang alles vanaf hier (regel 300+)
 
-AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.png"}
+AVATARS = {"assistant": "aichatbox.png", "user": "parochie.png"}
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
 
@@ -410,6 +410,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
