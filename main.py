@@ -39,8 +39,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-st.header('Welkom bij de IPAL Chatbox')
-st.video("helpdesk.mp4")
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
@@ -350,6 +348,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
