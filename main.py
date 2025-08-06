@@ -203,7 +203,7 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
         return None
 
 # Preload afbeeldingen
-aichatbox_img = PILImage.open("aichatbox.png").resize((128, 128)) if os.path.exists("aichatbox.png") else None
+aichatbox_img = PILImage.open("aichatbox.png").resize((256, 256)) if os.path.exists("aichatbox.png") else None
 logo_img = PILImage.open("logo.png") if os.path.exists("logo.png") else None
 
 AVATARS = {"assistant": "aichatbox.png", "user": "parochie.png"}
@@ -339,5 +339,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
