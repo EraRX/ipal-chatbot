@@ -151,11 +151,11 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df  # GEEN set_index
+    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
-subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem'] == p, 'Subthema'].dropna().unique()) for p in producten}
+subthema_dict = {p: sorted(faq_df.index.get_level_values('Subthema').dropna().unique()) for p in producten}
 BLACKLIST = ["persoonlijke gegevens", "medische gegevens", "gezondheid", "privacy schending"]
 
 def filter_topics(msg: str):
@@ -191,26 +191,15 @@ def fetch_web_info_cached(query: str):
 
 def vind_best_passend_antwoord(vraag, systeem, subthema):
     try:
-        resultaten = faq_df[
-            (faq_df["Systeem"].str.lower() == systeem.lower()) &
-            (faq_df["Subthema"].str.lower() == subthema.lower())
-        ]
-        if resultaten.empty:
-            return None
-
-        vraag_lower = vraag.lower()
-        def score(tekst):
-            return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
-
-        resultaten["score"] = resultaten["combined"].apply(score)
-        resultaten = resultaten.sort_values("score", ascending=False)
-
-        beste = resultaten.iloc[0]
-        if beste["score"] > 0:
-            return beste["Antwoord of oplossing"]
-        return None
-    except Exception as e:
-        logging.error(f"Fout in vind_best_passend_antwoord: {e}")
+        resultaten = faq_df.loc[(systeem.lower(), subthema.lower())]
+        if not resultaten.empty:
+            vraag_lower = vraag.lower()
+            def score(tekst):
+                return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
+            resultaten = resultaten.assign(score=resultaten['combined'].apply(score)).sort_values('score', ascending=False)
+            beste = resultaten.iloc[0]
+            return beste['Antwoord of oplossing'] if beste['score'] > 0 else None
+    except KeyError:
         return None
 
 # Preload afbeeldingen
@@ -229,8 +218,15 @@ def add_msg(role: str, content: str):
     st.session_state.history = (st.session_state.history + [{'role': role, 'content': content, 'time': ts}])[-MAX_HISTORY:]
 
 def render_chat():
-    for m in st.session_state.history:
+    for i, m in enumerate(st.session_state.history):
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
+        # Toon PDF-downloadknop direct na laatste assistant-bericht
+        if m['role'] == 'assistant' and i == len(st.session_state.history) - 1:
+            pdf_data = make_pdf(
+                question=st.session_state.last_question,
+                answer=m['content']
+            )
+            st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
 if 'history' not in st.session_state:
     st.session_state.history = []
@@ -243,12 +239,13 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
-        pdf_data = make_pdf(
-            question=st.session_state.last_question,
-            answer=st.session_state.history[-1]['content']
-        )
-        st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
+    # Verwijder downloadknop sidebar (niet meer hier)
+    # if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+    #     pdf_data = make_pdf(
+    #         question=st.session_state.last_question,
+    #         answer=st.session_state.history[-1]['content']
+    #     )
+    #     st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
     if not st.session_state.selected_product:
         if logo_img:
