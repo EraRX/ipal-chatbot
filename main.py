@@ -56,7 +56,7 @@ MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
 @st.cache_data
-def chatgpt_cached(messages, temperature=0.3, max_tokens=300):
+def chatgpt_cached(messages, temperature=0.3, max_tokens=800):
     resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -347,3 +347,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
