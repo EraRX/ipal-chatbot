@@ -211,7 +211,7 @@ TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 10
 
 def get_avatar(role: str):
-    return aichatbox_img if role == "assistant" and aichatbox_img else "🙂"
+    return aichatbox_img if role == "assistant" and aichatbox_img else "parochie.png"
 
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
@@ -339,3 +339,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
