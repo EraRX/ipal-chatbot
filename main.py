@@ -130,7 +130,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -237,9 +237,14 @@ if 'history' not in st.session_state:
     st.session_state.last_question = ''
 
 def main():
-    video_file = "helpdesk.mp4"
+    # Sidebar knop voor nieuw gesprek
+    with st.sidebar:
+        if st.button('🔄 Nieuw gesprek'):
+            st.session_state.clear()
+            st.experimental_rerun()
 
-    # Video afspelen als bestand bestaat, bovenaan pagina
+    # Video bovenaan in hoofdsectie
+    video_file = "helpdesk.mp4"
     if os.path.exists(video_file):
         video_html = f"""
         <video width="640" height="360" autoplay muted loop playsinline>
@@ -248,36 +253,38 @@ def main():
         </video>
         """
         st.markdown(video_html, unsafe_allow_html=True)
+    elif logo_img:
+        st.image(logo_img, width=244)
 
+    st.header('Welkom bij de IPAL Chatbox')
+
+    # Keuze buttons onder video
     if not st.session_state.selected_product:
-        if logo_img and not os.path.exists(video_file):
-            st.image(logo_img, width=244)
-        st.header('Welkom bij de IPAL Chatbox')
-
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_msg('assistant', 'Gekozen: Exact')
-            st.rerun()
+            st.experimental_rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_msg('assistant', 'Gekozen: DocBase')
-            st.rerun()
+            st.experimental_rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product = 'Algemeen'
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
-            st.rerun()
+            st.experimental_rerun()
         render_chat()
         return
 
+    # Onderwerpkeuze submodules
     if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_msg('assistant', f'Gekozen: {sel}')
-            st.rerun()
+            st.experimental_rerun()
         render_chat()
         return
 
@@ -292,7 +299,7 @@ def main():
         if antwoord:
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-            st.rerun()
+            st.experimental_rerun()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -303,7 +310,7 @@ def main():
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
+        st.experimental_rerun()
 
     # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
@@ -312,7 +319,7 @@ def main():
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.rerun()
+        st.experimental_rerun()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -325,7 +332,7 @@ def main():
         except:
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
+        st.experimental_rerun()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
@@ -346,7 +353,7 @@ def main():
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.rerun()
+        st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
