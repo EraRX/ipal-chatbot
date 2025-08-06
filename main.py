@@ -39,7 +39,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Set page config as first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
@@ -130,7 +129,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -237,54 +236,46 @@ if 'history' not in st.session_state:
     st.session_state.last_question = ''
 
 def main():
-    # Sidebar knop voor nieuw gesprek
-    with st.sidebar:
-        if st.button('🔄 Nieuw gesprek'):
-            st.session_state.clear()
-            st.experimental_rerun()
+    if st.sidebar.button('🔄 Nieuw gesprek'):
+        st.session_state.clear()
+        st.rerun()
 
-    # Video bovenaan in hoofdsectie
-    video_file = "helpdesk.mp4"
-    if os.path.exists(video_file):
-        video_html = f"""
-        <video width="640" height="360" autoplay muted loop playsinline>
-            <source src="{video_file}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        """
-        st.markdown(video_html, unsafe_allow_html=True)
-    elif logo_img:
-        st.image(logo_img, width=244)
+    # Verwijder downloadknop sidebar (niet meer hier)
+    # if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+    #     pdf_data = make_pdf(
+    #         question=st.session_state.last_question,
+    #         answer=st.session_state.history[-1]['content']
+    #     )
+    #     st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
-    st.header('Welkom bij de IPAL Chatbox')
-
-    # Keuze buttons onder video
     if not st.session_state.selected_product:
+        if logo_img:
+            st.image(logo_img, width=244)
+        st.header('Welkom bij de IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_msg('assistant', 'Gekozen: Exact')
-            st.experimental_rerun()
+            st.rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_msg('assistant', 'Gekozen: DocBase')
-            st.experimental_rerun()
+            st.rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product = 'Algemeen'
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
-            st.experimental_rerun()
+            st.rerun()
         render_chat()
         return
 
-    # Onderwerpkeuze submodules
     if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_msg('assistant', f'Gekozen: {sel}')
-            st.experimental_rerun()
+            st.rerun()
         render_chat()
         return
 
@@ -299,7 +290,7 @@ def main():
         if antwoord:
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-            st.experimental_rerun()
+            st.rerun()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -310,7 +301,7 @@ def main():
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.experimental_rerun()
+        st.rerun()
 
     # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
@@ -319,7 +310,7 @@ def main():
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.experimental_rerun()
+        st.rerun()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -332,7 +323,7 @@ def main():
         except:
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.experimental_rerun()
+        st.rerun()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
@@ -353,7 +344,7 @@ def main():
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.experimental_rerun()
+        st.rerun()
 
 if __name__ == '__main__':
     main()
