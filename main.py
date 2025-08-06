@@ -245,10 +245,11 @@ def main():
             st.image(logo_img, width=244)
         st.header('Welkom bij IPAL Chatbox')
 
-        # Video helpdesk.mp4 afspelen als aanwezig
-        video_file = "helpdesk.mp4"
+def main():
+    # Video helpdesk.mp4 afspelen als aanwezig
+    video_file = "helpdesk.mp4"
+
     if not st.session_state.selected_product:
-        video_file = "helpdesk.mp4"
         if os.path.exists(video_file):
             video_html = f"""
             <video width="640" height="360" autoplay muted loop playsinline>
@@ -358,6 +359,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
