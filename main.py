@@ -55,7 +55,8 @@ client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
-def chatgpt(messages, temperature=0.3, max_tokens=800):
+@st.cache_data
+def chatgpt_cached(messages, temperature=0.3, max_tokens=300):
     resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -75,7 +76,6 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
         return match.iloc[0]['Antwoord of oplossing']
     return None
 
-
 # AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
@@ -85,7 +85,6 @@ AI-Antwoord Info:
 
 # PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str) -> bytes:
-    # Strip Markdown symbols (** and ###) from answer
     answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
     answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
     buffer = io.BytesIO()
@@ -129,7 +128,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -152,68 +151,26 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df
+    return df  # GEEN set_index
 
 faq_df = load_faq()
-producten = ['Exact','DocBase']
-subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem']==p,'Subthema'].dropna().unique()) for p in producten}
-BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
+producten = ['Exact', 'DocBase']
+subthema_dict = {p: sorted(faq_df.loc[faq_df['Systeem'] == p, 'Subthema'].dropna().unique()) for p in producten}
+BLACKLIST = ["persoonlijke gegevens", "medische gegevens", "gezondheid", "privacy schending"]
 
 def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-def fetch_bishop_info(loc: str):
-    bishops = {
-        "Utrecht": "Willem Jacobus Eijk",
-        "Groningen-Leeuwarden": "Ron van den Hout",
-        "Haarlem-Amsterdam": "Jan Hendriks",
-        "Roermond": "Hendrikus Smeets",
-        "Rotterdam": "Hans van den Hende",
-        "'s-Hertogenbosch": "Gerard de Korte",
-        "Breda": "Jan Liesen",
-        "Militair Ordinariaat": "Geen bisschop, geleid door een diocesaan administrator"
-    }
-    loc = loc.lower().replace(" ", "-").replace("’s-hertogenbosch", "'s-hertogenbosch")
-    for diocese, bishop in bishops.items():
-        if diocese.lower().replace(" ", "-") == loc:
-            return bishop
-    # Fallback to web scraping if not found
-    query = loc.replace("-", "+")
-    for url in [f"https://www.rkk-online.nl/?s={query}", f"https://www.rkkerk.nl/?s={query}"]:
-        try:
-            r = requests.get(url, timeout=10)
-            r.raise_for_status()
-            soup = BeautifulSoup(r.text, "html.parser")
-            for tag in ("h1", "h2", "h3"):
-                h = soup.find(tag, string=re.compile(r"bisschop", re.I))
-                if h:
-                    return h.text.split("–")[0].strip()
-        except Exception as e:
-            logging.info(f"Kon {url} niet ophalen: {e}")
-    return None
-
-def fetch_all_bishops_nl():
-    dioceses = ["Utrecht", "Groningen-Leeuwarden", "Haarlem-Amsterdam", "Roermond", "Rotterdam", "'s-Hertogenbosch", "Breda", "Militair Ordinariaat"]
-    result = {}
-    for d in dioceses:
-        name = fetch_bishop_info(d)
-        if name:
-            result[d] = name
-    return result
-
-def fetch_web_info(query: str):
+@st.cache_data
+def fetch_web_info_cached(query: str):
     result = []
-    
-    # Check faq.csv
     dfm = faq_df[faq_df['combined'].str.contains(re.escape(query), case=False, na=False)]
     if not dfm.empty:
         row = dfm.iloc[0]
         result.append(f"Vanuit FAQ ({row['Systeem']} - {row['Subthema']}): {row['Antwoord']}")
-
-    # Scrape docbase.nl
     try:
-        r = requests.get("https://docbase.nl", timeout=10)
+        r = requests.get("https://docbase.nl", timeout=5)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
@@ -221,10 +178,8 @@ def fetch_web_info(query: str):
             result.append(f"Vanuit docbase.nl: {text[:200]}... (verkort)")
     except Exception as e:
         logging.info(f"Kon docbase.nl niet ophalen: {e}")
-
-    # Scrape support.exactonline.com
     try:
-        r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=10)
+        r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=5)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         text = ' '.join([p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3'])])
@@ -232,38 +187,42 @@ def fetch_web_info(query: str):
             result.append(f"Vanuit Exact Online Knowledge Base: {text[:200]}... (verkort)")
     except Exception as e:
         logging.info(f"Kon Exact Online Knowledge Base niet ophalen: {e}")
-
     return '\n'.join(result) if result else None
 
 def vind_best_passend_antwoord(vraag, systeem, subthema):
-    resultaten = faq_df[
-        (faq_df["Systeem"].str.lower() == systeem.lower()) &
-        (faq_df["Subthema"].str.lower() == subthema.lower())
-    ]
-    if resultaten.empty:
+    try:
+        resultaten = faq_df[
+            (faq_df["Systeem"].str.lower() == systeem.lower()) &
+            (faq_df["Subthema"].str.lower() == subthema.lower())
+        ]
+        if resultaten.empty:
+            return None
+
+        vraag_lower = vraag.lower()
+        def score(tekst):
+            return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
+
+        resultaten["score"] = resultaten["combined"].apply(score)
+        resultaten = resultaten.sort_values("score", ascending=False)
+
+        beste = resultaten.iloc[0]
+        if beste["score"] > 0:
+            return beste["Antwoord of oplossing"]
+        return None
+    except Exception as e:
+        logging.error(f"Fout in vind_best_passend_antwoord: {e}")
         return None
 
-    vraag_lower = vraag.lower()
-    def score(tekst):
-        return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
-
-    resultaten["score"] = resultaten["combined"].apply(score)
-    resultaten = resultaten.sort_values("score", ascending=False)
-
-    beste = resultaten.iloc[0]
-    if beste["score"] > 0:
-        return beste["Antwoord of oplossing"]
-    return None
-
-# Vervang alles vanaf hier (regel 300+)
+# Preload afbeeldingen
+aichatbox_img = PILImage.open("aichatbox.png").resize((256, 256)) if os.path.exists("aichatbox.png") else None
+logo_img = PILImage.open("logo.png") if os.path.exists("logo.png") else None
 
 AVATARS = {"assistant": "aichatbox.png", "user": "parochie.png"}
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
-MAX_HISTORY = 20
+MAX_HISTORY = 10
 
 def get_avatar(role: str):
-    path = AVATARS.get(role)
-    return PILImage.open(path).resize((256, 256)) if path and os.path.exists(path) else "🙂"
+    return aichatbox_img if role == "assistant" and aichatbox_img else "parochie.png"
 
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
@@ -292,9 +251,9 @@ def main():
         st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
     if not st.session_state.selected_product:
-        if os.path.exists("logo.png"):
-            st.image("logo.png", width=124)
-        st.header('Welkom bij IPAL Chatbox')
+        if logo_img:
+            st.image(logo_img, width=244)
+        st.header('Welkom bij de IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
@@ -355,30 +314,11 @@ def main():
         add_msg('assistant', warn)
         st.rerun()
 
-    m = re.match(r'(?i)wie is bisschop(?: van)?\s+(.+)', vraag)
-    if m:
-        loc = m.group(1).strip()
-        bishop = fetch_bishop_info(loc)
-        if bishop:
-            add_msg('assistant', f"De huidige bisschop van {loc} is {bishop}.\n\n{AI_INFO}")
-        else:
-            add_msg('assistant', f"Geen bisschop gevonden voor {loc}.\n\n{AI_INFO}")
-        st.rerun()
-
-    if re.search(r'(?i)bisschoppen (nederland|van deze bisdommen)', vraag):
-        all_bishops = fetch_all_bishops_nl()
-        if all_bishops:
-            lines = [f"Mgr. {name} - {diocese}" for diocese, name in all_bishops.items()]
-            add_msg('assistant', "Huidige bisschoppen van de Nederlandse bisdommen:\n" + "\n".join(lines) + f"\n\n{AI_INFO}")
-        else:
-            add_msg('assistant', "Geen informatie gevonden over de bisschoppen van Nederlandse bisdommen.\n\n{AI_INFO}")
-        st.rerun()
-
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
     if antwoord:
         try:
-            antwoord = chatgpt([
+            antwoord = chatgpt_cached([
                 {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
                 {'role': 'user', 'content': antwoord}
             ], temperature=0.2)
@@ -387,16 +327,16 @@ def main():
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.rerun()
 
-    with st.spinner('ChatGPT even aan het werk…'):
+    with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
-            web_info = fetch_web_info(vraag)
+            web_info = fetch_web_info_cached(vraag)
             if web_info:
-                ai = chatgpt([
+                ai = chatgpt_cached([
                     {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent. Gebruik de volgende informatie om de vraag te beantwoorden:\n' + web_info},
                     {'role': 'user', 'content': vraag}
                 ])
             else:
-                ai = chatgpt([
+                ai = chatgpt_cached([
                     {'role': 'system', 'content': 'Je bent een behulpzame Nederlandse assistent.'},
                     {'role': 'user', 'content': vraag}
                 ])
@@ -410,4 +350,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
