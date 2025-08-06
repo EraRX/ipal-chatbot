@@ -5,9 +5,8 @@ IPAL Chatbox voor oudere vrijwilligers
 - Antwoorden uit FAQ, Exact Online, DocBase, rkkerk.nl, rkk-online.nl, en AI
 - Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
 - Logging en foutafhandeling
-- Antwoorden downloaden als PDF
+- Antwoorden downloaden als PDF onder het laatste antwoord
 """
-
 import os
 import re
 import logging
@@ -39,7 +38,9 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Must be the first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
+
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
     unsafe_allow_html=True
@@ -55,9 +56,9 @@ if not OPENAI_KEY:
 client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(1,10), retry=retry_if_exception_type(RateLimitError))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(1, 10), retry=retry_if_exception_type(RateLimitError))
 @st.cache_data
-def chatgpt_cached(messages, temperature=0.3, max_tokens=1300):
+def chatgpt_cached(messages, temperature=0.3, max_tokens=300):
     resp = client.chat.completions.create(
         model=MODEL,
         messages=messages,
@@ -77,17 +78,16 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
         return match.iloc[0]['Antwoord of oplossing']
     return None
 
-# AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
 """
 
-# PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str) -> bytes:
-    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
-    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
+    # Verwijder Markdown formatting voor PDF
+    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # bold verwijderen
+    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # headings verwijderen
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
@@ -100,23 +100,24 @@ def make_pdf(question: str, answer: str) -> bytes:
         logo = Image("logopdf.png", width=124, height=52)
         logo_table = Table([[logo]], colWidths=[124])
         logo_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 0),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-            ('TOPPADDING', (0, 0), (-1, -1), 0),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('LEFTPADDING', (0,0), (-1,-1), 0),
+            ('RIGHTPADDING', (0,0), (-1,-1), 0),
+            ('TOPPADDING', (0,0), (-1,-1), 0),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 6),
         ]))
         story.append(logo_table)
 
     story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
+
     avatar_path = "aichatbox.png"
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
-        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
+        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN',(0,0),(-1,-1),'TOP')])))
         story.append(Spacer(1, 12))
         for line in answer.split("\n")[1:]:
             line = line.strip()
@@ -129,7 +130,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -152,7 +153,7 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
+    return df.set_index(['Systeem', 'Subthema'])
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
@@ -203,7 +204,6 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
     except KeyError:
         return None
 
-# Preload afbeeldingen
 aichatbox_img = PILImage.open("aichatbox.png").resize((256, 256)) if os.path.exists("aichatbox.png") else None
 logo_img = PILImage.open("logo.png") if os.path.exists("logo.png") else None
 
@@ -219,15 +219,8 @@ def add_msg(role: str, content: str):
     st.session_state.history = (st.session_state.history + [{'role': role, 'content': content, 'time': ts}])[-MAX_HISTORY:]
 
 def render_chat():
-    for i, m in enumerate(st.session_state.history):
+    for m in st.session_state.history:
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # Toon PDF-downloadknop direct na laatste assistant-bericht
-        if m['role'] == 'assistant' and i == len(st.session_state.history) - 1:
-            pdf_data = make_pdf(
-                question=st.session_state.last_question,
-                answer=m['content']
-            )
-            st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
 if 'history' not in st.session_state:
     st.session_state.history = []
@@ -240,33 +233,34 @@ def main():
         st.session_state.clear()
         st.rerun()
 
-    # Verwijder downloadknop sidebar (niet meer hier)
-    # if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
-    #     pdf_data = make_pdf(
-    #         question=st.session_state.last_question,
-    #         answer=st.session_state.history[-1]['content']
-    #     )
-    #     st.sidebar.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
+    render_chat()
+
+    # Toon de PDF-downloadknop direct onder het laatste antwoord, als het antwoord van assistant is
+    if st.session_state.history and st.session_state.history[-1]['role'] == 'assistant':
+        pdf_data = make_pdf(
+            question=st.session_state.last_question,
+            answer=st.session_state.history[-1]['content']
+        )
+        st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
     if not st.session_state.selected_product:
         if logo_img:
             st.image(logo_img, width=244)
-        st.header('Welkom bij de IPAL Chatbox')
+        st.header('Welkom bij IPAL Chatbox')
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_msg('assistant', 'Gekozen: Exact')
-            st.rerun()
+            st.experimental_rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_msg('assistant', 'Gekozen: DocBase')
-            st.rerun()
+            st.experimental_rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product = 'Algemeen'
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
-            st.rerun()
-        render_chat()
+            st.experimental_rerun()
         return
 
     if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
@@ -275,11 +269,9 @@ def main():
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_msg('assistant', f'Gekozen: {sel}')
-            st.rerun()
-        render_chat()
+            st.experimental_rerun()
         return
 
-    render_chat()
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
         return
@@ -290,7 +282,7 @@ def main():
         if antwoord:
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-            st.rerun()
+            st.experimental_rerun()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -301,16 +293,15 @@ def main():
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
+        st.experimental_rerun()
 
-    # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
     add_msg('user', vraag)
 
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.rerun()
+        st.experimental_rerun()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -323,7 +314,7 @@ def main():
         except:
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
+        st.experimental_rerun()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
@@ -344,12 +335,7 @@ def main():
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.rerun()
+        st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
