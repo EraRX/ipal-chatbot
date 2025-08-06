@@ -257,7 +257,7 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
 
 # Vervang alles vanaf hier (regel 300+)
 
-AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.jpg"}
+AVATARS = {"assistant": "aichatbox.jpg", "user": "parochie.png"}
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 MAX_HISTORY = 20
 
@@ -410,6 +410,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
