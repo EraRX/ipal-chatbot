@@ -11,7 +11,7 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8615;DocBase;DocBase Ledenadministratie;Ledenbeheer;Overleden leden registreren;Registreren van sterfdatum;Zorgt dat het lid niet meer in actieve tellingen voorkomt;Wijzig de status in de ledenkaart: 1. Open de ledenkaart van het overleden lid. 2. Wijzig de status naar Overleden. 3. Sla de wijziging op.;
 8616;DocBase;DocBase Ledenadministratie;Synchronisatie;SILA-koppeling;Synchronisatie met landelijke registers;Automatisch ontvangen van mutaties zoals verhuizing of overlijden;Beheer via instellingen: 1. Ga naar Instellingen ? SILA-koppeling. 2. Controleer de status en zet de synchronisatie aan.;
 8617;DocBase;DocBase Ledenadministratie;Ledenbeheer;Ledenexport;Ledenlijst downloaden;Voor rapportage of integratie met externe systemen;Ga naar Rapportages ? Leden ? Exporteren naar Excel: 1. Kies de gewenste filters voor de export. 2. Klik op Exporteren om de ledenlijst naar Excel te downloaden.;
-8618;DocBase;DocBase Ledenadministratie;Ledenbeheer;Zoekfunctie;Snel leden vinden op basis van criteria;Maakt de administratie efficiënt en toegankelijk;Typ in zoekveld bovenaan scherm: 1. Vul criteria in zoals naam, geboortedatum, of Rel-ID. 2. Klik op de zoekresultaten om het lid te openen.;
+8618;DocBase;DocBase Ledenadministratie;Ledenbeheer;Zoekfunctie;Snel leden vinden op basis van criteria;Maakt de administratie efficiÃ«nt en toegankelijk;Typ in zoekveld bovenaan scherm: 1. Vul criteria in zoals naam, geboortedatum, of Rel-ID. 2. Klik op de zoekresultaten om het lid te openen.;
 8619;DocBase;DocBase Ledenadministratie;Ledenbeheer;Ontdubbelen;Dubbele leden samenvoegen;Voorkomt fouten en verwarring in de administratie;Ga naar Beheer ? Ontdubbelen: 1. Selecteer de dubbele records. 2. Vergelijk de gegevens en klik op Samenvoegen. Controleer eerst de gegevens voor je ze samenvoegt.;
 8624;DocBase;DocBase Ledenadministratie;Documentbeheer;Documenten uploaden;Bestanden koppelen aan lid of graf;Duidelijke dossiervorming (bijv. scans van machtigingen of brieven);Open een lid of graf: 1. Ga naar tabblad Documenten. 2. Klik op Voeg document toe en selecteer het bestand dat je wilt uploaden.;
 8625;Exact;DocBase Ledenadministratie;Synchronisatie;Handmatig synchroniseren met Exact;Updates pushen naar Exact;Zorgt voor consistente gegevens;Ga naar Instellingen ? Koppelingen ? Synchronisatie starten: 1. Klik op Synchroniseren om de handmatige synchronisatie tussen DocBase en Exact Online te starten.;
@@ -24,28 +24,25 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8632;DocBase;DocBase Ledenadministratie;Ledenbeheer;Lid uitschrijven;Markeer een lid als vertrokken of overleden.;Houdt de ledenlijst actueel.;Open lid ? Status wijzigen naar 'Uitgeschreven' of 'Overleden' ? Opslaan. 1. Ga naar het lid en open de ledenkaart. 2. Klik op Status wijzigen en kies Uitgeschreven of Overleden. 3. Klik op Opslaan.;
 8633;DocBase;DocBase Ledenadministratie;Ledenbeheer;Geboortedatum corrigeren;Pas foutieve geboortedata aan.;Voor juiste leeftijdsregistratie.;Open lid ? Wijzig geboortedatum ? Opslaan. 1. Open de ledenkaart van het lid. 2. Wijzig de geboortedatum en klik op Opslaan.;
 8634;DocBase;DocBase Ledenadministratie;Ledenbeheer;Overleden lid archiveren;Verplaats overleden leden naar archief.;Beheert actieve vs. historische data.;Status wijzigen naar 'Overleden' ? Lid wordt automatisch gearchiveerd. 1. Open het lid en wijzig de status naar Overleden. 2. Het lid wordt automatisch naar het archief verplaatst.;
-8635;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezin aanmaken;Voeg meerdere leden toe aan één gezinseenheid.;Voor samenhangende rapportage en communicatie.;Menu ? Gezinnen ? Nieuw gezin ? Leden koppelen. 1. Ga naar Menu ? Gezinnen ? Nieuw gezin toevoegen. 2. Koppel de leden die onderdeel zijn van hetzelfde gezin. 3. Klik op Opslaan.;
+8635;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezin aanmaken;Voeg meerdere leden toe aan Ã©Ã©n gezinseenheid.;Voor samenhangende rapportage en communicatie.;Menu ? Gezinnen ? Nieuw gezin ? Leden koppelen. 1. Ga naar Menu ? Gezinnen ? Nieuw gezin toevoegen. 2. Koppel de leden die onderdeel zijn van hetzelfde gezin. 3. Klik op Opslaan.;
 8636;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezinsrol wijzigen;Wijzig wie hoofd of partner is binnen een gezin.;Correcte gezinsstructuur is essentieel.;Open gezin ? Wijzig rollen ? Opslaan. 1. Open het gezin en klik op Wijzig rollen. 2. Pas de rol aan naar hoofd of partner. 3. Klik op Opslaan.;
 8637;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Kind toevoegen;Voeg een kind toe aan een gezin.;Voor correcte gezinsstructuur.;Open gezin ? Lid toevoegen ? Selecteer of maak nieuw kind aan. 1. Open het gezin en klik op Lid toevoegen. 2. Selecteer een bestaand lid of maak een nieuw kind aan. 3. Klik op Opslaan.;
 8638;DocBase;DocBase algemeen;Rapportages;Export ledenlijst;Maak een Excel-export van alle leden.;Voor interne controle of communicatie.;Menu ? Rapportages ? Ledenlijst ? Exporteren naar Excel. 1. Ga naar Menu ? Rapportages ? Ledenlijst. 2. Kies de gewenste filters en klik op Exporteren naar Excel.;
 8639;DocBase;DocBase algemeen;Rapportages;Verjaardagslijst;Genereer overzicht van jarigen per maand.;Voor felicitaties of nieuwsbrief.;Rapportages ? Verjaardagslijst ? Kies maand ? Genereer. 1. Ga naar Rapportages ? Verjaardagslijst. 2. Kies de maand en klik op Genereer om het overzicht van jarigen te verkrijgen.;
-8640;DocBase;DocBase algemeen;Rapportages;Leden per wijk;Rapporteer ledenaantallen per parochiewijk.;Voor wijkcoördinatie en communicatie.;Rapportages ? Wijken ? Kies periode ? Exporteren. 1. Ga naar Rapportages ? Wijken. 2. Kies de periode en klik op Exporteren om de gegevens naar Excel te exporteren.;
+8640;DocBase;DocBase algemeen;Rapportages;Leden per wijk;Rapporteer ledenaantallen per parochiewijk.;Voor wijkcoÃ¶rdinatie en communicatie.;Rapportages ? Wijken ? Kies periode ? Exporteren. 1. Ga naar Rapportages ? Wijken. 2. Kies de periode en klik op Exporteren om de gegevens naar Excel te exporteren.;
 8641;Exact;DB Sjablonen;Toezeggingen;Nieuwe toezegging;Registreer een nieuwe kerkbijdrage.;Voor overzicht van verwachte inkomsten.;Open lid ? Financieel ? Nieuwe toezegging ? Bedrag en looptijd invoeren. 1. Open het lid en ga naar Financieel. 2. Klik op Nieuwe toezegging en vul het bedrag en de looptijd in. 3. Klik op Opslaan.;
-8642;Exact;DB Sjablonen;Toezeggingen;Toezegging beëindigen;Beëindig een actieve toezegging.;Voor correcte financiële administratie.;Open toezegging ? Einde datum invoeren ? Opslaan. 1. Open de toezegging en klik op Einde datum. 2. Vul de beëindigingsdatum in en klik op Opslaan.;
+8642;Exact;DB Sjablonen;Toezeggingen;Toezegging beÃ«indigen;BeÃ«indig een actieve toezegging.;Voor correcte financiÃ«le administratie.;Open toezegging ? Einde datum invoeren ? Opslaan. 1. Open de toezegging en klik op Einde datum. 2. Vul de beÃ«indigingsdatum in en klik op Opslaan.;
 8643;Exact;DB Sjablonen;Toezeggingen;Tussentijdse verhoging;Pas een toezegging aan naar een hoger bedrag.;Voor jaarlijkse verhogingen of acties.;Open toezegging ? Wijzig bedrag ? Opslaan. 1. Open de actieve toezegging en klik op Wijzig bedrag. 2. Pas het bedrag aan en klik op Opslaan.;
-8644;Exact;Exact Online;Financiën;Bankrekening koppelen;Voeg bankgegevens toe aan een lid.;Voor automatische incasso's.;Open lid ? Financieel ? Bankgegevens ? IBAN invullen ? Opslaan. 1. Open het lid en ga naar Financieel. 2. Vul het IBAN-nummer in bij Bankgegevens. 3. Klik op Opslaan om de gegevens toe te voegen.;
-8645;Exact;Exact Online;Financiën;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen.;Voor SEPA-verwerking.;Open bankgegevens ? BIC invullen ? Opslaan. 1. Open de bankgegevens van het lid. 2. Vul de BIC-code in bij het veld BIC. 3. Klik op Opslaan.;
+8644;Exact;Exact Online;FinanciÃ«n;Bankrekening koppelen;Voeg bankgegevens toe aan een lid.;Voor automatische incasso's.;Open lid ? Financieel ? Bankgegevens ? IBAN invullen ? Opslaan. 1. Open het lid en ga naar Financieel. 2. Vul het IBAN-nummer in bij Bankgegevens. 3. Klik op Opslaan om de gegevens toe te voegen.;
+8645;Exact;Exact Online;FinanciÃ«n;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen.;Voor SEPA-verwerking.;Open bankgegevens ? BIC invullen ? Opslaan. 1. Open de bankgegevens van het lid. 2. Vul de BIC-code in bij het veld BIC. 3. Klik op Opslaan.;
 8646;SILA;Synchronisatie;SILA-synchronisatie;Koppeling met landelijke SILA-register.;Voor automatische mutaties zoals overlijden.;SILA-synchronisatie;Menu ? SILA ? Synchronisatie starten ? Fouten controleren. 1. Ga naar Menu ? SILA. 2. Klik op Synchronisatie starten en controleer eventuele foutmeldingen.;
-8647;Exact;Exact Online;Synchronisatie;Exact-koppeling activeren;Verbind DocBase met Exact Online.;Voor financiële administratie.;Instellingen ? Koppelingen ? API-sleutel invoeren ? Synchroniseren. 1. Ga naar Instellingen ? Koppelingen. 2. Voer de juiste API-sleutel in. 3. Klik op Synchroniseren.;
+8647;Exact;Exact Online;Synchronisatie;Exact-koppeling activeren;Verbind DocBase met Exact Online.;Voor financiÃ«le administratie.;Instellingen ? Koppelingen ? API-sleutel invoeren ? Synchroniseren. 1. Ga naar Instellingen ? Koppelingen. 2. Voer de juiste API-sleutel in. 3. Klik op Synchroniseren.;
 8648;Exact;Exact Online;Synchronisatie;Exact Rel-ID controleren;Controleer of Rel-IDs van leden kloppen.;Voorkomt fouten bij gegevensuitwisseling.;Open lid ? Rel-ID ? Vergelijk met Exact Online. 1. Open de ledenkaart van het lid. 2. Vergelijk de Rel-ID met die in Exact Online.;
 8652;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruiker toevoegen;Voeg een nieuwe medewerker toe aan DocBase.;Voor gespreide verantwoordelijkheden.;Instellingen ? Gebruikersbeheer ? Nieuwe gebruiker aanmaken. 1. Ga naar Instellingen ? Gebruikersbeheer. 2. Klik op Nieuwe gebruiker aanmaken en vul de benodigde gegevens in (naam, e-mail, rol). 3. Klik op Opslaan om de gebruiker toe te voegen.;
 8653;DocBase;Mutatie (gebruikers)rechten;Beheer;Wachtwoord resetten;Stuur link om wachtwoord opnieuw in te stellen.;Voor veiligheid en toegankelijkheid.;Gebruiker selecteren ? Wachtwoord resetten ? Bevestigen. 1. Zoek de gebruiker op via Gebruikersbeheer. 2. Klik op Wachtwoord resetten en bevestig. 3. De gebruiker ontvangt een link om het wachtwoord opnieuw in te stellen.;
 8654;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruiker deactiveren;Blokkeer toegang voor ex-medewerker.;Beveiligt gevoelige data.;Gebruiker openen ? Status wijzigen naar inactief ? Opslaan. 1. Ga naar Gebruikersbeheer en open de betreffende gebruiker. 2. Wijzig de status naar Inactief. 3. Klik op Opslaan om de gebruiker te deactiveren.;
-8655;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruikersrollen instellen;Wijs rechten toe op basis van rol.;Beperkt toegang tot gevoelige modules.;Gebruikersbeheer ? Rollen ? Rechten aanvinken ? Opslaan. 1. Ga naar Gebruikersbeheer ? Rollen. 2. Selecteer de juiste rol en vink de benodigde rechten aan (bijv. toegang tot financiële gegevens). 3. Klik op Opslaan om de wijzigingen door te voeren.;
+8655;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruikersrollen instellen;Wijs rechten toe op basis van rol.;Beperkt toegang tot gevoelige modules.;Gebruikersbeheer ? Rollen ? Rechten aanvinken ? Opslaan. 1. Ga naar Gebruikersbeheer ? Rollen. 2. Selecteer de juiste rol en vink de benodigde rechten aan (bijv. toegang tot financiÃ«le gegevens). 3. Klik op Opslaan om de wijzigingen door te voeren.;
 8656;DocBase;Conversie;Synchronisatie;Test 1;Test 1;Test 1;Test 1;
-8657;DocBase;DocBase Kerkbalans;Ledenbeheer;Test 2;Test 2;Test 2;Test 2;
-8658;DocBase;Overig;Ledenbeheer;Test 3;Test 3;Test 3;Test 3;
-8659;DocBase;Samenvoegen administraties;Ledenbeheer;Test 4;Test 4;Test 4;Test 4;
 8660;Exact;Exact Online;Inloggen;Inloggen en Navigeren in Exact Online;Uitleg over het inloggen in Exact Online en de navigatie tussen modules.;;Exact Online (Module: Inloggen): Ga naar de website www.exact.com en klik op Inloggen in de rechterbovenhoek van de pagina. Vul je gebruikersnaam in (dit is je e-mailadres dat aan je Exact Online-account is gekoppeld) en voer je wachtwoord in. Klik vervolgens op Inloggen. Je wordt gevraagd om een 6-cijferige code in te voeren die via de Google Authenticator-app op je smartphone wordt gegenereerd. Zodra je de code hebt ingevuld, klik je op Inloggen om toegang te krijgen tot Exact Online.;
 8661;Exact;Exact Online;Inloggen;Standaard Inlogprocedure;Stappen om in te loggen in Exact Online via e-mailadres en wachtwoord.;;Exact Online (Module: Inloggen): Ga naar www.exact.com en klik op Inloggen. Vul je e-mailadres en wachtwoord in die aan je Exact Online-account zijn gekoppeld. Als je tweestapsverificatie hebt ingesteld, open je de Google Authenticator-app op je telefoon, vul je de 6-cijferige code in en klik je op Inloggen. Indien je geen toegang hebt tot de app, controleer dan of je telefoon tijdsinstellingen goed zijn of neem contact op met de systeembeheerder.;
 8662;Exact;Exact Online;Inloggen;Problemen met inloggen;Veelvoorkomende problemen bij inloggen en mogelijke oplossingen.;;Exact Online (Module: Inloggen): Als je wachtwoord vergeten bent, klik dan op de link Wachtwoord vergeten? onder het inlogformulier. Volg de instructies om een nieuw wachtwoord in te stellen. Als je geen toegang hebt tot de Google Authenticator-code, controleer dan de tijdinstellingen van je telefoon. Als het account geblokkeerd is, neem dan contact op met je systeembeheerder om toegang te herstellen via gebruikersbeheer.;
@@ -56,12 +53,12 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8667;Exact;Exact Online;Hoofdmenu;Hoe navigeer je tussen modules;Het gebruik van het hoofdmenu en het selecteren van modules zoals financieel, rapportages en bankbeheer.;;Exact Online (Module: Hoofdmenu): Klik in het hoofdmenu aan de linkerzijde van je scherm op de gewenste module zoals Financieel, Bank, of Rapportages. Als je niet kunt vinden wat je zoekt, gebruik dan de zoekfunctie bovenaan het scherm. Deze zoekfunctie helpt je om snel naar de specifieke module of functie te navigeren die je nodig hebt.;
 8668;Exact;Exact Online;Koppelingen;Integratie met DocBase;Uitleg over de integratie van Exact Online met DocBase en de synchronisatie van kerkbijdragen en ledenadministratie.;;Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd. Test de verbinding door de Test Koppeling-knop in Exact Online in te schakelen om te controleren of de gegevens tussen Exact Online en DocBase goed worden gesynchroniseerd.;
 8669;Exact;Exact Online;Financieel;Facturatievoorkeuren instellen;Uitleg over het instellen van facturatievoorkeuren voor inkoop- en verkoopfacturen.;;Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Facturatievoorkeuren. Kies het standaard btw-percentage (bijvoorbeeld 0% voor vrijgestelde parochies), stel de betalingstermijn in (standaard is 30 dagen), en stel een logische factuurnummering in zoals 2025-0001. Klik op Opslaan om de wijzigingen toe te passen.;
-8670;Exact;Exact Online;Rapportages;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiële rapportages.;;Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
+8670;Exact;Exact Online;Rapportages;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiÃ«le rapportages.;;Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
 8671;Exact;Exact Online;Kerkbijdragen;Rapportages voor Kerkbijdragen;Rapporten specifiek voor kerkbijdragen en de status van betalingen.;;Exact Online (Module: Kerkbijdragen): Ga naar Rapportages ? Kerkbijdragen ? Overzicht. Stel de filters in, bijvoorbeeld periode, betaalstatus (betaald of openstaand), of parochie en klik op Rapport Genereren om het rapport te verkrijgen.;
 8672;Exact;Exact Online;Boekingen;Correctieboekingen maken;Het proces om fouten in boekingen te corrigeren zonder de oorspronkelijke gegevens te verwijderen.;;Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen ? Correctieboeking. Selecteer de foutieve boeking en klik op Nieuwe Correctieboeking. Vul de juiste gegevens in en koppel deze aan de correcte grootboekrekening. Klik op Opslaan om de correctie door te voeren.;
-8673;Exact;Exact Online;Bank;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;;Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geïmporteerd in Exact Online.;
-8674;Exact;Exact Online;Betalingen;Betalingen initiëren;Het initiëren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
-8675;Exact;Exact Online;Incasso's;Incasso’s uitvoeren;Het uitvoeren van automatische incasso's via SEPA-bestanden.;;Exact Online (Module: Incasso's): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiëren.;
+8673;Exact;Exact Online;Bank;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;;Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geÃ¯mporteerd in Exact Online.;
+8674;Exact;Exact Online;Betalingen;Betalingen initiÃ«ren;Het initiÃ«ren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
+8675;Exact;Exact Online;Incasso's;IncassoÂ’s uitvoeren;Het uitvoeren van automatische incasso's via SEPA-bestanden.;;Exact Online (Module: Incasso's): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiÃ«ren.;
 8676;Exact;Exact Online;Inkoop;Inkoopfacturen verwerken;Het verwerken van inkoopfacturen in Exact Online, inclusief het koppelen aan grootboekrekeningen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Inkoopboeking. Vul de factuurgegevens in zoals de leverancier, factuurnummer, bedrag en btw. Koppel de factuur aan de juiste grootboekrekening en klik op Opslaan.;
 8677;Exact;Exact Online;Verkoop;Verkoopfacturen opstellen;Het opstellen van verkoopfacturen voor kerkbijdragen of andere inkomsten.;;Exact Online (Module: Verkoop): Ga naar Financieel ? Verkoop ? Nieuwe Verkoopboeking. Vul de klantgegevens (parochiaan), factuurnummer, datum, bedrag, en de bijbehorende grootboekrekening in. Klik op Opslaan en verstuur de factuur per e-mail of post.;
 8678;Exact;Exact Online;Inkoop;Het verwerken van creditnota's;Het proces om creditnota's te verwerken in Exact Online bij incorrecte facturen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Creditnota. Vul dezelfde gegevens in als de originele factuur, maar gebruik een negatief bedrag. Koppel de creditnota aan de bestaande factuur en klik op Opslaan.;
@@ -74,10 +71,10 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8685;Exact;Exact Online;Synchronisatie;Exact-koppeling activeren;Verbind DocBase met Exact Online.;;Exact Online (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd. Test de verbinding door de Test Koppeling-knop in Exact Online in te schakelen om te controleren of de gegevens tussen Exact Online en DocBase goed worden gesynchroniseerd.;
 8686;Exact;Exact Online;Synchronisatie;Exact Rel-ID controleren;Controleer of Rel-IDs van leden kloppen.;;Exact Online (Module: Synchronisatie): Open het lid ? Rel-ID ? Vergelijk met Exact Online. Controleer of de Rel-ID in Exact Online overeenkomt met de Rel-ID in DocBase om synchronisatieproblemen te voorkomen.;
 8687;Exact;Exact Online;Ledenbeheer;Nieuwe toezegging;Registreer een nieuwe kerkbijdrage.;;Exact Online (Module: Toezeggingen): Open lid ? Financieel ? Nieuwe toezegging. Vul het bedrag en de looptijd in en klik op Opslaan om de toezegging te registreren.;
-8688;Exact;Exact Online;Ledenbeheer;Toezegging beëindigen;Beëindig een actieve toezegging.;;Exact Online (Module: Toezeggingen): Open toezegging ? Vul de einddatum in ? Klik op Opslaan om de toezegging te beëindigen.;
+8688;Exact;Exact Online;Ledenbeheer;Toezegging beÃ«indigen;BeÃ«indig een actieve toezegging.;;Exact Online (Module: Toezeggingen): Open toezegging ? Vul de einddatum in ? Klik op Opslaan om de toezegging te beÃ«indigen.;
 8689;Exact;Exact Online;Ledenbeheer;Tussentijdse verhoging;Pas een toezegging aan naar een hoger bedrag.;;Exact Online (Module: Toezeggingen): Open toezegging ? Wijzig bedrag ? Klik op Opslaan om de verhoging door te voeren.;
-8690;Exact;Exact Online;Financiën;Bankrekening koppelen;Voeg bankgegevens toe aan een lid.;;Exact Online (Module: Financieel): Open lid ? Financieel ? Bankgegevens ? Vul het IBAN in ? Klik op Opslaan om de bankgegevens te koppelen.;
-8691;Exact;Exact Online;Financiën;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen.;;Exact Online (Module: Financieel): Open bankgegevens ? Voeg de BIC-code toe ? Klik op Opslaan om de BIC-code in te voeren.;
+8690;Exact;Exact Online;FinanciÃ«n;Bankrekening koppelen;Voeg bankgegevens toe aan een lid.;;Exact Online (Module: Financieel): Open lid ? Financieel ? Bankgegevens ? Vul het IBAN in ? Klik op Opslaan om de bankgegevens te koppelen.;
+8691;Exact;Exact Online;FinanciÃ«n;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen.;;Exact Online (Module: Financieel): Open bankgegevens ? Voeg de BIC-code toe ? Klik op Opslaan om de BIC-code in te voeren.;
 8692;SILA;Synchronisatie;SILA-synchronisatie;Koppeling met landelijke SILA-register;Synchronisatie van mutaties zoals overlijden en verhuizing.;;SILA (Synchronisatie): Ga naar Menu ? SILA ? Synchronisatie starten. Controleer de foutmeldingen en start de synchronisatie opnieuw indien nodig.;
 8693;Exact;Exact Online;Digitale Brievenbus;Digitale Brievenbus instellen;Het instellen van een digitale brievenbus voor het ontvangen van facturen van leveranciers.;;Exact Online (Module: Digitale Brievenbus): Ga naar Instellingen ? Administratie ? Digitale Brievenbus. Kopieer het unieke e-mailadres en stuur dit naar je leveranciers zodat zij hun facturen automatisch naar Exact Online kunnen sturen.;
 8694;Exact;Exact Online;Scan & Herken;Scan & Herken configureren;Het instellen van Scan & Herken voor automatisch herkennen van facturen.;;Exact Online (Module: Scan & Herken): Ga naar Instellingen ? Financieel ? Scan & Herken. Activeer de functie en kies of je facturen automatisch wilt verwerken of handmatig wilt controleren. Klik op Opslaan.;
@@ -89,19 +86,19 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8700;Exact;Exact Online;Rapportages;Rapportage genereren voor btw-aangiften;Het genereren van btw-aangiften en het controleren van aangiften.;;Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? BTW-overzicht. Controleer de btw-gegevens en exporteer het overzicht voor de aangifte.;
 8701;Exact;Exact Online;Rapportages;Het exporteren van rapportages voor audits;Het genereren van rapporten voor externe audits.;;Exact Online (Module: Rapportages): Ga naar de gewenste rapportage, bijvoorbeeld Balans of Winst- en verliesrekening. Klik op Exporteren naar Excel/PDF en sla het bestand op of deel het met de auditor.;
 8702;Exact;Exact Online;Synchronisatie;Synchronisatie van Exact Online met DocBase;De synchronisatie van kerkbijdragen, ledenadministratie en betalingen.;;Exact Online (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? DocBase. Test de synchronisatie om te controleren of gegevens goed worden gesynchroniseerd tussen de systemen.;
-8703;Exact;Exact Online;Betalingen;Betalingen uitvoeren via SEPA;Het initiëren van betalingen via SEPA-bestanden vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de betalingen, controleer de gegevens en klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving en bevestig de betaling.;
-8704;Exact;Exact Online;Betalingen;Betalingen verifiëren;Verifiëren van uitgaande betalingen voor kerkbijdragen of leveranciers.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Betalingsgeschiedenis. Controleer alle betalingen en bevestig de status van elke betaling.;
-8705;Exact;Exact Online;Incasso's;Incasso’s uitvoeren;Het uitvoeren van automatische incasso’s voor kerkbijdragen.;;Exact Online (Module: Incasso's): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden die automatische incasso’s hebben ingesteld en genereer het SEPA-bestand voor de bank.;
+8703;Exact;Exact Online;Betalingen;Betalingen uitvoeren via SEPA;Het initiÃ«ren van betalingen via SEPA-bestanden vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de betalingen, controleer de gegevens en klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving en bevestig de betaling.;
+8704;Exact;Exact Online;Betalingen;Betalingen verifiÃ«ren;VerifiÃ«ren van uitgaande betalingen voor kerkbijdragen of leveranciers.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Betalingsgeschiedenis. Controleer alle betalingen en bevestig de status van elke betaling.;
+8705;Exact;Exact Online;Incasso's;IncassoÂ’s uitvoeren;Het uitvoeren van automatische incassoÂ’s voor kerkbijdragen.;;Exact Online (Module: Incasso's): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden die automatische incassoÂ’s hebben ingesteld en genereer het SEPA-bestand voor de bank.;
 8706;Exact;Exact Online;Inkoop;Inkoopfacturen verwerken;Het verwerken van inkoopfacturen voor parochie-uitgaven.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Inkoopboeking. Vul de gegevens van de leverancier en de factuur in. Koppel de factuur aan de juiste grootboekrekening en klik op Opslaan.;
 8707;Exact;Exact Online;Verkoop;Verkoopfacturen opstellen;Het opstellen van verkoopfacturen voor bijdragen.;;Exact Online (Module: Verkoop): Ga naar Financieel ? Verkoop ? Nieuwe Verkoopboeking. Vul de gegevens in zoals de naam van het lid, het factuurnummer, het bedrag en de grootboekrekening. Klik op Opslaan en verstuur de factuur per e-mail of post.;
 8708;Exact;Exact Online;Bank;Bankkoppelingen instellen;Het verbinden van Exact Online met de bankrekening voor automatische verwerking van banktransacties.;;Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Voeg een nieuwe bankkoppeling toe en autoriseer de koppeling via je online bankomgeving.;
-8709;Exact;Exact Online;Inkoop;Creditnota’s verwerken;Het proces voor het verwerken van creditnota’s bij foutieve facturen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Creditnota. Vul dezelfde gegevens in als de oorspronkelijke factuur, maar gebruik een negatief bedrag en koppel het aan de oorspronkelijke factuur. Klik op Opslaan.;
+8709;Exact;Exact Online;Inkoop;CreditnotaÂ’s verwerken;Het proces voor het verwerken van creditnotaÂ’s bij foutieve facturen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Creditnota. Vul dezelfde gegevens in als de oorspronkelijke factuur, maar gebruik een negatief bedrag en koppel het aan de oorspronkelijke factuur. Klik op Opslaan.;
 8710;Exact;Exact Online;Financieel;Automatisch facturen verwerken;Het automatisch verwerken van ingelezen facturen via Scan & Herken.;;Exact Online (Module: Financieel): Ga naar Inkoop ? Inkoopfacturen. Controleer de automatisch ingevoerde gegevens die door Scan & Herken zijn herkend. Koppel de factuur aan de juiste grootboekrekening en klik op Boeken.;
 8711;Exact;Exact Online;Digitale Brievenbus;Digitale brievenbus instellen;Het instellen van een digitale brievenbus voor het ontvangen van facturen.;;Exact Online (Module: Digitale Brievenbus): Ga naar Instellingen ? Administratie ? Digitale Brievenbus. Kopieer het unieke e-mailadres en geef dit door aan leveranciers zodat zij hun facturen automatisch naar Exact Online kunnen sturen.;
 8712;Exact;Exact Online;Rapportages;Jaarafsluitingsrapporten genereren;Het genereren van rapportages voor de jaarafsluiting.;;Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Jaarafsluitingsrapporten. Selecteer het gewenste rapport (bijvoorbeeld balans of winst- en verliesrekening) en klik op Genereren.;
 8713;Exact;Exact Online;Synchronisatie;Handmatige synchronisatie met Exact;Handmatige synchronisatie van gegevens tussen Exact en DocBase.;;Exact Online (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? Synchronisatie starten. Controleer of de synchronisatie is gestart en test of de gegevens correct worden overgedragen.;
-8714;Exact;Exact Online;Synchronisatie;Koppeling met DocBase controleren;Verifiëren of de koppeling tussen Exact Online en DocBase goed werkt.;;Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer de status en eventuele foutmeldingen. Als de koppeling niet werkt, controleer dan de API-sleutels en probeer opnieuw te synchroniseren.;
-8715;Exact;Exact Online;Synchronisatie;Exact Rel-ID controleren;Verifiëren of Rel-IDs van leden correct zijn.;;Exact Online (Module: Synchronisatie): Open een lid in Exact Online, controleer de Rel-ID en vergelijk deze met de Rel-ID in DocBase. Als er verschillen zijn, werk dan de gegevens bij om te zorgen voor een juiste synchronisatie.;
+8714;Exact;Exact Online;Synchronisatie;Koppeling met DocBase controleren;VerifiÃ«ren of de koppeling tussen Exact Online en DocBase goed werkt.;;Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer de status en eventuele foutmeldingen. Als de koppeling niet werkt, controleer dan de API-sleutels en probeer opnieuw te synchroniseren.;
+8715;Exact;Exact Online;Synchronisatie;Exact Rel-ID controleren;VerifiÃ«ren of Rel-IDs van leden correct zijn.;;Exact Online (Module: Synchronisatie): Open een lid in Exact Online, controleer de Rel-ID en vergelijk deze met de Rel-ID in DocBase. Als er verschillen zijn, werk dan de gegevens bij om te zorgen voor een juiste synchronisatie.;
 8716;DocBase;DocBase Ledenadministratie;Ledenbeheer;Ledenkaart;Centraal overzicht per lid;;DocBase (Module: Ledenadministratie): Zoek het lid op via de zoekbalk, klik op Ledenkaart om alle gegevens van het lid te bekijken, inclusief persoonsgegevens, relaties en historie.;
 8717;DocBase;DocBase Ledenadministratie;Ledenbeheer;Leden toevoegen;Nieuwe leden registreren;;DocBase (Module: Ledenbeheer): Ga naar Leden ? Nieuw lid toevoegen, vul de benodigde gegevens in, zoals naam, geboortedatum en adres, en klik op Opslaan om het lid toe te voegen.;
 8718;DocBase;DocBase Ledenadministratie;Ledenbeheer;Kerkverlaters registreren;Aangeven dat iemand de kerk verlaat;;DocBase (Module: Ledenbeheer): Ga naar de Ledenkaart, selecteer het lid en wijzig de status naar Kerkverlater. Dit zorgt ervoor dat het lid niet meer als actief wordt beschouwd in de administratie.;
@@ -125,18 +122,18 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8740;DocBase;DocBase Ledenadministratie;Ledenbeheer;Lid uitschrijven;Markeer een lid als vertrokken of overleden.;;DocBase (Module: Ledenbeheer): Open het lid en wijzig de Status naar Uitgeschreven of Overleden en sla deze wijziging op. Dit zorgt ervoor dat het lid niet meer in de actieve ledenlijst voorkomt.;
 8741;DocBase;DocBase Ledenadministratie;Ledenbeheer;Geboortedatum corrigeren;Pas foutieve geboortedata aan.;;DocBase (Module: Ledenbeheer): Open het lid, wijzig de geboortedatum naar de juiste waarde en klik op Opslaan. Dit is belangrijk voor een juiste leeftijdsregistratie en voor statistieken.;
 8742;DocBase;DocBase Ledenadministratie;Ledenbeheer;Overleden lid archiveren;Verplaats overleden leden naar archief.;;DocBase (Module: Ledenbeheer): Wijzig de Status van het lid naar Overleden. Het lid wordt automatisch naar het archief verplaatst, zodat het niet meer voorkomt in de actieve administratie.;
-8743;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezin aanmaken;Voeg meerdere leden toe aan één gezinseenheid.;;DocBase (Module: Gezinsbeheer): Ga naar Menu ? Gezinnen ? Nieuw gezin. Voeg leden toe aan het gezin en sla op. Dit maakt het gemakkelijker om gezinsinformatie te beheren en rapportages te genereren.;
+8743;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezin aanmaken;Voeg meerdere leden toe aan Ã©Ã©n gezinseenheid.;;DocBase (Module: Gezinsbeheer): Ga naar Menu ? Gezinnen ? Nieuw gezin. Voeg leden toe aan het gezin en sla op. Dit maakt het gemakkelijker om gezinsinformatie te beheren en rapportages te genereren.;
 8744;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Gezinsrol wijzigen;Wijzig wie hoofd of partner is binnen een gezin.;;DocBase (Module: Gezinsbeheer): Open het gezin, wijzig de gezinsrol (bijvoorbeeld hoofd van het gezin of partner) en sla de wijziging op. Dit zorgt ervoor dat de gezinsstructuur correct wordt weergegeven in de administratie.;
 8745;DocBase;DocBase Ledenadministratie;Gezinsbeheer;Kind toevoegen;Voeg een kind toe aan een gezin.;;DocBase (Module: Gezinsbeheer): Open het gezin, klik op Lid toevoegen en selecteer of maak het kind aan. Dit helpt bij het correct registreren van gezinsleden.;
 8746;DocBase;DocBase algemeen;Rapportages;Export ledenlijst;Maak een Excel-export van alle leden.;;DocBase (Module: Rapportages): Ga naar Menu ? Rapportages ? Ledenlijst ? Exporteren naar Excel. Dit is handig voor interne controle of communicatie met de leden.;
 8747;DocBase;DocBase algemeen;Rapportages;Verjaardagslijst;Genereer overzicht van jarigen per maand.;;DocBase (Module: Rapportages): Ga naar Rapportages ? Verjaardagslijst. Kies de maand waarin je de verjaardagen wilt zien en klik op Genereer. Dit is handig voor felicitaties of nieuwsbrieven.;
-8748;DocBase;DocBase algemeen;Rapportages;Leden per wijk;Rapporteer ledenaantallen per parochiewijk.;;DocBase (Module: Rapportages): Ga naar Rapportages ? Wijken ? Kies periode. Dit is nuttig voor wijkcoördinatie en communicatie binnen de parochie.;
+8748;DocBase;DocBase algemeen;Rapportages;Leden per wijk;Rapporteer ledenaantallen per parochiewijk.;;DocBase (Module: Rapportages): Ga naar Rapportages ? Wijken ? Kies periode. Dit is nuttig voor wijkcoÃ¶rdinatie en communicatie binnen de parochie.;
 8749;Exact;DB Sjablonen;Toezeggingen;Nieuwe toezegging;Registreer een nieuwe kerkbijdrage.;;Exact (Module: Toezeggingen): Open het lid, ga naar Financieel ? Nieuwe toezegging. Vul het bedrag en de looptijd in en sla op. Dit is nodig voor een overzicht van verwachte inkomsten.;
-8750;Exact;DB Sjablonen;Toezeggingen;Toezegging beëindigen;Beëindig een actieve toezegging.;;Exact (Module: Toezeggingen): Open de actieve toezegging, voer de einddatum in en klik op Opslaan om de toezegging te beëindigen. Dit is nodig voor een correcte financiële administratie.;
+8750;Exact;DB Sjablonen;Toezeggingen;Toezegging beÃ«indigen;BeÃ«indig een actieve toezegging.;;Exact (Module: Toezeggingen): Open de actieve toezegging, voer de einddatum in en klik op Opslaan om de toezegging te beÃ«indigen. Dit is nodig voor een correcte financiÃ«le administratie.;
 8751;Exact;DB Sjablonen;Toezeggingen;Tussentijdse verhoging;Pas een toezegging aan naar een hoger bedrag.;;Exact (Module: Toezeggingen): Open de toezegging, wijzig het bedrag en sla de wijziging op. Dit is belangrijk voor jaarlijkse verhogingen of speciale acties.;
-8752;Exact;Exact Online;Financiën;Bankrekening koppelen;Voeg bankgegevens toe aan een lid;;Exact (Module: Financiën): Open het lid, ga naar Financieel ? Bankgegevens ? IBAN invullen ? Opslaan. Dit is nodig voor automatische incasso’s. Zorg ervoor dat de IBAN correct wordt ingevoerd om betalingstransacties mogelijk te maken.;
-8753;Exact;Exact Online;Financiën;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen;;Exact (Module: Financiën): Open de bankgegevens van het lid en vul de BIC in. Klik vervolgens op Opslaan. Dit is noodzakelijk voor SEPA-verwerking en het correct uitvoeren van internationale betalingen.;
-8754;SILA;Synchronisatie;SILA-synchronisatie;Koppeling met landelijke SILA-register;Voor automatische mutaties zoals overlijden;;SILA (Module: Synchronisatie): Ga naar Menu ? SILA ? Synchronisatie starten ? Fouten controleren. Dit zorgt ervoor dat mutaties, zoals overlijden of verhuizing, automatisch worden geïmporteerd.;
+8752;Exact;Exact Online;FinanciÃ«n;Bankrekening koppelen;Voeg bankgegevens toe aan een lid;;Exact (Module: FinanciÃ«n): Open het lid, ga naar Financieel ? Bankgegevens ? IBAN invullen ? Opslaan. Dit is nodig voor automatische incassoÂ’s. Zorg ervoor dat de IBAN correct wordt ingevoerd om betalingstransacties mogelijk te maken.;
+8753;Exact;Exact Online;FinanciÃ«n;BIC toevoegen;Voeg BIC-code toe bij buitenlandse rekeningen;;Exact (Module: FinanciÃ«n): Open de bankgegevens van het lid en vul de BIC in. Klik vervolgens op Opslaan. Dit is noodzakelijk voor SEPA-verwerking en het correct uitvoeren van internationale betalingen.;
+8754;SILA;Synchronisatie;SILA-synchronisatie;Koppeling met landelijke SILA-register;Voor automatische mutaties zoals overlijden;;SILA (Module: Synchronisatie): Ga naar Menu ? SILA ? Synchronisatie starten ? Fouten controleren. Dit zorgt ervoor dat mutaties, zoals overlijden of verhuizing, automatisch worden geÃ¯mporteerd.;
 8755;Exact;Exact Online;Synchronisatie;Exact-koppeling activeren;Verbind DocBase met Exact Online;;Exact (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? API-sleutel invoeren ? Synchroniseren. Dit zorgt ervoor dat de koppeling tussen Exact Online en DocBase goed functioneert en gegevens automatisch worden gesynchroniseerd.;
 8756;Exact;Exact Online;Synchronisatie;Exact Rel-ID controleren;Controleer of Rel-IDs van leden kloppen;;Exact (Module: Synchronisatie): Open het lid, ga naar Rel-ID en vergelijk met Exact Online. Dit is essentieel voor een correcte gegevensuitwisseling tussen de systemen en het voorkomen van synchronisatiefouten.;
 8760;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruiker toevoegen;Voeg een nieuwe medewerker toe aan DocBase;;DocBase (Module: Beheer): Ga naar Instellingen ? Gebruikersbeheer ? Nieuwe gebruiker aanmaken. Dit stelt je in staat om nieuwe medewerkers toegang te geven tot de administratie, met de juiste rechten en rollen.;
@@ -157,12 +154,12 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8775;Exact;Exact Online (Module: Hoofdmenu);Exact Online;Hoe navigeer je tussen modules;Het gebruik van het hoofdmenu en het selecteren van modules zoals financieel, rapportages en bankbeheer.;;Exact Online (Module: Hoofdmenu): Klik in het hoofdmenu aan de linkerzijde van je scherm op de gewenste module zoals Financieel, Bank, of Rapportages. Als je niet kunt vinden wat je zoekt, gebruik dan de zoekfunctie bovenaan het scherm. Deze zoekfunctie helpt je om snel naar de specifieke module of functie te navigeren die je nodig hebt.;
 8776;Exact;Exact Online (Module: Koppelingen);Exact Online;Integratie met DocBase;Uitleg over de integratie van Exact Online met DocBase en de synchronisatie van kerkbijdragen en ledenadministratie.;;Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd. Test de verbinding door de Test Koppeling-knop in Exact Online in te schakelen om te controleren of de gegevens tussen Exact Online en DocBase goed worden gesynchroniseerd.;
 8777;Exact;Exact Online (Module: Financieel);Exact Online;Facturatievoorkeuren instellen;Uitleg over het instellen van facturatievoorkeuren voor inkoop- en verkoopfacturen.;;Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Facturatievoorkeuren. Kies het standaard btw-percentage (bijvoorbeeld 0% voor vrijgestelde parochies), stel de betalingstermijn in (standaard is 30 dagen) en stel een logische factuurnummering in zoals 2025-0001. Klik op Opslaan om de wijzigingen toe te passen.;
-8778;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiële rapportages.;;Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
+8778;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiÃ«le rapportages.;;Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
 8779;Exact;Exact Online (Module: Kerkbijdragen);Exact Online;Rapportages voor Kerkbijdragen;Rapporten specifiek voor kerkbijdragen en de status van betalingen.;;Exact Online (Module: Kerkbijdragen): Ga naar Rapportages ? Kerkbijdragen ? Overzicht. Stel de filters in, bijvoorbeeld periode, betaalstatus (betaald of openstaand) of parochie en klik op Rapport Genereren om het rapport te verkrijgen.;
 8780;Exact;Exact Online (Module: Boekingen);Exact Online;Correctieboekingen maken;Het proces om fouten in boekingen te corrigeren zonder de oorspronkelijke gegevens te verwijderen.;;Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen ? Correctieboeking. Selecteer de foutieve boeking en klik op Nieuwe Correctieboeking. Vul de juiste gegevens in en koppel deze aan de correcte grootboekrekening. Klik op Opslaan om de correctie door te voeren.;
-8781;Exact;Exact Online (Module: Bank);Exact Online;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;;Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geïmporteerd in Exact Online.;
-8782;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen initiëren;Het initiëren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
-8783;Exact;Exact Online (Module: Incasso's);Exact Online;Incasso’s uitvoeren;Uitleg over het uitvoeren van automatische incasso's via SEPA-bestanden.;;Exact Online (Module: Incasso's): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiëren.;
+8781;Exact;Exact Online (Module: Bank);Exact Online;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;;Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geÃ¯mporteerd in Exact Online.;
+8782;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen initiÃ«ren;Het initiÃ«ren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;;Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
+8783;Exact;Exact Online (Module: Incasso's);Exact Online;IncassoÂ’s uitvoeren;Uitleg over het uitvoeren van automatische incasso's via SEPA-bestanden.;;Exact Online (Module: Incasso's): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiÃ«ren.;
 8784;Exact;Exact Online (Module: Inkoop);Exact Online;Inkoopfacturen verwerken;Het verwerken van inkoopfacturen in Exact Online, inclusief het koppelen aan grootboekrekeningen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Inkoopboeking. Vul de factuurgegevens in zoals de leverancier, factuurnummer, bedrag en btw. Koppel de factuur aan de juiste grootboekrekening en klik op Opslaan.;
 8785;Exact;Exact Online (Module: Verkoop);Exact Online;Verkoopfacturen opstellen;Het opstellen van verkoopfacturen voor kerkbijdragen of andere inkomsten.;;Exact Online (Module: Verkoop): Ga naar Financieel ? Verkoop ? Nieuwe Verkoopboeking. Vul de klantgegevens (parochiaan), factuurnummer, datum, bedrag, en de bijbehorende grootboekrekening in. Klik op Opslaan en verstuur de factuur per e-mail of post.;
 8786;Exact;Exact Online (Module: Inkoop);Exact Online;Het verwerken van creditnota's;Het proces om creditnota's te verwerken in Exact Online bij incorrecte facturen.;;Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Creditnota. Vul dezelfde gegevens in als de originele factuur, maar gebruik een negatief bedrag. Koppel de creditnota aan de bestaande factuur en klik op Opslaan.;
@@ -174,7 +171,7 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8792;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting voorbereiden;Het voorbereiden van de jaarafsluiting, inclusief het controleren van openstaande posten en btw-aangiften.;;Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Openstaande Posten. Controleer of alle facturen zijn betaald en alle btw-aangiften zijn ingediend voordat je het boekjaar afsluit.;
 8793;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting uitvoeren;Het daadwerkelijk afsluiten van het boekjaar.;;Exact Online (Module: Jaarafsluiting): Ga naar Financieel ? Jaarafsluiting en klik op Boekjaar afsluiten. Controleer of alles correct is verwerkt. Het boekjaar wordt vergrendeld en kan niet meer worden bewerkt.;
 8794;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Toezeggingen van leden registreren;Het registreren van toezeggingen voor kerkbijdragen van leden.;;Exact Online (Module: Ledenbeheer): Ga naar Leden ? Toezeggingen. Klik op Nieuwe toezegging, vul het bedrag en de looptijd in, en klik op Opslaan.;
-8795;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Toezeggingen beëindigen;Het beëindigen van een actieve toezegging.;;Exact Online (Module: Ledenbeheer): Ga naar Leden ? Toezeggingen. Selecteer de toezegging die beëindigd moet worden, vul de einddatum in, en klik op Opslaan.;
+8795;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Toezeggingen beÃ«indigen;Het beÃ«indigen van een actieve toezegging.;;Exact Online (Module: Ledenbeheer): Ga naar Leden ? Toezeggingen. Selecteer de toezegging die beÃ«indigd moet worden, vul de einddatum in, en klik op Opslaan.;
 8796;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Tussentijdse verhoging van toezegging;Het aanpassen van een toezegging naar een hoger bedrag.;;Exact Online (Module: Ledenbeheer): Ga naar Leden ? Toezeggingen. Selecteer de toezegging en pas het bedrag aan. Klik daarna op Opslaan om de wijziging door te voeren.;
 8797;Exact;Exact Online (Module: Financieel);Exact Online;Bankrekening koppelen;Het koppelen van een bankrekening aan een lid voor automatische incasso's.;;Exact Online (Module: Financieel): Ga naar Leden ? Financieel ? Bankgegevens. Voer het IBAN-nummer in en klik op Opslaan om de bankrekening te koppelen.;
 8798;Exact;Exact Online (Module: Financieel);Exact Online;BIC-code toevoegen;Het toevoegen van de BIC-code voor buitenlandse bankrekeningen.;;Exact Online (Module: Financieel): Ga naar Leden ? Financieel ? Bankgegevens. Voer de BIC-code in bij buitenlandse bankrekeningen en klik op Opslaan.;
@@ -195,12 +192,12 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8820;Exact;Exact Online (Module: Hoofdmenu);Exact Online;Hoe navigeer je tussen modules;Het gebruik van het hoofdmenu en het selecteren van modules zoals financieel, rapportages en bankbeheer.;Exact Online (Module: Hoofdmenu);Exact Online (Module: Hoofdmenu): Klik in het hoofdmenu aan de linkerzijde van je scherm op de gewenste module zoals Financieel, Bank, of Rapportages. Als je niet kunt vinden wat je zoekt, gebruik dan de zoekfunctie bovenaan het scherm. Deze zoekfunctie helpt je om snel naar de specifieke module of functie te navigeren die je nodig hebt.;
 8821;Exact;Exact Online (Module: Koppelingen);Exact Online;Integratie met DocBase;Uitleg over de integratie van Exact Online met DocBase en de synchronisatie van kerkbijdragen en ledenadministratie.;Exact Online (Module: Koppelingen);Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd. Test de verbinding door de Test Koppeling-knop in Exact Online in te schakelen om te controleren of de gegevens tussen Exact Online en DocBase goed worden gesynchroniseerd.;
 8822;Exact;Exact Online (Module: Financieel);Exact Online;Facturatievoorkeuren instellen;Uitleg over het instellen van facturatievoorkeuren voor inkoop- en verkoopfacturen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Facturatievoorkeuren. Kies het standaard btw-percentage (bijvoorbeeld 0% voor vrijgestelde parochies), stel de betalingstermijn in (standaard is 30 dagen), en stel een logische factuurnummering in zoals 2025-0001. Klik op Opslaan om de wijzigingen toe te passen.;
-8823;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiële rapportages.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
+8823;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van balansen, winst- en verliesrekeningen en andere financiÃ«le rapportages.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans. Selecteer de gewenste periode (bijvoorbeeld einde boekjaar) en klik op Rapport Genereren. Het rapport wordt vervolgens gegenereerd en je kunt het exporteren naar een PDF of Excel bestand.;
 8824;Exact;Exact Online (Module: Kerkbijdragen);Exact Online;Rapportages voor Kerkbijdragen;Rapporten specifiek voor kerkbijdragen en de status van betalingen.;Exact Online (Module: Kerkbijdragen);Exact Online (Module: Kerkbijdragen): Ga naar Rapportages ? Kerkbijdragen ? Overzicht. Stel de filters in, bijvoorbeeld periode, betaalstatus (betaald of openstaand), of parochie en klik op Rapport Genereren om het rapport te verkrijgen.;
 8825;Exact;Exact Online (Module: Boekingen);Exact Online;Correctieboekingen maken;Het proces om fouten in boekingen te corrigeren zonder de oorspronkelijke gegevens te verwijderen.;Exact Online (Module: Boekingen);Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen ? Correctieboeking. Selecteer de foutieve boeking en klik op Nieuwe Correctieboeking. Vul de juiste gegevens in en koppel deze aan de juiste grootboekrekening. Klik op Opslaan om de correctie door te voeren.;
-8826;Exact;Exact Online (Module: Bank);Exact Online;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geïmporteerd in Exact Online.;
-8827;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen initiëren;Het initiëren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
-8828;Exact;Exact Online (Module: Incasso's);Exact Online;Incasso’s uitvoeren;Het uitvoeren van automatische incasso's via SEPA-bestanden.;Exact Online (Module: Incasso's);Exact Online (Module: Incasso's): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiëren.;
+8826;Exact;Exact Online (Module: Bank);Exact Online;Bankkoppelingen beheren;Het beheren van bankkoppelingen voor het automatisch verwerken van banktransacties.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen. Selecteer je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om te controleren of de banktransacties correct worden geÃ¯mporteerd in Exact Online.;
+8827;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen initiÃ«ren;Het initiÃ«ren van betalingen via SEPA-bestanden rechtstreeks vanuit Exact Online.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen en controleer de betalingsgegevens zoals het IBAN en het bedrag. Klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving om de betaling te bevestigen.;
+8828;Exact;Exact Online (Module: Incasso's);Exact Online;IncassoÂ’s uitvoeren;Het uitvoeren van automatische incasso's via SEPA-bestanden.;Exact Online (Module: Incasso's);Exact Online (Module: Incasso's): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden die hebben toegezegd via automatische incasso te betalen. Controleer de incassogegevens, genereer het SEPA-bestand en upload dit naar je bank om de betalingen te initiÃ«ren.;
 8829;Exact;Exact Online (Module: Inkoop);Exact Online;Inkoopfacturen verwerken;Het verwerken van inkoopfacturen in Exact Online, inclusief het koppelen aan grootboekrekeningen.;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Inkoopboeking. Vul de factuurgegevens in zoals de leverancier, factuurnummer, bedrag en btw. Koppel de factuur aan de juiste grootboekrekening en klik op Opslaan.;
 8830;Exact;Exact Online (Module: Verkoop);Exact Online;Verkoopfacturen opstellen;Het opstellen van verkoopfacturen voor kerkbijdragen of andere inkomsten.;Exact Online (Module: Verkoop);Exact Online (Module: Verkoop): Ga naar Financieel ? Verkoop ? Nieuwe Verkoopboeking. Vul de klantgegevens (parochiaan), factuurnummer, datum, bedrag, en de bijbehorende grootboekrekening in. Klik op Opslaan en verstuur de factuur per e-mail of post.;
 8831;Exact;Exact Online (Module: Inkoop);Exact Online;Het verwerken van creditnota's;Het proces om creditnota's te verwerken in Exact Online bij incorrecte facturen.;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Nieuwe Creditnota. Vul dezelfde gegevens in als de originele factuur, maar gebruik een negatief bedrag. Koppel de creditnota aan de bestaande factuur en klik op Opslaan.;
@@ -213,25 +210,25 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8838;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting controleren;Het controleren van de jaarafsluiting, inclusief het controleren van openstaande posten en het correct afsluiten van het boekjaar.;Exact Online (Module: Jaarafsluiting);Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Jaarafsluitingsrapporten. Controleer de openstaande posten en verifieer of alle boekingen correct zijn verwerkt. Klik op Boekjaar afsluiten om het proces te voltooien.;
 8839;Exact;Exact Online (Module: Beveiliging);Exact Online;Beveiliging en gebruikersbeheer;Instellen van beveiligingsinstellingen en het beheer van gebruikersrollen.;Exact Online (Module: Beveiliging);Exact Online (Module: Beveiliging): Ga naar Instellingen ? Beveiliging ? Gebruikersbeheer. Stel de beveiligingsinstellingen in, zoals tweestapsverificatie en pas de gebruikersrollen aan om de toegang tot gevoelige modules te beperken.;
 8840;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen controleren;Het controleren en goedkeuren van betalingen.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen. Selecteer de betalingen die je wilt goedkeuren. Controleer de betalingsdetails, zoals het bedrag, IBAN, en facturen die gekoppeld moeten worden. Klik op Goedgekeurd om de betaling goed te keuren en verder te verwerken.;
-8841;Exact;Exact Online (Module: Financieel);Exact Online;Financiële rapportages genereren;Het genereren van financiële rapportages, zoals balansen en winst- en verliesrekeningen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Rapportages ? Financieel ? Balans of Rapportages ? Financieel ? Winst- en Verliesrekening. Stel de periode in (bijv. kwartaal of jaar) en klik op Genereren. Het rapport wordt vervolgens gegenereerd. Je kunt het rapport exporteren naar PDF of Excel.;
+8841;Exact;Exact Online (Module: Financieel);Exact Online;FinanciÃ«le rapportages genereren;Het genereren van financiÃ«le rapportages, zoals balansen en winst- en verliesrekeningen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Rapportages ? Financieel ? Balans of Rapportages ? Financieel ? Winst- en Verliesrekening. Stel de periode in (bijv. kwartaal of jaar) en klik op Genereren. Het rapport wordt vervolgens gegenereerd. Je kunt het rapport exporteren naar PDF of Excel.;
 8842;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Ledeninformatie bijwerken;Het bijwerken van ledeninformatie in Exact Online.;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Ledenlijst. Zoek het lid op en klik op Bewerken. Pas de benodigde gegevens aan en klik op Opslaan. Het lid wordt vervolgens bijgewerkt in het systeem.;
 8843;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen koppelen aan facturen;Het koppelen van betalingen aan de juiste facturen.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Bankmutaties. Selecteer de betaling die je wilt koppelen en klik op Handmatig koppelen. Kies de facturen die je wilt koppelen aan deze betaling en klik op Opslaan om de koppeling te bevestigen.;
 8844;Exact;Exact Online (Module: Financieel);Exact Online;Automatische boekingen;Het instellen van automatische boekingen voor terugkerende betalingen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Terugkerende Boekingen. Stel de frequentie in voor de automatische boekingen (bijv. maandelijks of jaarlijks) en koppel de boekingen aan de juiste grootboekrekeningen. Klik op Opslaan om de instellingen toe te passen.;
 8845;Exact;Exact Online (Module: Koppelingen);Exact Online;Koppeling met DocBase;Het instellen van de koppeling tussen Exact Online en DocBase voor gegevensuitwisseling.;Exact Online (Module: Koppelingen);Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Voer de API-sleutel in die je hebt ontvangen van DocBase en test de koppeling door op de Test Koppeling knop te klikken.;
 8846;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Leden exporteren;Het exporteren van ledengegevens naar Excel.;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Ledenlijst. Selecteer de leden die je wilt exporteren en klik op Exporteren naar Excel. Sla het bestand op je computer op voor verdere verwerking.;
 8847;Exact;Exact Online (Module: Rapportages);Exact Online;Openstaande facturen rapporteren;Het genereren van een rapport met openstaande verkoopfacturen.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Openstaande Posten. Stel de filters in voor de gewenste periode en klanten. Klik op Rapport Genereren om het overzicht van openstaande facturen te verkrijgen.;
-8848;Exact;Exact Online (Module: Bank);Exact Online;Banktransacties importeren;Het importeren van banktransacties naar Exact Online.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Klik op Nieuwe Bankmutatie en selecteer de optie om banktransacties te importeren. Kies het juiste bestandstype (bijv. MT940) en upload het bestand. De bankmutaties worden automatisch in Exact Online geïmporteerd.;
+8848;Exact;Exact Online (Module: Bank);Exact Online;Banktransacties importeren;Het importeren van banktransacties naar Exact Online.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Klik op Nieuwe Bankmutatie en selecteer de optie om banktransacties te importeren. Kies het juiste bestandstype (bijv. MT940) en upload het bestand. De bankmutaties worden automatisch in Exact Online geÃ¯mporteerd.;
 8849;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting uitvoeren;Het afsluiten van het boekjaar in Exact Online.;Exact Online (Module: Jaarafsluiting);Exact Online (Module: Jaarafsluiting): Ga naar Financieel ? Jaarafsluiting ? Boekjaar afsluiten. Controleer of alle facturen zijn verwerkt en of de rapportages correct zijn. Klik op Afsluiten om het boekjaar te vergrendelen.;
 8850;Exact;Exact Online (Module: Beveiliging);Exact Online;Gebruikersrechten aanpassen;Het aanpassen van gebruikersrechten in Exact Online.;Exact Online (Module: Beveiliging);Exact Online (Module: Beveiliging): Ga naar Instellingen ? Gebruikersbeheer ? Rollen. Selecteer de gebruikersrol die je wilt aanpassen en vink de benodigde rechten aan. Klik op Opslaan om de wijzigingen toe te passen.;
 8851;Exact;Exact Online (Module: Financieel);Exact Online;Grootboekrekeningen aanpassen;Het aanpassen van grootboekrekeningen in Exact Online.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Grootboekrekeningen. Kies de grootboekrekening die je wilt aanpassen en wijzig de instellingen zoals nodig. Klik op Opslaan om de wijzigingen door te voeren.;
-8852;Exact;Exact Online (Module: Betalingen);Exact Online;Bankbetalingen controleren;Het controleren van verwerkte betalingen en het verifiëren van bankgegevens.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Bankmutaties. Controleer de geïmporteerde betalingen en koppel ze aan de juiste facturen of grootboekrekeningen. Klik op Opslaan om de betalingen goed te keuren en verder te verwerken.;
-8853;Exact;Exact Online (Module: Bank);Exact Online;Bankrekeningen toevoegen;Het toevoegen van bankrekeningen voor automatische betalingen en incasso’s.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankrekeningen. Klik op Nieuwe bankrekening toevoegen, vul de bankgegevens in en klik op Opslaan.;
+8852;Exact;Exact Online (Module: Betalingen);Exact Online;Bankbetalingen controleren;Het controleren van verwerkte betalingen en het verifiÃ«ren van bankgegevens.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Bankmutaties. Controleer de geÃ¯mporteerde betalingen en koppel ze aan de juiste facturen of grootboekrekeningen. Klik op Opslaan om de betalingen goed te keuren en verder te verwerken.;
+8853;Exact;Exact Online (Module: Bank);Exact Online;Bankrekeningen toevoegen;Het toevoegen van bankrekeningen voor automatische betalingen en incassoÂ’s.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankrekeningen. Klik op Nieuwe bankrekening toevoegen, vul de bankgegevens in en klik op Opslaan.;
 8854;Exact;Exact Online (Module: Financieel);Exact Online;BTW-aangifte instellen;Het configureren van BTW-instellingen voor de juiste btw-verwerking.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? BTW-instellingen. Stel de juiste BTW-codes in (bijv. 21% voor standaard BTW) en koppel de BTW-codes aan de relevante grootboekrekeningen. Klik op Opslaan.;
-8855;Exact;Exact Online (Module: Rapportages);Exact Online;Jaaroverzicht rapporteren;Het genereren van een jaaroverzicht van de financiële administratie.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Jaaroverzicht. Stel de juiste periode in, bijvoorbeeld het afgelopen boekjaar, en klik op Rapport Genereren.;
+8855;Exact;Exact Online (Module: Rapportages);Exact Online;Jaaroverzicht rapporteren;Het genereren van een jaaroverzicht van de financiÃ«le administratie.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Jaaroverzicht. Stel de juiste periode in, bijvoorbeeld het afgelopen boekjaar, en klik op Rapport Genereren.;
 8856;Exact;Exact Online (Module: Administraties);Exact Online;Administratie wisselen;Het wisselen tussen verschillende administraties in Exact Online.;Exact Online (Module: Administraties);Exact Online (Module: Administraties): Klik rechtsboven op de naam van je huidige administratie. Kies uit de lijst met administraties en klik op de gewenste administratie. Let op de grootboekrekeningen, zodat je geen verwarring hebt met bestaande boekingen.;
 8857;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Ledenimport;Het importeren van ledengegevens vanuit een extern bestand naar Exact Online.;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Importeren. Upload het bestand in CSV- of Excel-formaat. Zorg ervoor dat de velden correct gematcht worden met de juiste gegevens in Exact Online. Klik op Importeren om de leden in het systeem te plaatsen.;
 8858;Exact;Exact Online (Module: Financieel);Exact Online;Terugkerende betalingen instellen;Het instellen van periodieke betalingen zoals maandelijkse bijdragen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Terugkerende betalingen. Stel de frequentie in (bijv. maandelijks) en voeg de bedragen en betaalmethode toe. Klik op Opslaan om de instellingen toe te passen.;
-8859;Exact;Exact Online (Module: Rapportages);Exact Online;Financiële rapporten genereren;Het genereren van gedetailleerde financiële rapporten voor interne en externe rapportage.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Gedetailleerd rapport. Kies de gewenste periode en grootboekrekeningen en klik op Rapport Genereren. Exporteren naar PDF of Excel is mogelijk.;
+8859;Exact;Exact Online (Module: Rapportages);Exact Online;FinanciÃ«le rapporten genereren;Het genereren van gedetailleerde financiÃ«le rapporten voor interne en externe rapportage.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Gedetailleerd rapport. Kies de gewenste periode en grootboekrekeningen en klik op Rapport Genereren. Exporteren naar PDF of Excel is mogelijk.;
 8860;Exact;Exact Online (Module: Betalingen);Exact Online;Automatische betalingsoverzichten;Het genereren van automatische betalingsoverzichten om betalingen per banktransactie te controleren.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen. Gebruik de filteroptie om de betalingen per datum of betalers te controleren en klik op Rapport Genereren om een overzicht van de betalingen te verkrijgen.;
 8861;Exact;Exact Online (Module: Bank);Exact Online;Bankmutaties importeren;Het importeren van bankmutaties voor automatische verwerking in Exact Online.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe Bankkoppeling Toevoegen, kies je bank en volg de stappen om de koppeling te autoriseren via je online bankomgeving. Test de koppeling om de bankmutaties te importeren.;
 8862;Exact;Exact Online (Module: Boekingen);Exact Online;Correctieboekingen verwerken;Het corrigeren van boekingen met fouten.;Exact Online (Module: Boekingen);Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen ? Correctieboeking. Selecteer de foutieve boeking en klik op Nieuwe Correctieboeking. Vul de juiste gegevens in en klik op Opslaan om de correctie door te voeren.;
@@ -241,9 +238,9 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8866;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen uitvoeren;Het uitvoeren van betalingen via SEPA-bestanden.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Betalingen. Selecteer de facturen die je wilt betalen, controleer de betalingsgegevens en klik op SEPA-bestand Genereren. Upload het bestand naar je bank om de betaling te voltooien.;
 8867;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Ledengegevens synchroniseren;Het synchroniseren van ledeninformatie tussen Exact Online en DocBase.;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd en klik op Synchroniseren om de gegevens tussen Exact Online en DocBase te synchroniseren.;
 8868;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingsherinneringen instellen;Het instellen van automatische betalingsherinneringen voor achterstallige betalingen.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Instellingen ? Betalingen ? Betalingsherinneringen. Stel de frequentie in (bijv. wekelijks) en voeg de tekst voor de herinnering toe. Klik op Opslaan om de instellingen toe te passen.;
-8869;Exact;Exact Online (Module: Bank);Exact Online;Bankmutaties reconciliëren;Het afstemmen van bankmutaties met boekingen in Exact Online.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Selecteer de bankmutatie die je wilt reconciliëren, koppel deze aan de juiste boeking en klik op Opslaan om de afstemming te voltooien.;
+8869;Exact;Exact Online (Module: Bank);Exact Online;Bankmutaties reconciliÃ«ren;Het afstemmen van bankmutaties met boekingen in Exact Online.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Selecteer de bankmutatie die je wilt reconciliÃ«ren, koppel deze aan de juiste boeking en klik op Opslaan om de afstemming te voltooien.;
 8870;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Lid verwijderen;Het verwijderen van een lid uit de administratie.;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Zoeken naar lid. Open de ledenkaart en klik op Lid verwijderen. Bevestig de actie om het lid permanent uit de administratie te verwijderen.;
-8871;Exact;Exact Online (Module: Rapportages);Exact Online;Financiële overzichten exporteren;Het exporteren van financiële rapporten naar PDF of Excel.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Overzicht. Selecteer het gewenste rapport en klik op Exporteren naar PDF/Excel. Kies waar je het bestand wilt opslaan en klik op Opslaan.;
+8871;Exact;Exact Online (Module: Rapportages);Exact Online;FinanciÃ«le overzichten exporteren;Het exporteren van financiÃ«le rapporten naar PDF of Excel.;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Overzicht. Selecteer het gewenste rapport en klik op Exporteren naar PDF/Excel. Kies waar je het bestand wilt opslaan en klik op Opslaan.;
 8872;Exact;Exact Online (Module: Inkoop);Exact Online;Inkooporder aanmaken;Het aanmaken van een inkooporder voor leveranciers.;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Inkoop ? Nieuwe Inkooporder. Vul de leverancier, producten en hoeveelheden in, en klik op Opslaan om de inkooporder te bevestigen.;
 8873;Exact;Exact Online (Module: Verkoop);Exact Online;Verkoopfactuur aanmaken;Het aanmaken van een verkoopfactuur voor een klant.;Exact Online (Module: Verkoop);Exact Online (Module: Verkoop): Ga naar Verkoop ? Nieuwe Verkoopfactuur. Vul de klantgegevens, factuurdatum, bedragen en BTW in. Klik op Opslaan om de factuur te genereren.;
 8874;Exact;Exact Online (Module: Bank);Exact Online;Banktransacties koppelen;Het koppelen van banktransacties aan de juiste boekingen.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Selecteer de transactie en koppel deze aan de bijbehorende factuur of grootboekrekening. Klik op Opslaan om de koppeling te bevestigen.;
@@ -252,14 +249,14 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8877;Exact;Exact Online (Module: Boekingen);Exact Online;Een boeking annuleren;Het annuleren van een foutieve boeking in Exact Online.;Exact Online (Module: Boekingen);Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen. Zoek de boeking die je wilt annuleren, klik op Annuleren en bevestig de actie.;
 8878;Exact;Exact Online (Module: Bank);Exact Online;Bankrekening wijzigen;Het wijzigen van de bankrekening voor automatische betalingen.;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankrekeningen. Kies de bankrekening die je wilt wijzigen, pas de gegevens aan en klik op Opslaan.;
 8879;Exact;Exact Online (Module: Financieel);Exact Online;Jaarafsluiting uitvoeren;Het uitvoeren van de jaarafsluiting om het boekjaar te vergrendelen.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Financieel ? Jaarafsluiting ? Boekjaar sluiten. Controleer of alle transacties en rapportages zijn voltooid, klik op Afsluiten om het jaar af te sluiten.;
-8880;Exact;Exact Online (Module: Betalingen);Exact Online;Incasso’s aanmaken;Het aanmaken van een incasso voor automatische betalingen.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de betalingen die je wilt incasseren, stel de frequentie in en klik op Genereren om de incasso aan te maken.;
+8880;Exact;Exact Online (Module: Betalingen);Exact Online;IncassoÂ’s aanmaken;Het aanmaken van een incasso voor automatische betalingen.;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de betalingen die je wilt incasseren, stel de frequentie in en klik op Genereren om de incasso aan te maken.;
 8881;Exact;Exact Online (Module: Koppelingen);Exact Online;Synchronisatie controleren;Nagaan of de synchronisatie tussen Exact Online en DocBase goed werkt;Exact Online (Module: Koppelingen);Exact Online (Module: Koppelingen): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer de status van de koppeling en eventuele foutmeldingen. Als er een probleem is, controleer de API-sleutel en de configuratie. Klik op Test Koppeling om te zien of de verbinding correct is.;
-8882;Exact;Exact Online (Module: Betalingen);Exact Online;Incasso’s uitvoeren;Het initiëren van automatische incasso's voor betalingen;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden voor de incasso, controleer de gegevens, genereer het SEPA-bestand en upload het naar de bank voor verwerking.;
+8882;Exact;Exact Online (Module: Betalingen);Exact Online;IncassoÂ’s uitvoeren;Het initiÃ«ren van automatische incasso's voor betalingen;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden voor de incasso, controleer de gegevens, genereer het SEPA-bestand en upload het naar de bank voor verwerking.;
 8883;Exact;Exact Online (Module: Betalingen);Exact Online;Betalingen koppelen;Het koppelen van betalingen aan openstaande facturen;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Bankmutaties. Zoek de betaling die je wilt koppelen aan de factuur en kies de optie Handmatig koppelen. Selecteer de bijbehorende factuur en klik op Opslaan om de betaling te bevestigen.;
 8884;Exact;Exact Online (Module: Inkoop);Exact Online;Inkoopfacturen controleren;Het controleren van ingelezen inkoopfacturen via Scan & Herken;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Inkoop ? Inkoopfacturen ? Te controleren facturen. Controleer de automatisch ingevoerde gegevens zoals het factuurnummer, bedrag, BTW en leverancier. Pas de foutieve gegevens aan en klik op Boeken.;
-8885;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van financiële rapporten zoals de winst- en verliesrekening;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Winst- en verliesrekening. Selecteer de gewenste periode en filters zoals specifieke grootboekrekeningen. Klik op Genereren om het rapport te bekijken. Exporteren naar PDF of Excel kan via de exportopties.;
+8885;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages genereren;Het genereren van financiÃ«le rapporten zoals de winst- en verliesrekening;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Winst- en verliesrekening. Selecteer de gewenste periode en filters zoals specifieke grootboekrekeningen. Klik op Genereren om het rapport te bekijken. Exporteren naar PDF of Excel kan via de exportopties.;
 8886;Exact;Exact Online (Module: Boekingen);Exact Online;Correctieboekingen maken;Het corrigeren van foutieve boekingen in Exact Online;Exact Online (Module: Boekingen);Exact Online (Module: Boekingen): Ga naar Financieel ? Boekingen ? Correctieboeking. Selecteer de foutieve boeking en klik op Nieuwe Correctieboeking. Voer de benodigde correctiegegevens in en klik op Opslaan om de wijziging door te voeren.;
-8887;Exact;Exact Online (Module: Bank);Exact Online;Bankrekening koppelen;Het koppelen van een bankrekening aan Exact Online voor automatische verwerking van bankmutaties;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe bankkoppeling toevoegen, kies de bank en autoriseer de koppeling via je online bankomgeving. Test de verbinding om te controleren of de bankmutaties correct worden geïmporteerd.;
+8887;Exact;Exact Online (Module: Bank);Exact Online;Bankrekening koppelen;Het koppelen van een bankrekening aan Exact Online voor automatische verwerking van bankmutaties;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Instellingen ? Financieel ? Bankkoppelingen. Klik op Nieuwe bankkoppeling toevoegen, kies de bank en autoriseer de koppeling via je online bankomgeving. Test de verbinding om te controleren of de bankmutaties correct worden geÃ¯mporteerd.;
 8888;Exact;Exact Online (Module: Financieel);Exact Online;Periodieke betalingen instellen;Het instellen van terugkerende betalingen zoals kerkbijdragen via automatische incasso;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Terugkerende betalingen. Kies de frequentie voor de betalingen (bijv. jaarlijks) en vul de bedragen en betaalmethode in. Klik op Opslaan om de instellingen toe te passen.;
 8889;Exact;Exact Online (Module: Inkoop);Exact Online;Inkooporder verwerken;Het verwerken van een inkooporder in Exact Online;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Inkoop ? Inkooporders ? Nieuwe Inkooporder. Vul de gegevens van de leverancier in, voeg de producten en hoeveelheden toe en klik op Opslaan om de inkooporder te bevestigen.;
 8890;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Lid toevoegen;Het toevoegen van een nieuw lid aan Exact Online voor administratieve doeleinden;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Nieuw lid toevoegen. Vul de gegevens van het lid in, zoals naam, geboortedatum en adres. Klik op Opslaan om het lid toe te voegen aan de administratie.;
@@ -268,17 +265,17 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8893;Exact;Exact Online (Module: Rapportages);Exact Online;Leden exporteren;Het exporteren van een ledenlijst voor administratieve doeleinden;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Leden ? Rapportages ? Ledenlijst. Klik op Exporteren naar Excel om de ledenlijst te downloaden in een Excel-bestand.;
 8894;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting voorbereiden;Het voorbereiden van de jaarafsluiting door openstaande posten te controleren;Exact Online (Module: Jaarafsluiting);Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Openstaande Posten. Controleer of alle facturen zijn betaald en of alle BTW-aangiften zijn ingediend voordat je het boekjaar afsluit.;
 8895;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting genereren;Het genereren van de jaarafsluitingsrapporten zoals balans en winst- en verliesrekening;Exact Online (Module: Jaarafsluiting);Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Jaarafsluitingsrapporten. Kies het gewenste rapport (bijv. balans) en klik op Genereren. Exporteer het rapport naar PDF of Excel voor verdere verantwoording.;
-8896;Exact;Exact Online (Module: Bank);Exact Online;Bankmutaties verwerken;Het verwerken van bankmutaties voor betalingen en ontvangsten;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Bekijk de lijst met geïmporteerde banktransacties en koppel elke transactie aan de juiste factuur of grootboekrekening. Klik op Opslaan om de koppeling te bevestigen.;
+8896;Exact;Exact Online (Module: Bank);Exact Online;Bankmutaties verwerken;Het verwerken van bankmutaties voor betalingen en ontvangsten;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Bankmutaties. Bekijk de lijst met geÃ¯mporteerde banktransacties en koppel elke transactie aan de juiste factuur of grootboekrekening. Klik op Opslaan om de koppeling te bevestigen.;
 8897;Exact;Exact Online (Module: Synchronisatie);Exact Online;Synchronisatie van kerkbijdragen;Synchroniseren van gegevens tussen Exact Online en DocBase voor kerkbijdragen;Exact Online (Module: Synchronisatie);Exact Online (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? DocBase. Controleer of de API-sleutel correct is ingevoerd en klik op Synchroniseren om de gegevens tussen beide systemen bij te werken.;
-8898;Exact;Exact Online (Module: Synchronisatie);Exact Online;Exact Rel-ID controleren;Het controleren van de Rel-ID van leden om correcte gegevensuitwisseling te waarborgen;Exact Online (Module: Synchronisatie);Exact Online (Module: Synchronisatie): Ga naar Leden ? Rel-ID en vergelijk de Rel-ID’s van Exact Online en DocBase. Dit garandeert een foutloze synchronisatie van ledeninformatie.;
+8898;Exact;Exact Online (Module: Synchronisatie);Exact Online;Exact Rel-ID controleren;Het controleren van de Rel-ID van leden om correcte gegevensuitwisseling te waarborgen;Exact Online (Module: Synchronisatie);Exact Online (Module: Synchronisatie): Ga naar Leden ? Rel-ID en vergelijk de Rel-IDÂ’s van Exact Online en DocBase. Dit garandeert een foutloze synchronisatie van ledeninformatie.;
 8899;Exact;Exact Online (Module: Bank);Exact Online;Betaling verwerken via SEPA-bestand;Het verwerken van betalingen via SEPA-bestanden vanuit Exact Online;Exact Online (Module: Bank);Exact Online (Module: Bank): Ga naar Bank ? Betalingen ? Nieuwe Betaling. Selecteer de facturen die je wilt betalen, controleer de betalingsdetails en klik op SEPA-bestand Genereren. Upload het bestand naar je online bankomgeving voor betaling.;
 8900;Exact;Exact Online (Module: Betalingen);Exact Online;Handmatig betalingen koppelen;Het handmatig koppelen van betalingen aan facturen in Exact Online;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Bank ? Bankmutaties. Selecteer de transactie en klik op Handmatig Koppelen. Koppel de betaling aan de juiste factuur of grootboekrekening en klik op Opslaan om de betaling te verwerken.;
 8901;Exact;Exact Online (Module: Financieel);Exact Online;Grootboekrekeningen configureren;Het instellen van grootboekrekeningen voor kerkbijdragen, betalingen, etc.;Exact Online (Module: Financieel);Exact Online (Module: Financieel): Ga naar Instellingen ? Financieel ? Grootboekrekeningen. Voeg de juiste grootboeknummers toe voor kerkbijdragen en andere relevante kosten. Klik op Opslaan om de wijzigingen door te voeren.;
-8902;Exact;Exact Online (Module: Rapportages);Exact Online;Financiële rapportages genereren;Het genereren van financiële overzichten zoals balansen en winst- en verliesrekeningen;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans of Winst- en verliesrekening. Stel de gewenste periode in (bijv. kwartaal of boekjaar) en klik op Genereren om het rapport te verkrijgen.;
+8902;Exact;Exact Online (Module: Rapportages);Exact Online;FinanciÃ«le rapportages genereren;Het genereren van financiÃ«le overzichten zoals balansen en winst- en verliesrekeningen;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Financieel ? Balans of Winst- en verliesrekening. Stel de gewenste periode in (bijv. kwartaal of boekjaar) en klik op Genereren om het rapport te verkrijgen.;
 8903;Exact;Exact Online (Module: Inkoop);Exact Online;Inkoopfactuur controleren;Het controleren en verwerken van ontvangen inkoopfacturen;Exact Online (Module: Inkoop);Exact Online (Module: Inkoop): Ga naar Financieel ? Inkoop ? Inkoopfacturen. Controleer of de gegevens van de factuur kloppen en koppel de factuur aan de juiste grootboekrekening. Klik op Opslaan om de factuur te boeken.;
 8904;Exact;Exact Online (Module: Ledenbeheer);Exact Online;Leden exporteren naar Excel;Het exporteren van ledeninformatie naar een Excel-bestand voor rapportage;Exact Online (Module: Ledenbeheer);Exact Online (Module: Ledenbeheer): Ga naar Leden ? Rapportages ? Ledenlijst. Klik op Exporteren naar Excel om de lijst van leden in een Excel-bestand te downloaden.;
 8905;Exact;Exact Online (Module: Synchronisatie);Exact Online;DocBase koppelen;Het koppelen van Exact Online aan DocBase voor gegevensuitwisseling;Exact Online (Module: Synchronisatie);Exact Online (Module: Synchronisatie): Ga naar Instellingen ? Koppelingen ? DocBase. Voer de juiste API-sleutel in en klik op Synchroniseren om de koppeling te testen en gegevens bij te werken tussen Exact Online en DocBase.;
-8906;Exact;Exact Online (Module: Betalingen);Exact Online;Incasso’s verwerken;Het uitvoeren van automatische incasso’s via Exact Online;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? Incasso’s ? Nieuwe Incassobatch. Selecteer de leden die via automatische incasso willen betalen, controleer de gegevens, en genereer het SEPA-bestand voor verwerking via de bank.;
+8906;Exact;Exact Online (Module: Betalingen);Exact Online;IncassoÂ’s verwerken;Het uitvoeren van automatische incassoÂ’s via Exact Online;Exact Online (Module: Betalingen);Exact Online (Module: Betalingen): Ga naar Financieel ? IncassoÂ’s ? Nieuwe Incassobatch. Selecteer de leden die via automatische incasso willen betalen, controleer de gegevens, en genereer het SEPA-bestand voor verwerking via de bank.;
 8907;Exact;Exact Online (Module: Beveiliging);Exact Online;Gebruikersbeheer;Het beheren van gebruikersrechten en toegang binnen Exact Online;Exact Online (Module: Beveiliging);Exact Online (Module: Beveiliging): Ga naar Instellingen ? Gebruikersbeheer ? Gebruikers. Pas de rechten en rollen aan voor medewerkers op basis van hun verantwoordelijkheden binnen Exact Online.;
 8908;Exact;Exact Online (Module: Rapportages);Exact Online;Rapportages voor kerkbijdragen;Het genereren van rapportages over kerkbijdragen en betalingen;Exact Online (Module: Rapportages);Exact Online (Module: Rapportages): Ga naar Rapportages ? Kerkbijdragen ? Overzicht. Stel filters in voor periode, betaalstatus en parochie. Klik op Genereren om het rapport te verkrijgen.;
 8909;Exact;Exact Online (Module: Jaarafsluiting);Exact Online;Jaarafsluiting voorbereiden;Het voorbereiden van de jaarafsluiting in Exact Online;Exact Online (Module: Jaarafsluiting);Exact Online (Module: Jaarafsluiting): Ga naar Rapportages ? Financieel ? Jaarafsluitingsrapporten. Controleer openstaande posten, btw-aangiften, en boekingen om het boekjaar af te sluiten. Klik op Afsluiten om het proces te voltooien.;
@@ -326,7 +323,7 @@ Ga naar Administratienaam > Stamgegevens > Financieel > Periode-datumtabel en kl
 
 Zorg ervoor dat je ook het boekjaar bijwerkt in de boekingen.
 =HYPERLINK(""https://www.exact.com/nl/support/documents/BOEKJAREN-SAMENVOEGEN"",""Lees meer over een boekjaar openen, samenvoegen of verwijderen en boekingsregels met een periode-datumcontrole controleren en bijwerken"")";
-8912;DocBase;KASKI;KASKI;Wat is kaski;Details Kaski;Soort melding;"Het KASKI (Katholiek Sociaal-Kerkelijk Instituut), sinds 1946 verbonden aan de Faculteit der Filosofie, Theologie en Religiewetenschappen van de Radboud Universiteit in Nijmegen, is een toonaangevend onderzoeks- en expertisecentrum voor religie en samenleving in Nederland. Het voert onderzoek uit en biedt beleidsadvies over religie, zingeving en geloof voor diverse opdrachtgevers, zoals kerken, overheden, onderwijsinstellingen en media. Hieronder volgt een gedetailleerde beschrijving van KASKI’s activiteiten, met specifieke aandacht voor de kerncijfers over katholieken, zielzorgeenheden, kerkgebouwen, pastorale beroepskrachten, vrijwilligers, sacramenten en kerkbezoek.
+8912;DocBase;KASKI;KASKI;Wat is kaski;Details Kaski;Soort melding;"Het KASKI (Katholiek Sociaal-Kerkelijk Instituut), sinds 1946 verbonden aan de Faculteit der Filosofie, Theologie en Religiewetenschappen van de Radboud Universiteit in Nijmegen, is een toonaangevend onderzoeks- en expertisecentrum voor religie en samenleving in Nederland. Het voert onderzoek uit en biedt beleidsadvies over religie, zingeving en geloof voor diverse opdrachtgevers, zoals kerken, overheden, onderwijsinstellingen en media. Hieronder volgt een gedetailleerde beschrijving van KASKIÂ’s activiteiten, met specifieke aandacht voor de kerncijfers over katholieken, zielzorgeenheden, kerkgebouwen, pastorale beroepskrachten, vrijwilligers, sacramenten en kerkbezoek.
 Doelstellingen en Werkzaamheden
 KASKI richt zich op het vertalen van maatschappelijke en religieuze ontwikkelingen naar praktisch beleid. Het ondersteunt organisaties bij:
 Het analyseren van vraagstukken rond religie en zingeving.
@@ -424,7 +421,7 @@ Statistische overzicht van de Rooms-Katholieke Kerk, inclusief katholieken, kerk
 Onderzoekers en Specialisaties
 Dr. Jorien Copier: Identiteitsontwikkeling in onderwijs, vernieuwing geloofsgemeenschappen, geestelijke verzorging, kwalitatief onderzoek (interviews, focusgroepen).
 
-Dr. Joris Kregting: Kerkelijke ontwikkelingen (geloofsgemeenschappen, inkomsten, gebouwen), religieuze waarden, kwantitatief onderzoek (enquêtes).
+Dr. Joris Kregting: Kerkelijke ontwikkelingen (geloofsgemeenschappen, inkomsten, gebouwen), religieuze waarden, kwantitatief onderzoek (enquÃªtes).
 
 Layla de Moor, MA: Geestelijke verzorging, onderwijs, kwantitatief en kwalitatief onderzoek.
 
@@ -439,7 +436,7 @@ Overheid: Ministeries van Defensie, Justitie en Veiligheid, Onderwijs, Cultuur e
 Onderwijs en media: Verus, Tilburg School of Catholic Theology, KRO-NCRV, EO, Trouw, Nederlands Dagblad, Reformatorisch Dagblad.
 
 Publicaties en Archief
-Veel van KASKI’s publicaties, waaronder rapporten en statistieken, zijn openbaar toegankelijk via het online archief van de Radboud Universiteit, met een overzicht van de afgelopen 10 jaar.
+Veel van KASKIÂ’s publicaties, waaronder rapporten en statistieken, zijn openbaar toegankelijk via het online archief van de Radboud Universiteit, met een overzicht van de afgelopen 10 jaar.
 Contactinformatie
 Locatie: Erasmusgebouw, Erasmusplein 1, 6525 HT Nijmegen.
 
@@ -452,7 +449,7 @@ Postadres: Postbus 6656, 6503 GD Nijmegen.
 Conclusie
 KASKI speelt een cruciale rol in het begrijpen van religieuze en maatschappelijke ontwikkelingen in Nederland, met een specifieke focus op de Rooms-Katholieke Kerk. De kerncijfers bieden gedetailleerde inzichten in katholieken, zielzorgeenheden, kerkgebouwen, pastorale krachten, vrijwilligers, sacramenten en kerkbezoek, ondanks uitdagingen zoals de beperkte respons van migrantengemeenschappen. Door academisch onderzoek te combineren met praktische toepassingen blijft KASKI een waardevolle partner voor organisaties die zich bezighouden met religie en zingeving.
 Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI of het archief raadplegen op de website van de Radboud Universiteit.
-Het KASKI (Katholiek Sociaal-Kerkelijk Instituut), sinds 1946 verbonden aan de Faculteit der Filosofie, Theologie en Religiewetenschappen van de Radboud Universiteit in Nijmegen, is een toonaangevend onderzoeks- en expertisecentrum voor religie en samenleving in Nederland. Het voert onderzoek uit en biedt beleidsadvies over religie, zingeving en geloof voor diverse opdrachtgevers, zoals kerken, overheden, onderwijsinstellingen en media. Hieronder volgt een gedetailleerde beschrijving van KASKI’s activiteiten, met specifieke aandacht voor de kerncijfers over katholieken, zielzorgeenheden, kerkgebouwen, pastorale beroepskrachten, vrijwilligers, sacramenten en kerkbezoek.
+Het KASKI (Katholiek Sociaal-Kerkelijk Instituut), sinds 1946 verbonden aan de Faculteit der Filosofie, Theologie en Religiewetenschappen van de Radboud Universiteit in Nijmegen, is een toonaangevend onderzoeks- en expertisecentrum voor religie en samenleving in Nederland. Het voert onderzoek uit en biedt beleidsadvies over religie, zingeving en geloof voor diverse opdrachtgevers, zoals kerken, overheden, onderwijsinstellingen en media. Hieronder volgt een gedetailleerde beschrijving van KASKIÂ’s activiteiten, met specifieke aandacht voor de kerncijfers over katholieken, zielzorgeenheden, kerkgebouwen, pastorale beroepskrachten, vrijwilligers, sacramenten en kerkbezoek.
 Doelstellingen en Werkzaamheden
 KASKI richt zich op het vertalen van maatschappelijke en religieuze ontwikkelingen naar praktisch beleid. Het ondersteunt organisaties bij:
 Het analyseren van vraagstukken rond religie en zingeving.
@@ -550,7 +547,7 @@ Statistische overzicht van de Rooms-Katholieke Kerk, inclusief katholieken, kerk
 Onderzoekers en Specialisaties
 Dr. Jorien Copier: Identiteitsontwikkeling in onderwijs, vernieuwing geloofsgemeenschappen, geestelijke verzorging, kwalitatief onderzoek (interviews, focusgroepen).
 
-Dr. Joris Kregting: Kerkelijke ontwikkelingen (geloofsgemeenschappen, inkomsten, gebouwen), religieuze waarden, kwantitatief onderzoek (enquêtes).
+Dr. Joris Kregting: Kerkelijke ontwikkelingen (geloofsgemeenschappen, inkomsten, gebouwen), religieuze waarden, kwantitatief onderzoek (enquÃªtes).
 
 Layla de Moor, MA: Geestelijke verzorging, onderwijs, kwantitatief en kwalitatief onderzoek.
 
@@ -565,7 +562,7 @@ Overheid: Ministeries van Defensie, Justitie en Veiligheid, Onderwijs, Cultuur e
 Onderwijs en media: Verus, Tilburg School of Catholic Theology, KRO-NCRV, EO, Trouw, Nederlands Dagblad, Reformatorisch Dagblad.
 
 Publicaties en Archief
-Veel van KASKI’s publicaties, waaronder rapporten en statistieken, zijn openbaar toegankelijk via het online archief van de Radboud Universiteit, met een overzicht van de afgelopen 10 jaar.
+Veel van KASKIÂ’s publicaties, waaronder rapporten en statistieken, zijn openbaar toegankelijk via het online archief van de Radboud Universiteit, met een overzicht van de afgelopen 10 jaar.
 Contactinformatie
 Locatie: Erasmusgebouw, Erasmusplein 1, 6525 HT Nijmegen.
 
@@ -579,7 +576,7 @@ Conclusie
 KASKI speelt een cruciale rol in het begrijpen van religieuze en maatschappelijke ontwikkelingen in Nederland, met een specifieke focus op de Rooms-Katholieke Kerk. De kerncijfers bieden gedetailleerde inzichten in katholieken, zielzorgeenheden, kerkgebouwen, pastorale krachten, vrijwilligers, sacramenten en kerkbezoek, ondanks uitdagingen zoals de beperkte respons van migrantengemeenschappen. Door academisch onderzoek te combineren met praktische toepassingen blijft KASKI een waardevolle partner voor organisaties die zich bezighouden met religie en zingeving.
 Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI of het archief raadplegen op de website van de Radboud Universiteit.
 ";
-8913;DocBase;Samenvoegen administraties;Inleiding;Doel van het document;Het document biedt richtlijnen voor het samenvoegen van administraties binnen parochies naar één centrale administratie in DocBase en Exact Online. Dit vereenvoudigt het beheer en maakt de processen efficiënter. Parochies kunnen hiermee beter voldoen aan rapportageverplichtingen en interne controle. ;Inleiding;"- Lees het volledige document ter voorbereiding op de samenvoeging.
+8913;DocBase;Samenvoegen administraties;Inleiding;Doel van het document;Het document biedt richtlijnen voor het samenvoegen van administraties binnen parochies naar Ã©Ã©n centrale administratie in DocBase en Exact Online. Dit vereenvoudigt het beheer en maakt de processen efficiÃ«nter. Parochies kunnen hiermee beter voldoen aan rapportageverplichtingen en interne controle. ;Inleiding;"- Lees het volledige document ter voorbereiding op de samenvoeging.
 
 - - Vraag indien gewenst het aanvraagformulier aan bij de Helpdesk.
 
@@ -591,11 +588,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8914;DocBase;Samenvoegen administraties;Inleiding;Kenmerken centrale administratie;In een centrale administratie loggen alle gebruikers in met een P-code. De volledige administratie (leden, vrijwilligers, wijkindeling, grafbeheer) wordt vanuit één DocBase-administratie gevoerd. In Exact Online wordt per locatie gewerkt met kostenplaatsen en, waar van toepassing, met aparte betaalcondities. SILA-mutaties, looplijsten en andere locatie-specifieke taken kunnen per locatie worden gefilterd via zoekopdrachten.;Inleiding;"- Zorg dat alle gebruikers beschikken over een P-code.
+8914;DocBase;Samenvoegen administraties;Inleiding;Kenmerken centrale administratie;In een centrale administratie loggen alle gebruikers in met een P-code. De volledige administratie (leden, vrijwilligers, wijkindeling, grafbeheer) wordt vanuit Ã©Ã©n DocBase-administratie gevoerd. In Exact Online wordt per locatie gewerkt met kostenplaatsen en, waar van toepassing, met aparte betaalcondities. SILA-mutaties, looplijsten en andere locatie-specifieke taken kunnen per locatie worden gefilterd via zoekopdrachten.;Inleiding;"- Zorg dat alle gebruikers beschikken over een P-code.
 
 - - Stel per gebruiker de juiste rechten en voorkeurslocaties in.
 
@@ -607,7 +604,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -623,7 +620,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -639,7 +636,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -657,11 +654,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8918;DocBase;Samenvoegen administraties;Decentraal naar centraal;Aanpassingen in DocBase;In DocBase worden alle administratieve onderdelen (leden, wijkgegevens, vrijwilligers, werkgroepen) overgezet naar één centrale administratie. Wijknamen, codes en werkgroepnamen worden voorzien van het Kaskinummer van de oorspronkelijke locatie om dubbele namen te voorkomen. Abonnementen en debiteuren worden opnieuw aangemaakt in de nieuwe administratie.;Decentraal naar centraal;"- Vraag nieuwe P-codes aan voor alle administrateurs.
+8918;DocBase;Samenvoegen administraties;Decentraal naar centraal;Aanpassingen in DocBase;In DocBase worden alle administratieve onderdelen (leden, wijkgegevens, vrijwilligers, werkgroepen) overgezet naar Ã©Ã©n centrale administratie. Wijknamen, codes en werkgroepnamen worden voorzien van het Kaskinummer van de oorspronkelijke locatie om dubbele namen te voorkomen. Abonnementen en debiteuren worden opnieuw aangemaakt in de nieuwe administratie.;Decentraal naar centraal;"- Vraag nieuwe P-codes aan voor alle administrateurs.
 
 - - Controleer of alle wijk- en werkgroepgegevens correct zijn hernoemd.
 
@@ -673,7 +670,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -689,11 +686,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8920;DocBase;Samenvoegen administraties;Voorbereiding;Verplichte controles;Voorafgaand aan de samenvoeging moet de parochie de administraties opschonen en synchroniseren: foutmeldingen oplossen, statussen bijwerken, en dubbele of overlappende gegevens corrigeren. De financiële administratie moet tot op identieke datum bijgewerkt zijn in alle administraties.;Voorbereiding;"- Controleer alle foutmeldingen in abonnementenlijst.
+8920;DocBase;Samenvoegen administraties;Voorbereiding;Verplichte controles;Voorafgaand aan de samenvoeging moet de parochie de administraties opschonen en synchroniseren: foutmeldingen oplossen, statussen bijwerken, en dubbele of overlappende gegevens corrigeren. De financiÃ«le administratie moet tot op identieke datum bijgewerkt zijn in alle administraties.;Voorbereiding;"- Controleer alle foutmeldingen in abonnementenlijst.
 
 - - Zorg dat alle bankafschriften zijn verwerkt tot eenzelfde datum.
 
@@ -705,7 +702,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -721,7 +718,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -743,7 +740,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -763,11 +760,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8924;DocBase;Samenvoegen administraties;Combinaties;Samenvoegen van gemengde administraties;Indien er meerdere hybride of decentrale administraties worden samengevoegd, moet per situatie worden bekeken hoe deze het beste kunnen worden geïntegreerd. Dit kan maatwerk vereisen.;Combinaties;"- Noteer de combinatie van administraties die u wilt samenvoegen.
+8924;DocBase;Samenvoegen administraties;Combinaties;Samenvoegen van gemengde administraties;Indien er meerdere hybride of decentrale administraties worden samengevoegd, moet per situatie worden bekeken hoe deze het beste kunnen worden geÃ¯ntegreerd. Dit kan maatwerk vereisen.;Combinaties;"- Noteer de combinatie van administraties die u wilt samenvoegen.
 
 - - Dien het aanvraagformulier in via de Helpdesk.
 
@@ -777,13 +774,13 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8925;DocBase;Samenvoegen administraties;Aanvraagprocedure;Indienen aanvraag samenvoeging;Een aanvraag moet worden gedaan via een formulier dat beschikbaar is bij de Helpdesk. Het formulier moet volledig ingevuld en ondertekend worden en als bijlage bij een helpdeskticket worden geüpload.;Aanvraagprocedure;"- Vraag het aanvraagformulier aan via de Helpdesk.
+8925;DocBase;Samenvoegen administraties;Aanvraagprocedure;Indienen aanvraag samenvoeging;Een aanvraag moet worden gedaan via een formulier dat beschikbaar is bij de Helpdesk. Het formulier moet volledig ingevuld en ondertekend worden en als bijlage bij een helpdeskticket worden geÃ¼pload.;Aanvraagprocedure;"- Vraag het aanvraagformulier aan via de Helpdesk.
 
-- - Vul beide formulieren volledig in en laat één ondertekenen door het bestuur.
+- - Vul beide formulieren volledig in en laat Ã©Ã©n ondertekenen door het bestuur.
 
 - - Upload de formulieren in een nieuw helpdeskticket met juiste categorie.
 
@@ -791,7 +788,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -805,11 +802,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8927;DocBase;Samenvoegen administraties;Voorbereiding;Financiële administratie bijwerken (8.2);Alle financiële administraties moeten bijgewerkt zijn tot dezelfde peildatum. Geen batchbetalingen mogen onderweg zijn.;Voorbereiding;"- Verwerk alle bankafschriften in Exact Online.
+8927;DocBase;Samenvoegen administraties;Voorbereiding;FinanciÃ«le administratie bijwerken (8.2);Alle financiÃ«le administraties moeten bijgewerkt zijn tot dezelfde peildatum. Geen batchbetalingen mogen onderweg zijn.;Voorbereiding;"- Verwerk alle bankafschriften in Exact Online.
 
 - - Controleer dat alle boekingen correct zijn verwerkt.
 
@@ -819,7 +816,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -833,7 +830,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -847,7 +844,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -859,7 +856,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -871,11 +868,11 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
-8932;DocBase;Samenvoegen administraties;Controle na samenvoeging;Controlepunten door parochie;Na de samenvoeging moet de parochie controleren of alle gegevens correct zijn overgekomen.;Controle na samenvoeging;"- Vergelijk exportbestanden van vóór de samenvoeging met de actuele data.
+8932;DocBase;Samenvoegen administraties;Controle na samenvoeging;Controlepunten door parochie;Na de samenvoeging moet de parochie controleren of alle gegevens correct zijn overgekomen.;Controle na samenvoeging;"- Vergelijk exportbestanden van vÃ³Ã³r de samenvoeging met de actuele data.
 
 - - Controleer vrijwilligers, sacramenten, debiteuren, abonnementen en wijkgegevens.
 
@@ -885,7 +882,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -899,7 +896,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 ?? **How-to:**
 - Log in op DocBase en/of Exact Online met uw beheerdersaccount.
-- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging – wijkgegevens') om gerichte controles uit te voeren.
+- Gebruik de zoekfunctie of lijsten (bijv. '04. Abonnementen', '07. Bezorging Â– wijkgegevens') om gerichte controles uit te voeren.
 - Exporteer lijsten via de exportfunctie rechtsboven in het scherm (indien beschikbaar).
 - Controleer op fouten of ontbrekende gegevens, noteer bevindingen en neem contact op met de Helpdesk indien nodig.
 - Voor het aanmaken van nieuwe P-codes of kostenplaatsen gebruikt u het formulier dat bij de Helpdesk kan worden opgevraagd.";
@@ -907,7 +904,7 @@ Voor verdere details of specifieke publicaties kun je contact opnemen met KASKI 
 
 In de Basisregistratie Personen staat achter de naam van iedere burger die is opgenomen in de SILA-administratie een 'SILA-stip'. Het is niet letterlijk een stip, maar een digitaal kenmerk.
 Wanneer de betrokken burger verhuist of overlijdt, weet de gemeenteadministratie door dat kenmerk dat de mutatie ook moet worden doorgegeven aan de SILA.
-De gemeente weet niet bij welk kerkgenootschap de betrokkene hoort, wél dat mutaties moeten worden doorgegeven aan de SILA.
+De gemeente weet niet bij welk kerkgenootschap de betrokkene hoort, wÃ©l dat mutaties moeten worden doorgegeven aan de SILA.
 Bij de SILA weet men bij welke kerk de betrokkene hoort en zo kan de SILA de binnengekomen mutatie dus doorgeven aan het kerkgenootschap waar het om gaat.
 
 Het verkeer tussen de burgerlijke gemeenten en de SILA verloopt geheel geautomatiseerd, evenals het verkeer tussen de SILA en de centrale bureaus van de deelnemende kerkgenootschappen.
@@ -930,8 +927,8 @@ In 1994 verdween de vermelding van kerkelijke gezindte uit het bevolkingsregiste
 Dat was vervelend voor de lokale kerken in Nederland, want die konden bij de burgerlijke gemeenten tegen een kleine vergoeding mutaties in de gegevens van hun kerkleden opvragen.
 Enerzijds wilde de overheid recht doen aan de vernieuwing in het denken over privacy, anderzijds wilde zij de kerken niet dwarszitten.
 
-De kerken kwamen met een prachtige oplossing: de SILA en de 'SILA-stip'. Bij de burgerlijke gemeente staat nu achter de naam van iedere burger die lid is van één van de bij de SILA aangesloten kerken een 'SILA-stip'. Die stip betekent dat de betrokkene is opgenomen in de SILA-administratie, een verzameladministratie van kerkleden. De burgerlijke gemeenten, die aan die stip niet kunnen zien bij welk kerkgenootschap iemand met zo'n SILA-stip hoort, verstrekken aan de verzameladministratie SILA de mutaties over die burgers.
-Bij de SILA weet men wél wie bij welke kerk hoort en zo kan de SILA de mutaties doorsturen naar de betrokken kerk.
+De kerken kwamen met een prachtige oplossing: de SILA en de 'SILA-stip'. Bij de burgerlijke gemeente staat nu achter de naam van iedere burger die lid is van Ã©Ã©n van de bij de SILA aangesloten kerken een 'SILA-stip'. Die stip betekent dat de betrokkene is opgenomen in de SILA-administratie, een verzameladministratie van kerkleden. De burgerlijke gemeenten, die aan die stip niet kunnen zien bij welk kerkgenootschap iemand met zo'n SILA-stip hoort, verstrekken aan de verzameladministratie SILA de mutaties over die burgers.
+Bij de SILA weet men wÃ©l wie bij welke kerk hoort en zo kan de SILA de mutaties doorsturen naar de betrokken kerk.
 Bij het opzetten van de SILA-administratie is aan alle kerkleden deze oplossing uitgelegd en is iedereen in de gelegenheid gesteld desgewenst bezwaar te maken tegen opname in de SILA-administratie.
 
 De SILA meldt zelf ook mutaties aan de burgerlijke gemeenten: nieuwe kerkleden en 'bedankjes'. Voor deze mensen wordt respectievelijk een SILA-stip geplaatst of weggehaald. Die meldingen komen uit de deelnemende kerkgenootschappen, uiteindelijk van de betrokkenen zelf .
@@ -943,55 +940,55 @@ Uitgebeeld is de hoofdstroom van mutaties vanuit de burgerlijke gemeenten ('geme
 ";
 8935;DocBase;Grafbeheer;Grafbeheer;Wat is grafbeheer;"Grafbeheer verwijst naar het beheer en onderhoud van grafmonumenten op begraafplaatsen. Dit omvat verschillende taken, zoals het schoonmaken van grafstenen, het onderhouden van planten en bloemen, het herstellen van beschadigde grafmonumenten en het zorgen voor een nette en respectvolle omgeving voor bezoekers.
 
-Grafbeheer kan ook betrekking hebben op administratieve taken, zoals het bijhouden van registraties van graven, het coördineren van begrafenissen en het verstrekken van informatie aan nabestaanden. Het doel van grafbeheer is om een waardige en respectvolle plek te bieden voor het herdenken van overledenen.";DocBase en Grafbeheer;"UNIEKECODE123 Tekst uitleg’s Begraafplaatsadministratie bladzijde 1 van 10
+Grafbeheer kan ook betrekking hebben op administratieve taken, zoals het bijhouden van registraties van graven, het coÃ¶rdineren van begrafenissen en het verstrekken van informatie aan nabestaanden. Het doel van grafbeheer is om een waardige en respectvolle plek te bieden voor het herdenken van overledenen.";DocBase en Grafbeheer;"UNIEKECODE123 Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 1 van 10
 Begraafplaatsadministratie
 Inhoudsopgave:
 1. Graven en begravingen op een graf .............................................................................................1
-1.1. Een resumé .........................................................................................................................2
+1.1. Een resumÃ© .........................................................................................................................2
 2. Rechthebbende ...........................................................................................................................2
-2.1. Een resumé .........................................................................................................................3
+2.1. Een resumÃ© .........................................................................................................................3
 3. Belanghebbende lidstatus ...........................................................................................................3
 3.1. Toevoegen belanghebbende................................................................................................4
-3.2. Een resumé .........................................................................................................................4
+3.2. Een resumÃ© .........................................................................................................................4
 4. Belanghebbende toevoegen ........................................................................................................4
-4.1. Een resumé .........................................................................................................................5
+4.1. Een resumÃ© .........................................................................................................................5
 5. Begraafplaatsen, grafstatus en graven .........................................................................................5
 5.1. Een voorbeeld .....................................................................................................................6
-5.2. Een resumé .........................................................................................................................7
+5.2. Een resumÃ© .........................................................................................................................7
 6. Betrokken organisaties ................................................................................................................7
 6.1. Een Voorbeeld .....................................................................................................................7
 6.2. Een betrokken organisatie op een graf toevoegen ...............................................................7
 6.3. Een voorbeeld .....................................................................................................................8
-6.4. Een resumé .........................................................................................................................8
+6.4. Een resumÃ© .........................................................................................................................8
 7. Aanverwante informatie - Documenten ......................................................................................8
 8. Correspondentie inzien, maken, wijzigen en verwijderen ............................................................9
 8.1. Inzien Correspondentie .......................................................................................................9
 8.2. Nieuwe correspondentie aanmaken ....................................................................................9
 8.3. Wijzigen correspondentie .................................................................................................. 10
 8.4. Verwijderen correspondentie ............................................................................................ 10
-8.5. Een resumé ....................................................................................................................... 10
+8.5. Een resumÃ© ....................................................................................................................... 10
 1. Graven en begravingen op een graf
 In deze uitleg wordt uitgelegd hoe u bij een graf kan zien wie er allemaal binnen dit graf zijn
 begraven.
 Omdat er in een graf meerdere begravingen verricht kunnen worden, maakt Docbase een
-onderscheid tussen de typen “Grafbeheer” en “Begravingen”.
-Klik allereerst op “Grafbeheer”. U bevindt zich nu op het overzicht van alle graven binnen uw
-parochie. Klik op “Zoek & Vind“ om de gegevens van een specifiek graf op te zoeken en te bekijken.
-Zoek naar het grafnummer dat u wilt inzien en klik op “Vind nu”.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 2 van 10
+onderscheid tussen de typen Â“GrafbeheerÂ” en Â“BegravingenÂ”.
+Klik allereerst op Â“GrafbeheerÂ”. U bevindt zich nu op het overzicht van alle graven binnen uw
+parochie. Klik op Â“Zoek & VindÂ“ om de gegevens van een specifiek graf op te zoeken en te bekijken.
+Zoek naar het grafnummer dat u wilt inzien en klik op Â“Vind nuÂ”.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 2 van 10
 Klik op de hyperlink om alle informatie over het graf en de eventuele begravingen op het betreffende
 graf in te kunnen zien. U bevindt zich nu op de grafkaart.
-Klik op het tabblad “Begravingen”. Hier staat wie er op dit moment in het graf begraven is. Bij een
+Klik op het tabblad Â“BegravingenÂ”. Hier staat wie er op dit moment in het graf begraven is. Bij een
 dubbel-graf of een familiegraf zijn er meerdere personen begraven.
-Wanneer een graf is geruimd, dan staat de begraving niet langer onder het tabblad “Begravingen”,
-maar onder “Begravingen historie”.
+Wanneer een graf is geruimd, dan staat de begraving niet langer onder het tabblad Â“BegravingenÂ”,
+maar onder Â“Begravingen historieÂ”.
 Onder relaties Begravingen staat een overzicht van alle personen die zijn begraven.
-Via ”Zoek Vind” kunt u een overledene zoeken.
+Via Â”Zoek VindÂ” kunt u een overledene zoeken.
 Klik op de naam van een overledene. U bevindt zich nu op de detailkaart van de overledene. Hier is te
 zien in welk graf de persoon is begraven.
-Klik vervolgens op het tabblad “Graf“ en op de hyperlink om bij de grafkaart uit te komen. Hier staat
+Klik vervolgens op het tabblad Â“GrafÂ“ en op de hyperlink om bij de grafkaart uit te komen. Hier staat
 alle informatie omtrent het graf waarin de persoon is begraven.
-1.1. Een resumé
+1.1. Een resumÃ©
 Er zijn binnen DocBase verschillende manieren om te zien wie waar is begraven. Met de zoek & vind
 functie kunt u zoeken naar specifieke graven. Klik vervolgens op het desbetreffende graf. Onder het
 tabblad begravingen staan alle relaties die in het desbetreffende graf zijn begraven. Onder
@@ -1016,11 +1013,11 @@ U ziet de resultaten van uw zoekopdracht staan. Dit zijn alle personen met Janse
 wonen. Selecteer de juiste naam en klik op ok.
 Daarnaast is het ook mogelijk om via het vergrootglas de gegevens van een persoon op te zoeken.
 Via deze zoekmethode is het mogelijk om op verschillende persoonsgegevens te filteren, waardoor
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 3 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 3 van 10
 het mogelijk is om een persoon zodanig uniek te specificeren dat uit het gehele ledenbestand van
-alle parochies slechts één resultaat mogelijk is.
+alle parochies slechts Ã©Ã©n resultaat mogelijk is.
 Wanneer u een dergelijk uniek zoekresultaat kunt samenstellen, krijgt u toegang tot de gegevens van
-deze persoon. Zie voor meer informatie hierover de “zoeken; uniek resultaat”.
+deze persoon. Zie voor meer informatie hierover de Â“zoeken; uniek resultaatÂ”.
 Wanneer de rechthebbende niet in het lendenbestand van de RKK voorkomt, vul de lege velden dan
 handmatig in. Stuur vervolgens een notificatie naar de ledenadministratie om de persoon in kwestie
 als lokale relatie in het ledenbestand van de parochie op te nemen.
@@ -1029,13 +1026,13 @@ terugkoppeling te krijgen.
 Wanneer de ledenadministratie de rechthebbende als lokaal lid heeft aangemaakt, dan moet dit
 lokale lid nog wel als rechthebbende gekoppeld worden aan het graf.
 Ga naar de grafkaart, klik op wijzigen en vul het rechthebbende DocBase-ID in.
-2.1. Een resumé
+2.1. Een resumÃ©
 Wanneer u een begraving gaat administreren, dient u via de sjabloonapplicatie eerst een graf te
 selecteren. Voer ook een rechthebbende in. Dit kunt u op drie manieren doen.
 Ten eerste kunt u bij een graf een rechthebbende toevoegen die een relatie is binnen uw parochie.
 Dit kan eenvoudig door het gebruik van de tab zoek functie.
 Ten tweede kunt u een rechthebbende toevoegen die wel lid is van de RKK, maar niet als relatie
-voorkomt in uw parochie. Creëer via het vergrootglas een uniek zoekresultaat om de gegevens van
+voorkomt in uw parochie. CreÃ«er via het vergrootglas een uniek zoekresultaat om de gegevens van
 deze persoon te vinden.
 Ten derde is het mogelijk om de gegevens van de rechthebbende handmatig in te vullen. Stuur een
 notificatie naar de ledenadministratie om deze persoon als lokale relatie in het ledenbestand op te
@@ -1044,7 +1041,7 @@ DocBase-ID alsnog als rechthebbende aan het graf te koppelen.
 3. Belanghebbende lidstatus
 Belanghebbenden
 Naast rechthebbende, kan het zijn dat er meerdere personen met een begraving op een graf zijn
-verbonden. Deze personen kunt u aan het grafkoppelen als “belanghebbende”.
+verbonden. Deze personen kunt u aan het grafkoppelen als Â“belanghebbendeÂ”.
 Om een belanghebbende op een graf toe te voegen gaat u naar het graf waarbij u een
 belanghebbende wilt toevoegen.
 Wanneer u naar de grafbeheerkaart van een graf gaat, klik dan op het tabblad belanghebbenden
@@ -1052,7 +1049,7 @@ Let op
 Het is zeer gewenst om naast een rechthebbende ook belanghebbenden te administreren. Wanneer
 de rechthebbende komt te overlijden dan kunt u contact opnemen met de belanghebbenden. Op de
 grafkaart staat de relatiestatus van de belanghebbende.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 4 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 4 van 10
 3.1. Toevoegen belanghebbende
 Klik op nieuw. Klik vervolgens op het vergrootglas naast RKK-Lid.
 Vul de gegevens in van het lid of de organisatie die u wilt toevoegen.
@@ -1061,25 +1058,25 @@ Deze manier van toevoegen geldt alleen voor relaties die al binnen DocBase staan
 belanghebbende binnen uw parochie kunt u simpel zoeken en krijgt u een overzicht van resultaten.
 Als de belanghebbende geen lid is in uw parochie, maar wel in het totale ledenbestand van de RKK
 staat, dan kunt u deze persoon alsnog opzoeken.
-Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts één uniek
+Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts Ã©Ã©n uniek
 resultaat oplevert in de gehele ledenadministratie van de RKK, alleen dan krijgt u toegang tot de
 gegevens van deze persoon.
 Wanneer u bijvoorbeeld de precieze naam, geboortedatum, postcode en huisnummer heeft, dan
-kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar één relatie in de totale
+kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar Ã©Ã©n relatie in de totale
 ledenadministratie van de RKK aan die zoekvraag voldoet. In die situatie krijgt u toegang, ook wel
 leesrechten genoemd, tot de desbetreffende ledenkaart van de desbetreffende persoon.
-Bekijk voor meer informatie de uitleg’s die het zoeken binnen DocBase behandelen.
+Bekijk voor meer informatie de uitlegÂ’s die het zoeken binnen DocBase behandelen.
 Het kan ook voorkomen dat een belanghebbende geen lid is van de Kerk. U moet dan de
 ledenadministratie notificeren. De ledenadministratie kan vervolgens de betreffende persoon als
 lokale relatie in DocBase administreren. U kunt deze persoon vervolgens als belanghebbende
 toevoegen.
 Wanneer u de juiste persoon heeft gevonden, selecteer deze dan en klik op ok. U heeft nu een
 belanghebbende toegevoegd.
-3.2. Een resumé
+3.2. Een resumÃ©
 In deze uitleg is het concept belanghebbende uitgelegd. Dit zijn relaties die aan een graf zijn
 verbonden. Wanneer de rechthebbende komt te overlijden, wordt de rol van rechthebbende
 automatisch overgezet naar de eerstvolgende belanghebbende. Via de grafbeheerkaart onder het
-tabblad belanghebbenden kunt u één of meerdere belanghebbende toevoegen. De belanghebbende
+tabblad belanghebbenden kunt u Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende
 moet als relatie in DocBase zijn opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het
 ledenbestand zoeken, waartoe u toegang toe heeft. Wanneer u een uniek zoekresultaat produceert,
 kunt u binnen de gehele ledenadministratie van de RKK zoeken. Wanneer de persoon in kwestie geen
@@ -1092,21 +1089,21 @@ belanghebbende wilt toevoegen.
 Wanneer u naar de grafbeheerkaart van een graf gaat, dan gaat u naar het tabblad
 Belanghebbenden.
 Klik op nieuw. Klik vervolgens op het vergrootglas naast RKK-Lid.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 5 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 5 van 10
 Vul de gegevens in van het lid of de organisatie die u wilt toevoegen.
 Selecteer vervolgens de gewenste relatie en klik op ok.
 Deze manier van toevoegen geldt alleen voor relaties die al binnen DocBase staan. Voor
 belanghebbende die lid zijn binnen uw parochie, kunt u eenvoudig op naam zoeken waarna er een
 overzicht van resultaten verschijnt. Als de belanghebbende geen lid is in uw parochie, maar wel in
 het totale ledenbestand van de RKK staat, dan kunt u deze persoon alsnog opzoeken.
-Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts één uniek
+Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts Ã©Ã©n uniek
 resultaat oplevert in de gehele ledenadministratie van de RKK, dan krijgt u toegang tot de gegevens
 van deze persoon.
 Wanneer u bijvoorbeeld de precieze naam, geboortedatum, postcode en huisnummer heeft, dan
-kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar één relatie in de totale
+kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar Ã©Ã©n relatie in de totale
 ledenadministratie van de RKK aan die zoekvraag voldoet. In die situatie krijgt u toegang, ook wel
 leesrechten genoemd, tot de ledenkaart van de desbetreffende persoon.
-Bekijk voor meer informatie de uitleg’s die het zoeken binnen DocBase behandelen.
+Bekijk voor meer informatie de uitlegÂ’s die het zoeken binnen DocBase behandelen.
 Het kan ook voorkomen dat een belanghebbende geen lid is van de Kerk. U moet dan de
 ledenadministratie notificeren. De ledenadministratie kan vervolgens de betreffende persoon als
 lokale relatie in DocBase administreren. U kunt deze persoon vervolgens als belanghebbende
@@ -1115,9 +1112,9 @@ Wanneer u de juiste persoon heeft gevonden, selecteer deze dan en klik op ok. U 
 belanghebbende toegevoegd.
 Onder relaties, staat een overzicht van alle belanghebbende. Via de zoek en vind functie kunt u
 zoeken binnen het overzicht van alle belanghebbende.
-4.1. Een resumé
+4.1. Een resumÃ©
 Via de grafkaart kunt een belanghebbende toevoegen. Onder het tabblad belanghebbenden kunt u
-één of meerdere belanghebbende toevoegen. De belanghebbende moet als relatie in DocBase zijn
+Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende moet als relatie in DocBase zijn
 opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het ledenbestand van uw parochie zoeken.
 Wanneer u een uniek zoekresultaat produceert, kunt u binnen de gehele ledenadministratie van de
 RKK zoeken. Wanneer de persoon in kwestie geen lid van de kerk, dan is het zaak dat de
@@ -1131,30 +1128,30 @@ Onder Relaties klikt u op het type begraafplaatsen.
 Hier staat het overzicht van alle begraafplaatsen binnen uw parochie.
 In de tweede kolom staat elke begraafplaatsnaam blauw en onderstreept, dit geeft de hyperlink
 functie aan.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 6 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 6 van 10
 Klik vervolgens op de hyperlink. In deze uitleg wordt de begraafplaats Velp als voorbeeld gebruikt. De
-begraafplaats wordt nu geopend met de tab “Alle graven” actief. Hier staan alle graven op deze
+begraafplaats wordt nu geopend met de tab Â“Alle gravenÂ” actief. Hier staan alle graven op deze
 begraafplaats.
 U bevindt zich nu binnen een overzicht van alle graven op de desbetreffende begraafplaats.
 In dit overzicht staat een aantal tabbladen: vrije graven, te ruimen graven, graven in reparatie en
 expiratiedatum minder dan een jaar.
 Elk tabblad geeft u een overzicht van graven met specifieke kenmerken.
 Belangrijk
-Het tabblad ‘’expiratiedatum minder dan een jaar’’ is van groot belang. Bij deze graven moet dit jaar
+Het tabblad Â‘Â’expiratiedatum minder dan een jaarÂ’Â’ is van groot belang. Bij deze graven moet dit jaar
 actie ondernomen worden. Het grafrecht kan worden verlengd of het graf kan worden geruimd.
 Wanneer u als Begraafplaatsadministrateur meerdere begraafplaatsen onder uw hoede heeft, dan
-kan het zijn dat u een overzicht van alle graven die een expiratiedatum van binnen één jaar van alle
+kan het zijn dat u een overzicht van alle graven die een expiratiedatum van binnen Ã©Ã©n jaar van alle
 begraafplaatsen wilt hebben. U moet hiervoor een zoekopdracht samenstellen.
 5.1. Een voorbeeld
 Klik onder relaties op het type grafbeheer.
 Klik vervolgens op Zoek en vind.
 Onderaan staat expiratiedatum grafrecht staan.
-Vul in het vak waar nu een = teken staat “Tussen“ in. Vul de huidige datum en de laatste datum van
+Vul in het vak waar nu een = teken staat Â“TussenÂ“ in. Vul de huidige datum en de laatste datum van
 het jaar in. Deze uitleg is op 28 mei gemaakt. De laatste datum van 2018 is 31-12-2018.
-Klik vervolgens op “Vind nu”.
+Klik vervolgens op Â“Vind nuÂ”.
 Er staat nu een overzicht van alle graven waarvan de expiratiedatum binnen het huidige jaar is.
-Klik vervolgens onder “Overige functies” op “Opslaan zoekopdracht”.
-Geef de zoekopdracht vervolgens een omschrijving en vul bij het veld “Bericht” het e-mailadres in
+Klik vervolgens onder Â“Overige functiesÂ” op Â“Opslaan zoekopdrachtÂ”.
+Geef de zoekopdracht vervolgens een omschrijving en vul bij het veld Â“BerichtÂ” het e-mailadres in
 waarop u automatisch berichten van deze zoekopdracht wilt ontvangen. Kies vervolgens of u op de
 hoogte wilt worden gehouden van nieuwe items in de zoekresultaten, van gewijzigde zoekresultaten
 of van beide. Klik hiervoor de juiste keuzevelden aan. Wanneer er geen e-mailadres wordt ingevuld,
@@ -1165,10 +1162,10 @@ en daarmee een overzicht van alle graven waarvan de expiratiedatum dit jaar is.
 Ga nu terug naar het gravenoverzicht van Velp.
 De hyperlinks binnen dit overzicht sturen u door naar de details van het desbetreffende graf.
 Binnen dit overzicht staan de gebruiksstatus en onderhoudsstatus van elk graf duidelijk aangegeven.
-Verder ziet u dat de status van onderhoud van graven “Goed”, “nvt” of “In reparatie” kan zijn.
-In deze uitleg zijn een aantal overzichten binnen de rol “Begraafplaatsbeheerder” getoond.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 7 van 10
-5.2. Een resumé
+Verder ziet u dat de status van onderhoud van graven Â“GoedÂ”, Â“nvtÂ” of Â“In reparatieÂ” kan zijn.
+In deze uitleg zijn een aantal overzichten binnen de rol Â“BegraafplaatsbeheerderÂ” getoond.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 7 van 10
+5.2. Een resumÃ©
 In deze uitleg is kort uitgelegd hoe u bij begraafplaatsen komt en hoe u, met gebruik van de hyperlink
 functie, door kunt gaan naar een gravenoverzicht. Ook is aangegeven hoe u in een keer een overzicht
 kunt verkrijgen van alle graven waarvan de expiratiedatum dit jaar is en dit overzicht kunt opslaan
@@ -1181,7 +1178,7 @@ zijn begrafenisondernemers, grafdelvers, en steenhouwers. Ook kan het voorkomen 
 begraving verschillende organisaties zijn betrokken. Denk hierbij aan uitvaartorganisaties en
 bloemisten.
 Deze organisaties kunnen bij een graf worden geadministreerd.
-Klik onder ‘’relaties’’ op het type ‘’Graf- en begravingsorganisaties’’. Hier staat een overzicht van alle
+Klik onder Â‘Â’relatiesÂ’Â’ op het type Â‘Â’Graf- en begravingsorganisatiesÂ’Â’. Hier staat een overzicht van alle
 organisaties.
 Belangrijk.
 Wanneer u een betrokken organisatie aan een graf wilt toevoegen, dan kunt u alleen uit organisaties
@@ -1189,36 +1186,36 @@ kiezen die in deze lijst staan. Om een organisatie aan een graf toe te voegen di
 staat, dient u eerst de organisatie toe te voegen.
 6.1. Een Voorbeeld
 U wilt een steenhouwer als nieuwe organisatie toevoegen. Klik allereerst op nieuw.
-Vul de gegevens in van de betreffende steenhouwer en klik op ‘’ok’’. De steenhouwer staat nu in het
+Vul de gegevens in van de betreffende steenhouwer en klik op Â‘Â’okÂ’Â’. De steenhouwer staat nu in het
 overzicht.
 6.2. Een betrokken organisatie op een graf toevoegen
-Ga onder ‘’Relaties’’ naar ‘’Grafbeheer’’. Klik vervolgens op het betreffende grafnummer om naar de
+Ga onder Â‘Â’RelatiesÂ’Â’ naar Â‘Â’GrafbeheerÂ’Â’. Klik vervolgens op het betreffende grafnummer om naar de
 grafdetailkaart van dit graf te gaan.
-Klik binnen het grafoverzicht op het tabblad betrokken organisaties. Klik vervolgens op ‘’nieuw’’.
+Klik binnen het grafoverzicht op het tabblad betrokken organisaties. Klik vervolgens op Â‘Â’nieuwÂ’Â’.
 Vul bij organisatienaam Rotsvast Steenhouwers in. Druk op tab.
 Docbase vult in een keer alle gegevens van de steenhouwer in.
-Ook is het mogelijk om te zoeken met het vergrootglas. Door niks in te vullen en op “vind nu” te
+Ook is het mogelijk om te zoeken met het vergrootglas. Door niks in te vullen en op Â“vind nuÂ” te
 klikken, krijgt u het totaaloverzicht van de betrokken organisaties. Kies de gewenste organisatie en
 klik op ok.
 Let op
 U heeft nu een betrokken organisatie aan een graf toegevoegd. Het is ook mogelijk om een
 betrokken organisatie op een begraving toe te voegen.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 8 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 8 van 10
 6.3. Een voorbeeld
-Ga naar de detailkaart van een begraving. Klik onder ‘’relaties’’ op het type ‘’begravingen’’. U kunt uit
+Ga naar de detailkaart van een begraving. Klik onder Â‘Â’relatiesÂ’Â’ op het type Â‘Â’begravingenÂ’Â’. U kunt uit
 dit overzicht van begravingen de betreffende begraving kiezen. Ook is het mogelijk om met zoek en
 vind een begraving op te vragen.
 Klik op de hyperlink van de begraving.
 U bevindt zich nu op de detailkaart van de begraving.
-Klik op het tabblad ‘’betrokken organisaties’’ Klik op ‘’nieuw’’. Vul een betrokken organisatie in. Dit
+Klik op het tabblad Â‘Â’betrokken organisatiesÂ’Â’ Klik op Â‘Â’nieuwÂ’Â’. Vul een betrokken organisatie in. Dit
 gaat op eenzelfde manier als het toevoegen van een betrokken organisatie bij een graf.
-6.4. Een resumé
-Zowel op de grafkaart als op de begravingkaart staat het tabblad ‘’betrokken organisaties’’. Klik
+6.4. Een resumÃ©
+Zowel op de grafkaart als op de begravingkaart staat het tabblad Â‘Â’betrokken organisatiesÂ’Â’. Klik
 hierop en klik op nieuw om een betrokken organisatie op het graf of de begraving toe te voegen. De
 betrokken organisatie moet een DocBase ID hebben. Daarom is het noodzakelijk dat de betrokken
-organisatie geadministreerd staat onder het type ‘’graf- en begravingsorganisaties’’. Wanneer dit niet
+organisatie geadministreerd staat onder het type Â‘Â’graf- en begravingsorganisatiesÂ’Â’. Wanneer dit niet
 het geval is, is het zaak om deze organisatie via de knop nieuw te administreren. Vul de benodigde
-gegevens in en klik op ‘’Ok’’.
+gegevens in en klik op Â‘Â’OkÂ’Â’.
 7. Aanverwante informatie - Documenten
 Binnen deze uitleg wordt het tabblad documenten uitgelegd binnen een begraving.
 Binnen een graf ziet u het tabblad documenten.
@@ -1233,76 +1230,76 @@ vinden.
 Let op!
 Bij het ruimen van een graf is het van belang om:
 - Het grafaktenummer te verwijderen.
-- De gebruiksstatus op “te ruimen” te zetten.
+- De gebruiksstatus op Â“te ruimenÂ” te zetten.
 Bij het weghalen van het grafaktenummer worden de oude documenten en begravingen automatisch
 verplaatst naar de historie tabbladen.
 Om een wijziging door te voeren is het niet noodzakelijk om de status naar ""In behandeling"" te
 zetten. Dit is alleen van belang wanneer u een wijziging niet nu gaat doorvoeren omdat de wijziging
 niet afkomt waardoor u er later mee verder wilt gaan. Door de wijziging in behandeling te zetten, is
 het gemakkelijk in de gaten te houden welke wijzigingen nog aandacht vergen.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 9 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 9 van 10
 De voorkeursparochie kan altijd de gegevens inzien, ongeacht of er verhuisd is of niet.
 Dit zodat uw parochie met het betreffende lid in contact kan blijven.
 8. Correspondentie inzien, maken, wijzigen en verwijderen
 In deze uitleg wordt uitgelegd hoe het inzien, maken, wijzigen en verwijderen van correspondentie in
 DocBase werkt.
 In DocBase zijn er twee manieren om de correspondentie binnen uw parochie in te zien. Via
-“Documenten” of via de “ledenkaart” van een relatie. Vooral met betrekking tot een rechthebbende
+Â“DocumentenÂ” of via de Â“ledenkaartÂ” van een relatie. Vooral met betrekking tot een rechthebbende
 of belanghebbende is het bijhouden en aanmaken van correspondentie noodzakelijk.
 8.1. Inzien Correspondentie
 8.1.1. Manier 1: via documenten
-Klik onder “Documenten” op “Correspondentie”
+Klik onder Â“DocumentenÂ” op Â“CorrespondentieÂ”
 Hier treft u een overzicht aan van alle correspondentie binnen uw parochie. Binnen dit type is het
-vaak praktisch de ‘’zoek & vind’’ functie te gebruiken. Zie voor meer informatie over de zoek&vind
-functie de uitleg ‘’Zoeken - eenvoudig en uitgebreid zoeken’’.
+vaak praktisch de Â‘Â’zoek & vindÂ’Â’ functie te gebruiken. Zie voor meer informatie over de zoek&vind
+functie de uitleg Â‘Â’Zoeken - eenvoudig en uitgebreid zoekenÂ’Â’.
 8.1.2. Manier 2: via de Grafkaart
-Ga onder ‘’relaties’’ naar ‘’grafbeheer’’. Selecteer het graf waarvan u de correspondentie wilt inzien.
+Ga onder Â‘Â’relatiesÂ’Â’ naar Â‘Â’grafbeheerÂ’Â’. Selecteer het graf waarvan u de correspondentie wilt inzien.
 Als het om correspondentie gaat die over het graf in zijn algemeenheid gaat, is dit te vinden onder
-het tabblad “documenten” of bij een vorige begraving onder “documenten historie”.
+het tabblad Â“documentenÂ” of bij een vorige begraving onder Â“documenten historieÂ”.
 8.1.3. Manier 3: via de ledenkaart
 Als u correspondentie specifiek bij de rechthebbende - en dus niet bij het hele graf - wil inzien, klik
-dan op de grafkaart op de “hyperlink” naast “Rechthebbende DocBase-ID”. Onder het tabblad
-“Correspondentie” is de correspondentie in te zien.
+dan op de grafkaart op de Â“hyperlinkÂ” naast Â“Rechthebbende DocBase-IDÂ”. Onder het tabblad
+Â“CorrespondentieÂ” is de correspondentie in te zien.
 Daarnaast kunt u correspondentie aanmerken als mijn favoriet. Ook kunt u een notificatie op een
-document toevoegen. Kijk hiervoor de uitleg’s “Algemeen; Mijn werkplek favorieten” en “Algemeen;
-mijn werkplek - mijn notificaties”
+document toevoegen. Kijk hiervoor de uitlegÂ’s Â“Algemeen; Mijn werkplek favorietenÂ” en Â“Algemeen;
+mijn werkplek - mijn notificatiesÂ”
 8.2. Nieuwe correspondentie aanmaken
 Het kan zijn dat u correspondentie met de rechthebbende van een graf wilt toevoegen.
 Ga hiervoor naar de ledenkaart van de rechthebbende en klik vervolgens op het tabblad
-“Correspondentie”.
-Klik binnen het tabblad op “nieuw” voor het toevoegen van nieuwe correspondentie. Klik vervolgens
-op het “Map icoon”. Voeg daarna het gewenste document toe.
+Â“CorrespondentieÂ”.
+Klik binnen het tabblad op Â“nieuwÂ” voor het toevoegen van nieuwe correspondentie. Klik vervolgens
+op het Â“Map icoonÂ”. Voeg daarna het gewenste document toe.
 DocBase vult automatisch het documentformaat, de versie status en de omschrijving in.
 Vul de overige gegevens in en wijzig de automatisch ingevulde gegevens indien nodig. Klik vervolgens
-op “ok”.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 10 van 10
-De correspondentie verschijnt nu zowel binnen de ledenkaart van de relatie als onder “Documenten”
-bij het type “Correspondentie”.
+op Â“okÂ”.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 10 van 10
+De correspondentie verschijnt nu zowel binnen de ledenkaart van de relatie als onder Â“DocumentenÂ”
+bij het type Â“CorrespondentieÂ”.
 Let op
-Correspondentie met een rechthebbende verschijnt niet onder het tabblad “documenten” van een
+Correspondentie met een rechthebbende verschijnt niet onder het tabblad Â“documentenÂ” van een
 graf.
 8.3. Wijzigen correspondentie
-Indien u ziet dat er iets veranderd moet worden aan het document, klik dan op het “selectievak”
+Indien u ziet dat er iets veranderd moet worden aan het document, klik dan op het Â“selectievakÂ”
 naast het te wijzigen document.
 Klik vervolgens op wijzigen. Nu is het mogelijk de gegevens binnen de correspondentie te wijzigen of
-extra bestanden toe te voegen. Klik na de wijzigingen op ‘’Ok’’.
+extra bestanden toe te voegen. Klik na de wijzigingen op Â‘Â’OkÂ’Â’.
 8.4. Verwijderen correspondentie
 Selecteer hiervoor de gewenste correspondentie door op het selectievak te klikken. Klik daarna op
-“overige functies” en op “verwijderen”. Voltooi de handeling door op “ja” te drukken.
+Â“overige functiesÂ” en op Â“verwijderenÂ”. Voltooi de handeling door op Â“jaÂ” te drukken.
 Let op
-Wanneer u een bestand verwijdert, is dit bestand ook écht verwijderd. Er is dus geen prullenbak
+Wanneer u een bestand verwijdert, is dit bestand ook Ã©cht verwijderd. Er is dus geen prullenbak
 waaruit de bestanden kunnen worden hersteld.
-8.5. Een resumé
+8.5. Een resumÃ©
 In deze uitleg werd uitgelegd hoe correspondentie kan worden ingezien, gemaakt en gewijzigd
-binnen Docbase. Binnen Docbase is het mogelijk om via het type “Documenten” bij
-“Correspondentie” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u
+binnen Docbase. Binnen Docbase is het mogelijk om via het type Â“DocumentenÂ” bij
+Â“CorrespondentieÂ” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u
 bestanden inzien via de grafkaart van een graf. Daarnaast is het mogelijk via de ledenkaart van
 bijvoorbeeld een rechthebbende correspondentie in te zien. Correspondentie wordt toegevoegd via
 de Ledenkaart. Bij het toevoegen van een bestand voert Docbase automatisch het documentformaat,
-de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op ‘’ok’’. Deze bestanden
+de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op Â‘Â’okÂ’Â’. Deze bestanden
 kunnen gewijzigd worden door op het selectievak te klikken en vervolgens op wijzigen. Ten slotte is
 het mogelijk om correspondentie te verwijderen door de gewenste correspondentie te selecteren en
-onder “overige functies” op “verwijderen” te klikken.";
+onder Â“overige functiesÂ” op Â“verwijderenÂ” te klikken.";
 8935;DocBase;Begraafplaatsadministratie;Graven en begravingen;1. Graven en begravingen op een graf;"Er zijn binnen DocBase verschillende manieren om te zien wie waar is begraven. Met de zoek & vind
 functie kunt u zoeken naar specifieke graven. Klik vervolgens op het desbetreffende graf. Onder het
 tabblad begravingen staan alle relaties die in het desbetreffende graf zijn begraven. Onder
@@ -1313,22 +1310,22 @@ tabblad graf gaat u naar de grafkaart.";DocBase en Grafbeheer;"1. Graven en begr
 In deze uitleg wordt uitgelegd hoe u bij een graf kan zien wie er allemaal binnen dit graf zijn
 begraven.
 Omdat er in een graf meerdere begravingen verricht kunnen worden, maakt Docbase een
-onderscheid tussen de typen “Grafbeheer” en “Begravingen”.
-Klik allereerst op “Grafbeheer”. U bevindt zich nu op het overzicht van alle graven binnen uw
-parochie. Klik op “Zoek & Vind“ om de gegevens van een specifiek graf op te zoeken en te bekijken.
-Zoek naar het grafnummer dat u wilt inzien en klik op “Vind nu”.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 2 van 10
+onderscheid tussen de typen Â“GrafbeheerÂ” en Â“BegravingenÂ”.
+Klik allereerst op Â“GrafbeheerÂ”. U bevindt zich nu op het overzicht van alle graven binnen uw
+parochie. Klik op Â“Zoek & VindÂ“ om de gegevens van een specifiek graf op te zoeken en te bekijken.
+Zoek naar het grafnummer dat u wilt inzien en klik op Â“Vind nuÂ”.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 2 van 10
 Klik op de hyperlink om alle informatie over het graf en de eventuele begravingen op het betreffende
 graf in te kunnen zien. U bevindt zich nu op de grafkaart.
-Klik op het tabblad “Begravingen”. Hier staat wie er op dit moment in het graf begraven is. Bij een
+Klik op het tabblad Â“BegravingenÂ”. Hier staat wie er op dit moment in het graf begraven is. Bij een
 dubbel-graf of een familiegraf zijn er meerdere personen begraven.
-Wanneer een graf is geruimd, dan staat de begraving niet langer onder het tabblad “Begravingen”,
-maar onder “Begravingen historie”.
+Wanneer een graf is geruimd, dan staat de begraving niet langer onder het tabblad Â“BegravingenÂ”,
+maar onder Â“Begravingen historieÂ”.
 Onder relaties Begravingen staat een overzicht van alle personen die zijn begraven.
-Via ”Zoek Vind” kunt u een overledene zoeken.
+Via Â”Zoek VindÂ” kunt u een overledene zoeken.
 Klik op de naam van een overledene. U bevindt zich nu op de detailkaart van de overledene. Hier is te
 zien in welk graf de persoon is begraven.
-Klik vervolgens op het tabblad “Graf“ en op de hyperlink om bij de grafkaart uit te komen. Hier staat
+Klik vervolgens op het tabblad Â“GrafÂ“ en op de hyperlink om bij de grafkaart uit te komen. Hier staat
 alle informatie omtrent het graf waarin de persoon is begraven.
 ";
 8935;DocBase;Begraafplaatsadministratie;Rechthebbende;2. Rechthebbende;"Wanneer u een begraving gaat administreren, dient u via de sjabloonapplicatie eerst een graf te
@@ -1336,7 +1333,7 @@ selecteren. Voer ook een rechthebbende in. Dit kunt u op drie manieren doen.
 Ten eerste kunt u bij een graf een rechthebbende toevoegen die een relatie is binnen uw parochie.
 Dit kan eenvoudig door het gebruik van de tab zoek functie.
 Ten tweede kunt u een rechthebbende toevoegen die wel lid is van de RKK, maar niet als relatie
-voorkomt in uw parochie. Creëer via het vergrootglas een uniek zoekresultaat om de gegevens van
+voorkomt in uw parochie. CreÃ«er via het vergrootglas een uniek zoekresultaat om de gegevens van
 deze persoon te vinden.
 Ten derde is het mogelijk om de gegevens van de rechthebbende handmatig in te vullen. Stuur een
 notificatie naar de ledenadministratie om deze persoon als lokale relatie in het ledenbestand op te
@@ -1358,11 +1355,11 @@ U ziet de resultaten van uw zoekopdracht staan. Dit zijn alle personen met Janse
 wonen. Selecteer de juiste naam en klik op ok.
 Daarnaast is het ook mogelijk om via het vergrootglas de gegevens van een persoon op te zoeken.
 Via deze zoekmethode is het mogelijk om op verschillende persoonsgegevens te filteren, waardoor
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 3 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 3 van 10
 het mogelijk is om een persoon zodanig uniek te specificeren dat uit het gehele ledenbestand van
-alle parochies slechts één resultaat mogelijk is.
+alle parochies slechts Ã©Ã©n resultaat mogelijk is.
 Wanneer u een dergelijk uniek zoekresultaat kunt samenstellen, krijgt u toegang tot de gegevens van
-deze persoon. Zie voor meer informatie hierover de “zoeken; uniek resultaat”.
+deze persoon. Zie voor meer informatie hierover de Â“zoeken; uniek resultaatÂ”.
 Wanneer de rechthebbende niet in het lendenbestand van de RKK voorkomt, vul de lege velden dan
 handmatig in. Stuur vervolgens een notificatie naar de ledenadministratie om de persoon in kwestie
 als lokale relatie in het ledenbestand van de parochie op te nemen.
@@ -1375,7 +1372,7 @@ Ga naar de grafkaart, klik op wijzigen en vul het rechthebbende DocBase-ID in.
 8935;DocBase;Begraafplaatsadministratie;Belanghebbende lidstatus;3. Belanghebbende lidstatus;"Het concept belanghebbende uitgelegd. Dit zijn relaties die aan een graf zijn
 verbonden. Wanneer de rechthebbende komt te overlijden, wordt de rol van rechthebbende
 automatisch overgezet naar de eerstvolgende belanghebbende. Via de grafbeheerkaart onder het
-tabblad belanghebbenden kunt u één of meerdere belanghebbende toevoegen. De belanghebbende
+tabblad belanghebbenden kunt u Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende
 moet als relatie in DocBase zijn opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het
 ledenbestand zoeken, waartoe u toegang toe heeft. Wanneer u een uniek zoekresultaat produceert,
 kunt u binnen de gehele ledenadministratie van de RKK zoeken. Wanneer de persoon in kwestie geen
@@ -1384,7 +1381,7 @@ toegang toe heeft, dan is het zaak dat de ledenadministratie de persoon als loka
 het systeem zet. Vervolgens kunt u deze persoon dan noteren als belanghebbende.";DocBase en Grafbeheer;"3. Belanghebbende lidstatus
 Belanghebbenden
 Naast rechthebbende, kan het zijn dat er meerdere personen met een begraving op een graf zijn
-verbonden. Deze personen kunt u aan het grafkoppelen als “belanghebbende”.
+verbonden. Deze personen kunt u aan het grafkoppelen als Â“belanghebbendeÂ”.
 Om een belanghebbende op een graf toe te voegen gaat u naar het graf waarbij u een
 belanghebbende wilt toevoegen.
 Wanneer u naar de grafbeheerkaart van een graf gaat, klik dan op het tabblad belanghebbenden
@@ -1392,7 +1389,7 @@ Let op
 Het is zeer gewenst om naast een rechthebbende ook belanghebbenden te administreren. Wanneer
 de rechthebbende komt te overlijden dan kunt u contact opnemen met de belanghebbenden. Op de
 grafkaart staat de relatiestatus van de belanghebbende.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 4 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 4 van 10
 3.1. Toevoegen belanghebbende
 Klik op nieuw. Klik vervolgens op het vergrootglas naast RKK-Lid.
 Vul de gegevens in van het lid of de organisatie die u wilt toevoegen.
@@ -1401,25 +1398,25 @@ Deze manier van toevoegen geldt alleen voor relaties die al binnen DocBase staan
 belanghebbende binnen uw parochie kunt u simpel zoeken en krijgt u een overzicht van resultaten.
 Als de belanghebbende geen lid is in uw parochie, maar wel in het totale ledenbestand van de RKK
 staat, dan kunt u deze persoon alsnog opzoeken.
-Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts één uniek
+Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts Ã©Ã©n uniek
 resultaat oplevert in de gehele ledenadministratie van de RKK, alleen dan krijgt u toegang tot de
 gegevens van deze persoon.
 Wanneer u bijvoorbeeld de precieze naam, geboortedatum, postcode en huisnummer heeft, dan
-kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar één relatie in de totale
+kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar Ã©Ã©n relatie in de totale
 ledenadministratie van de RKK aan die zoekvraag voldoet. In die situatie krijgt u toegang, ook wel
 leesrechten genoemd, tot de desbetreffende ledenkaart van de desbetreffende persoon.
-Bekijk voor meer informatie de uitleg’s die het zoeken binnen DocBase behandelen.
+Bekijk voor meer informatie de uitlegÂ’s die het zoeken binnen DocBase behandelen.
 Het kan ook voorkomen dat een belanghebbende geen lid is van de Kerk. U moet dan de
 ledenadministratie notificeren. De ledenadministratie kan vervolgens de betreffende persoon als
 lokale relatie in DocBase administreren. U kunt deze persoon vervolgens als belanghebbende
 toevoegen.
 Wanneer u de juiste persoon heeft gevonden, selecteer deze dan en klik op ok. U heeft nu een
 belanghebbende toegevoegd.
-3.2. Een resumé
+3.2. Een resumÃ©
 In deze uitleg is het concept belanghebbende uitgelegd. Dit zijn relaties die aan een graf zijn
 verbonden. Wanneer de rechthebbende komt te overlijden, wordt de rol van rechthebbende
 automatisch overgezet naar de eerstvolgende belanghebbende. Via de grafbeheerkaart onder het
-tabblad belanghebbenden kunt u één of meerdere belanghebbende toevoegen. De belanghebbende
+tabblad belanghebbenden kunt u Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende
 moet als relatie in DocBase zijn opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het
 ledenbestand zoeken, waartoe u toegang toe heeft. Wanneer u een uniek zoekresultaat produceert,
 kunt u binnen de gehele ledenadministratie van de RKK zoeken. Wanneer de persoon in kwestie geen
@@ -1427,7 +1424,7 @@ lid van de kerk is, en daarom logischerwijze ook niet voorkomt in het ledenbesta
 toegang toe heeft, dan is het zaak dat de ledenadministratie de persoon als lokale relatie alsnog in
 het systeem zet. Vervolgens kunt u deze persoon dan noteren als belanghebbende.";
 8935;DocBase;Begraafplaatsadministratie;Belanghebbende toevoegen;4. Belanghebbende toevoegen;"Via de grafkaart kunt een belanghebbende toevoegen. Onder het tabblad belanghebbenden kunt u
-één of meerdere belanghebbende toevoegen. De belanghebbende moet als relatie in DocBase zijn
+Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende moet als relatie in DocBase zijn
 opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het ledenbestand van uw parochie zoeken.
 Wanneer u een uniek zoekresultaat produceert, kunt u binnen de gehele ledenadministratie van de
 RKK zoeken. Wanneer de persoon in kwestie geen lid van de kerk, dan is het zaak dat de
@@ -1439,21 +1436,21 @@ belanghebbende wilt toevoegen.
 Wanneer u naar de grafbeheerkaart van een graf gaat, dan gaat u naar het tabblad
 Belanghebbenden.
 Klik op nieuw. Klik vervolgens op het vergrootglas naast RKK-Lid.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 5 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 5 van 10
 Vul de gegevens in van het lid of de organisatie die u wilt toevoegen.
 Selecteer vervolgens de gewenste relatie en klik op ok.
 Deze manier van toevoegen geldt alleen voor relaties die al binnen DocBase staan. Voor
 belanghebbende die lid zijn binnen uw parochie, kunt u eenvoudig op naam zoeken waarna er een
 overzicht van resultaten verschijnt. Als de belanghebbende geen lid is in uw parochie, maar wel in
 het totale ledenbestand van de RKK staat, dan kunt u deze persoon alsnog opzoeken.
-Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts één uniek
+Wanneer u een zoekopdracht zodanig specificeert waardoor deze zoekopdracht slechts Ã©Ã©n uniek
 resultaat oplevert in de gehele ledenadministratie van de RKK, dan krijgt u toegang tot de gegevens
 van deze persoon.
 Wanneer u bijvoorbeeld de precieze naam, geboortedatum, postcode en huisnummer heeft, dan
-kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar één relatie in de totale
+kunt u waarschijnlijk een zodanige zoekvraag stellen dat er maar Ã©Ã©n relatie in de totale
 ledenadministratie van de RKK aan die zoekvraag voldoet. In die situatie krijgt u toegang, ook wel
 leesrechten genoemd, tot de ledenkaart van de desbetreffende persoon.
-Bekijk voor meer informatie de uitleg’s die het zoeken binnen DocBase behandelen.
+Bekijk voor meer informatie de uitlegÂ’s die het zoeken binnen DocBase behandelen.
 Het kan ook voorkomen dat een belanghebbende geen lid is van de Kerk. U moet dan de
 ledenadministratie notificeren. De ledenadministratie kan vervolgens de betreffende persoon als
 lokale relatie in DocBase administreren. U kunt deze persoon vervolgens als belanghebbende
@@ -1474,30 +1471,30 @@ Onder Relaties klikt u op het type begraafplaatsen.
 Hier staat het overzicht van alle begraafplaatsen binnen uw parochie.
 In de tweede kolom staat elke begraafplaatsnaam blauw en onderstreept, dit geeft de hyperlink
 functie aan.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 6 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 6 van 10
 Klik vervolgens op de hyperlink. In deze uitleg wordt de begraafplaats Velp als voorbeeld gebruikt. De
-begraafplaats wordt nu geopend met de tab “Alle graven” actief. Hier staan alle graven op deze
+begraafplaats wordt nu geopend met de tab Â“Alle gravenÂ” actief. Hier staan alle graven op deze
 begraafplaats.
 U bevindt zich nu binnen een overzicht van alle graven op de desbetreffende begraafplaats.
 In dit overzicht staat een aantal tabbladen: vrije graven, te ruimen graven, graven in reparatie en
 expiratiedatum minder dan een jaar.
 Elk tabblad geeft u een overzicht van graven met specifieke kenmerken.
 Belangrijk
-Het tabblad ‘’expiratiedatum minder dan een jaar’’ is van groot belang. Bij deze graven moet dit jaar
+Het tabblad Â‘Â’expiratiedatum minder dan een jaarÂ’Â’ is van groot belang. Bij deze graven moet dit jaar
 actie ondernomen worden. Het grafrecht kan worden verlengd of het graf kan worden geruimd.
 Wanneer u als Begraafplaatsadministrateur meerdere begraafplaatsen onder uw hoede heeft, dan
-kan het zijn dat u een overzicht van alle graven die een expiratiedatum van binnen één jaar van alle
+kan het zijn dat u een overzicht van alle graven die een expiratiedatum van binnen Ã©Ã©n jaar van alle
 begraafplaatsen wilt hebben. U moet hiervoor een zoekopdracht samenstellen.
 5.1. Een voorbeeld
 Klik onder relaties op het type grafbeheer.
 Klik vervolgens op Zoek en vind.
 Onderaan staat expiratiedatum grafrecht staan.
-Vul in het vak waar nu een = teken staat “Tussen“ in. Vul de huidige datum en de laatste datum van
+Vul in het vak waar nu een = teken staat Â“TussenÂ“ in. Vul de huidige datum en de laatste datum van
 het jaar in. Deze uitleg is op 28 mei gemaakt. De laatste datum van 2018 is 31-12-2018.
-Klik vervolgens op “Vind nu”.
+Klik vervolgens op Â“Vind nuÂ”.
 Er staat nu een overzicht van alle graven waarvan de expiratiedatum binnen het huidige jaar is.
-Klik vervolgens onder “Overige functies” op “Opslaan zoekopdracht”.
-Geef de zoekopdracht vervolgens een omschrijving en vul bij het veld “Bericht” het e-mailadres in
+Klik vervolgens onder Â“Overige functiesÂ” op Â“Opslaan zoekopdrachtÂ”.
+Geef de zoekopdracht vervolgens een omschrijving en vul bij het veld Â“BerichtÂ” het e-mailadres in
 waarop u automatisch berichten van deze zoekopdracht wilt ontvangen. Kies vervolgens of u op de
 hoogte wilt worden gehouden van nieuwe items in de zoekresultaten, van gewijzigde zoekresultaten
 of van beide. Klik hiervoor de juiste keuzevelden aan. Wanneer er geen e-mailadres wordt ingevuld,
@@ -1508,23 +1505,23 @@ en daarmee een overzicht van alle graven waarvan de expiratiedatum dit jaar is.
 Ga nu terug naar het gravenoverzicht van Velp.
 De hyperlinks binnen dit overzicht sturen u door naar de details van het desbetreffende graf.
 Binnen dit overzicht staan de gebruiksstatus en onderhoudsstatus van elk graf duidelijk aangegeven.
-Verder ziet u dat de status van onderhoud van graven “Goed”, “nvt” of “In reparatie” kan zijn.
-In deze uitleg zijn een aantal overzichten binnen de rol “Begraafplaatsbeheerder” getoond.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 7 van 10
+Verder ziet u dat de status van onderhoud van graven Â“GoedÂ”, Â“nvtÂ” of Â“In reparatieÂ” kan zijn.
+In deze uitleg zijn een aantal overzichten binnen de rol Â“BegraafplaatsbeheerderÂ” getoond.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 7 van 10
 ";
-8935;DocBase;Begraafplaatsadministratie;Betrokken organisaties;6. Betrokken organisaties;"Zowel op de grafkaart als op de begravingkaart staat het tabblad ‘’betrokken organisaties’’. Klik
+8935;DocBase;Begraafplaatsadministratie;Betrokken organisaties;6. Betrokken organisaties;"Zowel op de grafkaart als op de begravingkaart staat het tabblad Â‘Â’betrokken organisatiesÂ’Â’. Klik
 hierop en klik op nieuw om een betrokken organisatie op het graf of de begraving toe te voegen. De
 betrokken organisatie moet een DocBase ID hebben. Daarom is het noodzakelijk dat de betrokken
-organisatie geadministreerd staat onder het type ‘’graf- en begravingsorganisaties’’. Wanneer dit niet
+organisatie geadministreerd staat onder het type Â‘Â’graf- en begravingsorganisatiesÂ’Â’. Wanneer dit niet
 het geval is, is het zaak om deze organisatie via de knop nieuw te administreren. Vul de benodigde
-gegevens in en klik op ‘’Ok’’.";DocBase en Grafbeheer;"6. Betrokken organisaties
+gegevens in en klik op Â‘Â’OkÂ’Â’.";DocBase en Grafbeheer;"6. Betrokken organisaties
 In deze uitleg worden de functie betrokken organisaties uitgelegd.
 Het kan voorkomen dat bij een graf verschillende organisaties betrokken zijn. Voorbeelden hiervan
 zijn begrafenisondernemers, grafdelvers, en steenhouwers. Ook kan het voorkomen dat er bij een
 begraving verschillende organisaties zijn betrokken. Denk hierbij aan uitvaartorganisaties en
 bloemisten.
 Deze organisaties kunnen bij een graf worden geadministreerd.
-Klik onder ‘’relaties’’ op het type ‘’Graf- en begravingsorganisaties’’. Hier staat een overzicht van alle
+Klik onder Â‘Â’relatiesÂ’Â’ op het type Â‘Â’Graf- en begravingsorganisatiesÂ’Â’. Hier staat een overzicht van alle
 organisaties.
 Belangrijk.
 Wanneer u een betrokken organisatie aan een graf wilt toevoegen, dan kunt u alleen uit organisaties
@@ -1532,33 +1529,33 @@ kiezen die in deze lijst staan. Om een organisatie aan een graf toe te voegen di
 staat, dient u eerst de organisatie toe te voegen.
 6.1. Een Voorbeeld
 U wilt een steenhouwer als nieuwe organisatie toevoegen. Klik allereerst op nieuw.
-Vul de gegevens in van de betreffende steenhouwer en klik op ‘’ok’’. De steenhouwer staat nu in het
+Vul de gegevens in van de betreffende steenhouwer en klik op Â‘Â’okÂ’Â’. De steenhouwer staat nu in het
 overzicht.
 6.2. Een betrokken organisatie op een graf toevoegen
-Ga onder ‘’Relaties’’ naar ‘’Grafbeheer’’. Klik vervolgens op het betreffende grafnummer om naar de
+Ga onder Â‘Â’RelatiesÂ’Â’ naar Â‘Â’GrafbeheerÂ’Â’. Klik vervolgens op het betreffende grafnummer om naar de
 grafdetailkaart van dit graf te gaan.
-Klik binnen het grafoverzicht op het tabblad betrokken organisaties. Klik vervolgens op ‘’nieuw’’.
+Klik binnen het grafoverzicht op het tabblad betrokken organisaties. Klik vervolgens op Â‘Â’nieuwÂ’Â’.
 Vul bij organisatienaam Rotsvast Steenhouwers in. Druk op tab.
 Docbase vult in een keer alle gegevens van de steenhouwer in.
-Ook is het mogelijk om te zoeken met het vergrootglas. Door niks in te vullen en op “vind nu” te
+Ook is het mogelijk om te zoeken met het vergrootglas. Door niks in te vullen en op Â“vind nuÂ” te
 klikken, krijgt u het totaaloverzicht van de betrokken organisaties. Kies de gewenste organisatie en
 klik op ok.
 Let op
 U heeft nu een betrokken organisatie aan een graf toegevoegd. Het is ook mogelijk om een
 betrokken organisatie op een begraving toe te voegen.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 8 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 8 van 10
 6.3. Een voorbeeld
-Ga naar de detailkaart van een begraving. Klik onder ‘’relaties’’ op het type ‘’begravingen’’. U kunt uit
+Ga naar de detailkaart van een begraving. Klik onder Â‘Â’relatiesÂ’Â’ op het type Â‘Â’begravingenÂ’Â’. U kunt uit
 dit overzicht van begravingen de betreffende begraving kiezen. Ook is het mogelijk om met zoek en
 vind een begraving op te vragen.
 Klik op de hyperlink van de begraving.
 U bevindt zich nu op de detailkaart van de begraving.
-Klik op het tabblad ‘’betrokken organisaties’’ Klik op ‘’nieuw’’. Vul een betrokken organisatie in. Dit
+Klik op het tabblad Â‘Â’betrokken organisatiesÂ’Â’ Klik op Â‘Â’nieuwÂ’Â’. Vul een betrokken organisatie in. Dit
 gaat op eenzelfde manier als het toevoegen van een betrokken organisatie bij een graf.
 ";
 8935;DocBase;Begraafplaatsadministratie;Aanverwante informatie - Documenten;7. Aanverwante informatie - Documenten;"Bij het ruimen van een graf is het van belang om:
 - Het grafaktenummer te verwijderen.
-- De gebruiksstatus op “te ruimen” te zetten.
+- De gebruiksstatus op Â“te ruimenÂ” te zetten.
 Bij het weghalen van het grafaktenummer worden de oude documenten en begravingen automatisch
 verplaatst naar de historie tabbladen.";DocBase en Grafbeheer;"7. Aanverwante informatie - Documenten
 Binnen deze uitleg wordt het tabblad documenten uitgelegd binnen een begraving.
@@ -1574,72 +1571,73 @@ vinden.
 Let op!
 Bij het ruimen van een graf is het van belang om:
 - Het grafaktenummer te verwijderen.
-- De gebruiksstatus op “te ruimen” te zetten.
+- De gebruiksstatus op Â“te ruimenÂ” te zetten.
 Bij het weghalen van het grafaktenummer worden de oude documenten en begravingen automatisch
 verplaatst naar de historie tabbladen.
 Om een wijziging door te voeren is het niet noodzakelijk om de status naar ""In behandeling"" te
 zetten. Dit is alleen van belang wanneer u een wijziging niet nu gaat doorvoeren omdat de wijziging
 niet afkomt waardoor u er later mee verder wilt gaan. Door de wijziging in behandeling te zetten, is
 het gemakkelijk in de gaten te houden welke wijzigingen nog aandacht vergen.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 9 van 10
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 9 van 10
 De voorkeursparochie kan altijd de gegevens inzien, ongeacht of er verhuisd is of niet.
 Dit zodat uw parochie met het betreffende lid in contact kan blijven.";
 8935;DocBase;Begraafplaatsadministratie;Correspondentie inzien, maken, wijzigen en verwijderen;8. Correspondentie inzien, maken, wijzigen en verwijderen;"Uitleg hoe correspondentie kan worden ingezien, gemaakt en gewijzigd
-binnen Docbase. Binnen Docbase is het mogelijk om via het type “Documenten” bij
-“Correspondentie” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u
+binnen Docbase. Binnen Docbase is het mogelijk om via het type Â“DocumentenÂ” bij
+Â“CorrespondentieÂ” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u
 bestanden inzien via de grafkaart van een graf. Daarnaast is het mogelijk via de ledenkaart van
 bijvoorbeeld een rechthebbende correspondentie in te zien. Correspondentie wordt toegevoegd via
 de Ledenkaart. Bij het toevoegen van een bestand voert Docbase automatisch het documentformaat,
-de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op ‘’ok’’. Deze bestanden
+de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op Â‘Â’okÂ’Â’. Deze bestanden
 kunnen gewijzigd worden door op het selectievak te klikken en vervolgens op wijzigen. Ten slotte is
 het mogelijk om correspondentie te verwijderen door de gewenste correspondentie te selecteren en
-onder “overige functies” op “verwijderen” te klikken.";DocBase en Grafbeheer;"8. Correspondentie inzien, maken, wijzigen en verwijderen
+onder Â“overige functiesÂ” op Â“verwijderenÂ” te klikken.";DocBase en Grafbeheer;"8. Correspondentie inzien, maken, wijzigen en verwijderen
 In deze uitleg wordt uitgelegd hoe het inzien, maken, wijzigen en verwijderen van correspondentie in
 DocBase werkt.
 In DocBase zijn er twee manieren om de correspondentie binnen uw parochie in te zien. Via
-“Documenten” of via de “ledenkaart” van een relatie. Vooral met betrekking tot een rechthebbende
+Â“DocumentenÂ” of via de Â“ledenkaartÂ” van een relatie. Vooral met betrekking tot een rechthebbende
 of belanghebbende is het bijhouden en aanmaken van correspondentie noodzakelijk.
 8.1. Inzien Correspondentie
 8.1.1. Manier 1: via documenten
-Klik onder “Documenten” op “Correspondentie”
+Klik onder Â“DocumentenÂ” op Â“CorrespondentieÂ”
 Hier treft u een overzicht aan van alle correspondentie binnen uw parochie. Binnen dit type is het
-vaak praktisch de ‘’zoek & vind’’ functie te gebruiken. Zie voor meer informatie over de zoek&vind
-functie de uitleg ‘’Zoeken - eenvoudig en uitgebreid zoeken’’.
+vaak praktisch de Â‘Â’zoek & vindÂ’Â’ functie te gebruiken. Zie voor meer informatie over de zoek&vind
+functie de uitleg Â‘Â’Zoeken - eenvoudig en uitgebreid zoekenÂ’Â’.
 8.1.2. Manier 2: via de Grafkaart
-Ga onder ‘’relaties’’ naar ‘’grafbeheer’’. Selecteer het graf waarvan u de correspondentie wilt inzien.
+Ga onder Â‘Â’relatiesÂ’Â’ naar Â‘Â’grafbeheerÂ’Â’. Selecteer het graf waarvan u de correspondentie wilt inzien.
 Als het om correspondentie gaat die over het graf in zijn algemeenheid gaat, is dit te vinden onder
-het tabblad “documenten” of bij een vorige begraving onder “documenten historie”.
+het tabblad Â“documentenÂ” of bij een vorige begraving onder Â“documenten historieÂ”.
 8.1.3. Manier 3: via de ledenkaart
 Als u correspondentie specifiek bij de rechthebbende - en dus niet bij het hele graf - wil inzien, klik
-dan op de grafkaart op de “hyperlink” naast “Rechthebbende DocBase-ID”. Onder het tabblad
-“Correspondentie” is de correspondentie in te zien.
+dan op de grafkaart op de Â“hyperlinkÂ” naast Â“Rechthebbende DocBase-IDÂ”. Onder het tabblad
+Â“CorrespondentieÂ” is de correspondentie in te zien.
 Daarnaast kunt u correspondentie aanmerken als mijn favoriet. Ook kunt u een notificatie op een
-document toevoegen. Kijk hiervoor de uitleg’s “Algemeen; Mijn werkplek favorieten” en “Algemeen;
-mijn werkplek - mijn notificaties”
+document toevoegen. Kijk hiervoor de uitlegÂ’s Â“Algemeen; Mijn werkplek favorietenÂ” en Â“Algemeen;
+mijn werkplek - mijn notificatiesÂ”
 8.2. Nieuwe correspondentie aanmaken
 Het kan zijn dat u correspondentie met de rechthebbende van een graf wilt toevoegen.
 Ga hiervoor naar de ledenkaart van de rechthebbende en klik vervolgens op het tabblad
-“Correspondentie”.
-Klik binnen het tabblad op “nieuw” voor het toevoegen van nieuwe correspondentie. Klik vervolgens
-op het “Map icoon”. Voeg daarna het gewenste document toe.
+Â“CorrespondentieÂ”.
+Klik binnen het tabblad op Â“nieuwÂ” voor het toevoegen van nieuwe correspondentie. Klik vervolgens
+op het Â“Map icoonÂ”. Voeg daarna het gewenste document toe.
 DocBase vult automatisch het documentformaat, de versie status en de omschrijving in.
 Vul de overige gegevens in en wijzig de automatisch ingevulde gegevens indien nodig. Klik vervolgens
-op “ok”.
-Tekst uitleg’s Begraafplaatsadministratie bladzijde 10 van 10
-De correspondentie verschijnt nu zowel binnen de ledenkaart van de relatie als onder “Documenten”
-bij het type “Correspondentie”.
+op Â“okÂ”.
+Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 10 van 10
+De correspondentie verschijnt nu zowel binnen de ledenkaart van de relatie als onder Â“DocumentenÂ”
+bij het type Â“CorrespondentieÂ”.
 Let op
-Correspondentie met een rechthebbende verschijnt niet onder het tabblad “documenten” van een
+Correspondentie met een rechthebbende verschijnt niet onder het tabblad Â“documentenÂ” van een
 graf.
 8.3. Wijzigen correspondentie
-Indien u ziet dat er iets veranderd moet worden aan het document, klik dan op het “selectievak”
+Indien u ziet dat er iets veranderd moet worden aan het document, klik dan op het Â“selectievakÂ”
 naast het te wijzigen document.
 Klik vervolgens op wijzigen. Nu is het mogelijk de gegevens binnen de correspondentie te wijzigen of
-extra bestanden toe te voegen. Klik na de wijzigingen op ‘’Ok’’.
+extra bestanden toe te voegen. Klik na de wijzigingen op Â‘Â’OkÂ’Â’.
 8.4. Verwijderen correspondentie
 Selecteer hiervoor de gewenste correspondentie door op het selectievak te klikken. Klik daarna op
-“overige functies” en op “verwijderen”. Voltooi de handeling door op “ja” te drukken.
+Â“overige functiesÂ” en op Â“verwijderenÂ”. Voltooi de handeling door op Â“jaÂ” te drukken.
 Let op
-Wanneer u een bestand verwijdert, is dit bestand ook écht verwijderd. Er is dus geen prullenbak
+Wanneer u een bestand verwijdert, is dit bestand ook Ã©cht verwijderd. Er is dus geen prullenbak
 waaruit de bestanden kunnen worden hersteld.
 ";
+
