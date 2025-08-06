@@ -96,8 +96,8 @@ def make_pdf(question: str, answer: str) -> bytes:
     bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
     story = []
-    if os.path.exists("logo.png"):
-        logo = Image("logo.png", width=124, height=52)
+    if os.path.exists("logopdf.png"):
+        logo = Image("logopdf.png", width=124, height=52)
         logo_table = Table([[logo]], colWidths=[124])
         logo_table.setStyle(TableStyle([
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -410,6 +410,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
