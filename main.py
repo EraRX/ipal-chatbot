@@ -263,7 +263,7 @@ MAX_HISTORY = 20
 
 def get_avatar(role: str):
     path = AVATARS.get(role)
-    return PILImage.open(path).resize((128, 128)) if path and os.path.exists(path) else "🙂"
+    return PILImage.open(path).resize((64, 64)) if path and os.path.exists(path) else "🙂"
 
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
@@ -410,6 +410,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
