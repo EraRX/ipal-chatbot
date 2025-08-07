@@ -239,14 +239,15 @@ def main():
         st.session_state.clear()
         st.experimental_rerun()
 
-if not st.session_state.get("selected_product", False):
-    video_path = "helpdesk.mp4"
-    if os.path.exists(video_path):
-        with open(video_path, "rb") as video_file:
-            video_bytes = video_file.read()
-        st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
-    elif logo_img:
-        st.image(logo_img, width=244)
+    # Video autostart and product selection
+    if not st.session_state.get("selected_product", False):
+        video_path = "helpdesk.mp4"
+        if os.path.exists(video_path):
+            with open(video_path, "rb") as video_file:
+                video_bytes = video_file.read()
+            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
+        elif logo_img:
+            st.image(logo_img, width=244)
 
         st.header('Welkom bij IPAL Chatbox')
 
@@ -265,8 +266,9 @@ if not st.session_state.get("selected_product", False):
             add_msg('assistant', 'Gekozen: Algemeen')
             st.experimental_rerun()
         render_chat()
-        return
+        return  # Valid inside main()
 
+    # Module selection for Exact or DocBase
     if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
@@ -275,12 +277,15 @@ if not st.session_state.get("selected_product", False):
             add_msg('assistant', f'Gekozen: {sel}')
             st.experimental_rerun()
         render_chat()
-        return
+        return  # Valid inside main()
 
+    # Render chat history
     render_chat()
+
+    # Handle user input
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
-        return
+        return  # Valid inside main()
 
     # Controle op uniek codewoord
     if vraag.strip().upper() == "UNIEKECODE123":
@@ -289,6 +294,7 @@ if not st.session_state.get("selected_product", False):
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
             st.experimental_rerun()
+        return  # Valid inside main()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -300,6 +306,7 @@ if not st.session_state.get("selected_product", False):
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.experimental_rerun()
+        return  # Valid inside main()
 
     # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
@@ -309,6 +316,7 @@ if not st.session_state.get("selected_product", False):
     if not ok:
         add_msg('assistant', warn)
         st.experimental_rerun()
+        return  # Valid inside main()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -322,6 +330,7 @@ if not st.session_state.get("selected_product", False):
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.experimental_rerun()
+        return  # Valid inside main()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
@@ -346,5 +355,3 @@ if not st.session_state.get("selected_product", False):
 
 if __name__ == '__main__':
     main()
-
-
