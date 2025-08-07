@@ -39,10 +39,8 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Zorg dat set_page_config als eerste komt
+# Set page config as first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
-
-# Style
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
     unsafe_allow_html=True
@@ -55,7 +53,6 @@ OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 if not OPENAI_KEY:
     st.sidebar.error("🔑 Voeg je OpenAI API-key toe in .env of Secrets.")
     st.stop()
-
 client = OpenAI(api_key=OPENAI_KEY)
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
@@ -81,30 +78,23 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
         return match.iloc[0]['Antwoord of oplossing']
     return None
 
+# AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
 """
 
+# PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str) -> bytes:
-    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)
-    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)
+    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
+    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            leftMargin=2*cm, rightMargin=2*cm,
-                            topMargin=2*cm, bottomMargin=2*cm)
+    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
-    body_style = ParagraphStyle("Body", parent=styles["Normal"],
-                                fontName="Helvetica", fontSize=11, leading=16,
-                                spaceAfter=12, alignment=TA_LEFT)
-    heading_style = ParagraphStyle("Heading", parent=styles["Heading2"],
-                                   fontName="Helvetica-Bold", fontSize=14, leading=18,
-                                   textColor=colors.HexColor("#333333"),
-                                   spaceBefore=12, spaceAfter=6)
-    bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"],
-                                  fontName="Helvetica", fontSize=11,
-                                  leftIndent=12, bulletIndent=0, leading=16)
+    body_style = ParagraphStyle("Body", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT)
+    heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333333"), spaceBefore=12, spaceAfter=6)
+    bullet_style = ParagraphStyle("Bullet", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leftIndent=12, bulletIndent=0, leading=16)
 
     story = []
     if os.path.exists("logopdf.png"):
@@ -127,8 +117,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
-        story.append(Table([[avatar, intro_text]], colWidths=[30, 440],
-                           style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
+        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
         story.append(Spacer(1, 12))
         for line in answer.split("\n")[1:]:
             line = line.strip()
@@ -164,7 +153,7 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df.set_index(['Systeem', 'Subthema'])
+    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
@@ -215,7 +204,7 @@ def vind_best_passend_antwoord(vraag, systeem, subthema):
     except KeyError:
         return None
 
-# Preload images
+# Preload afbeeldingen
 aichatbox_img = PILImage.open("aichatbox.png").resize((256, 256)) if os.path.exists("aichatbox.png") else None
 logo_img = PILImage.open("logo.png") if os.path.exists("logo.png") else None
 
@@ -241,25 +230,19 @@ def render_chat():
             )
             st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
-def reset_session_state():
+if 'history' not in st.session_state:
     st.session_state.history = []
     st.session_state.selected_product = None
     st.session_state.selected_module = None
     st.session_state.last_question = ''
 
-# Init session_state keys als nog niet aanwezig
-if 'history' not in st.session_state:
-    reset_session_state()
-
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
-        reset_session_state()
+        st.session_state.clear()
         st.experimental_rerun()
 
-    # Video helpdesk.mp4 afspelen als aanwezig
-    video_file = "helpdesk.mp4"
-
     if not st.session_state.selected_product:
+        video_file = "helpdesk.mp4"
         if os.path.exists(video_file):
             video_html = f"""
             <video width="640" height="360" autoplay muted loop playsinline>
@@ -272,7 +255,6 @@ def main():
             st.image(logo_img, width=244)
 
         st.header('Welkom bij de IPAL Chatbox')
-
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
