@@ -42,13 +42,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 # Set page config as first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
-    """
-    <style>
-    html, body, [class*="css"] { font-size:20px; }
-    button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
-    video { width: 600px !important; height: auto !important; max-width: 100%; }
-    </style>
-    """,
+    '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
     unsafe_allow_html=True
 )
 
@@ -109,7 +103,7 @@ def make_pdf(question: str, answer: str) -> bytes:
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-            ('TOPPADING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
         ]))
         story.append(logo_table)
@@ -157,7 +151,7 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df.set_index(['Systeem', 'Subthema'])
+    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
@@ -226,6 +220,7 @@ def add_msg(role: str, content: str):
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m['role'], avatar=get_avatar(m['role'])).markdown(f"{m['content']}\n\n_{m['time']}_")
+        # Toon PDF-downloadknop direct na laatste assistant-bericht
         if m['role'] == 'assistant' and i == len(st.session_state.history) - 1:
             pdf_data = make_pdf(
                 question=st.session_state.last_question,
@@ -242,7 +237,7 @@ if 'history' not in st.session_state:
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         st.session_state.clear()
-        st.rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
 
     # Video autostart and product selection
     if not st.session_state.get("selected_product", False):
@@ -254,24 +249,24 @@ def main():
         elif logo_img:
             st.image(logo_img, width=244)
 
-        st.header('Welkom bij IPAL Chatbox, kies hieronder uw onderwerp:')
+        st.header('Welkom bij IPAL Chatbox')
 
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_msg('assistant', 'Gekozen: Exact')
-            st.rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_msg('assistant', 'Gekozen: DocBase')
-            st.rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product = 'Algemeen'
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
-            st.rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         render_chat()
-        return
+        return  # Valid inside main()
 
     # Module selection for Exact or DocBase
     if st.session_state.selected_product in ['Exact', 'DocBase'] and not st.session_state.selected_module:
@@ -280,9 +275,9 @@ def main():
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_msg('assistant', f'Gekozen: {sel}')
-            st.rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         render_chat()
-        return
+        return  # Valid inside main()
 
     # Render chat history
     render_chat()
@@ -290,7 +285,7 @@ def main():
     # Handle user input
     vraag = st.chat_input('Stel uw vraag:')
     if not vraag:
-        return
+        return  # Valid inside main()
 
     # Controle op uniek codewoord
     if vraag.strip().upper() == "UNIEKECODE123":
@@ -298,8 +293,8 @@ def main():
         if antwoord:
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-            st.rerun()
-        return
+            st.rerun()  # Replaced st.experimental_rerun()
+        return  # Valid inside main()
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
@@ -310,8 +305,8 @@ def main():
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
-        return
+        st.rerun()  # Replaced st.experimental_rerun()
+        return  # Valid inside main()
 
     # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
@@ -320,8 +315,8 @@ def main():
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.rerun()
-        return
+        st.rerun()  # Replaced st.experimental_rerun()
+        return  # Valid inside main()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
 
@@ -334,8 +329,8 @@ def main():
         except:
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.rerun()
-        return
+        st.rerun()  # Replaced st.experimental_rerun()
+        return  # Valid inside main()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
         try:
@@ -356,7 +351,7 @@ def main():
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
