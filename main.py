@@ -109,7 +109,7 @@ def make_pdf(question: str, answer: str) -> bytes:
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('LEFTPADDING', (0, 0), (-1, -1), 0),
             ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-            ('TOPPADING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
         ]))
         story.append(logo_table)
@@ -148,7 +148,7 @@ def load_faq(path="faq.csv"):
     if not os.path.exists(path):
         logging.error(f"FAQ niet gevonden: {path}")
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=['Systeem','Subthema','Omschrijving melding','Toelichting melding','Antwoord of oplossing','Afbeelding'])
+        return pd.DataFrame(columns=['ID', 'Systeem', 'Subthema', 'Categorie', 'Omschrijving melding', 'Toelichting melding', 'Soort melding', 'Antwoord of oplossing', 'Afbeelding'])
     try:
         df = pd.read_csv(path, encoding="utf-8", sep=";")
     except UnicodeDecodeError:
@@ -156,7 +156,7 @@ def load_faq(path="faq.csv"):
     if 'Afbeelding' not in df.columns:
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
-    df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
+    df['combined'] = df[['Systeem', 'Subthema', 'Omschrijving melding', 'Toelichting melding']].fillna('').agg(' '.join, axis=1)
     return df.set_index(['Systeem', 'Subthema'])
 
 faq_df = load_faq()
@@ -197,15 +197,27 @@ def fetch_web_info_cached(query: str):
 
 def vind_best_passend_antwoord(vraag, systeem, subthema):
     try:
-        resultaten = faq_df.loc[(systeem.lower(), subthema.lower())]
+        logging.info(f"Looking for answer in faq_df for systeem='{systeem}', subthema='{subthema}', vraag='{vraag}'")
+        # Try exact index match
+        try:
+            resultaten = faq_df.loc[(systeem.lower(), subthema.lower())]
+        except KeyError:
+            logging.warning(f"Exact index match failed for ({systeem.lower()}, {subthema.lower()}). Trying broader search.")
+            # Fall back to searching all rows if index lookup fails
+            resultaten = faq_df.reset_index()
+        
         if not resultaten.empty:
             vraag_lower = vraag.lower()
             def score(tekst):
                 return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
-            resultaten = resultaten.assign(score=resultaten['combined'].apply(score)).sort_values('score', ascending=False)
-            beste = resultaten.iloc[0]
-            return beste['Antwoord of oplossing'] if beste['score'] > 0 else None
-    except KeyError:
+            if isinstance(resultaten, pd.DataFrame):
+                resultaten = resultaten.assign(score=resultaten['combined'].apply(score)).sort_values('score', ascending=False)
+                beste = resultaten.iloc[0]
+                return beste['Antwoord of oplossing'] if beste['score'] > 0 else None
+        logging.warning(f"No matching results found in faq_df for vraag='{vraag}'.")
+        return None
+    except Exception as e:
+        logging.error(f"Error in vind_best_passend_antwoord: {str(e)}")
         return None
 
 # Preload afbeeldingen
@@ -250,7 +262,7 @@ def main():
         if os.path.exists(video_path):
             with open(video_path, "rb") as video_file:
                 video_bytes = video_file.read()
-            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
+            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True, subtitles="subtitles.srt")
         elif logo_img:
             st.image(logo_img, width=244)
 
@@ -279,7 +291,7 @@ def main():
         sel = st.selectbox('Kies onderwerp:', ['(Kies)'] + opts)
         if sel != '(Kies)':
             st.session_state.selected_module = sel
-            add_msg('assistant', f'Gekozen: {sel}')
+            add_msg('assistant', f'Gekozen: {st.session_state.selected_product} (Module: {sel})')
             st.rerun()
         render_chat()
         return
@@ -303,8 +315,8 @@ def main():
 
     # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
-    faq_df["normalized"] = faq_df["Omschrijving melding"].str.strip().str.lower()
-    exact_match = faq_df[faq_df["normalized"] == vraag_normalized]
+    faq_df_reset = faq_df.reset_index()
+    exact_match = faq_df_reset[faq_df_reset["Omschrijving melding"].str.strip().str.lower() == vraag_normalized]
 
     if not exact_match.empty:
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
@@ -331,7 +343,8 @@ def main():
                 {'role': 'system', 'content': 'Herschrijf eenvoudig en vriendelijk.'},
                 {'role': 'user', 'content': antwoord}
             ], temperature=0.2)
-        except:
+        except Exception as e:
+            logging.error(f"Error rewriting answer with chatgpt_cached: {str(e)}")
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.rerun()
@@ -360,3 +373,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
