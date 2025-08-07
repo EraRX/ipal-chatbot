@@ -39,6 +39,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Set page config as first Streamlit command
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
@@ -77,14 +78,12 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
         return match.iloc[0]['Antwoord of oplossing']
     return None
 
-# AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
 """
 
-# PDF generation with chat-style layout and logo top-left
 def make_pdf(question: str, answer: str) -> bytes:
     answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
     answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
@@ -129,7 +128,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -241,19 +240,16 @@ def main():
         st.experimental_rerun()
 
     if not st.session_state.selected_product:
-        video_file = "helpdesk.mp4"
-        if os.path.exists(video_file):
-            video_html = f"""
-            <video width="640" height="360" autoplay muted loop playsinline>
-                <source src="{video_file}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            """
-            st.markdown(video_html, unsafe_allow_html=True)
+        video_path = "helpdesk.mp4"
+        if os.path.exists(video_path):
+            with open(video_path, "rb") as video_file:
+                video_bytes = video_file.read()
+                st.video(video_bytes, format="video/mp4", start_time=0)
         elif logo_img:
             st.image(logo_img, width=244)
 
-        st.header('Welkom bij de IPAL Chatbox')
+        st.header('Welkom bij IPAL Chatbox')
+
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
