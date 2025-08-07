@@ -262,7 +262,20 @@ def main():
         if os.path.exists(video_path):
             with open(video_path, "rb") as video_file:
                 video_bytes = video_file.read()
-            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True")
+            # Load subtitles if available
+            subtitle_path = "subtitles.srt"
+            subtitles = None
+            if os.path.exists(subtitle_path):
+                with open(subtitle_path, "rb") as subtitle_file:
+                    subtitles = subtitle_file
+                logging.info(f"Subtitles loaded from {subtitle_path}")
+            else:
+                logging.warning(f"Subtitles file {subtitle_path} not found, displaying video without subtitles")
+            try:
+                st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True, subtitles=subtitles)
+            except Exception as e:
+                logging.error(f"Error displaying video with subtitles: {str(e)}")
+                st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)  # Fallback without subtitles
         elif logo_img:
             st.image(logo_img, width=244)
 
@@ -373,5 +386,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
