@@ -239,14 +239,14 @@ def main():
         st.session_state.clear()
         st.experimental_rerun()
 
-    if not st.session_state.selected_product:
-        video_path = "helpdesk.mp4"
-        if os.path.exists(video_path):
-            with open(video_path, "rb") as video_file:
-                video_bytes = video_file.read()
-                st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
-        elif logo_img:
-            st.image(logo_img, width=244)
+if not st.session_state.get("selected_product", False):
+    video_path = "helpdesk.mp4"
+    if os.path.exists(video_path):
+        with open(video_path, "rb") as video_file:
+            video_bytes = video_file.read()
+        st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
+    elif logo_img:
+        st.image(logo_img, width=244)
 
         st.header('Welkom bij IPAL Chatbox')
 
@@ -346,4 +346,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
