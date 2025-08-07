@@ -237,7 +237,7 @@ if 'history' not in st.session_state:
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
 
     # Video autostart and product selection
     if not st.session_state.get("selected_product", False):
@@ -255,16 +255,16 @@ def main():
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
             add_msg('assistant', 'Gekozen: Exact')
-            st.experimental_rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         if c2.button('DocBase', use_container_width=True):
             st.session_state.selected_product = 'DocBase'
             add_msg('assistant', 'Gekozen: DocBase')
-            st.experimental_rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         if c3.button('Algemeen', use_container_width=True):
             st.session_state.selected_product = 'Algemeen'
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
-            st.experimental_rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         render_chat()
         return  # Valid inside main()
 
@@ -275,7 +275,7 @@ def main():
         if sel != '(Kies)':
             st.session_state.selected_module = sel
             add_msg('assistant', f'Gekozen: {sel}')
-            st.experimental_rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         render_chat()
         return  # Valid inside main()
 
@@ -293,7 +293,7 @@ def main():
         if antwoord:
             add_msg('user', vraag)
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-            st.experimental_rerun()
+            st.rerun()  # Replaced st.experimental_rerun()
         return  # Valid inside main()
 
     # Exacte match op 'Omschrijving melding'
@@ -305,7 +305,7 @@ def main():
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
         add_msg('user', vraag)
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.experimental_rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
         return  # Valid inside main()
 
     # Geen exacte match → reguliere verwerking
@@ -315,7 +315,7 @@ def main():
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg('assistant', warn)
-        st.experimental_rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
         return  # Valid inside main()
 
     antwoord = vind_best_passend_antwoord(vraag, st.session_state.selected_product, st.session_state.selected_module)
@@ -329,7 +329,7 @@ def main():
         except:
             pass
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
-        st.experimental_rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
         return  # Valid inside main()
 
     with st.spinner('de IPAL Helpdesk zoekt het juiste antwoord…'):
@@ -351,7 +351,7 @@ def main():
         except Exception as e:
             logging.exception('AI-fallback mislukt')
             add_msg('assistant', f'⚠️ AI-fallback mislukt: {e}')
-        st.experimental_rerun()
+        st.rerun()  # Replaced st.experimental_rerun()
 
 if __name__ == '__main__':
     main()
