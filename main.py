@@ -247,7 +247,7 @@ def main():
                 video_bytes = video_file.read()
             st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True)
         elif logo_img:
-            st.image(logo_img, width=244)
+            st.image(logo_img, width=122)
 
         st.header('Welkom bij de IPAL Chatbox, kies hier uw onderwerp')
 
@@ -355,4 +355,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
