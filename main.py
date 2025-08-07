@@ -249,7 +249,7 @@ def main():
         elif logo_img:
             st.image(logo_img, width=244)
 
-        st.header('Welkom bij IPAL Chatbox')
+        st.header('Welkom bij de IPAL Chatbox, kies hier uw onderwerp')
 
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
@@ -355,3 +355,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
