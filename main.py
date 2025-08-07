@@ -245,7 +245,7 @@ def main():
         if os.path.exists(video_path):
             with open(video_path, "rb") as video_file:
                 video_bytes = video_file.read()
-            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True, width=600)
+            st.video(video_bytes, format="video/mp4", start_time=0, autoplay=True, width=300)
         elif logo_img:
             st.image(logo_img, width=244)
 
@@ -355,6 +355,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
