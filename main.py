@@ -1,13 +1,3 @@
-"""
-IPAL Chatbox voor oudere vrijwilligers
-- Python 3, Streamlit
-- Groot lettertype, eenvoudige bediening
-- Antwoorden uit FAQ, Exact Online, DocBase, rkkerk.nl, rkk-online.nl, en AI
-- Topicfiltering (blacklist + herstelde fallback op geselecteerde module)
-- Logging en foutafhandeling
-- Antwoorden downloaden als PDF
-"""
-
 import os
 import re
 import logging
@@ -39,8 +29,10 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# Set page config as first Streamlit command
+# -- Set page config MUST be first Streamlit command --
 st.set_page_config(page_title='IPAL Chatbox', layout='centered')
+
+# Font size css
 st.markdown(
     '<style>html, body, [class*="css"] { font-size:20px; } button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }</style>',
     unsafe_allow_html=True
@@ -78,6 +70,7 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
         return match.iloc[0]['Antwoord of oplossing']
     return None
 
+# AI-Antwoord Info
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
@@ -85,8 +78,8 @@ AI-Antwoord Info:
 """
 
 def make_pdf(question: str, answer: str) -> bytes:
-    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
-    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
+    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)
+    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
@@ -151,7 +144,7 @@ def load_faq(path="faq.csv"):
         df['Afbeelding'] = None
     df['Antwoord'] = df['Antwoord of oplossing']
     df['combined'] = df[['Systeem','Subthema','Omschrijving melding','Toelichting melding']].fillna('').agg(' '.join, axis=1)
-    return df.set_index(['Systeem', 'Subthema'])  # Toegevoegd voor snellere lookups
+    return df.set_index(['Systeem', 'Subthema'])
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
@@ -215,6 +208,8 @@ def get_avatar(role: str):
 
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime('%d-%m-%Y %H:%M')
+    if 'history' not in st.session_state:
+        st.session_state.history = []
     st.session_state.history = (st.session_state.history + [{'role': role, 'content': content, 'time': ts}])[-MAX_HISTORY:]
 
 def render_chat():
@@ -230,8 +225,11 @@ def render_chat():
 
 if 'history' not in st.session_state:
     st.session_state.history = []
+if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
+if 'selected_module' not in st.session_state:
     st.session_state.selected_module = None
+if 'last_question' not in st.session_state:
     st.session_state.last_question = ''
 
 def main():
@@ -239,8 +237,9 @@ def main():
         st.session_state.clear()
         st.experimental_rerun()
 
+    # Startpagina: video afspelen als bestand bestaat
+    video_path = "helpdesk.mp4"
     if not st.session_state.selected_product:
-        video_path = "helpdesk.mp4"
         if os.path.exists(video_path):
             with open(video_path, "rb") as video_file:
                 video_bytes = video_file.read()
@@ -249,7 +248,6 @@ def main():
             st.image(logo_img, width=244)
 
         st.header('Welkom bij IPAL Chatbox')
-
         c1, c2, c3 = st.columns(3)
         if c1.button('Exact', use_container_width=True):
             st.session_state.selected_product = 'Exact'
@@ -264,6 +262,7 @@ def main():
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
             st.experimental_rerun()
+
         render_chat()
         return
 
@@ -282,7 +281,6 @@ def main():
     if not vraag:
         return
 
-    # Controle op uniek codewoord
     if vraag.strip().upper() == "UNIEKECODE123":
         antwoord = find_answer_by_codeword(faq_df, codeword="[UNIEKECODE123]")
         if antwoord:
@@ -290,7 +288,6 @@ def main():
             add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
             st.experimental_rerun()
 
-    # Exacte match op 'Omschrijving melding'
     vraag_normalized = vraag.strip().lower()
     faq_df["normalized"] = faq_df["Omschrijving melding"].str.strip().str.lower()
     exact_match = faq_df[faq_df["normalized"] == vraag_normalized]
@@ -301,7 +298,6 @@ def main():
         add_msg('assistant', antwoord + f"\n\n{AI_INFO}")
         st.experimental_rerun()
 
-    # Geen exacte match → reguliere verwerking
     st.session_state.last_question = vraag
     add_msg('user', vraag)
 
