@@ -129,7 +129,7 @@ def make_pdf(question: str, answer: str) -> bytes:
         for line in answer.split("\n"):
             line = line.strip()
             if line.startswith("•") or line.startswith("-"):
-                bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
+                bullets = ListFlowable([ListItem(Paragraph(line[1].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
@@ -229,27 +229,18 @@ def render_chat():
             )
             st.download_button('📄 Download PDF', data=pdf_data, file_name='antwoord.pdf', mime='application/pdf')
 
-# INITIËLE SESSIESTATE VARIABELEN (zorg dat altijd bestaan)
 if 'history' not in st.session_state:
     st.session_state.history = []
-if 'selected_product' not in st.session_state:
     st.session_state.selected_product = None
-if 'selected_module' not in st.session_state:
     st.session_state.selected_module = None
-if 'last_question' not in st.session_state:
     st.session_state.last_question = ''
 
 def main():
     if st.sidebar.button('🔄 Nieuw gesprek'):
-        # Alleen expliciet verwijderen wat nodig is
-        keys_to_clear = ['history', 'selected_product', 'selected_module', 'last_question']
-        for key in keys_to_clear:
-            if key in st.session_state:
-                del st.session_state[key]
+        st.session_state.clear()
         st.experimental_rerun()
 
     if not st.session_state.selected_product:
-        # Video helpdesk.mp4 afspelen als aanwezig
         video_file = "helpdesk.mp4"
         if os.path.exists(video_file):
             video_html = f"""
@@ -277,7 +268,6 @@ def main():
             st.session_state.selected_module = 'alles'
             add_msg('assistant', 'Gekozen: Algemeen')
             st.experimental_rerun()
-
         render_chat()
         return
 
