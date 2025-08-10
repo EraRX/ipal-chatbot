@@ -161,20 +161,27 @@ def load_faq(path="faq.csv"):
 
 faq_df = load_faq()
 producten = ['Exact', 'DocBase']
-subthema_dict = {p: sorted(faq_df.index.get_level_values('Subthema').dropna().unique()) for p in producten}
+
+# ❗ FIX 1: toon alléén subthema's van het gekozen systeem
+subthema_dict = {p: [] for p in producten}
+for p in producten:
+    try:
+        subthema_dict[p] = sorted(
+            faq_df.xs(p, level='Systeem').index.get_level_values('Subthema').dropna().unique().tolist()
+        )
+    except KeyError:
+        logging.warning(f"Geen subthema's gevonden voor: {p}")
+
 BLACKLIST = ["persoonlijke gegevens", "medische gegevens", "gezondheid", "privacy schending"]
 
 def filter_topics(msg: str):
-    found = [t for t in BLACKLIST if re.search(rf"\b{re.escape(t)}\b", msg.lower())]
+    found = [t for t in BLACKLIST if re.search(rf"\\b{re.escape(t)}\\b", msg.lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
 @st.cache_data
 def fetch_web_info_cached(query: str):
     result = []
-    dfm = faq_df[faq_df['combined'].str.contains(re.escape(query), case=False, na=False)]
-    if not dfm.empty:
-        row = dfm.iloc[0]
-        result.append(f"Vanuit FAQ ({row['Systeem']} - {row['Subthema']}): {row['Antwoord']}")
+    # Alleen gebruiken als CSV binnen gekozen systeem niets oplevert
     try:
         r = requests.get("https://docbase.nl", timeout=5)
         r.raise_for_status()
@@ -195,27 +202,46 @@ def fetch_web_info_cached(query: str):
         logging.info(f"Kon Exact Online Knowledge Base niet ophalen: {e}")
     return '\n'.join(result) if result else None
 
+# ❗ FIX 2: strikt zoeken binnen gekozen systeem (en subthema)
+def _score_tokens(vraag_lower: str, text: str) -> int:
+    woorden = [w for w in re.findall(r"\w+", vraag_lower) if len(w) > 2]
+    tokens = set(re.findall(r"\w+", str(text).lower()))
+    return sum(1 for w in woorden if w in tokens)
+
 def vind_best_passend_antwoord(vraag, systeem, subthema):
     try:
-        logging.info(f"Looking for answer in faq_df for systeem='{systeem}', subthema='{subthema}', vraag='{vraag}'")
-        # Try exact index match
+        vraag_lower = vraag.lower()
         try:
-            resultaten = faq_df.loc[(systeem.lower(), subthema.lower())]
+            df_sys = faq_df.xs(systeem, level='Systeem', drop_level=False)
         except KeyError:
-            logging.warning(f"Exact index match failed for ({systeem.lower()}, {subthema.lower()}). Trying broader search.")
-            # Fall back to searching all rows if index lookup fails
-            resultaten = faq_df.reset_index()
-        
-        if not resultaten.empty:
-            vraag_lower = vraag.lower()
-            def score(tekst):
-                return sum(1 for woord in vraag_lower.split() if woord in str(tekst).lower())
-            if isinstance(resultaten, pd.DataFrame):
-                resultaten = resultaten.assign(score=resultaten['combined'].apply(score)).sort_values('score', ascending=False)
-                beste = resultaten.iloc[0]
-                return beste['Antwoord of oplossing'] if beste['score'] > 0 else None
-        logging.warning(f"No matching results found in faq_df for vraag='{vraag}'.")
-        return None
+            logging.warning(f"Geen data voor systeem: {systeem}")
+            return None
+
+        # filter op subthema indien gekozen
+        if subthema and subthema != 'alles':
+            try:
+                df_mod = df_sys.xs(subthema, level='Subthema', drop_level=False)
+            except KeyError:
+                logging.info(f"Geen data voor subthema '{subthema}' binnen {systeem}; val terug op alle {systeem}-items")
+                df_mod = df_sys
+        else:
+            df_mod = df_sys
+
+        # 1) exacte match op Omschrijving melding binnen scope
+        df_reset = df_mod.reset_index()
+        exact = df_reset[df_reset['Omschrijving melding'].astype(str).str.strip().str.lower() == vraag_lower]
+        if not exact.empty:
+            return exact.iloc[0]['Antwoord of oplossing']
+
+        # 2) eenvoudige ranking op token-overlap binnen scope
+        if df_mod.empty:
+            return None
+        cand = df_mod.reset_index()
+        cand['_score'] = cand['combined'].apply(lambda t: _score_tokens(vraag_lower, t))
+        cand = cand.sort_values('_score', ascending=False)
+        top = cand.iloc[0]
+        return top['Antwoord of oplossing'] if top['_score'] > 0 else None
+
     except Exception as e:
         logging.error(f"Error in vind_best_passend_antwoord: {str(e)}")
         return None
@@ -326,10 +352,19 @@ def main():
             st.rerun()
         return
 
-    # Exacte match op 'Omschrijving melding'
+    # Exacte match op 'Omschrijving melding' — strikt binnen gekozen systeem (en subthema indien gekozen)
     vraag_normalized = vraag.strip().lower()
     faq_df_reset = faq_df.reset_index()
-    exact_match = faq_df_reset[faq_df_reset["Omschrijving melding"].str.strip().str.lower() == vraag_normalized]
+    syst = st.session_state.selected_product
+    modu = st.session_state.selected_module
+    cond = (
+        (faq_df_reset["Systeem"] == syst) &
+        (faq_df_reset["Omschrijving melding"].astype(str).str.strip().str.lower() == vraag_normalized)
+    )
+    if modu and modu != 'alles':
+        cond = cond & (faq_df_reset["Subthema"] == modu)
+
+    exact_match = faq_df_reset[cond]
 
     if not exact_match.empty:
         antwoord = exact_match.iloc[0]["Antwoord of oplossing"]
@@ -386,6 +421,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
