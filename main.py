@@ -236,9 +236,14 @@ def list_categorieen(systeem: str, subthema: str) -> list:
 
 @st.cache_data(show_spinner=False)
 def list_toelichtingen(systeem: str, subthema: str, categorie: str) -> list:
-    """Unieke 'Toelichting melding' waarden binnen de gekozen scope."""
+    """Unieke 'Toelichting melding' waarden binnen de gekozen scope.
+    Als er geen categorieën zijn of 'alles' is gekozen, pakken we alle toelichtingen onder systeem+subthema.
+    """
     try:
-        scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
+        if not categorie or str(categorie).lower() == "alles":
+            scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
+        else:
+            scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
         return sorted(scope["Toelichting melding"].dropna().astype(str).unique())
     except KeyError:
         return []
@@ -368,6 +373,10 @@ def main():
     # 2) Categorie
     if st.session_state.get("selected_product") in PRODUCTEN and st.session_state.get("selected_module") and not st.session_state.get("selected_category"): 
         cats = list_categorieen(st.session_state.selected_product, st.session_state.selected_module)
+        if len(cats) == 0:
+            st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
+            st.session_state.selected_category = "alles"
+            st.rerun()
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
             st.session_state.selected_category = selc
@@ -379,7 +388,7 @@ def main():
     if (
         st.session_state.get("selected_product") in PRODUCTEN
         and st.session_state.get("selected_module")
-        and st.session_state.get("selected_category")
+        and st.session_state.get("selected_category") is not None
         and not st.session_state.get("selected_toelichting")
     ):
         toes = list_toelichtingen(
@@ -387,6 +396,10 @@ def main():
             st.session_state.selected_module,
             st.session_state.selected_category,
         )
+        if len(toes) == 0:
+            st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
+            st.session_state.selected_toelichting = None
+            st.rerun()
         toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
         if toe_sel != "(Kies)":
             st.session_state.selected_toelichting = toe_sel
