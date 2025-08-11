@@ -133,7 +133,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
-        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'])]))
+        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP']))))
         story.append(Spacer(1, 12))
         for line in answer.split("\n")[1:]:
             line = line.strip()
@@ -442,3 +442,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
