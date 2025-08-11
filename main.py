@@ -272,6 +272,31 @@ def antwoord_qna(zinnen_bron: str, vraag: str, max_zinnen: int = 3) -> str:
     top = [z for s, z in scores if s > 0][:max_zinnen]
     return "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen. Zet eventueel AI‑QA aan in de sidebar."
 
+def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
+    """Zoek het beste antwoord in de hele CSV voor de modus 'Algemeen'.
+    1) Exacte match op 'Omschrijving melding' (case-insensitief)
+    2) Anders: hoogste token-overlap score op 'combined'
+    """
+    try:
+        if faq_df.empty:
+            return None
+        df_all = faq_df.reset_index().copy()
+        vraag_norm = str(vraag).strip().lower()
+        exact = df_all[df_all["Omschrijving melding"].astype(str).str.strip().str.lower() == vraag_norm]
+        if not exact.empty:
+            return str(exact.iloc[0].get("Antwoord of oplossing", "")).strip()
+        # ranking
+        def _score_row(row):
+            return _token_score(vraag, row.get("combined", ""))
+        df_all["_score"] = df_all.apply(_score_row, axis=1)
+        df_all = df_all.sort_values("_score", ascending=False)
+        if len(df_all) == 0 or int(df_all.iloc[0]["_score"]) <= 0:
+            return None
+        return str(df_all.iloc[0].get("Antwoord of oplossing", "")).strip()
+    except Exception as e:
+        logging.error(f"Algemeen-zoekfout: {e}")
+        return None
+
 # ──────────────────────────────────────────────────────────────────────────────
 # UI helpers & state
 # ──────────────────────────────────────────────────────────────────────────────
@@ -371,6 +396,31 @@ def main():
             st.session_state.selected_product = "Algemeen"; st.session_state.selected_module = "alles"; st.session_state.selected_category = "alles"; add_msg("assistant", "Gekozen: Algemeen"); st.rerun()
         render_chat(); return
 
+    # ALGEMEEN-modus (geen cascade — vrije vraag op hele CSV)
+    if st.session_state.get("selected_product") == "Algemeen":
+        render_chat()
+        vraag = st.chat_input("Stel uw algemene vraag:")
+        if not vraag:
+            return
+        st.session_state.last_question = vraag
+        add_msg("user", vraag)
+        ok, warn = filter_topics(vraag)
+        if not ok:
+            add_msg("assistant", warn); st.rerun(); return
+        antwoord = vind_best_algemeen_antwoord(vraag)
+        if not antwoord and st.session_state.allow_ai and client is not None:
+            try:
+                antwoord = chatgpt_cached([
+                    {"role":"system","content":"Je bent een behulpzame Nederlandse assistent. Houd antwoorden kort en concreet. Geef aan als je iets niet zeker weet."},
+                    {"role":"user","content": vraag}
+                ], temperature=0.2, max_tokens=700)
+            except Exception as e:
+                logging.error(f"AI fallback (Algemeen) fout: {e}")
+        add_msg("assistant", (antwoord or "Ik vond geen passend antwoord in de CSV. Probeer je vraag specifieker te stellen.") + "
+
+" + AI_INFO)
+        st.rerun(); return
+
     # 1) Subthema
     if st.session_state.selected_product in PRODUCTEN and not st.session_state.selected_module:
         opts = subthema_dict.get(st.session_state.selected_product, [])
@@ -387,10 +437,18 @@ def main():
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state.selected_category = "alles"
+            # reset afgeleide keuzes
+            st.session_state.selected_toelichting = None
+            st.session_state.selected_answer_id = None
+            st.session_state.selected_answer_text = None
             st.rerun()
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
             st.session_state.selected_category = selc
+            # reset lagere keuzes zodra categorie wijzigt
+            st.session_state.selected_toelichting = None
+            st.session_state.selected_answer_id = None
+            st.session_state.selected_answer_text = None
             add_msg("assistant", f"Gekozen categorie: {selc}")
             st.rerun()
         render_chat(); return
@@ -457,10 +515,14 @@ def main():
         if keuze != "(Kies)":
             i = int(keuze.split(".")[0]) - 1
             row = df_reset.iloc[i]
-            st.session_state.selected_answer_id = row.get("ID", i)
-            st.session_state.selected_answer_text = row.get("Antwoord of oplossing", "")
-            add_msg("assistant", st.session_state.selected_answer_text + "\n\n" + AI_INFO)
-            st.rerun()
+            row_id = row.get("ID", i)
+            if st.session_state.get("selected_answer_id") != row_id:
+                st.session_state.selected_answer_id = row_id
+                st.session_state.selected_answer_text = row.get("Antwoord of oplossing", "")
+                add_msg("assistant", st.session_state.selected_answer_text + "
+
+" + AI_INFO)
+                st.rerun()
     else:
         st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting.")
 
