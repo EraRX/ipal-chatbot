@@ -222,6 +222,15 @@ def list_categorieen(systeem: str, subthema: str) -> list:
     except KeyError:
         return []
 
+@st.cache_data(show_spinner=False)
+def list_toelichtingen(systeem: str, subthema: str, categorie: str) -> list:
+    """Unieke 'Toelichting melding' waarden binnen de gekozen scope."""
+    try:
+        scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
+        return sorted(scope["Toelichting melding"].dropna().astype(str).unique())
+    except KeyError:
+        return []
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Veiligheidsfilters
 # ──────────────────────────────────────────────────────────────────────────────
@@ -286,6 +295,7 @@ DEFAULT_STATE = {
     "selected_product": None,
     "selected_module": None,
     "selected_category": None,
+    "selected_toelichting": None,
     "selected_answer_id": None,
     "selected_answer_text": None,
     "last_question": "",
@@ -353,7 +363,26 @@ def main():
             st.rerun()
         render_chat(); return
 
-    # 3) Record (antwoord) kiezen binnen scope
+    # 3) Toelichting (binnen de gekozen Systeem/Subthema/Categorie)
+    if (
+        st.session_state.get("selected_product") in PRODUCTEN
+        and st.session_state.get("selected_module")
+        and st.session_state.get("selected_category")
+        and not st.session_state.get("selected_toelichting")
+    ):
+        toes = list_toelichtingen(
+            st.session_state.selected_product,
+            st.session_state.selected_module,
+            st.session_state.selected_category,
+        )
+        toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
+        if toe_sel != "(Kies)":
+            st.session_state.selected_toelichting = toe_sel
+            add_msg("assistant", f"Gekozen toelichting: {toe_sel}")
+            st.rerun()
+        render_chat(); return
+
+    # 4) Record (antwoord) kiezen binnen scope
     df_scope = faq_df
     syst = st.session_state.selected_product
     sub = st.session_state.selected_module
@@ -365,6 +394,13 @@ def main():
             df_scope = df_scope.xs(sub, level="Subthema", drop_level=False)
         if cat and cat != "alles":
             df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
+        # filter op gekozen toelichting (4e stap)
+        toe = st.session_state.get("selected_toelichting")
+        if toe:
+            try:
+                df_scope = df_scope[df_scope["Toelichting melding"].astype(str) == str(toe)]
+            except Exception:
+                pass
     except KeyError:
         df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
 
@@ -388,7 +424,7 @@ def main():
             add_msg("assistant", st.session_state.selected_answer_text + "\n\n" + AI_INFO)
             st.rerun()
     else:
-        st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie.")
+        st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting.")
 
     # 4) Doorvraag over het gekozen antwoord
     vraag = st.chat_input("Stel uw vraag (over het gekozen antwoord):")
