@@ -93,9 +93,18 @@ AI-Antwoord Info:
 - [Veelgestelde vragen Exact Online](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1)
 """
 
+# FAQ-links voor PDF (klikbaar, zonder de lange URL's af te drukken)
+FAQ_LINKS = [
+    ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
+    ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
+]
+
 def make_pdf(question: str, answer: str) -> bytes:
-    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)  # Remove bold
-    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)  # Remove headings
+    # Verberg markdown-opmaak en inline markdown-links in het antwoord
+    answer = re.sub(r'\*\*([^\*]+)\*\*', r'\1', answer)     # **bold** -> plain
+    answer = re.sub(r'###\s*([^\n]+)', r'\1', answer)       # ### kop -> plain
+    answer = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'\1', answer)  # [label](url) -> label
+
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
@@ -124,11 +133,11 @@ def make_pdf(question: str, answer: str) -> bytes:
     if os.path.exists(avatar_path):
         avatar = Image(avatar_path, width=30, height=30)
         intro_text = Paragraph(answer.split("\n")[0], body_style)
-        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')])))
+        story.append(Table([[avatar, intro_text]], colWidths=[30, 440], style=TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'])]))
         story.append(Spacer(1, 12))
         for line in answer.split("\n")[1:]:
             line = line.strip()
-            if line.startswith("•") or line.startswith("-"):
+            if line.startswith(("•", "-")):
                 bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
@@ -136,11 +145,20 @@ def make_pdf(question: str, answer: str) -> bytes:
     else:
         for line in answer.split("\n"):
             line = line.strip()
-            if line.startswith("•") or line.startswith("-"):
+            if line.startswith(("•", "-")):
                 bullets = ListFlowable([ListItem(Paragraph(line[1:].strip(), bullet_style))], bulletType="bullet")
                 story.append(bullets)
             elif line:
                 story.append(Paragraph(line, body_style))
+
+    # Klikbare FAQ-links toevoegen (mooie bullets, geen afgebroken URL's)
+    story.append(Spacer(1, 12))
+    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+    link_items = []
+    for label, url in FAQ_LINKS:
+        p = Paragraph(f'<link href="{url}" color="blue">{label}</link>', body_style)
+        link_items.append(ListItem(p, leftIndent=12))
+    story.append(ListFlowable(link_items, bulletType="bullet"))
 
     doc.build(story)
     buffer.seek(0)
@@ -424,6 +442,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
