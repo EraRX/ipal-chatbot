@@ -1,15 +1,15 @@
 """
-IPAL Chatbox — Definitieve main.py (inclusief PDF)
+IPAL Chatbox — Definitieve main.py (Nieuwe cascade + 1) UNIEKECODE123 + 2) Web-fallback + 3) FAQ-links in PDF)
 
 Functie-overzicht
 - Startscherm met optionele introvideo (helpdesk.mp4) of logo.png
 - Keuze: Exact / DocBase / Algemeen
-  • Exact/DocBase: cascade Systeem → Subthema → Categorie → Toelichting → itemkeuze → vraag over getoonde Antwoord
+  • Exact/DocBase: cascade Systeem → Subthema → Categorie → (Toelichting) → itemkeuze → vraag over getoonde Antwoord
   • Algemeen: géén cascade, direct een vrije vraag die zoekt in de héle CSV
-- Antwoordbron: uitsluitend CSV (filter strikt op cascadekeuzes)
-- Optionele AI-QA (sidebar toggle): extra toelichting / Q&A op basis van gekozen antwoord
-- PDF-download van het laatste antwoord + vraag
-- Robuuste state-initialisatie + fouttolerante CSV-normalisatie
+- Antwoordbron: primair CSV (filter strikt op cascadekeuzes)
+- Optionele AI-QA (sidebar toggle) en optionele Web-fallback (sidebar toggle, Algemeen-modus)
+- PDF-download van het laatste antwoord + klikbare FAQ-links
+- Robuuste state-initialisatie + CSV-normalisatie
 """
 
 import os
@@ -17,7 +17,6 @@ import re
 import io
 import logging
 from datetime import datetime
-from collections import defaultdict
 from typing import Optional, List
 
 import streamlit as st
@@ -25,6 +24,10 @@ import pandas as pd
 import pytz
 from dotenv import load_dotenv
 from openai import OpenAI
+
+# Voor web-fallback
+import requests
+from bs4 import BeautifulSoup
 
 try:
     from openai.error import RateLimitError
@@ -85,19 +88,26 @@ def chatgpt_cached(messages, temperature=0.2, max_tokens=700) -> str:
 
 
 # ─────────────────────────────────────────────────────────────
-# PDF helpers
+# PDF helpers (+ FAQ-links)
 # ─────────────────────────────────────────────────────────────
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
+
+FAQ_LINKS = [
+    ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
+    ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
+]
 
 def _strip_md(s: str) -> str:
     # Vermijd backref-issues door lambda te gebruiken
     s = re.sub(r"\*\*([^*]+)\*\*", lambda m: m.group(1), s)
     s = re.sub(r"#+\s*([^\n]+)", lambda m: m.group(1), s)
+    # Markdown links → label
+    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", lambda m: m.group(1), s)
     return s
 
 def make_pdf(question: str, answer: str) -> bytes:
-    """Genereer een eenvoudige PDF met de vraag en het antwoord."""
+    """Genereer een PDF met vraag, antwoord en klikbare FAQ-links."""
     answer = _strip_md(answer or "")
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -128,11 +138,21 @@ def make_pdf(question: str, answer: str) -> bytes:
     story.append(Paragraph(f"Vraag: {question or ''}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
+
     for line in (answer.split("\n") if answer else []):
         line = line.strip()
         if not line:
             continue
         story.append(Paragraph(line, body_style))
+
+    # FAQ-links onderaan
+    story.append(Spacer(1, 12))
+    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+    link_items = []
+    for label, url in FAQ_LINKS:
+        p = Paragraph(f'<link href="{url}" color="blue">{label}</link>', body_style)
+        link_items.append(ListItem(p, leftIndent=12))
+    story.append(ListFlowable(link_items, bulletType="bullet"))
 
     doc.build(story)
     buffer.seek(0)
@@ -214,7 +234,7 @@ def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) ->
 
 
 # ─────────────────────────────────────────────────────────────
-# Veiligheidsfilter en ranking
+# Veiligheidsfilter, ranking en extra zoekfuncties
 # ─────────────────────────────────────────────────────────────
 BLACKLIST = ["persoonlijke gegevens", "medische gegevens", "gezondheid", "privacy schending"]
 
@@ -227,10 +247,16 @@ def _token_score(q: str, text: str) -> int:
     ts = set(re.findall(r"\w+", str(text).lower()))
     return sum(1 for w in qs if w in ts)
 
+def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]") -> Optional[str]:
+    """Zoek een antwoord dat het codewoord bevat (case-insensitief)."""
+    try:
+        mask = df["Antwoord of oplossing"].astype(str).str.contains(codeword, case=False, na=False)
+        if mask.any():
+            return str(df.loc[mask].iloc[0]["Antwoord of oplossing"]).strip()
+    except Exception:
+        pass
+    return None
 
-# ─────────────────────────────────────────────────────────────
-# Zoekfuncties
-# ─────────────────────────────────────────────────────────────
 def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
     """Algemeen-modus: zoek in hele CSV. Eerst exacte Omschrijving, anders hoogste token-overlap."""
     try:
@@ -238,9 +264,19 @@ def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
             return None
         df_all = faq_df.reset_index().copy()
         vraag_norm = str(vraag).strip().lower()
+
+        # 1) UNIEKECODE123 direct
+        if vraag_norm == "uniekecode123":
+            cw = find_answer_by_codeword(df_all)
+            if cw:
+                return cw
+
+        # 2) Exacte Omschrijving
         exact = df_all[df_all["Omschrijving melding"].astype(str).str.strip().str.lower() == vraag_norm]
         if not exact.empty:
             return str(exact.iloc[0].get("Antwoord of oplossing", "")).strip()
+
+        # 3) Ranking
         df_all["_score"] = df_all["combined"].apply(lambda t: _token_score(vraag, t))
         df_all = df_all.sort_values("_score", ascending=False)
         if len(df_all) == 0 or int(df_all.iloc[0]["_score"]) <= 0:
@@ -249,6 +285,33 @@ def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
     except Exception as e:
         logging.error(f"Algemeen-zoekfout: {e}")
         return None
+
+
+# ─────────────────────────────────────────────────────────────
+# Web-fallback (optioneel via toggle; bedoeld voor Algemeen)
+# ─────────────────────────────────────────────────────────────
+@st.cache_data(show_spinner=False)
+def fetch_web_info_cached(query: str) -> Optional[str]:
+    result = []
+    try:
+        r = requests.get("https://docbase.nl", timeout=5)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3']))
+        if txt and query.lower() in txt.lower():
+            result.append(f"Vanuit docbase.nl: {txt[:200]}... (verkort)")
+    except Exception:
+        pass
+    try:
+        r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=5)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p', 'h1', 'h2', 'h3']))
+        if txt and query.lower() in txt.lower():
+            result.append(f"Vanuit Exact Online Knowledge Base: {txt[:200]}... (verkort)")
+    except Exception:
+        pass
+    return "\n".join(result) if result else None
 
 
 # ─────────────────────────────────────────────────────────────
@@ -274,7 +337,8 @@ DEFAULT_STATE = {
     "selected_answer_text": None,
     "last_question": "",
     "debug": False,
-    "allow_ai": False,  # toggle in sidebar
+    "allow_ai": False,   # toggle in sidebar
+    "allow_web": False,  # toggle in sidebar
 }
 for _k, _v in DEFAULT_STATE.items():
     if _k not in st.session_state:
@@ -294,7 +358,6 @@ def add_msg(role: str, content: str):
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # PDF alleen tonen bij de laatste assistant message + laatste vraag
         if m["role"] == "assistant" and i == len(st.session_state.history) - 1 and st.session_state.get("last_question"):
             pdf = make_pdf(st.session_state["last_question"], m["content"])
             st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf")
@@ -310,13 +373,15 @@ def main():
     with st.sidebar:
         if st.button("🔄 Nieuw gesprek", use_container_width=True):
             st.session_state.clear()
-            # herstel defaults
             for _k, _v in DEFAULT_STATE.items():
                 if _k not in st.session_state:
                     st.session_state[_k] = _v
             st.rerun()
+
         st.session_state["debug"] = st.toggle("Debug info", value=st.session_state.get("debug", False))
         st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
+        st.session_state["allow_web"] = st.toggle("Web-fallback aan (Algemeen)", value=st.session_state.get("allow_web", False))
+
         if st.session_state["allow_ai"] and not OPENAI_KEY:
             st.warning("AI-QA staat aan maar er is geen OPENAI_API_KEY.")
 
@@ -369,6 +434,17 @@ def main():
         vraag = st.chat_input("Stel uw algemene vraag:")
         if not vraag:
             return
+
+        # UNIEKECODE123 direct afhandelen
+        if (vraag or "").strip().upper() == "UNIEKECODE123":
+            cw = find_answer_by_codeword(faq_df.reset_index())
+            if cw:
+                st.session_state["last_question"] = vraag
+                add_msg("user", vraag)
+                add_msg("assistant", with_info(cw))
+                st.rerun()
+                return
+
         st.session_state["last_question"] = vraag
         add_msg("user", vraag)
 
@@ -379,6 +455,14 @@ def main():
             return
 
         antwoord = vind_best_algemeen_antwoord(vraag)
+
+        # Web-fallback (optioneel) alleen in Algemeen
+        if not antwoord and st.session_state.get("allow_web"):
+            webbits = fetch_web_info_cached(vraag)
+            if webbits:
+                antwoord = webbits
+
+        # AI-fallback (optioneel)
         if not antwoord and st.session_state.get("allow_ai") and client is not None:
             try:
                 antwoord = chatgpt_cached(
@@ -405,7 +489,6 @@ def main():
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
-            # Reset lagere keuzes
             st.session_state["selected_category"] = None
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
@@ -427,7 +510,6 @@ def main():
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
             st.session_state["selected_category"] = selc
-            # Reset lagere keuzes
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
@@ -507,15 +589,20 @@ def main():
     if not vraag:
         return
 
+    # UNIEKECODE123 ook hier toestaan
+    if (vraag or "").strip().upper() == "UNIEKECODE123":
+        cw = find_answer_by_codeword(faq_df.reset_index())
+        if cw:
+            st.session_state["last_question"] = vraag
+            add_msg("user", vraag)
+            add_msg("assistant", with_info(cw))
+            st.rerun()
+            return
+
     st.session_state["last_question"] = vraag
     add_msg("user", vraag)
 
-    if not st.session_state.get("selected_answer_text"):
-        add_msg("assistant", "Kies eerst een item in de lijst hierboven.")
-        st.rerun()
-        return
-
-    # Veiligheidsfilter (optioneel; hier beperkt, want vraag is over bestaand antwoord)
+    # Veiligheidsfilter (beperkt; vraag is over bestaand antwoord)
     ok, warn = filter_topics(vraag)
     if not ok:
         add_msg("assistant", warn)
@@ -523,7 +610,8 @@ def main():
         return
 
     # QA over gekozen antwoord
-    bron = str(st.session_state["selected_answer_text"] or "")
+    bron = str(st.session_state.get("selected_answer_text") or "")
+    reactie = None
     if st.session_state.get("allow_ai") and client is not None:
         try:
             reactie = chatgpt_cached(
@@ -537,8 +625,6 @@ def main():
         except Exception as e:
             logging.error(f"AI-QA fout: {e}")
             reactie = None
-    else:
-        reactie = None
 
     if not reactie:
         # deterministische fallback: top-zinnen met token overlap
