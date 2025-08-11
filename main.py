@@ -177,9 +177,20 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
 
     # kolommen aanvullen indien ontbreken
     required = {"Systeem","Subthema","Categorie","Omschrijving melding","Antwoord of oplossing"}
-    missing = required - set(df.columns)
-    for col in missing:
-        df[col] = ""
+    for col in required:
+        if col not in df.columns:
+            df[col] = ""
+
+    # normaliseer whitespace en cases (voorkomt cascade die niets toont)
+    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding"]
+    for c in norm_cols:
+        if c in df.columns:
+            df[c] = df[c].fillna("").astype(str).str.strip()
+
+    # standaardiseer systeemaanduidingen
+    if "Systeem" in df.columns:
+        mapping = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
+        df["Systeem"] = df["Systeem"].str.lower().map(mapping).fillna(df["Systeem"]).astype(str)
 
     if "Afbeelding" not in df.columns:
         df["Afbeelding"] = None
@@ -193,6 +204,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
             df[c] = ""
     df["combined"] = df[keep_cols].fillna("").agg(" ".join, axis=1)
 
+    # MultiIndex pas NA normalisatie zetten
     return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
 
 faq_df = load_faq()
