@@ -281,16 +281,20 @@ def render_chat():
             st.download_button("📄 Download PDF", data=pdf_data, file_name="antwoord.pdf", mime="application/pdf")
 
 # init session
-if "history" not in st.session_state:
-    st.session_state.history = []
-    st.session_state.selected_product = None
-    st.session_state.selected_module = None
-    st.session_state.selected_category = None
-    st.session_state.selected_answer_id = None
-    st.session_state.selected_answer_text = None
-    st.session_state.last_question = ""
-    st.session_state.debug = False
-    st.session_state.allow_ai = False   # conservatief: AI uit; kan aan via sidebar
+DEFAULT_STATE = {
+    "history": [],
+    "selected_product": None,
+    "selected_module": None,
+    "selected_category": None,
+    "selected_answer_id": None,
+    "selected_answer_text": None,
+    "last_question": "",
+    "debug": False,
+    "allow_ai": False,
+}
+for _k, _v in DEFAULT_STATE.items():
+    if _k not in st.session_state:
+        st.session_state[_k] = _v
 
 # ──────────────────────────────────────────────────────────────────────────────
 # App
@@ -340,7 +344,7 @@ def main():
         render_chat(); return
 
     # 2) Categorie
-    if st.session_state.selected_product in PRODUCTEN and st.session_state.selected_module and not st.session_state.selected_category:
+    if st.session_state.get("selected_product") in PRODUCTEN and st.session_state.get("selected_module") and not st.session_state.get("selected_category"): 
         cats = list_categorieen(st.session_state.selected_product, st.session_state.selected_module)
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
@@ -394,7 +398,7 @@ def main():
     st.session_state.last_question = vraag
     add_msg("user", vraag)
 
-    if not st.session_state.selected_answer_text:
+    if not st.session_state.get("selected_answer_text"): 
         add_msg("assistant", "Kies eerst een item in de lijst hierboven.")
         st.rerun(); return
 
