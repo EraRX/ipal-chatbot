@@ -348,8 +348,19 @@ def main():
 
     # Startscherm (systeemkeuze)
     if not st.session_state.get("selected_product"):
-        if os.path.exists("logo.png"):
+        # Optionele introvideo (alleen afspelen als het bestand bestaat)
+        video_path = "helpdesk.mp4"
+        if os.path.exists(video_path):
+            try:
+                with open(video_path, "rb") as f:
+                    st.video(f.read(), format="video/mp4", start_time=0, autoplay=True)
+            except Exception as e:
+                logging.error(f"Introvideo kon niet worden afgespeeld: {e}")
+        elif os.path.exists("logo.png"):
             st.image("logo.png", width=244)
+        else:
+            st.info("Welkom bij IPAL Chatbox")
+
         st.header("Welkom bij IPAL Chatbox")
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
