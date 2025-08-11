@@ -87,7 +87,10 @@ def find_answer_by_codeword(df, codeword="[UNIEKECODE123]"):
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
-2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site.
+2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site. Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:
+
+Veel gestelde vragen Docbase nieuw 2024
+Veel gestelde vragen Exact Online
 """
 
 def make_pdf(question: str, answer: str) -> bytes:
@@ -421,3 +424,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
