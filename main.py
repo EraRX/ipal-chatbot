@@ -400,7 +400,7 @@ def main():
         st.session_state.get("selected_product") in PRODUCTEN
         and st.session_state.get("selected_module")
         and st.session_state.get("selected_category") is not None
-        and not st.session_state.get("selected_toelichting")
+        and st.session_state.get("selected_toelichting") is None
     ):
         toes = list_toelichtingen(
             st.session_state.selected_product,
@@ -408,15 +408,17 @@ def main():
             st.session_state.selected_category,
         )
         if len(toes) == 0:
+            # Geen toelichtingen: sla stap over en ga meteen door naar record-selectie
             st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
-            st.session_state.selected_toelichting = None
-            st.rerun()
-        toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
-        if toe_sel != "(Kies)":
-            st.session_state.selected_toelichting = toe_sel
-            add_msg("assistant", f"Gekozen toelichting: {toe_sel}")
-            st.rerun()
-        render_chat(); return
+            st.session_state.selected_toelichting = ""  # markeer als afgehandeld
+            # geen rerun en geen return: we vallen door naar stap 4 in deze run
+        else:
+            toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
+            if toe_sel != "(Kies)":
+                st.session_state.selected_toelichting = toe_sel
+                add_msg("assistant", f"Gekozen toelichting: {toe_sel}")
+                st.rerun()
+            render_chat(); return
 
     # 4) Record (antwoord) kiezen binnen scope
     df_scope = faq_df
