@@ -5,15 +5,16 @@ IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Inf
 - Zoeken (hele CSV): vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
 - Algemeen: géén CSV, alleen AI (en optioneel Web-fallback)
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
-- Altijd PDF-knop (unieke key) + “Kopieer antwoord” + optionele Afbeelding + scope teller
+- Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
 - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
 """
 
 import os
 import re
 import io
-import logging
+import json
 import hashlib
+import logging
 from datetime import datetime
 from typing import Optional, List
 
@@ -22,6 +23,7 @@ import pandas as pd
 import pytz
 from dotenv import load_dotenv
 from openai import OpenAI
+import streamlit.components.v1 as components
 
 # Web-fallback
 import requests
@@ -37,7 +39,6 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, Table, TableStyle
 )
-    # noqa: E124
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT
@@ -509,31 +510,43 @@ def with_info(text: str) -> str:
     return clean_text((text or "").strip()) + "\n\n" + AI_INFO
 
 def _copy_button(text: str, key_suffix: str):
-    # Client-side kopiëren naar klembord
-    safe = (text or "")
-    safe = safe.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n")
-    btn_id = f"copybtn-{key_suffix}"
-    st.markdown(
-        f"""
-        <button id="{btn_id}" style="margin-top:8px;padding:6px 10px;font-size:16px;">
-          Kopieer antwoord
-        </button>
-        <script>
-        const _btn = document.getElementById("{btn_id}");
-        if (_btn) {{
-          _btn.onclick = async () => {{
-            try {{
-              await navigator.clipboard.writeText(`{safe}`);
-              const old = _btn.innerText;
-              _btn.innerText = "Gekopieerd!";
-              setTimeout(()=>{{ _btn.innerText = old; }}, 1500);
-            }} catch(e) {{ console.log(e); }}
-          }};
-        }}
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
+    """Werkende copy-knop met JS (via components.html) + fallback textarea."""
+    payload = text or ""
+    js_text = json.dumps(payload)  # veilige JS-string
+
+    html_code = f"""
+<div style="margin-top:8px;">
+  <button id="copybtn-{key_suffix}" style="padding:6px 10px;font-size:16px;">
+    Kopieer antwoord
+  </button>
+  <span id="copystate-{key_suffix}" style="margin-left:8px;font-size:14px;"></span>
+  <script>
+    (function(){{
+      const btn = document.getElementById('copybtn-{key_suffix}');
+      const state = document.getElementById('copystate-{key_suffix}');
+      if (btn) {{
+        btn.addEventListener('click', async () => {{
+          try {{
+            await navigator.clipboard.writeText({js_text});
+            state.textContent = 'Gekopieerd!';
+            setTimeout(() => state.textContent = '', 1500);
+          }} catch (e) {{
+            state.textContent = 'Niet gelukt — gebruik de tekst hieronder.';
+            setTimeout(() => state.textContent = '', 3000);
+          }}
+        }});
+      }}
+    }})();
+  </script>
+</div>
+"""
+    components.html(html_code, height=60, key=f"copy_html_{key_suffix}")
+
+    with st.expander("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren."):
+        st.text_area(
+            "Tekst", payload, height=150,
+            key=f"copy_fallback_{key_suffix}"
+        )
 
 def render_chat():
     for i, m in enumerate(st.session_state.history):
