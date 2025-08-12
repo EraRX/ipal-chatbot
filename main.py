@@ -1,7 +1,7 @@
 """
 IPAL Chatbox — Definitieve main.py
 - Cascade: Exact/DocBase → Subthema → Categorie → (Toelichting) → item → vraag
-- Algemeen: géén cascade, directe vraag (CSV → optioneel Web → AI)
+- Algemeen: géén cascade, directe vraag (CSV + API, en optioneel Web)
 - UNIEKECODE123, Web-fallback (toggle), FAQ-links in PDF
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
 - Geen chatspam (selecties via st.toast)
@@ -466,7 +466,7 @@ def main():
         render_chat()
         return
 
-    # ALGEMEEN: geen cascade
+    # ALGEMEEN: geen cascade maar wél CSV + API (en optioneel web)
     if st.session_state.get("selected_product") == "Algemeen":
         render_chat()
         vraag = st.chat_input("Stel uw algemene vraag:")
@@ -492,26 +492,56 @@ def main():
             st.rerun()
             return
 
-        antwoord = vind_best_algemeen_antwoord(vraag)
+        # 1) CSV altijd proberen
+        csv_ans = vind_best_algemeen_antwoord(vraag)
 
-        if not antwoord and st.session_state.get("allow_web"):
-            webbits = fetch_web_info_cached(vraag)
-            if webbits:
-                antwoord = webbits
+        # 2) (optioneel) web-fallback verzamelen
+        webbits = fetch_web_info_cached(vraag) if st.session_state.get("allow_web") else None
 
-        if not antwoord and st.session_state.get("allow_ai") and client is not None:
+        # 3) API altijd raadplegen (als key aanwezig), ook als CSV iets geeft
+        ai_ans = None
+        if client is not None:
             try:
-                antwoord = chatgpt_cached(
-                    [
-                        {"role": "system", "content": "Je bent een behulpzame Nederlandse assistent. Antwoorden kort en concreet."},
-                        {"role": "user", "content": vraag},
-                    ],
+                sys_prompt = (
+                    "Je bent een behulpzame Nederlandse assistent voor parochies. "
+                    "Gebruik CSV-informatie als primaire bron wanneer aanwezig. "
+                    "Wees kort, concreet en vriendelijk. Als iets onduidelijk is, stel 1 korte verhelderende vraag. "
+                    "Als CSV leeg is, geef 1-3 praktische suggesties of vervolgstappen."
+                )
+                if csv_ans:
+                    user_prompt = (
+                        f"Vraag: {vraag}\n\n"
+                        f"CSV-fragment (leidend indien relevant):\n{csv_ans}\n\n"
+                        "Taak: Leg kort uit in 2-4 zinnen of bullets. Voeg 1 tip of waarschuwing toe als nuttig."
+                    )
+                else:
+                    user_prompt = (
+                        f"Vraag: {vraag}\n\n"
+                        "CSV bevat geen directe match.\n"
+                        "Taak: Stel 1 korte verhelderende vraag OF geef 1-3 praktische suggesties. "
+                        "Noem geen niet-bestaande bronnen."
+                    )
+
+                ai_ans = chatgpt_cached(
+                    [{"role": "system", "content": sys_prompt},
+                     {"role": "user", "content": user_prompt}],
                     temperature=0.2, max_tokens=700,
                 )
             except Exception as e:
-                logging.error(f"AI fallback (Algemeen) fout: {e}")
+                logging.error(f"AI (Algemeen) fout: {e}")
+                ai_ans = None
 
-        add_msg("assistant", with_info(antwoord or "Ik vond geen passend antwoord in de CSV. Probeer je vraag specifieker te stellen."))
+        # 4) Antwoord samenstellen
+        parts = []
+        if csv_ans:
+            parts.append(csv_ans.strip())
+        if ai_ans:
+            parts.append("AI-toelichting:\n" + ai_ans.strip())
+        if not parts and webbits:
+            parts.append(webbits.strip())
+
+        final = "\n\n".join(parts) if parts else "Ik vond geen passend antwoord in de CSV. Kunt u uw vraag iets specifieker maken?"
+        add_msg("assistant", with_info(final))
         st.rerun()
         return
 
