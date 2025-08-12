@@ -1,10 +1,11 @@
 """
 IPAL Chatbox — Definitieve main.py
-- Nieuwe cascade: Exact/DocBase → Systeem > Subthema > Categorie > (Toelichting) > item > vraag
+- Cascade: Exact/DocBase → Subthema → Categorie → (Toelichting) → item → vraag
 - Algemeen: géén cascade, directe vraag (CSV → optioneel Web → AI)
 - UNIEKECODE123, Web-fallback (toggle), FAQ-links in PDF
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
-- Geen chatspam (selecties via st.toast i.p.v. chat)
+- Geen chatspam (selecties via st.toast)
+- Patches: altijd antwoord + altijd PDF-knop (met fallbacktitel)
 """
 
 import os
@@ -309,6 +310,7 @@ DEFAULT_STATE = {
     "selected_answer_id": None,
     "selected_answer_text": None,
     "last_question": "",
+    "last_item_label": "",
     "debug": False,
     "allow_ai": False,
     "allow_web": False,
@@ -326,15 +328,21 @@ def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
 
+def with_info(text: str) -> str:
+    return (text or "").strip() + "\n\n" + AI_INFO
+
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        if m["role"] == "assistant" and i == len(st.session_state.history) - 1 and st.session_state.get("last_question"):
-            pdf = make_pdf(st.session_state["last_question"], m["content"])
+        # ✅ Altijd een PDF-knop bij het laatste assistentbericht
+        if m["role"] == "assistant" and i == len(st.session_state.history) - 1:
+            q = (
+                st.session_state.get("last_question")
+                or st.session_state.get("last_item_label")
+                or "Gekozen item"
+            )
+            pdf = make_pdf(q, m["content"])
             st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf")
-
-def with_info(text: str) -> str:
-    return (text or "").strip() + "\n\n" + AI_INFO
 
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -554,10 +562,20 @@ def main():
         i = int(keuze.split(".")[0]) - 1
         row = df_reset.iloc[i]
         row_id = row.get("ID", i)
+
+        # ✅ Altijd een echte tekst als antwoord + label voor PDF
+        ans = str(row.get("Antwoord of oplossing", "") or "").strip()
+        if not ans:
+            oms = str(row.get("Omschrijving melding", "") or "").strip()
+            ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
+        label = mk_label(i, row)
+
         if st.session_state.get("selected_answer_id") != row_id:
             st.session_state["selected_answer_id"] = row_id
-            st.session_state["selected_answer_text"] = row.get("Antwoord of oplossing", "")
-            add_msg("assistant", with_info(st.session_state["selected_answer_text"]))
+            st.session_state["selected_answer_text"] = ans
+            st.session_state["last_item_label"] = label
+            st.session_state["last_question"] = f"Gekozen item: {label}"
+            add_msg("assistant", with_info(ans))
             st.rerun()
 
     # Vervolgvraag over gekozen antwoord
