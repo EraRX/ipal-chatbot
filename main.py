@@ -1,12 +1,13 @@
 """
 IPAL Chatbox — Definitieve main.py
 - Cascade: Exact/DocBase → Subthema → Categorie → (Toelichting) → item → vraag
-- Algemeen: géén cascade, directe vraag (CSV + API, en optioneel Web)
+- Algemeen: géén cascade, directe vraag (CSV + API, optioneel Web)
 - UNIEKECODE123, Web-fallback (toggle), FAQ-links in PDF
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
 - Geen chatspam (selecties via st.toast)
-- Patches: altijd antwoord + altijd PDF-knop (met unieke key)
+- Altijd antwoord + altijd PDF-knop (met unieke key)
 - Extra: Breadcrumbs, Kopieer-antwoord knop, Afbeelding tonen, Scope teller
+- Algemeen-relevantie: Nederlandse stopwoorden, tunable min_hits & min_cov (sliders)
 """
 
 import os
@@ -217,17 +218,40 @@ def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) ->
         return []
 
 
-# ── Veiligheidsfilter & ranking ──────────────────────────────────────────────
+# ── Veiligheidsfilter & relevance helpers ────────────────────────────────────
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
 
 def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(r"\b" + re.escape(t) + r"\b", (msg or "").lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
+# Nederlandse stopwoorden (compact, uitbreidbaar)
+STOPWORDS_NL = {
+    "de","het","een","en","of","maar","want","dus","als","dan","dat","die","dit","deze",
+    "ik","jij","hij","zij","wij","jullie","u","ze","je","mijn","jouw","zijn","haar","ons","hun",
+    "van","voor","naar","met","bij","op","in","aan","om","tot","uit","over","onder","boven","zonder",
+    "ook","nog","al","wel","niet","nooit","altijd","hier","daar","ergens","niets","iets","alles",
+    "is","was","wordt","zijn","heeft","heb","hebben","doe","doet","doen","kan","kunnen","moet","moeten"
+}
+
+def _tokenize_clean(text: str) -> list[str]:
+    return [
+        w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
+        if len(w) > 2 and w not in STOPWORDS_NL
+    ]
+
+def _relevance(q: str, t: str) -> tuple[int, float]:
+    """(hits, coverage) waarbij coverage = hits / #vraagtokens."""
+    qs = set(_tokenize_clean(q))
+    ts = set(_tokenize_clean(t))
+    hits = len(qs & ts)
+    coverage = hits / max(1, len(qs))
+    return hits, coverage
+
 def _token_score(q: str, text: str) -> int:
-    qs = [w for w in re.findall(r"\w+", (q or "").lower()) if len(w) > 2]
-    ts = set(re.findall(r"\w+", str(text).lower()))
-    return sum(1 for w in qs if w in ts)
+    qs = set(_tokenize_clean(q))
+    ts = set(_tokenize_clean(text))
+    return len(qs & ts)
 
 
 # ── Zoekfuncties ─────────────────────────────────────────────────────────────
@@ -241,6 +265,7 @@ def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]")
     return None
 
 def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
+    """Zoekt in hele CSV; keert alleen terug als relevantie-drempels gehaald worden."""
     try:
         if faq_df.empty:
             return None
@@ -258,12 +283,24 @@ def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
         if not exact.empty:
             return str(exact.iloc[0].get("Antwoord of oplossing", "")).strip()
 
-        # 3) Ranking
+        # 3) Ranking + drempels
+        if df_all.empty:
+            return None
         df_all["_score"] = df_all["combined"].apply(lambda t: _token_score(vraag, t))
         df_all = df_all.sort_values("_score", ascending=False)
-        if len(df_all) == 0 or int(df_all.iloc[0]["_score"]) <= 0:
+        if df_all.empty or int(df_all.iloc[0]["_score"]) <= 0:
             return None
-        return str(df_all.iloc[0].get("Antwoord of oplossing", "")).strip()
+
+        min_hits = int(st.session_state.get("min_hits", 2))
+        min_cov = float(st.session_state.get("min_cov", 0.25))
+
+        best = df_all.iloc[0]
+        hits, cov = _relevance(vraag, str(best["combined"]))
+
+        if hits < min_hits or cov < min_cov:
+            return None
+
+        return str(best.get("Antwoord of oplossing", "")).strip()
     except Exception as e:
         logging.error(f"Algemeen-zoekfout: {e}")
         return None
@@ -314,12 +351,15 @@ DEFAULT_STATE = {
     "selected_toelichting": None,
     "selected_answer_id": None,
     "selected_answer_text": None,
-    "selected_image": None,      # nieuw
+    "selected_image": None,
     "last_question": "",
     "last_item_label": "",
     "debug": False,
     "allow_ai": False,
     "allow_web": False,
+    # Algemeen-relevantie drempels:
+    "min_hits": 2,     # minimaal aantal inhoudelijke trefwoorden
+    "min_cov": 0.25,   # minimale dekking (0.0–1.0)
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
@@ -338,7 +378,7 @@ def with_info(text: str) -> str:
     return (text or "").strip() + "\n\n" + AI_INFO
 
 def _copy_button(text: str, key_suffix: str):
-    # Client-side copy naar klembord
+    # Client-side kopiëren naar klembord
     safe = (text or "")
     safe = safe.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n")
     btn_id = f"copybtn-{key_suffix}"
@@ -413,6 +453,16 @@ def main():
         st.session_state["debug"] = st.toggle("Debug info", value=st.session_state.get("debug", False))
         st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
         st.session_state["allow_web"] = st.toggle("Web-fallback aan (Algemeen)", value=st.session_state.get("allow_web", False))
+
+        # Tunables voor Algemeen (CSV-relevantie)
+        st.session_state["min_hits"] = st.slider(
+            "CSV minimum treffers (Algemeen)", min_value=0, max_value=6,
+            value=int(st.session_state.get("min_hits", 2)), step=1
+        )
+        st.session_state["min_cov"] = st.slider(
+            "CSV minimale dekking (Algemeen)", min_value=0.0, max_value=1.0,
+            value=float(st.session_state.get("min_cov", 0.25)), step=0.05
+        )
 
         if st.button("🧹 Cache legen", use_container_width=True):
             st.cache_data.clear()
@@ -492,7 +542,7 @@ def main():
             st.rerun()
             return
 
-        # 1) CSV altijd proberen
+        # 1) CSV altijd proberen (met relevantie-drempels uit sliders)
         csv_ans = vind_best_algemeen_antwoord(vraag)
 
         # 2) (optioneel) web-fallback verzamelen
