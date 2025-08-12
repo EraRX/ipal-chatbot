@@ -1,13 +1,12 @@
 """
-IPAL Chatbox — Definitieve main.py
-- Cascade: Exact/DocBase → Subthema → Categorie → (Toelichting) → item → vraag
-- Algemeen: géén cascade, directe vraag (CSV + API, optioneel Web)
-- UNIEKECODE123, Web-fallback (toggle), FAQ-links in PDF
+IPAL Chatbox — Definitieve main.py (4 knoppen)
+- Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
+- Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
+- Zoeken (hele CSV): vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
+- Algemeen: géén CSV, alleen AI (en optioneel Web-fallback)
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
-- Geen chatspam (selecties via st.toast)
-- Altijd antwoord + altijd PDF-knop (met unieke key)
-- Extra: Breadcrumbs, Kopieer-antwoord knop, Afbeelding tonen, Scope teller
-- Algemeen-relevantie: Nederlandse stopwoorden, tunable min_hits & min_cov (sliders)
+- Altijd PDF-knop (unieke key) + “Kopieer antwoord” + optionele Afbeelding + scope teller
+- Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
 """
 
 import os
@@ -87,9 +86,9 @@ FAQ_LINKS = [
 ]
 
 def _strip_md(s: str) -> str:
-    s = re.sub(r"\*\*([^*]+)\*\*", lambda m: m.group(1), s)          # **bold** → plain
-    s = re.sub(r"#+\s*([^\n]+)", lambda m: m.group(1), s)            # # heading → plain
-    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", lambda m: m.group(1), s)  # [label](url) → label
+    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)                      # **bold** → plain
+    s = re.sub(r"#+\s*([^\n]+)", r"\1", s)                        # # heading → plain
+    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)              # [label](url) → label
     return s
 
 def make_pdf(question: str, answer: str) -> bytes:
@@ -159,7 +158,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         if c not in df.columns:
             df[c] = None
 
-    # Normalize: strip + NBSP→space + collapse spaces
+    # Normalize
     norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding"]
     for c in norm_cols:
         df[c] = (df[c]
@@ -167,20 +166,19 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
                  .astype(str)
                  .str.replace("\u00A0", " ", regex=False)   # NBSP
                  .str.strip()
-                 .str.replace(r"\s+", " ", regex=True))     # meerdere spaties/linebreaks → 1 spatie
+                 .str.replace(r"\s+", " ", regex=True))     # meerdere spaties → 1
 
     # Standaardiseer Systeem
     mapping = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
     df["Systeem"] = df["Systeem"].str.lower().map(mapping).fillna(df["Systeem"]).astype(str)
 
-    # Combined voor eenvoudige ranking
+    # Combined voor ranking
     keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
     df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
     return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
 
 faq_df = load_faq()
-PRODUCTEN = ["Exact","DocBase","Algemeen"]
 
 
 # ── Cascade helpers ──────────────────────────────────────────────────────────
@@ -225,7 +223,7 @@ def filter_topics(msg: str):
     found = [t for t in BLACKLIST if re.search(r"\b" + re.escape(t) + r"\b", (msg or "").lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
-# Nederlandse stopwoorden (compact, uitbreidbaar)
+# Stopwoorden (NL)
 STOPWORDS_NL = {
     "de","het","een","en","of","maar","want","dus","als","dan","dat","die","dit","deze",
     "ik","jij","hij","zij","wij","jullie","u","ze","je","mijn","jouw","zijn","haar","ons","hun",
@@ -241,7 +239,6 @@ def _tokenize_clean(text: str) -> list[str]:
     ]
 
 def _relevance(q: str, t: str) -> tuple[int, float]:
-    """(hits, coverage) waarbij coverage = hits / #vraagtokens."""
     qs = set(_tokenize_clean(q))
     ts = set(_tokenize_clean(t))
     hits = len(qs & ts)
@@ -264,47 +261,45 @@ def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]")
         pass
     return None
 
-def vind_best_algemeen_antwoord(vraag: str) -> Optional[str]:
-    """Zoekt in hele CSV; keert alleen terug als relevantie-drempels gehaald worden."""
+def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25) -> pd.DataFrame:
+    """Zoekt over hele CSV en geeft gefilterde, gesorteerde resultaten terug (DataFrame)."""
+    if faq_df.empty:
+        return pd.DataFrame()
+    df = faq_df.reset_index().copy()
+    df["_score"] = df["combined"].apply(lambda t: _token_score(vraag, t))
+    if df.empty:
+        return df
+    df = df.sort_values("_score", ascending=False)
+    # Relevantie-drempel
+    def _ok(row):
+        hits, cov = _relevance(vraag, str(row["combined"]))
+        return hits >= min_hits and cov >= min_cov
+    df = df[df.apply(_ok, axis=1)]
+    return df
+
+def vind_best_algemeen_AI(vraag: str) -> str:
+    """Algemeen: géén CSV. Alleen AI + één verhelderende vraag max (of suggesties)."""
+    if client is None:
+        # Zonder AI: basic echo/suggestie
+        return "Kunt u uw vraag iets concreter maken (bijv. ‘DocBase wachtwoord resetten’ of ‘Exact bankkoppeling’)?"
+    sys = (
+        "Je helpt vrijwilligers van parochies. "
+        "Beantwoord kort en concreet. Stel maximaal één verhelderende vraag als dat echt nodig is. "
+        "Noem geen niet-bestaande bronnen."
+    )
+    user = (
+        f"Vraag: {vraag}\n\n"
+        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1-2 praktische vervolgsuggesties "
+        "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag."
+    )
     try:
-        if faq_df.empty:
-            return None
-        df_all = faq_df.reset_index().copy()
-        vraag_norm = (vraag or "").strip().lower()
-
-        # 1) UNIEKECODE123 direct
-        if vraag_norm == "uniekecode123":
-            cw = find_answer_by_codeword(df_all)
-            if cw:
-                return cw
-
-        # 2) Exacte match op Omschrijving
-        exact = df_all[df_all["Omschrijving melding"].astype(str).str.strip().str.lower() == vraag_norm]
-        if not exact.empty:
-            return str(exact.iloc[0].get("Antwoord of oplossing", "")).strip()
-
-        # 3) Ranking + drempels
-        if df_all.empty:
-            return None
-        df_all["_score"] = df_all["combined"].apply(lambda t: _token_score(vraag, t))
-        df_all = df_all.sort_values("_score", ascending=False)
-        if df_all.empty or int(df_all.iloc[0]["_score"]) <= 0:
-            return None
-
-        min_hits = int(st.session_state.get("min_hits", 2))
-        min_cov = float(st.session_state.get("min_cov", 0.25))
-
-        best = df_all.iloc[0]
-        hits, cov = _relevance(vraag, str(best["combined"]))
-
-        if hits < min_hits or cov < min_cov:
-            return None
-
-        return str(best.get("Antwoord of oplossing", "")).strip()
+        return chatgpt_cached(
+            [{"role":"system","content":sys},{"role":"user","content":user}],
+            temperature=0.2, max_tokens=500
+        )
     except Exception as e:
-        logging.error(f"Algemeen-zoekfout: {e}")
-        return None
-
+        logging.error(f"AI (Algemeen) fout: {e}")
+        return "Kunt u uw vraag iets concreter maken?"
 
 # ── Web-fallback ─────────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -345,7 +340,7 @@ USER_AVATAR = "parochie.png" if os.path.exists("parochie.png") else None
 
 DEFAULT_STATE = {
     "history": [],
-    "selected_product": None,
+    "selected_product": None,     # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
     "selected_module": None,
     "selected_category": None,
     "selected_toelichting": None,
@@ -357,9 +352,12 @@ DEFAULT_STATE = {
     "debug": False,
     "allow_ai": False,
     "allow_web": False,
-    # Algemeen-relevantie drempels:
-    "min_hits": 2,     # minimaal aantal inhoudelijke trefwoorden
-    "min_cov": 0.25,   # minimale dekking (0.0–1.0)
+    # Zoeken (hele CSV) drempels:
+    "min_hits": 2,
+    "min_cov": 0.25,
+    # Voor Zoeken-mode:
+    "search_query": "",
+    "search_selection_index": None,
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
@@ -454,13 +452,13 @@ def main():
         st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
         st.session_state["allow_web"] = st.toggle("Web-fallback aan (Algemeen)", value=st.session_state.get("allow_web", False))
 
-        # Tunables voor Algemeen (CSV-relevantie)
+        # Drempels voor Zoeken (hele CSV)
         st.session_state["min_hits"] = st.slider(
-            "CSV minimum treffers (Algemeen)", min_value=0, max_value=6,
+            "CSV minimum treffers (Zoeken)", min_value=0, max_value=6,
             value=int(st.session_state.get("min_hits", 2)), step=1
         )
         st.session_state["min_cov"] = st.slider(
-            "CSV minimale dekking (Algemeen)", min_value=0.0, max_value=1.0,
+            "CSV minimale dekking (Zoeken)", min_value=0.0, max_value=1.0,
             value=float(st.session_state.get("min_cov", 0.25)), step=0.05
         )
 
@@ -497,33 +495,67 @@ def main():
             st.info("Welkom bij IPAL Chatbox")
 
         st.header("Welkom bij IPAL Chatbox")
-        c1, c2, c3 = st.columns(3)
+        c1, c2 = st.columns(2)
+        c3, c4 = st.columns(2)
         if c1.button("Exact", use_container_width=True):
-            st.session_state["selected_product"] = "Exact"
-            st.session_state["selected_image"] = None
+            st.session_state.update({
+                "selected_product": "Exact",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+            })
             st.toast("Gekozen: Exact")
             st.rerun()
         if c2.button("DocBase", use_container_width=True):
-            st.session_state["selected_product"] = "DocBase"
-            st.session_state["selected_image"] = None
+            st.session_state.update({
+                "selected_product": "DocBase",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+            })
             st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Algemeen", use_container_width=True):
-            st.session_state["selected_product"] = "Algemeen"
-            st.session_state["selected_image"] = None
+        if c3.button("Zoeken (hele CSV)", use_container_width=True):
+            st.session_state.update({
+                "selected_product": "Zoeken",
+                "selected_image": None,
+                "search_query": "",
+                "search_selection_index": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+                "last_item_label": "",
+            })
+            st.toast("Gekozen: Zoeken (hele CSV)")
+            st.rerun()
+        if c4.button("Algemeen", use_container_width=True):
+            st.session_state.update({
+                "selected_product": "Algemeen",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+            })
             st.toast("Gekozen: Algemeen (vrije vraag)")
             st.rerun()
         render_chat()
         return
 
-    # ALGEMEEN: geen cascade maar wél CSV + API (en optioneel web)
+    # ── ALGEMEEN (géén CSV) ────────────────────────────────────────────────
     if st.session_state.get("selected_product") == "Algemeen":
         render_chat()
-        vraag = st.chat_input("Stel uw algemene vraag:")
+        vraag = st.chat_input("Stel uw algemene vraag (geen CSV):")
         if not vraag:
             return
 
-        # UNIEKECODE123 direct
+        # UNIEKECODE123 direct (optioneel)
         if (vraag or "").strip().upper() == "UNIEKECODE123":
             cw = find_answer_by_codeword(faq_df.reset_index())
             if cw:
@@ -542,66 +574,119 @@ def main():
             st.rerun()
             return
 
-        # 1) CSV altijd proberen (met relevantie-drempels uit sliders)
-        csv_ans = vind_best_algemeen_antwoord(vraag)
+        # Alleen AI (+ optioneel web ter aanvulling)
+        antwoord = vind_best_algemeen_AI(vraag)
+        if not antwoord and st.session_state.get("allow_web"):
+            webbits = fetch_web_info_cached(vraag)
+            if webbits:
+                antwoord = webbits
 
-        # 2) (optioneel) web-fallback verzamelen
-        webbits = fetch_web_info_cached(vraag) if st.session_state.get("allow_web") else None
-
-        # 3) API altijd raadplegen (als key aanwezig), ook als CSV iets geeft
-        ai_ans = None
-        if client is not None:
-            try:
-                sys_prompt = (
-                    "Je bent een behulpzame Nederlandse assistent voor parochies. "
-                    "Gebruik CSV-informatie als primaire bron wanneer aanwezig. "
-                    "Wees kort, concreet en vriendelijk. Als iets onduidelijk is, stel 1 korte verhelderende vraag. "
-                    "Als CSV leeg is, geef 1-3 praktische suggesties of vervolgstappen."
-                )
-                if csv_ans:
-                    user_prompt = (
-                        f"Vraag: {vraag}\n\n"
-                        f"CSV-fragment (leidend indien relevant):\n{csv_ans}\n\n"
-                        "Taak: Leg kort uit in 2-4 zinnen of bullets. Voeg 1 tip of waarschuwing toe als nuttig."
-                    )
-                else:
-                    user_prompt = (
-                        f"Vraag: {vraag}\n\n"
-                        "CSV bevat geen directe match.\n"
-                        "Taak: Stel 1 korte verhelderende vraag OF geef 1-3 praktische suggesties. "
-                        "Noem geen niet-bestaande bronnen."
-                    )
-
-                ai_ans = chatgpt_cached(
-                    [{"role": "system", "content": sys_prompt},
-                     {"role": "user", "content": user_prompt}],
-                    temperature=0.2, max_tokens=700,
-                )
-            except Exception as e:
-                logging.error(f"AI (Algemeen) fout: {e}")
-                ai_ans = None
-
-        # 4) Antwoord samenstellen
-        parts = []
-        if csv_ans:
-            parts.append(csv_ans.strip())
-        if ai_ans:
-            parts.append("AI-toelichting:\n" + ai_ans.strip())
-        if not parts and webbits:
-            parts.append(webbits.strip())
-
-        final = "\n\n".join(parts) if parts else "Ik vond geen passend antwoord in de CSV. Kunt u uw vraag iets specifieker maken?"
-        add_msg("assistant", with_info(final))
+        add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
         st.rerun()
         return
 
-    # Vanaf hier: Exact/DocBase cascade
+    # ── ZOEKEN (hele CSV) ──────────────────────────────────────────────────
+    if st.session_state.get("selected_product") == "Zoeken":
+        render_chat()
+
+        # 1) Zoekterm
+        st.session_state["search_query"] = st.text_input(
+            "Waar wil je in de volledige CSV op zoeken?",
+            value=st.session_state.get("search_query", "")
+        )
+        q = st.session_state["search_query"].strip()
+        if not q:
+            return
+
+        # 2) Resultaten ophalen met drempels
+        results = zoek_hele_csv(q, min_hits=st.session_state["min_hits"], min_cov=st.session_state["min_cov"])
+        if results.empty:
+            st.info("Geen resultaten gevonden. Pas je zoekterm aan of verlaag de drempels (sliders in de sidebar).")
+            return
+
+        df_reset = results.reset_index(drop=True)
+
+        def mk_label(i, row):
+            oms = str(row.get("Omschrijving melding", "")).strip()
+            toel = str(row.get("Toelichting melding", "")).strip()
+            preview = oms or toel or str(row.get("Antwoord of oplossing", "")).strip()
+            preview = re.sub(r"\s+", " ", preview)[:140]
+            return f"{i+1:02d}. {preview}"
+
+        opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
+        keuze = st.selectbox("Kies een item uit de zoekresultaten:", ["(Kies)"] + opties)
+        if keuze == "(Kies)":
+            return
+
+        idx = int(keuze.split(".")[0]) - 1
+        row = df_reset.iloc[idx]
+        row_id = row.get("ID", idx)
+        ans = str(row.get("Antwoord of oplossing", "") or "").strip()
+        if not ans:
+            oms = str(row.get("Omschrijving melding", "") or "").strip()
+            ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
+        label = mk_label(idx, row)
+        img = str(row.get("Afbeelding", "") or "").strip()
+        st.session_state["selected_image"] = img if img else None
+
+        if st.session_state.get("selected_answer_id") != row_id:
+            st.session_state["selected_answer_id"] = row_id
+            st.session_state["selected_answer_text"] = ans
+            st.session_state["last_item_label"] = label
+            st.session_state["last_question"] = f"Gekozen item: {label}"
+            add_msg("assistant", with_info(ans))
+            st.rerun()
+            return
+
+        # 3) Vervolgvraag over dit item
+        vraag2 = st.chat_input("Stel uw vraag over dit antwoord:")
+        if not vraag2:
+            return
+
+        st.session_state["last_question"] = vraag2
+        add_msg("user", vraag2)
+
+        ok, warn = filter_topics(vraag2)
+        if not ok:
+            add_msg("assistant", warn)
+            st.rerun()
+            return
+
+        bron = str(st.session_state.get("selected_answer_text") or "")
+        reactie = None
+        if st.session_state.get("allow_ai") and client is not None:
+            try:
+                reactie = chatgpt_cached(
+                    [
+                        {"role": "system", "content": "Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                        {"role": "user", "content": f"Bron:\n{bron}\n\nVraag: {vraag2}"},
+                    ],
+                    temperature=0.1, max_tokens=600,
+                )
+            except Exception as e:
+                logging.error(f"AI-QA fout: {e}")
+                reactie = None
+
+        if not reactie:
+            # Kleine extractieve fallback
+            zinnen = re.split(r"(?<=[.!?])\s+", bron)
+            scores = [(_token_score(vraag2, z), z) for z in zinnen]
+            scores.sort(key=lambda x: x[0], reverse=True)
+            top = [z for s, z in scores if s > 0][:3]
+            reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
+
+        add_msg("assistant", with_info(reactie))
+        st.rerun()
+        return
+
+    # ── Exact/DocBase cascade ────────────────────────────────────────────────
     render_chat()
     render_breadcrumbs()
 
+    systeem = st.session_state.get("selected_product")
     # 1) Subthema
     if not st.session_state.get("selected_module"):
-        opts = list_subthema(st.session_state["selected_product"])
+        opts = list_subthema(systeem)
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
@@ -616,7 +701,7 @@ def main():
 
     # 2) Categorie
     if not st.session_state.get("selected_category"):
-        cats = list_categorieen(st.session_state["selected_product"], st.session_state["selected_module"])
+        cats = list_categorieen(systeem, st.session_state["selected_module"])
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state["selected_category"] = "alles"
@@ -639,7 +724,7 @@ def main():
     # 3) Toelichting (optioneel)
     if st.session_state.get("selected_toelichting") is None:
         toes = list_toelichtingen(
-            st.session_state["selected_product"],
+            systeem,
             st.session_state["selected_module"],
             st.session_state.get("selected_category"),
         )
@@ -655,24 +740,22 @@ def main():
                 st.session_state["selected_image"] = None
                 st.toast(f"Gekozen toelichting: {toe_sel}")
                 st.rerun()
-            return  # wacht op keuze of overslaan
+            return  # wachten op keuze/overslaan
 
     # 4) Recordselectie binnen scope
     df_scope = faq_df
-    syst = st.session_state["selected_product"]
     sub = st.session_state["selected_module"]
     cat = st.session_state["selected_category"]
     toe = st.session_state.get("selected_toelichting", "")
 
     try:
-        df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
+        df_scope = df_scope.xs(systeem, level="Systeem", drop_level=False)
         df_scope = df_scope.xs(sub, level="Subthema", drop_level=False)
         if cat and str(cat).lower() != "alles":
             df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
     except KeyError:
         df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
 
-    # Robuuste toelichting-match (trim, NBSP→spatie, collapse, casefold)
     if not df_scope.empty and toe is not None and str(toe) != "":
         tm = (df_scope["Toelichting melding"]
               .astype(str)
@@ -683,7 +766,6 @@ def main():
         sel = re.sub(r"\s+", " ", str(toe).replace("\u00A0", " ").strip()).casefold()
         df_scope = df_scope[tm == sel]
 
-    # Scope teller in sidebar
     try:
         st.sidebar.metric("Records in scope", len(df_scope))
     except Exception:
@@ -712,14 +794,12 @@ def main():
         row = df_reset.iloc[i]
         row_id = row.get("ID", i)
 
-        # ✅ Altijd een echte tekst als antwoord + label voor PDF
         ans = str(row.get("Antwoord of oplossing", "") or "").strip()
         if not ans:
             oms = str(row.get("Omschrijving melding", "") or "").strip()
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(i, row)
 
-        # Afbeelding opslaan in state (voor weergave onder antwoord)
         img = str(row.get("Afbeelding", "") or "").strip()
         st.session_state["selected_image"] = img if img else None
 
@@ -730,6 +810,7 @@ def main():
             st.session_state["last_question"] = f"Gekozen item: {label}"
             add_msg("assistant", with_info(ans))
             st.rerun()
+            return
 
     # Vervolgvraag over gekozen antwoord
     vraag = st.chat_input("Stel uw vraag over dit antwoord:")
