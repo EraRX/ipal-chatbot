@@ -6,12 +6,14 @@ IPAL Chatbox — Definitieve main.py
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
 - Geen chatspam (selecties via st.toast)
 - Patches: altijd antwoord + altijd PDF-knop (met unieke key)
+- Extra: Breadcrumbs, Kopieer-antwoord knop, Afbeelding tonen, Scope teller
 """
 
 import os
 import re
 import io
 import logging
+import hashlib
 from datetime import datetime
 from typing import Optional, List
 
@@ -312,6 +314,7 @@ DEFAULT_STATE = {
     "selected_toelichting": None,
     "selected_answer_id": None,
     "selected_answer_text": None,
+    "selected_image": None,      # nieuw
     "last_question": "",
     "last_item_label": "",
     "debug": False,
@@ -334,10 +337,46 @@ def add_msg(role: str, content: str):
 def with_info(text: str) -> str:
     return (text or "").strip() + "\n\n" + AI_INFO
 
+def _copy_button(text: str, key_suffix: str):
+    # Client-side copy naar klembord
+    safe = (text or "")
+    safe = safe.replace("\\", "\\\\").replace("`", "\\`").replace("\n", "\\n")
+    btn_id = f"copybtn-{key_suffix}"
+    st.markdown(
+        f"""
+        <button id="{btn_id}" style="margin-top:8px;padding:6px 10px;font-size:16px;">
+          Kopieer antwoord
+        </button>
+        <script>
+        const _btn = document.getElementById("{btn_id}");
+        if (_btn) {{
+          _btn.onclick = async () => {{
+            try {{
+              await navigator.clipboard.writeText(`{safe}`);
+              const old = _btn.innerText;
+              _btn.innerText = "Gekopieerd!";
+              setTimeout(()=>{{ _btn.innerText = old; }}, 1500);
+            }} catch(e) {{ console.log(e); }}
+          }};
+        }}
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
+def render_breadcrumbs():
+    syst = st.session_state.get("selected_product") or ""
+    sub = st.session_state.get("selected_module") or ""
+    cat = st.session_state.get("selected_category") or ""
+    toe = st.session_state.get("selected_toelichting") or ""
+    parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
+    if parts:
+        st.caption(" › ".join(parts))
+
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # ✅ Altijd een PDF-knop bij het laatste assistentbericht, met unieke key
+        # ✅ Altijd een PDF-knop + copy-knop bij het laatste assistentbericht
         if m["role"] == "assistant" and i == len(st.session_state.history) - 1:
             q = (
                 st.session_state.get("last_question")
@@ -347,6 +386,18 @@ def render_chat():
             pdf = make_pdf(q, m["content"])
             btn_key = f"pdf_{i}_{m['time'].replace(':','-')}"
             st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf", key=btn_key)
+
+            # Copy knop (client-side)
+            hash_key = hashlib.md5((m["time"] + m["content"]).encode("utf-8")).hexdigest()[:8]
+            _copy_button(m["content"], hash_key)
+
+            # Afbeelding tonen indien gekozen record er één had
+            img = st.session_state.get("selected_image")
+            if img and isinstance(img, str) and img.strip():
+                try:
+                    st.image(img, caption="Afbeelding bij dit antwoord", use_column_width=True)
+                except Exception:
+                    pass
 
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -399,14 +450,17 @@ def main():
         c1, c2, c3 = st.columns(3)
         if c1.button("Exact", use_container_width=True):
             st.session_state["selected_product"] = "Exact"
+            st.session_state["selected_image"] = None
             st.toast("Gekozen: Exact")
             st.rerun()
         if c2.button("DocBase", use_container_width=True):
             st.session_state["selected_product"] = "DocBase"
+            st.session_state["selected_image"] = None
             st.toast("Gekozen: DocBase")
             st.rerun()
         if c3.button("Algemeen", use_container_width=True):
             st.session_state["selected_product"] = "Algemeen"
+            st.session_state["selected_image"] = None
             st.toast("Gekozen: Algemeen (vrije vraag)")
             st.rerun()
         render_chat()
@@ -463,6 +517,7 @@ def main():
 
     # Vanaf hier: Exact/DocBase cascade
     render_chat()
+    render_breadcrumbs()
 
     # 1) Subthema
     if not st.session_state.get("selected_module"):
@@ -474,6 +529,7 @@ def main():
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
+            st.session_state["selected_image"] = None
             st.toast(f"Gekozen subthema: {sel}")
             st.rerun()
         return
@@ -487,6 +543,7 @@ def main():
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
+            st.session_state["selected_image"] = None
             st.rerun()
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
@@ -494,6 +551,7 @@ def main():
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
+            st.session_state["selected_image"] = None
             st.toast(f"Gekozen categorie: {selc}")
             st.rerun()
         return
@@ -514,6 +572,7 @@ def main():
                 st.session_state["selected_toelichting"] = toe_sel
                 st.session_state["selected_answer_id"] = None
                 st.session_state["selected_answer_text"] = None
+                st.session_state["selected_image"] = None
                 st.toast(f"Gekozen toelichting: {toe_sel}")
                 st.rerun()
             return  # wacht op keuze of overslaan
@@ -543,6 +602,12 @@ def main():
               .str.casefold())
         sel = re.sub(r"\s+", " ", str(toe).replace("\u00A0", " ").strip()).casefold()
         df_scope = df_scope[tm == sel]
+
+    # Scope teller in sidebar
+    try:
+        st.sidebar.metric("Records in scope", len(df_scope))
+    except Exception:
+        pass
 
     if st.session_state.get("debug"):
         st.caption(f"Scope rows vóór itemkeuze: {len(df_scope)}")
@@ -574,6 +639,10 @@ def main():
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(i, row)
 
+        # Afbeelding opslaan in state (voor weergave onder antwoord)
+        img = str(row.get("Afbeelding", "") or "").strip()
+        st.session_state["selected_image"] = img if img else None
+
         if st.session_state.get("selected_answer_id") != row_id:
             st.session_state["selected_answer_id"] = row_id
             st.session_state["selected_answer_text"] = ans
@@ -583,7 +652,6 @@ def main():
             st.rerun()
 
     # Vervolgvraag over gekozen antwoord
-    # (LET OP: GEEN tweede render_chat() hier!)
     vraag = st.chat_input("Stel uw vraag over dit antwoord:")
     if not vraag:
         return
@@ -635,5 +703,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
