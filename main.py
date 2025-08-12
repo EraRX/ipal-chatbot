@@ -1,5 +1,5 @@
 """
-IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix
+IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info preambule
 - Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
 - Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
 - Zoeken (hele CSV): vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
@@ -109,20 +109,25 @@ def clean_text(s: str) -> str:
     return s
 
 
-# ── PDF helpers ──────────────────────────────────────────────────────────────
-if os.path.exists("Calibri.ttf"):
-    pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
+# ── PDF/AI-INFO constants (moeten vóór make_pdf staan) ──────────────────────
+FAQ_LINKS = [
+    ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
+    ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
+]
 
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
 2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site. Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:
+
+- [Veelgestelde vragen DocBase nieuw 2024](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1)
+- [Veelgestelde vragen Exact Online](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1)
 """
 
-FAQ_LINKS = [
-    ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
-    ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
-]
+
+# ── PDF helpers ──────────────────────────────────────────────────────────────
+if os.path.exists("Calibri.ttf"):
+    pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
 def _strip_md(s: str) -> str:
     s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)                      # **bold** → plain
@@ -131,18 +136,37 @@ def _strip_md(s: str) -> str:
     return s
 
 def make_pdf(question: str, answer: str) -> bytes:
+    # Zorg dat AI_INFO bovenaan staat: hier extraheren we de preambule vóór de bullet-links
     question = clean_text(question or "")
-    answer = clean_text(_strip_md(answer or ""))
+    answer   = clean_text(_strip_md(answer or ""))
+
+    # 1) Preambule uit AI_INFO (alles t/m de zin, stoppen vóór de bulletlinks)
+    ai_preamble_lines = []
+    for ln in (AI_INFO or "").splitlines():
+        if ln.strip().startswith("- ["):   # eerste bulletlink -> stop
+            break
+        ai_preamble_lines.append(ln)
+    ai_preamble_text = clean_text(_strip_md("\n".join(ai_preamble_lines).strip()))
+
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
-        buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm
+        buffer, pagesize=A4,
+        leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm
     )
     styles = getSampleStyleSheet()
-    body_style = ParagraphStyle("Body", parent=styles["Normal"], fontName="Helvetica", fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT)
-    heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333"), spaceBefore=12, spaceAfter=6)
+    body_style = ParagraphStyle(
+        "Body", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
+    )
+    heading_style = ParagraphStyle(
+        "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
+        fontSize=14, leading=18, textColor=colors.HexColor("#333"),
+        spaceBefore=12, spaceAfter=6
+    )
 
     story = []
 
+    # Logo
     if os.path.exists("logopdf.png"):
         logo = Image("logopdf.png", width=124, height=52)
         story.append(Table([[logo]], colWidths=[124], style=TableStyle([
@@ -154,21 +178,34 @@ def make_pdf(question: str, answer: str) -> bytes:
             ("BOTTOMPADDING", (0,0), (-1,-1), 6),
         ])))
 
+    # Vraag + antwoord
     story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
-
     for line in (answer.split("\n") if answer else []):
         line = line.strip()
         if line:
             story.append(Paragraph(line, body_style))
 
-    # FAQ-links
+    # AI-Antwoord Info (preambule)
+    if ai_preamble_text:
+        story.append(Spacer(1, 12))
+        story.append(Paragraph("AI-Antwoord Info:", heading_style))
+        for ln in ai_preamble_text.split("\n"):
+            ln = ln.strip()
+            if not ln:
+                continue
+            story.append(Paragraph(ln, body_style))
+
+    # Hyperlinks naar FAQ (klikbaar)
     story.append(Spacer(1, 12))
-    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+    # Als de preambule de zin "Klik hieronder..." al bevat, geen extra kopje; anders wel.
+    if "Klik hieronder om de FAQ te openen" not in ai_preamble_text:
+        story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+
     items = []
     for label, url in FAQ_LINKS:
-        p = Paragraph(f'<link href="{url}" color="blue">{label}</link>', body_style)
+        p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
         items.append(ListItem(p, leftIndent=12))
     story.append(ListFlowable(items, bulletType="bullet"))
 
@@ -399,15 +436,6 @@ def fetch_web_info_cached(query: str) -> Optional[str]:
 
 
 # ── UI helpers & state ───────────────────────────────────────────────────────
-AI_INFO = """
-AI-Antwoord Info:  
-1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
-2. Heeft u hulp nodig met DocBase of Exact? Dan kunt u eenvoudig een melding maken door een ticket aan te maken in DocBase. Maar voordat u een ticket invult, hebben we een handige tip: controleer eerst onze FAQ (het document met veelgestelde vragen en antwoorden). Dit document vindt u op onze site. Klik hieronder om de FAQ te openen en te kijken of uw vraag al beantwoord is:
-
-- [Veelgestelde vragen DocBase nieuw 2024](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1)
-- [Veelgestelde vragen Exact Online](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1)
-"""
-
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 ASSISTANT_AVATAR = "aichatbox.png" if os.path.exists("aichatbox.png") else None
 USER_AVATAR = "parochie.png" if os.path.exists("parochie.png") else None
@@ -941,4 +969,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
