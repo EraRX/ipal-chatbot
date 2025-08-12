@@ -1,5 +1,5 @@
 """
-IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info preambule
+IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info netjes
 - Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
 - Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
 - Zoeken (hele CSV): vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
@@ -37,6 +37,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, Table, TableStyle
 )
+    # noqa: E124
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT
@@ -135,18 +136,52 @@ def _strip_md(s: str) -> str:
     s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)              # [label](url) → label
     return s
 
+# ── Helper: parseer AI_INFO naar nette lijst + klikprompt ─────────────────────
+def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
+    """
+    Haalt de genummerde punten (1., 2., ...) uit AI_INFO.
+    Knipt 'Klik hieronder om de FAQ te openen' weg uit de punten
+    en zet een vlag om die regel later apart te tonen.
+    """
+    numbered: list[str] = []
+    show_click = False
+    for raw in (ai_info or "").splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if line.startswith("- ["):                # bij eerste bulletlink stoppen
+            break
+        if line.lower().startswith("ai-antwoord info"):
+            continue
+        m = re.match(r"^(\d+)\.\s*(.*)$", line)   # genummerd item
+        if m:
+            txt = m.group(2)
+            key = "Klik hieronder om de FAQ te openen"
+            if key in txt:
+                txt = txt.split(key, 1)[0].strip()
+                show_click = True
+            txt = clean_text(_strip_md(txt))
+            if txt:
+                numbered.append(txt)
+        else:
+            # eventuele vervolgregels aan laatste item plakken
+            if numbered:
+                extra = clean_text(_strip_md(line))
+                if extra:
+                    numbered[-1] += " " + extra
+
+    # fallback: als de zin elders in AI_INFO staat
+    if not show_click and "Klik hieronder om de FAQ te openen" in (ai_info or ""):
+        show_click = True
+    return numbered, show_click
+
+
+# ── PDF-maker: nettere AI-Info (genummerd + klikprompt + links) ──────────────
 def make_pdf(question: str, answer: str) -> bytes:
-    # Zorg dat AI_INFO bovenaan staat: hier extraheren we de preambule vóór de bullet-links
     question = clean_text(question or "")
     answer   = clean_text(_strip_md(answer or ""))
 
-    # 1) Preambule uit AI_INFO (alles t/m de zin, stoppen vóór de bulletlinks)
-    ai_preamble_lines = []
-    for ln in (AI_INFO or "").splitlines():
-        if ln.strip().startswith("- ["):   # eerste bulletlink -> stop
-            break
-        ai_preamble_lines.append(ln)
-    ai_preamble_text = clean_text(_strip_md("\n".join(ai_preamble_lines).strip()))
+    numbered_items, show_click = _parse_ai_info(AI_INFO)
 
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -178,7 +213,7 @@ def make_pdf(question: str, answer: str) -> bytes:
             ("BOTTOMPADDING", (0,0), (-1,-1), 6),
         ])))
 
-    # Vraag + antwoord
+    # Vraag + Antwoord
     story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
@@ -187,27 +222,23 @@ def make_pdf(question: str, answer: str) -> bytes:
         if line:
             story.append(Paragraph(line, body_style))
 
-    # AI-Antwoord Info (preambule)
-    if ai_preamble_text:
+    # AI-Antwoord Info (mooi als genummerde lijst)
+    if numbered_items:
         story.append(Spacer(1, 12))
         story.append(Paragraph("AI-Antwoord Info:", heading_style))
-        for ln in ai_preamble_text.split("\n"):
-            ln = ln.strip()
-            if not ln:
-                continue
-            story.append(Paragraph(ln, body_style))
+        list_items = [ListItem(Paragraph(item, body_style), leftIndent=12) for item in numbered_items]
+        story.append(ListFlowable(list_items, bulletType="1"))
 
-    # Hyperlinks naar FAQ (klikbaar)
+    # Klikprompt + Links (altijd netjes onderaan)
     story.append(Spacer(1, 12))
-    # Als de preambule de zin "Klik hieronder..." al bevat, geen extra kopje; anders wel.
-    if "Klik hieronder om de FAQ te openen" not in ai_preamble_text:
+    if show_click:
         story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
 
-    items = []
+    link_items = []
     for label, url in FAQ_LINKS:
         p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
-        items.append(ListItem(p, leftIndent=12))
-    story.append(ListFlowable(items, bulletType="bullet"))
+        link_items.append(ListItem(p, leftIndent=12))
+    story.append(ListFlowable(link_items, bulletType="bullet"))
 
     doc.build(story)
     buffer.seek(0)
@@ -503,15 +534,6 @@ def _copy_button(text: str, key_suffix: str):
         """,
         unsafe_allow_html=True
     )
-
-def render_breadcrumbs():
-    syst = st.session_state.get("selected_product") or ""
-    sub = st.session_state.get("selected_module") or ""
-    cat = st.session_state.get("selected_category") or ""
-    toe = st.session_state.get("selected_toelichting") or ""
-    parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
-    if parts:
-        st.caption(" › ".join(parts))
 
 def render_chat():
     for i, m in enumerate(st.session_state.history):
