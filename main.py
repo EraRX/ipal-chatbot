@@ -300,8 +300,6 @@ AI-Antwoord Info:
 - [Veelgestelde vragen Exact Online](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1)
 """
 
-)
-
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
 ASSISTANT_AVATAR = "aichatbox.png" if os.path.exists("aichatbox.png") else None
 USER_AVATAR = "parochie.png" if os.path.exists("parochie.png") else None
@@ -637,4 +635,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
