@@ -42,7 +42,6 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8653;DocBase;Mutatie (gebruikers)rechten;Beheer;Wachtwoord resetten;Stuur link om wachtwoord opnieuw in te stellen.;Voor veiligheid en toegankelijkheid.;Gebruiker selecteren ? Wachtwoord resetten ? Bevestigen. 1. Zoek de gebruiker op via Gebruikersbeheer. 2. Klik op Wachtwoord resetten en bevestig. 3. De gebruiker ontvangt een link om het wachtwoord opnieuw in te stellen.;
 8654;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruiker deactiveren;Blokkeer toegang voor ex-medewerker.;Beveiligt gevoelige data.;Gebruiker openen ? Status wijzigen naar inactief ? Opslaan. 1. Ga naar Gebruikersbeheer en open de betreffende gebruiker. 2. Wijzig de status naar Inactief. 3. Klik op Opslaan om de gebruiker te deactiveren.;
 8655;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruikersrollen instellen;Wijs rechten toe op basis van rol.;Beperkt toegang tot gevoelige modules.;Gebruikersbeheer ? Rollen ? Rechten aanvinken ? Opslaan. 1. Ga naar Gebruikersbeheer ? Rollen. 2. Selecteer de juiste rol en vink de benodigde rechten aan (bijv. toegang tot financiÃ«le gegevens). 3. Klik op Opslaan om de wijzigingen door te voeren.;
-8656;DocBase;Conversie;Synchronisatie;Test 1;Test 1;Test 1;Test 1;
 8660;Exact;Exact Online;Inloggen;Inloggen en Navigeren in Exact Online;Uitleg over het inloggen in Exact Online en de navigatie tussen modules.;;Exact Online (Module: Inloggen): Ga naar de website www.exact.com en klik op Inloggen in de rechterbovenhoek van de pagina. Vul je gebruikersnaam in (dit is je e-mailadres dat aan je Exact Online-account is gekoppeld) en voer je wachtwoord in. Klik vervolgens op Inloggen. Je wordt gevraagd om een 6-cijferige code in te voeren die via de Google Authenticator-app op je smartphone wordt gegenereerd. Zodra je de code hebt ingevuld, klik je op Inloggen om toegang te krijgen tot Exact Online.;
 8661;Exact;Exact Online;Inloggen;Standaard Inlogprocedure;Stappen om in te loggen in Exact Online via e-mailadres en wachtwoord.;;Exact Online (Module: Inloggen): Ga naar www.exact.com en klik op Inloggen. Vul je e-mailadres en wachtwoord in die aan je Exact Online-account zijn gekoppeld. Als je tweestapsverificatie hebt ingesteld, open je de Google Authenticator-app op je telefoon, vul je de 6-cijferige code in en klik je op Inloggen. Indien je geen toegang hebt tot de app, controleer dan of je telefoon tijdsinstellingen goed zijn of neem contact op met de systeembeheerder.;
 8662;Exact;Exact Online;Inloggen;Problemen met inloggen;Veelvoorkomende problemen bij inloggen en mogelijke oplossingen.;;Exact Online (Module: Inloggen): Als je wachtwoord vergeten bent, klik dan op de link Wachtwoord vergeten? onder het inlogformulier. Volg de instructies om een nieuw wachtwoord in te stellen. Als je geen toegang hebt tot de Google Authenticator-code, controleer dan de tijdinstellingen van je telefoon. Als het account geblokkeerd is, neem dan contact op met je systeembeheerder om toegang te herstellen via gebruikersbeheer.;
@@ -140,10 +139,6 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8761;DocBase;Mutatie (gebruikers)rechten;Beheer;Wachtwoord resetten;Stuur link om wachtwoord opnieuw in te stellen;;DocBase (Module: Beheer): Ga naar Gebruiker selecteren ? Wachtwoord resetten ? Bevestigen. De gebruiker ontvangt een link om het wachtwoord opnieuw in te stellen voor toegang tot het systeem.;
 8762;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruiker deactiveren;Blokkeer toegang voor ex-medewerker;;DocBase (Module: Beheer): Open de gebruiker, wijzig de Status naar Inactief en sla op. Dit zorgt ervoor dat de ex-medewerker geen toegang meer heeft tot het systeem.;
 8763;DocBase;Mutatie (gebruikers)rechten;Beheer;Gebruikersrollen instellen;Wijs rechten toe op basis van rol;;DocBase (Module: Beheer): Ga naar Gebruikersbeheer ? Rollen ? Rechten aanvinken ? Opslaan. Dit zorgt ervoor dat gebruikers alleen toegang hebben tot de modules die voor hun functie nodig zijn.;
-8764;DocBase;Conversie;Synchronisatie;Test 1;Test 1;;DocBase (Module: Conversie): Test 1 is een voorbeeld dat geconfigureerd kan worden voor specifieke synchronisatie-instellingen. Dit kan een functie zijn voor nieuwe implementaties of troubleshooting.;
-8765;DocBase;DocBase Kerkbalans;Ledenbeheer;Test 2;Test 2;;DocBase (Module: Kerkbalans): Test 2 is voor de validatie van Kerkbalans-gerelateerde gegevens. Dit kan gebruikt worden om de configuratie van dit systeem te testen.;
-8766;DocBase;Overig;Ledenbeheer;Test 3;Test 3;;DocBase (Module: Overig): Test 3 kan ingezet worden voor aanvullende testen van administratieve functies binnen DocBase.;
-8767;DocBase;Samenvoegen administraties;Ledenbeheer;Test 4;Test 4;;DocBase (Module: Samenvoegen administraties): Test 4 is bedoeld voor het combineren van administraties in DocBase en het validatieproces daarvoor.;
 8768;Exact;Exact Online (Module: Inloggen);Exact Online;Inloggen en Navigeren in Exact Online;Uitleg over het inloggen in Exact Online en de navigatie tussen modules.;;Exact Online (Module: Inloggen): Ga naar de website www.exact.com en klik op Inloggen in de rechterbovenhoek van de pagina. Voer je gebruikersnaam in (dit is je e-mailadres dat aan je Exact Online-account is gekoppeld) en voer je wachtwoord in. Klik vervolgens op Inloggen. Je wordt gevraagd om een 6-cijferige code in te voeren die via de Google Authenticator-app op je smartphone wordt gegenereerd. Zodra je de code hebt ingevuld, klik je op Inloggen om toegang te krijgen tot Exact Online.;
 8769;Exact;Exact Online (Module: Inloggen);Exact Online;Standaard Inlogprocedure;Stappen om in te loggen in Exact Online via e-mailadres en wachtwoord.;;Exact Online (Module: Inloggen): Ga naar www.exact.com en klik op Inloggen. Vul je e-mailadres en wachtwoord in die aan je Exact Online-account zijn gekoppeld. Als je tweestapsverificatie hebt ingesteld, open je de Google Authenticator-app op je telefoon, vul je de 6-cijferige code in en klik je op Inloggen. Indien je geen toegang hebt tot de app, controleer dan of je telefoon tijdsinstellingen goed zijn of neem contact op met de systeembeheerder.;
 8770;Exact;Exact Online (Module: Inloggen);Exact Online;Problemen met inloggen;Veelvoorkomende problemen bij inloggen en mogelijke oplossingen.;;Exact Online (Module: Inloggen): Als je wachtwoord vergeten bent, klik dan op de link Wachtwoord vergeten? onder het inlogformulier. Volg de instructies om een nieuw wachtwoord in te stellen. Als je geen toegang hebt tot de Google Authenticator-code, controleer dan de tijdinstellingen van je telefoon. Als het account geblokkeerd is, neem dan contact op met je systeembeheerder om toegang te herstellen via gebruikersbeheer.;
@@ -1300,7 +1295,7 @@ de versie en de omschrijving in. Na het invullen van alle gegevens klikt u op Â‘
 kunnen gewijzigd worden door op het selectievak te klikken en vervolgens op wijzigen. Ten slotte is
 het mogelijk om correspondentie te verwijderen door de gewenste correspondentie te selecteren en
 onder Â“overige functiesÂ” op Â“verwijderenÂ” te klikken.";
-8935;DocBase;Begraafplaatsadministratie;Graven en begravingen;1. Graven en begravingen op een graf;"Er zijn binnen DocBase verschillende manieren om te zien wie waar is begraven. Met de zoek & vind
+8936;DocBase;Begraafplaatsadministratie;Graven en begravingen;1. Graven en begravingen op een graf;"Er zijn binnen DocBase verschillende manieren om te zien wie waar is begraven. Met de zoek & vind
 functie kunt u zoeken naar specifieke graven. Klik vervolgens op het desbetreffende graf. Onder het
 tabblad begravingen staan alle relaties die in het desbetreffende graf zijn begraven. Onder
 begravingen historie staan alle begravingen die ooit op een graf hebben plaatsgevonden.
@@ -1328,7 +1323,7 @@ zien in welk graf de persoon is begraven.
 Klik vervolgens op het tabblad Â“GrafÂ“ en op de hyperlink om bij de grafkaart uit te komen. Hier staat
 alle informatie omtrent het graf waarin de persoon is begraven.
 ";
-8935;DocBase;Begraafplaatsadministratie;Rechthebbende;2. Rechthebbende;"Wanneer u een begraving gaat administreren, dient u via de sjabloonapplicatie eerst een graf te
+8937;DocBase;Begraafplaatsadministratie;Rechthebbende;2. Rechthebbende;"Wanneer u een begraving gaat administreren, dient u via de sjabloonapplicatie eerst een graf te
 selecteren. Voer ook een rechthebbende in. Dit kunt u op drie manieren doen.
 Ten eerste kunt u bij een graf een rechthebbende toevoegen die een relatie is binnen uw parochie.
 Dit kan eenvoudig door het gebruik van de tab zoek functie.
@@ -1369,7 +1364,7 @@ Wanneer de ledenadministratie de rechthebbende als lokaal lid heeft aangemaakt, 
 lokale lid nog wel als rechthebbende gekoppeld worden aan het graf.
 Ga naar de grafkaart, klik op wijzigen en vul het rechthebbende DocBase-ID in.
 ";
-8935;DocBase;Begraafplaatsadministratie;Belanghebbende lidstatus;3. Belanghebbende lidstatus;"Het concept belanghebbende uitgelegd. Dit zijn relaties die aan een graf zijn
+8938;DocBase;Begraafplaatsadministratie;Belanghebbende lidstatus;3. Belanghebbende lidstatus;"Het concept belanghebbende uitgelegd. Dit zijn relaties die aan een graf zijn
 verbonden. Wanneer de rechthebbende komt te overlijden, wordt de rol van rechthebbende
 automatisch overgezet naar de eerstvolgende belanghebbende. Via de grafbeheerkaart onder het
 tabblad belanghebbenden kunt u Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende
@@ -1423,7 +1418,7 @@ kunt u binnen de gehele ledenadministratie van de RKK zoeken. Wanneer de persoon
 lid van de kerk is, en daarom logischerwijze ook niet voorkomt in het ledenbestand waartoe u
 toegang toe heeft, dan is het zaak dat de ledenadministratie de persoon als lokale relatie alsnog in
 het systeem zet. Vervolgens kunt u deze persoon dan noteren als belanghebbende.";
-8935;DocBase;Begraafplaatsadministratie;Belanghebbende toevoegen;4. Belanghebbende toevoegen;"Via de grafkaart kunt een belanghebbende toevoegen. Onder het tabblad belanghebbenden kunt u
+8939;DocBase;Begraafplaatsadministratie;Belanghebbende toevoegen;4. Belanghebbende toevoegen;"Via de grafkaart kunt een belanghebbende toevoegen. Onder het tabblad belanghebbenden kunt u
 Ã©Ã©n of meerdere belanghebbende toevoegen. De belanghebbende moet als relatie in DocBase zijn
 opgenomen. Via de zoekfunctie kunt u eenvoudig binnen het ledenbestand van uw parochie zoeken.
 Wanneer u een uniek zoekresultaat produceert, kunt u binnen de gehele ledenadministratie van de
@@ -1460,7 +1455,7 @@ belanghebbende toegevoegd.
 Onder relaties, staat een overzicht van alle belanghebbende. Via de zoek en vind functie kunt u
 zoeken binnen het overzicht van alle belanghebbende.
 ";
-8935;DocBase;Begraafplaatsadministratie;Begraafplaatsen, grafstatus en graven;5. Begraafplaatsen, grafstatus en graven;"Korte uitleg hoe u bij begraafplaatsen komt en hoe u, met gebruik van de hyperlink
+8940;DocBase;Begraafplaatsadministratie;Begraafplaatsen, grafstatus en graven;5. Begraafplaatsen, grafstatus en graven;"Korte uitleg hoe u bij begraafplaatsen komt en hoe u, met gebruik van de hyperlink
 functie, door kunt gaan naar een gravenoverzicht. Ook is aangegeven hoe u in een keer een overzicht
 kunt verkrijgen van alle graven waarvan de expiratiedatum dit jaar is en dit overzicht kunt opslaan
 binnen mijn werkplek.
@@ -1509,7 +1504,7 @@ Verder ziet u dat de status van onderhoud van graven Â“GoedÂ”, Â“nvtÂ” of Â“In r
 In deze uitleg zijn een aantal overzichten binnen de rol Â“BegraafplaatsbeheerderÂ” getoond.
 Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 7 van 10
 ";
-8935;DocBase;Begraafplaatsadministratie;Betrokken organisaties;6. Betrokken organisaties;"Zowel op de grafkaart als op de begravingkaart staat het tabblad Â‘Â’betrokken organisatiesÂ’Â’. Klik
+8941;DocBase;Begraafplaatsadministratie;Betrokken organisaties;6. Betrokken organisaties;"Zowel op de grafkaart als op de begravingkaart staat het tabblad Â‘Â’betrokken organisatiesÂ’Â’. Klik
 hierop en klik op nieuw om een betrokken organisatie op het graf of de begraving toe te voegen. De
 betrokken organisatie moet een DocBase ID hebben. Daarom is het noodzakelijk dat de betrokken
 organisatie geadministreerd staat onder het type Â‘Â’graf- en begravingsorganisatiesÂ’Â’. Wanneer dit niet
@@ -1553,7 +1548,7 @@ U bevindt zich nu op de detailkaart van de begraving.
 Klik op het tabblad Â‘Â’betrokken organisatiesÂ’Â’ Klik op Â‘Â’nieuwÂ’Â’. Vul een betrokken organisatie in. Dit
 gaat op eenzelfde manier als het toevoegen van een betrokken organisatie bij een graf.
 ";
-8935;DocBase;Begraafplaatsadministratie;Aanverwante informatie - Documenten;7. Aanverwante informatie - Documenten;"Bij het ruimen van een graf is het van belang om:
+8942;DocBase;Begraafplaatsadministratie;Aanverwante informatie - Documenten;7. Aanverwante informatie - Documenten;"Bij het ruimen van een graf is het van belang om:
 - Het grafaktenummer te verwijderen.
 - De gebruiksstatus op Â“te ruimenÂ” te zetten.
 Bij het weghalen van het grafaktenummer worden de oude documenten en begravingen automatisch
@@ -1581,7 +1576,7 @@ het gemakkelijk in de gaten te houden welke wijzigingen nog aandacht vergen.
 Tekst uitlegÂ’s Begraafplaatsadministratie bladzijde 9 van 10
 De voorkeursparochie kan altijd de gegevens inzien, ongeacht of er verhuisd is of niet.
 Dit zodat uw parochie met het betreffende lid in contact kan blijven.";
-8935;DocBase;Begraafplaatsadministratie;Correspondentie inzien, maken, wijzigen en verwijderen;8. Correspondentie inzien, maken, wijzigen en verwijderen;"Uitleg hoe correspondentie kan worden ingezien, gemaakt en gewijzigd
+8943;DocBase;Begraafplaatsadministratie;Correspondentie inzien, maken, wijzigen en verwijderen;8. Correspondentie inzien, maken, wijzigen en verwijderen;"Uitleg hoe correspondentie kan worden ingezien, gemaakt en gewijzigd
 binnen Docbase. Binnen Docbase is het mogelijk om via het type Â“DocumentenÂ” bij
 Â“CorrespondentieÂ” alle correspondentie-bestanden binnen de parochie in te zien. Ook kunt u
 bestanden inzien via de grafkaart van een graf. Daarnaast is het mogelijk via de ledenkaart van
@@ -1640,4 +1635,539 @@ Let op
 Wanneer u een bestand verwijdert, is dit bestand ook Ã©cht verwijderd. Er is dus geen prullenbak
 waaruit de bestanden kunnen worden hersteld.
 ";
+8944;Exact;1.1 Grootboekrekeningen;1.1 Grootboekrekeningen;;;1.1.2 “Mag ik bestaande grootboekrekeningen aanpassen en/of extra grootboekrekeningen;"aanmaken?” 
+ 
+ Wat mag wel? 
+ Wat mag niet? 
+Omschrijving van een bestaande 
+grootboekrekening aanpassen mits deze 
+onder dezelfde classificatie blijft vallen. 
+(Tip: voeg in de omschrijving bij de 
+grootboekrekeningen van 
+bankrekeningen het IBAN-nummer of de 
+laatste 3 cijfers daarvan toe (bv. 
+NL44RABO0123456789 of RABO789.) 
+Bestaande grootboekrekening verwijderen (in 
+verband met koppeling DocBase) 
+Extra grootboekrekening aanmaken onder 
+voorwaarde dat: 
+- 
+het juiste type wordt ingevuld 
+- 
+de juiste classificatie (= verdichting) 
+wordt ingevuld 
+- 
+in de grootboekrekening onder de 
+classificatie (= verdichting) 
+“Persoonskosten” of “Kosten 
+onroerend goed” valt, de kosten- 
+drager “??” verplicht wordt gekoppeld 
+aan de grootboekrekening 
+- 
+bij een fusieparochie, de kosten- 
+plaats “??” verplicht wordt gekoppeld 
+aan de grootboekrekening. 
+ Overleg met uw bisdom of het toegestaan is 
+ om nieuwe grootboekrekeningen aan te 
+ maken in verband met de jaarrekening-
+rapportage. 
+Extra grootboekrekening(en) voor opbrengsten 
+kerkbijdragen aanmaken (in verband met 
+koppeling DocBase) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Extra grootboekclassificaties (= verdichtingen) 
+aanmaken (in verband met de jaarrekening-
+rapportage)";
+8945;Exact;1.1 Grootboekrekeningen;1.1 Grootboekrekeningen;;;1.1.3 “Hoe maak ik een grootboekrekening aan?”;"Als u een grootboekrekening wilt toevoegen, doe dit dan bij voorkeur door een kopie 
+te maken van een grootboekrekening van hetzelfde type en classificatie. 
+Bijvoorbeeld; u wilt een grootboekrekening toevoegen voor een kerkgebouw. Ga naar 
+Financieel > Boekingen en grootboekrekeningen > Grootboekrekeningen > Overzicht. 
+Klik op de code “0100” en klik op Kopiëren. Vul een code in die nog niet bestaat en 
+die ligt in dezelfde volgorde als “0100” (denk in dit geval aan de voorloop nul) bv. 
+“0102”. Pas de omschrijving en eventueel de zoekcode aan. Klik op Opslaan. 
+Let op: Overleg met uw bisdom of het toegestaan is om grootboekrekeningen toe te 
+voegen in verband met de jaarrekening-rapportage!";
+8946;Exact;1.2 Dagboeken;1.2 Dagboeken;;;1.2.1 “Moet ik met een inkoop- en verkoopboek gaan werken?”;"Dit is niet verplicht, maar wel wenselijk o.a. met het oog op: a) het automatisch 
+incasseren van kerkbijdragen b) het kunnen verrichten van betalingen c) het kunnen 
+factureren van uitvaarten, grafrechten, parochiebladen etc. d) het bieden van inzicht in 
+openstaande posten e) de transparantie van uw administratie.";
+8947;Exact;1.2 Dagboeken;1.2 Dagboeken;;;1.2.2 “Mag ik bestaande dagboeken aanpassen?”;"Ja. Het is zelfs aan te raden om eerst (de omschrijvingen en IBAN-nummers van) de 
+bestaande dagboeken aan te passen voordat er nieuwe dagboeken worden aangemaakt.";
+8948;Exact;1.2 Dagboeken;1.2 Dagboeken;;;1.2.3 “Hoe maak ik zelf extra dagboeken aan?”;"Via het pad Administratienaam > Stamgegevens > Financieel > Dagboeken > Pijltje 
+achter “Nieuw”. In het geval van “bank” dient er rekening te worden gehouden met: 
+? 
+IBAN-nummer 
+? 
+Omschrijving (bv. “Rabobank betaalrekening .123”) 
+? 
+Grootboekrekening (die eerder is aangemaakt, zie 1.1.2 en 1.1.3): deze kan worden 
+gekoppeld aan het dagboek door op het kleine pijltje halverwege het scherm (onder 
+“geavanceerde opties”) te klikken waarna het scherm als het ware wordt 
+opengeklapt. 
+ 
+Onder het kopje “financieel” staat al een driecijferige grootboekrekening ingevuld; 
+deze dient te worden overschreven met de juiste, door u hiervoor bestemde, 
+viercijferige grootboekrekening.";
+8949;Exact;1.2 Dagboeken;1.2 Dagboeken;;;1.2.4 “Maak ik voor spaarrekeningen ook een dagboek aan?”;"Ja. Let op: de ING-bank hanteert vaak dezelfde rekeningnummers voor betaal- en 
+spaarrekeningen. In dat geval kan er voor de spaarrekening bij “Bankrekeningnummer” 
+het nummer van het dagboek worden ingevuld en bij de omschrijving het betreffende 
+IBAN-nummer met de toevoeging “Spaarrekening”. In dat geval is er geen mogelijkheid 
+een bankkoppeling aan te leggen met de spaarrekening.";
+8950;Exact;1.2 Dagboeken;1.2 Dagboeken;;;1.2.5 “Kan ik aan een bankrekening/-dagboek een vaste kostenplaats koppelen?”;"Nee. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per 
+geloofsgemeenschap inzichtelijk te maken. Idealiter wordt de kostenplaats ingevuld bij 
+het boeken van de kosten en opbrengsten in het inkoopboek en verkoopboek (zie 1.2.1). 
+Lees ook: https://www.rkk-online.nl/single-post/2018/04/04/Het-waarom-van- 
+%C3%A9%C3%A9n-financi%C3%ABle-administratie";
+8951;Exact;1.3 Bankkoppelingen;1.3 Bankkoppelingen;;;1.3.1 “Hoe vraag ik een bankkoppeling aan?”;"Klik hier voor een uitleg over het bankieren in Exact Online waarin onder andere wordt 
+uitgelegd hoe u de bankkoppeling eenmalig aanlegt en vervolgens de bankmutaties kunt 
+importeren en afletteren. Het is voor parochies vooralsnog niet mogelijk een PSD2-
+koppeling te maken. Een PSD2-koppeling vereist een bedrijfsscreening en een UBO-
+registratie. Parochies beschikken niet over een UBO-registratie. 
+ 
+- “Hoe vraag ik een bankkoppeling voor de Rabobank aan?” 
+Voor de Rabobank bestaat de mogelijkheid om (in plaats van de PSD2-koppeling) te 
+kiezen voor de Rabo Boekhoudkoppeling. 
+Klik op de administratienaam en kies Instellingen. Klik op tabblad Bankkoppelingen. Klik 
+achter de betreffende Rabobankrekening op Bankkoppeling aanmaken. U ziet dan het 
+volgende scherm: 
+ 
+Selecteer bij Type bankkoppeling de Rabo BoekhoudKoppeling en zet onder 
+Mogelijkheden bankkoppeling 3 vinkjes (bij Transacties ophalen, Betalingen versturen 
+en Incasso’s versturen). 
+Klik hierna op Bank toegang geven. U wordt nu doorgeleid naar Rabobank 
+Internetbankieren. Log in met een zgn. Eigenaarspas om de bankkoppeling te activeren. 
+ 
+- “Hoe vraag ik een bankkoppeling aan voor ABN-AMRO, ING, Bunq of Knab?” 
+Klik op de administratienaam > Stamgegevens > Bank > Oude generatie 
+bankkoppelingen beheren. Klik op de bank waarvoor u de koppeling wilt maken. Volg de 
+stappen die daar beschreven staan. Let op: zodra u doorgeleid bent naar de 
+bankomgeving, dient u uit te loggen in Exact!";
+8952;Exact;1.3 Bankkoppelingen;1.3 Bankkoppelingen;;;1.3.2 “Ik heb geen bankrekening bij Rabobank, ABN-Amro, ING, Bunq of Knab, wat nu?”;"Het is op dit moment nog onduidelijk welke andere banken er wanneer kunnen worden 
+gekoppeld. Tot dat moment is het uiteraard wel mogelijk om voor alle Nederlandse 
+banken de bankmutaties met een bankbestand (MT940) binnen te halen. Het handmatig 
+boeken van de bank is dus absoluut niet meer nodig.";
+8953;Exact;1.3 Bankkoppelingen;1.3 Bankkoppelingen;;;1.3.3 “Waar moet ik nog meer op letten?”;"- Zorg dat u volledig bij bent met het boeken van de bank. Een bankkoppeling haalt 
+namelijk geen historische bankmutaties op. Als u bijvoorbeeld op 1 maart de 
+bankkoppeling activeert, dient u met een handmatig import van een bankbestand 
+(MT940) alle gewenste mutaties van vóór 1 maart binnen te halen. 
+ 
+- Bij het aanleggen van de bankkoppeling dient de gemachtigde binnen de parochie 
+(meestal de houder van de zgn. Eigenaarspas) hiervoor eenmalig toestemming te 
+geven. De vorm van deze goedkeuring is afhankelijk van de bank (reader/tan-
+code/app/schriftelijk).";
+8954;Exact;"1.4 Kostenplaatsen en
 
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.1 “Wat zijn kostenplaatsen en kostendragers?”;"Een kostenplaats gebruiken we om een geloofsgemeenschap/voormalige 
+parochie/locatie aan te duiden. De kostenplaatsen maken het mogelijk om de 
+opbrengsten en kosten per geloofsgemeenschap inzichtelijk te maken. 
+Een kostendrager gebruiken we om kosten en opbrengsten van een bepaalde persoon, 
+een bepaald gebouw, een bepaalde begraafplaats, een bepaalde groep, product of 
+dienst inzichtelijk te maken.";
+8955;Exact;"1.4 Kostenplaatsen en
+
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.2 “Waar vind ik de kostenplaatsen en kostendragers?”;Administratienaam > Stamgegevens > Financieel > Kostenplaatsen of Kostendragers;
+8956;Exact;"1.4 Kostenplaatsen en
+
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.3 “Mag ik zelf kostenplaatsen en kostendragers aanmaken of wijzigen?”;"De kostenplaatsen worden bij de oplevering van de parochie-administratie standaard 
+vanuit IPAL ingericht. Als code hebben de kostenplaatsen de (oude) kaski-nummers van 
+de geloofsgemeenschappen/voormalige parochies/locaties. Aangezien Exact Online en 
+DocBase informatie over de kostenplaats van een parochiaan met elkaar uitwisselen, is 
+het van groot belang aan de kostenplaatsen NIETS te wijzigen. Mocht u onjuistheden 
+constateren of aanvullingen wenselijk achten, dan verzoeken wij u deze aan IPAL te 
+melden. 
+Bij de oplevering van de parochie-administratie zijn enkele kostendragers standaard 
+aangemaakt om als voorbeeld te fungeren. Van bestaande kostendragers kunnen alleen 
+de omschrijvingen worden aangepast. Van nieuwe kostendragers kunt u zowel de code 
+als de omschrijving zelf bepalen. Hanteer daarbij logische coderingen, zodat de 
+gewenste kostendragers bij het boeken snel en gemakkelijk te achterhalen zijn. In elk 
+geval dient u de gebouwen en de personen die van de parochie een honorarium of 
+salaris ontvangen onder de kostendragers op te nemen, zodat voor het bisdom in elk 
+geval de kosten per gebouw en per persoon inzichtelijk zijn. 
+Let op 1: Van een reeds bestaande kostendrager kunt u de omschrijving wijzigen. 
+Wijziging (of “vernummering”) van de code is alleen mogelijk in overleg met IPAL. Wel 
+kunt u een nieuwe kostendrager aanmaken en de “oude” kostendrager verwijderen. 
+Verwijderen is echter alleen mogelijk als de “oude” kostendrager nog niet is gebruikt in 
+een boeking. Verwijder bovendien NIET de kostendrager “??” met de omschrijving 
+“Verplicht invullen”. 
+Let op 2: In Exact Online kan per boeking/mutatie maximaal maar één kostenplaats en 
+één kostendrager worden ingevuld. Het is daarom zaak efficiënt om te gaan met de 
+inrichting van de kostendragers en vooral NIET de kostenplaatsen te “misbruiken” als 
+extra kostendragers. Zo kunnen van een persoon de naam en functie worden 
+gecombineerd in één kostendrager (bv. H. Jacobs, pastoor”).";
+8957;Exact;"1.4 Kostenplaatsen en
+
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.4 “Waartoe dienen de kostenplaats en de kostendrager “??”;"met als omschrijving “verplicht 
+invullen”?” 
+Het invullen van een kostenplaats en/of kostendrager kan verplicht of niet verplicht 
+
+ 
+ 
+(“optioneel”) zijn. Dit wordt per grootboekrekening bepaald en is voor de 
+grootboekrekeningen in het standaard-rekeningschema van uw Exact Online- 
+administratie al ingesteld. Dit kunt u NIET wijzigen. 
+Als een kostenplaats of kostendrager bij een boeking niet wordt ingevuld, terwijl dat wel 
+verplicht is, wordt deze automatisch ingevuld met vraagtekens (“??”). Op die manier is 
+voor u snel inzichtelijk in welke boekingen alsnog de (juiste) kostenplaats of kostendrager 
+moet worden ingevuld.";
+8958;Exact;"1.4 Kostenplaatsen en
+
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.5 “Kan ik de beginbalans uitsplitsen naar kostenplaatsen?”;"Nee, aan de balansrekeningen op de beginbalans kunnen geen kostenplaatsen worden 
+gekoppeld. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per 
+geloofsgemeenschap/voormalige parochie/locatie inzichtelijk te maken. Zie ook 1.2.5 en 
+1.4.1. Lees ook: https://www.rkk-online.nl/single-post/2018/04/04/Het-waarom-van- 
+%C3%A9%C3%A9n-financi%C3%ABle-administratie";
+8959;Exact;"1.4 Kostenplaatsen en
+
+kostendragers";"1.4 Kostenplaatsen en
+
+kostendragers";;;1.4.6 “Kan ik de beginbalans uitsplitsen naar kostendragers?”;"Om de boekwaarde bv. per gebouw inzichtelijk te maken kunt u: 
+a) kiezen voor een afzonderlijke grootboekrekening per gebouw (bij kleine 
+aantallen); 
+b) in het memoriaal een aanvullende boeking op 1 januari boeken om de 
+uitsplitsing naar kostendragers te maken waarmee in feite de beginbalans wordt 
+gecorrigeerd; 
+c) als er afschrijvingen van toepassing zijn, de Activa-module binnen Exact Online 
+gebruiken (onder Financieel > Activa)";
+8960;Exact;1.5 Relaties;1.5 Relaties;;;1.5.1 “Moet/mag ik zelf debiteuren aanmaken?”;"Ja en nee. Voor parochianen die kerkbijdrage aan uw parochie betalen worden (vanaf 
+het moment dat Exact Online en DocBase gekoppeld zijn) op initiatief van DocBase 
+automatisch debiteuren-/relatienummers aangemaakt in Exact Online. Zie ook 5.4. Het is 
+dus NIET de bedoeling dat u voor deze parochianen zelf debiteuren gaat aanmaken. Zo 
+voorkomt u dat één parochiaan onder verschillende nummers in uw debiteuren- 
+/relatiebestand wordt opgenomen. Andere debiteuren (bv. uitvaartondernemingen, 
+telecombedrijven), niet zijnde kerkbijdrage-deelnemers, dient u wel zelf aan te maken in 
+Exact Online, ook als hun gegevens reeds zijn opgeslagen in DocBase. Zie ook 1.5.3.";
+8961;Exact;1.5 Relaties;1.5 Relaties;;;1.5.2 “Moet/mag ik zelf crediteuren aanmaken?”;"Ja. Er zijn verschillende manieren om op een efficiënte manier crediteuren aan te maken. 
+Zie 1.5.3.";
+8962;Exact;1.5 Relaties;1.5 Relaties;;;1.5.3 “Hoe kan ik crediteuren of debiteuren aanmaken?”;"Via het pad Relaties > Klanten (=debiteuren) of Leveranciers (=crediteuren) > Aanmaken 
+komt u bij de opties: 
+o 
+Handmatig: u vult dan alle gegevens zelf in 
+o 
+Zoek een bedrijf op basis van naam en adres: de bedrijfsgegevens worden dan voor een 
+groot deel automatisch opgehaald van de website van de Kamer van Koophandel. 
+Let op: een bankrekeningnummer zult u zelf handmatig moeten toevoegen, hetgeen o.a. 
+relevant is om via Exact Online te kunnen betalen en om Exact Online in staat te stellen 
+aan bankmutaties automatisch het juiste relatienummer te verbinden. 
+o 
+Postcode en huisnummer: op basis van de postcode-huisnummer tabel van PostNL haalt 
+Exact Online de straatnaam en woonplaats op. 
+
+ 
+ 
+ 
+In het geval dat er een groot aantal crediteuren moet worden aangemaakt, kan er in 
+samenspraak met IPAL worden gekeken naar importmogelijkheden. 
+ 
+Let op: Als u in het inkoopboek de naam van een nog niet bekende crediteur intikt, vraagt 
+Exact Online u of u deze wilt aanmaken in uw relatiebestand. Door dan te klikken op 
+nieuwe relatie aanmaken kunt u ter plekke al enkele essentiële gegevens van deze 
+nieuwe crediteur invoeren (Exact Online kent hem zelf een nummer toe). U kunt er ook 
+voor kiezen om middels de F2-toets naar het scherm Relaties te gaan en vervolgens via 
+de optie Nieuw de gegevens handmatig in te vullen dan wel via het pad Nieuw > Zoeken: 
+Adres de gegevens op te halen van de website van de Kamer van Koophandel. Middels 
+de optie Sluiten keert u weer terug in het inkoopboek.";
+8963;Exact;1.5 Relaties;1.5 Relaties;;;1.5.4 “Welke nummering moet ik geven aan debiteuren?”;"Debiteuren (parochianen) die in DocBase worden geregistreerd ten behoeve van de 
+kerkbijdragen worden automatisch overgezet naar Exact Online. Echter alle overige 
+debiteuren worden niet in DocBase geregistreerd. Denk hierbij aan debiteuren voor 
+grafrechten, parochiebladen, uitvaarten etc. Om deze debiteuren op een praktische 
+manier te kunnen scheiden van de debiteuren ten behoeve van de kerkbijdragen, is het 
+van belang om deze een specifieke nummering te geven. De notatie die u dient te 
+hanteren is het KASKI-nummer gevolgd door een volgnummer van 4 cijfers. Bijvoorbeeld: 
+999990001";
+8964;Exact;"1.6 Digitale brievenbus/
+
+Scan en herken";"1.6 Digitale brievenbus/
+
+Scan en herken";;;1.6.1 “Wat is een digitale brievenbus?”;"Een digitale brievenbus maakt het mogelijk om inkoopfacturen te e-mailen naar Exact 
+Online. Dit kan vanuit een e-mailprogramma of direct vanuit een scanner. Dit heeft als 
+voordeel dat de facturen digitaal en veilig worden opgeslagen en dat de digitale factuur 
+direct aan de boeking kan worden gekoppeld. Later is het dan eenvoudiger om een 
+factuur terug te vinden in Exact Online.";
+8965;Exact;"1.6 Digitale brievenbus/
+
+Scan en herken";"1.6 Digitale brievenbus/
+
+Scan en herken";;;1.6.2 “Mag ik zelf een digitale brievenbus aanmaken?”;"Nee. IPAL beheert de digitale brievenbussen. U kunt een mail sturen naar 
+helpdesk@ipal.nu met daarin uw parochienummer en één of meerdere e-mailadressen waar 
+vanaf het toegestaan is om naar de digitale brievenbus te mailen. IPAL zal dan de digitale 
+brievenbus voor u aanmaken.";
+8966;Exact;"1.6 Digitale brievenbus/
+
+Scan en herken";"1.6 Digitale brievenbus/
+
+Scan en herken";;;1.6.3 “Kan ik gebruik maken van Scan & Herken?”;"Voor enkele bisdommen is deze functionaliteit centraal ingeschakeld. Neem contact op 
+met uw bisdom over de mogelijkheden.";
+8967;Exact;"1.7 BTW
+
+2. Boeken";"1.7 BTW
+
+2. Boeken";;;1.7.1 “Is de administratie geschikt voor het werken met BTW?”;"De standaardinrichting voor parochies voorziet niet in een BTW-administratie. Indien een 
+parochie BTW-plichtige activiteiten verricht, kan de administratie desgewenst door IPAL 
+worden aangevuld met de noodzakelijke BTW-inrichting. 
+ 
+ 
+ 
+
+ 
+ 
+ 
+2. BOEKEN";
+8968;Exact;2.1 Beginbalans;2.1 Beginbalans;;;2.1.1 “Hoe kan ik de beginbalans invoeren in Exact Online?”;"Graag verwijzen we u hiervoor naar het YouTube-filmpje: 
+https://www.youtube.com/watch?v=VGtr5lZytsQ 
+Het filmpje begin met het scherm “Aan de slag”. Dit krijgt u niet te zien. U kiest het pad 
+Financieel > Boekingen > Aanmaken en komt dan uit bij het scherm: “Boeking - Nieuw”. 
+Vanaf dat scherm verwijzen we u weer naar het filmpje. 
+In afwijking van het voorbeeld in het filmpje is het nummer van de (tegen)rekening 
+“tussenrekening beginbalans” niet 2900 maar 1798.";
+8969;Exact;2.1 Beginbalans;2.1 Beginbalans;;;2.1.2 “Kan ik de beginbalans uitsplitsen naar kostenplaatsen?”;"Nee, aan de balansrekeningen op de beginbalans kunnen geen kostenplaatsen worden 
+gekoppeld. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per 
+geloofsgemeenschap/voormalige parochie/locatie inzichtelijk te maken. Zie ook 1.2.5 en 
+1.4.1. Lees ook: https://www.rkk-online.nl/single-post/2018/04/04/Het-waarom-van- 
+%C3%A9%C3%A9n-financi%C3%ABle-administratie";
+8970;Exact;2.1 Beginbalans;2.1 Beginbalans;;;2.1.3 “Kan ik de beginbalans uitsplitsen naar kostendragers?”;"Om de boekwaarde bv. per gebouw inzichtelijk te maken kunt u: 
+a) kiezen voor een afzonderlijke grootboekrekening per gebouw (bij kleine aantallen) 
+b) in het memoriaal een aanvullende boeking op 1 januari boeken om de uitsplitsing naar 
+kostendragers te maken waarmee in feite de beginbalans wordt gecorrigeerd 
+c) als er afschrijvingen van toepassing zijn, de Activa-module binnen Exact Online 
+gebruiken (onder Financieel > Activa)";
+8971;Exact;2.2 Inkoop;2.2 Inkoop;;;2.2.1 “Hoe kan ik een kostenplaats of kostendrager koppelen aan een boekingsregel?”;"De boekingsregels in een dagboek (bv. inkoopboek, bankboek, kasboek) zijn niet 
+standaard voorzien van velden waar u de kostenplaats en kostendrager kunt invullen. 
+Deze dient een gebruiker per dagboek toe te voegen aan de boekingsregel. Exact Online 
+koppelt deze aanpassingen van de boekingsregel aan de betreffende gebruiker, zodat 
+deze actie per gebruiker maar eenmalig per dagboek nodig is. Aanpassing is mogelijk 
+door in het dagboek op het “gereedschapsicoontje” rechts bovenin en vervolgens op 
+Aanpassen te klikken. Door vervolgens de kostenplaats en kostendrager aan te vinken, 
+worden deze voortaan standaard opgenomen in de boekingsregel van het betreffende 
+dagboek.";
+8972;Exact;2.3 Verkoop;2.3 Verkoop;;;2.3.1 “Hoe ga ik om met de artikelen die al in mijn administratie staan?;"In de administratie staan onder andere artikelen ten behoeve van de kerkbijdrage (zie 
+onderstaand). Let op: deze dienen ter ondersteuning van de verwerking van de 
+kerkbijdrage in koppeling met DocBase. Aan deze artikel mag niets worden gewijzigd 
+zodat de koppeling intact blijft. 
+
+ 
+ 
+ 
+ 
+Voor een groot aantal andere scenario’s kan er worden gefactureerd vanuit Exact Online. 
+Hiervoor zijn eveneens artikelen aangemaakt en beschikbaar. Deze artikelen kunt u 
+desgewenst aanvullen of wijzigen. Denk hierbij aan artikelen voor grafrechten, 
+uitvaartdiensten of parochiebladen.";
+8973;Exact;2.4 Bank;2.4 Bank;;;2.4.1 “Hoe kan ik een kostenplaats of kostendrager koppelen aan een boekingsregel?”;"De boekingsregels in een dagboek (bv. inkoopboek, bankboek, kasboek) zijn niet 
+standaard voorzien van velden waar u de kostenplaats en kostendrager kunt invullen. 
+Deze dient een gebruiker per dagboek toe te voegen aan de boekingsregel. Exact Online 
+koppelt deze aanpassingen van de boekingsregel aan de betreffende gebruiker, zodat 
+deze actie per gebruiker maar eenmalig per dagboek nodig is. Aanpassing is mogelijk 
+door in het dagboek op het “gereedschapsicoontje” rechts bovenin en vervolgens op 
+Aanpassen te klikken. Door vervolgens de kostenplaats en kostendrager aan te vinken, 
+worden deze voortaan standaard opgenomen in de boekingsregel van het betreffende 
+dagboek.";
+8974;Exact;2.4 Bank;2.4 Bank;;;2.4.2 “Na het importeren van de bankmutaties staan in het scherm “Af te handelen”;"alle 
+mutaties op groen/op de status “Afgehandeld”. Kan ik er dan van uit gaan dat dit goed is 
+geboekt? 
+Nee. Hoewel zo veel mogelijk automatisch en correct wordt geboekt, kan er altijd een 
+boeking foutief worden afgehandeld. Controleer daarom altijd alle boekingsregels ongeacht 
+of ze op rood of groen staan. Voorbeeld: mutaties kunnen onterecht automatisch op 
+kerkbijdragen zijn geboekt terwijl het ook grafrechten/uitvaartdiensten/misintenties kan 
+betreffen.";
+8975;Exact;2.5 Verwerken boekingen;2.5 Verwerken boekingen;;;2.5.1 “Moet ik boekingen verwerken?”;"Nee, dat is in elk geval niet nodig voor alle gewenste rapportages. Alleen na sluiting en 
+goedkeuring van de cijfers van een bepaald boekjaar kan voor verwerking van de 
+boekingen worden gekozen. Niet verwerkte boekingen kunnen altijd worden gewijzigd. 
+U kunt altijd nog terugkeren naar de oorspronkelijke niet verwerkte boeking in het 
+dagboek en de gewenste wijzigingen aanbrengen. Het heropenen van reeds verwerkte 
+boekingen kan alleen door uw bisdom of IPAL worden uitgevoerd.";
+8976;Exact;2.5 Verwerken boekingen;2.5 Verwerken boekingen;;;2.5.2 “Hoe maak ik een boekingsverslag?”;Hiervoor verwijzen wij u naar 3.1.;
+8977;Exact;2.6 Verwerken en incasseren kerkbijdragen;2.6 Verwerken en incasseren kerkbijdragen;;;2.6.1 “Hoe wordt de geboekte kerkbijdragen in Exact Online doorgezet naar DocBase?”;"Als u in Exact de kerkbijdrage-ontvangst geboekt heeft op grootboekrekening 8000 en 
+daarbij het relatienummer (= debiteurennummer) hebt ingevuld, dan wordt deze boeking in 
+de nachtverwerking doorgezet naar DocBase. U kunt de kerkbijdrage de dag erna dus 
+terugzien bij de betreffende debiteur in DocBase. Ook correctieboekingen op 8000 worden 
+in de nachtverwerking doorgezet naar DocBase.";
+8978;Exact;2.6 Verwerken en incasseren kerkbijdragen;2.6 Verwerken en incasseren kerkbijdragen;;;2.6.2 “Welke stappen moet ik in Exact Online uitvoeren om de kerkbijdragen te incasseren?”;"DocBase is de basis voor de registratie van kerkbijdragen en de incasso gegevens. Een 
+koppeling tussen DocBase en Exact Online zorgt ervoor dat de uiteindelijke incasso- 
+opdracht vanuit Exact Online kan worden verricht. Alvorens u hiermee aan de slag kunt, 
+dient er een aantal stappen te worden uitgevoerd. Hiervoor kunt het document 
+“Handleiding incasseren kerkbijdragen” raadplegen dat evenals deze FAQ’s is 
+opgenomen in de rubriek “Documenten” op de website www.rkk-online.nl.";
+8979;Exact;"2.7 Begroting
+
+3. Overzichten 
+ 
+4. Tips & Tricks 
+ 
+5. Spelregels 
+
+ 
+ 
+1. INRICHTING 
+ 
+Op diverse schermen in Exact kunt u met behulp van het “gereedschapsicoontje” rechtsboven in het 
+scherm filters of kolommen toevoegen. Klik op het “gereedschapsicoontje” en klik op Aanpassen. 
+ 
+Zodra u de aanpassing heeft gedaan klikt u op Opslaan. Exact bewaart deze aanpassing voor u als 
+gebruiker.";"2.7 Begroting
+
+3. Overzichten 
+ 
+4. Tips & Tricks 
+ 
+5. Spelregels 
+
+ 
+ 
+1. INRICHTING 
+ 
+Op diverse schermen in Exact kunt u met behulp van het “gereedschapsicoontje” rechtsboven in het 
+scherm filters of kolommen toevoegen. Klik op het “gereedschapsicoontje” en klik op Aanpassen. 
+ 
+Zodra u de aanpassing heeft gedaan klikt u op Opslaan. Exact bewaart deze aanpassing voor u als 
+gebruiker.";;;2.7.1 “Hoe kan ik de begroting invoeren in Exact Online?”;"Dit is mogelijk via de onderstaande menupaden. 
+Financieel > Analyse en resultaten > Budgetten > Budgetscenario’s 
+Financieel > Analyse en resultaten > Budgetten > Aanmaken 
+Jaarbedragen kunnen worden ingevoerd bij periode 12. Het is dus niet verplicht deze 
+begroting te verdelen over de 12 perioden. Bij uitsplitsing van de begroting over 
+kostenplaatsen kunt u helemaal onderaan de lijst met het plusje (+) de betreffende 
+verdeling over kostenplaatsen invoeren.";
+8980;Exact;3 OVERZICHTEN;4 OVERZICHTEN;;;3.1 “Hoe maak ik een boekingsverslag?” ;"Via Financieel > Boekingen en grootboekrekeningen > Overzichten > Boekingsverslag 
+Let op: Om ook kostenplaatsen en kostendragers zichtbaar te maken in het 
+boekingsverslag, dient onder het kopje “Aanvullende informatie” bij de optie 
+“Kostenanalyse” te worden gekozen voor “Code + Omschrijving”.";
+8981;Exact;4 TIPS EN TRICKS;5 TIPS EN TRICKS;;;4.1 “Waar vind ik uitleg over het scherm waarin ik aan het werken ben?” ;"Als u in een bepaald scherm in Exact Online documentatie over dit specifieke scherm wilt 
+opvragen kunt u via F1 op het toetsenbord deze documentatie oproepen. Hetzelfde 
+bereikt u als u rechts bovenin op Help klikt gevolgd door “Help bij: {onderwerp}”. Behalve 
+informatie over het scherm krijgt u ook informatie over onderwerpen die hieraan 
+gerelateerd zijn. 
+4.2 
+“Hoe voorkom ik dat ik tijdens het boeken van de bank of kas inkomende en uitgaande 
+bedragen door elkaar haal?” 
+Standaard is er een veld ingeschakeld genaamd “Bedrag”. Echter kunt u klikken op het 
+“gereedschapsicoontje” rechts bovenin en vervolgens op Aanpassen klikken waarna 
+de optie Bedrag kan worden omgezet naar Bedrag in + Bedrag uit. Vanaf nu zijn er 2 
+kolommen beschikbaar in de boeking voor zowel “bedrag in” als “bedrag uit”.";
+8982;Exact;5 SPELREGELS;6 SPELREGELS;;;5.1 “Mag ik mijn eigen gebruikersgegevens aanpassen?” ;"Nadat de inloggegevens aan u zijn verstuurd, worden uw gebruikersgegevens om 
+privacy-redenen door ons gecodeerd en daarmee geanonimiseerd. Hoewel u als 
+gebruiker zelf uw eigen profiel in Exact Online kunt aanpassen, verzoeken we u dringend 
+in elk geval uw gecodeerde voor- en achternaam NIET te wijzigen! 
+5.2 
+“Aan welke instellingen of inrichting mag ik niet komen?” 
+o 
+Administratie-instellingen 
+o 
+Voor- en achternaam gebruiker: zie ook 5.1 
+o 
+Grootboekrekeningen: zie 1.1.2 
+o 
+Grootboekclassificaties 
+o 
+Kostenplaatsen: zie ook 1.4.3 
+o 
+BTW-codes: zie ook 1.7 
+o 
+De standaard ingerichte abonnementsvoorwaarden 
+o 
+De standaard ingerichte artikelen en artikelgroepen t.b.v. de kerkbijdragen: zie ook 2.3.1 
+o 
+De standaard ingerichte betalingscondities 
+o 
+De standaard ingerichte toewijzingsregels 
+5.3 
+“Kan ik oefenen in een testomgeving?“ 
+Er is geen afzonderlijke testomgeving beschikbaar waarin u kunt oefenen. Het is wel 
+mogelijk om na de overstap naar Exact Online tijdelijk te oefenen (in uw echte 
+administratie) voordat u daadwerkelijk gaat starten. In dat geval dient u, voordat u gaat 
+oefenen in uw echte administratie, een back-up aan te maken. Zie 5.5 voor het menupad. 
+Let op: als u klaar bent met oefenen dient u de back-up terug te lezen. 
+Let op: bovenstaande optie is niet mogelijk als u een koppeling heeft met DocBase. 
+5.4 
+“Hoe stel ik tweestapsverificatie in? 
+Zorg dat u (via de Google Play Store) de app “Google Authenticator” op uw smartphone 
+heeft geïnstalleerd. 
+Log in Exact in met uw gebruikersnaam en wachtwoord. Zodra u zich in het scherm bevindt, 
+waar u de verificatiecode moet invullen, klikt u op de blauwe link Hoe stel ik verificatie in 
+twee stappen opnieuw in?. In het volgende scherm klikt u op E-mail versturen. U ontvangt 
+nu een e-mail-bericht ontvangen met daarin een link om de Google Authenticator verder in 
+te stellen. 
+ 
+5.5 
+“Moet ik een back-up maken en zo ja, wanneer?” 
+Het is in principe niet nodig om een back-up te maken. In het geval van calamiteiten is 
+het voordeel van een onlineboekhoudpakket dat alles bewaard blijft. Denk hierbij aan 
+stroomstoringen en brand. Echter, in het geval dat er bijvoorbeeld boekingen onjuist zijn 
+geregistreerd, facturen verkeerd zijn verstuurd of er iets misgaat tijdens het betalings- of 
+incassoproces, is het alleen mogelijk om dit terug te draaien en terug te vallen op een 
+eerdere back-up als deze handmatig is aangemaakt in de betreffende administratie. 
+Exact Online maakt deze dus niet automatisch aan. Het terugzetten van een back-up 
+brengt niettemin ook gevaren met zich mee en wordt daarom toch afgeraden. Het 
+corrigeren van gemaakte fouten kan dan ook beter gedaan worden door 
+boekhoudkundige correcties zoals aanmaken credit-facturen, memoriaal-boekingen etc. 
+Het teruglezen van een back-up zou dus problemen kunnen verhelpen, maar ook 
+nieuwe problemen creëren. Exact Online is immers gekoppeld aan DocBase en 
+mogelijk ook aan één of meerdere banken, waarmee gegevens worden uitgewisseld. 
+
+ 
+ 
+Indien er bijvoorbeeld in de periode tussen het aanmaken en het teruglezen van de back- 
+up in DocBase gegevens worden ingevoerd of gewijzigd die ook voor Exact Online 
+relevant zijn, worden deze ook meteen in Exact Online verwerkt (bv. aanmaak nieuwe 
+debiteur, wijziging of toevoeging bankrekeningnummer debiteur, aanmaak of beëindiging 
+incasso-abonnement). Deze gegevens in Exact Online gaan verloren door het teruglezen 
+van de back-up. Hoe meer tijd er is verstreken tussen het maken van de back-up en het 
+teruglezen hiervan, hoe groter de kans is dat er in de tussentijd mutaties vanuit DocBase 
+in Exact Online zijn verwerkt en hoe groter dus de kans is dat er bij het teruglezen van de 
+back-up mutaties verloren gaan. Het opsporen hiervan is erg lastig. Indien in die 
+tussentijd bv. een debiteur is aangemaakt in DocBase en Exact Online, is vanuit Exact 
+Online het debiteurennummer teruggekoppeld naar DocBase. De DocBase-gebruiker 
+denkt dan dat alles goed is gegaan in Exact Online, terwijl in Exact Online door het 
+teruglezen van een back-up de gegevens van deze debiteur inmiddels volledig 
+ontbreken. Daarnaast kan Exact Online gekoppeld zijn aan één of meerdere banken, op 
+grond waarvan bankmutaties automatisch binnenkomen in de Exact-administratie. 
+Bankmutaties die zijn binnengekomen na het tijdstip van de back-up gaan door 
+het teruglezen van de back-up verloren, met vervelende gevolgen voor 
+boekingen, afletteringen etc. 
+Conclusie: gaat u handelingen binnen Exact Online verrichten over de afloop waarvan u 
+onzeker bent, dan kan een back-up uitkomst bieden, maar realiseer u dan ook wat de 
+gevolgen kunnen zijn van het teruglezen van deze back-up! Probeer die gevolgen zoveel 
+mogelijk te bepreken door voor die handelingen een geschikt tijdstip te kiezen en door te 
+communiceren met de andere Exact- en DocBase-gebruikers in uw parochie. 
+ 
+ 
+ 
+ 
+
+ 
+ 
+WIJZIGINGEN IN DIT DOCUMENT 
+In dit onderdeel kunt u zien welke wijzigingen er in dit document hebben plaatsgevonden. 
+ 
+Versie 1.1 (14-5-2018) 
+Toegevoegd: 2.5.2 + 3.1 + 4.2 
+Aangepast: 1.4.3 
+ 
+Versie 1.2 (22-10-2018) 
+Toegevoegd: 1.3.1-1.3.3 + 1.5.4 + 2.3.1 + 2.4.2 + 2.6.1-2.6.9 + 5.3 + 5.4 
+Versie 1.3 (17-5-2019) 
+Verwijderd: 2.6.5-2.6.10 (verplaatst naar “Handleiding incasseren kerkbijdragen”). 
+Versie 1.4 (13-12-2019) 
+Aangepast: 5.5 
+Versie 1.5 (06-03-2024) en 1.6 (26-03-2024) 
+Aangepast 1.1.2, 1.2.3, 1.3.1, 1.3.2, 1.3.3, 1.4.1, 1.4.3, 1.6.2, 1.6.3, 2.5.1, 2.6., 5.4, 
+Toegevoegd tekst onder 1 en 1.1.3. 
+Paginanummering toegevoegd.";
