@@ -5,7 +5,7 @@ IPAL Chatbox — Definitieve main.py
 - UNIEKECODE123, Web-fallback (toggle), FAQ-links in PDF
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
 - Geen chatspam (selecties via st.toast)
-- Patches: altijd antwoord + altijd PDF-knop (met fallbacktitel)
+- Patches: altijd antwoord + altijd PDF-knop (met unieke key)
 """
 
 import os
@@ -334,7 +334,7 @@ def with_info(text: str) -> str:
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # ✅ Altijd een PDF-knop bij het laatste assistentbericht
+        # ✅ Altijd een PDF-knop bij het laatste assistentbericht, met unieke key
         if m["role"] == "assistant" and i == len(st.session_state.history) - 1:
             q = (
                 st.session_state.get("last_question")
@@ -342,7 +342,8 @@ def render_chat():
                 or "Gekozen item"
             )
             pdf = make_pdf(q, m["content"])
-            st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf")
+            btn_key = f"pdf_{i}_{m['time'].replace(':','-')}"
+            st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf", key=btn_key)
 
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -579,7 +580,7 @@ def main():
             st.rerun()
 
     # Vervolgvraag over gekozen antwoord
-    render_chat()
+    # (LET OP: GEEN tweede render_chat() hier!)
     vraag = st.chat_input("Stel uw vraag over dit antwoord:")
     if not vraag:
         return
