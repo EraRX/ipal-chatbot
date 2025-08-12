@@ -1,10 +1,10 @@
 """
-IPAL Chatbox — Definitieve main.py (4 knoppen)
+IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix
 - Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
 - Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
 - Zoeken (hele CSV): vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
 - Algemeen: géén CSV, alleen AI (en optioneel Web-fallback)
-- CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches
+- CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
 - Altijd PDF-knop (unieke key) + “Kopieer antwoord” + optionele Afbeelding + scope teller
 - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
 """
@@ -76,6 +76,39 @@ def chatgpt_cached(messages, temperature=0.2, max_tokens=700) -> str:
     return resp.choices[0].message.content.strip()
 
 
+# ── Smart punctuation / Windows-1252 opschonen ──────────────────────────────
+def clean_text(s: str) -> str:
+    if s is None:
+        return ""
+    s = str(s)
+
+    # NBSP → spatie
+    s = s.replace("\u00A0", " ")
+
+    # Windows-1252 gremlins & smart punctuation → normaal
+    repl = {
+        "\u0091": "'", "\u0092": "'", "\u0093": '"', "\u0094": '"',
+        "\u0096": "-", "\u0097": "-", "\u0085": "...",
+
+        "\u2018": "'", "\u2019": "'", "\u201A": ",", "\u201B": "'",
+        "\u201C": '"', "\u201D": '"', "\u201E": '"',
+
+        "\u00AB": '"', "\u00BB": '"', "\u2039": "'", "\u203A": "'",
+
+        "\u2013": "-", "\u2014": "-", "\u2212": "-",
+        "\u00AD": "",   # zachte afbreekstreep
+        "\u2026": "...",
+
+        "\u00B4": "'", "\u02BC": "'", "\u02BB": "'",
+    }
+    for k, v in repl.items():
+        s = s.replace(k, v)
+
+    # Meervoudige whitespace terugbrengen naar 1 spatie
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
 # ── PDF helpers ──────────────────────────────────────────────────────────────
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
@@ -92,7 +125,8 @@ def _strip_md(s: str) -> str:
     return s
 
 def make_pdf(question: str, answer: str) -> bytes:
-    answer = _strip_md(answer or "")
+    question = clean_text(question or "")
+    answer = clean_text(_strip_md(answer or ""))
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer, pagesize=A4, leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm
@@ -114,7 +148,7 @@ def make_pdf(question: str, answer: str) -> bytes:
             ("BOTTOMPADDING", (0,0), (-1,-1), 6),
         ])))
 
-    story.append(Paragraph(f"Vraag: {question or ''}", heading_style))
+    story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
 
@@ -158,15 +192,19 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         if c not in df.columns:
             df[c] = None
 
-    # Normalize
-    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding"]
+    # Basis normalisatie: strip + spaties
+    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
     for c in norm_cols:
         df[c] = (df[c]
                  .fillna("")
                  .astype(str)
-                 .str.replace("\u00A0", " ", regex=False)   # NBSP
+                 .str.replace("\u00A0", " ", regex=False)
                  .str.strip()
-                 .str.replace(r"\s+", " ", regex=True))     # meerdere spaties → 1
+                 .str.replace(r"\s+", " ", regex=True))
+
+    # Smart quotes/symbolen fixen
+    for c in norm_cols:
+        df[c] = df[c].apply(clean_text)
 
     # Standaardiseer Systeem
     mapping = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
@@ -207,9 +245,7 @@ def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) ->
         vals = (scope["Toelichting melding"]
                 .dropna()
                 .astype(str)
-                .str.replace("\u00A0", " ", regex=False)
-                .str.strip()
-                .str.replace(r"\s+", " ", regex=True)
+                .apply(clean_text)
                 .unique())
         return sorted(vals)
     except Exception:
@@ -268,7 +304,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
 
     df = faq_df.reset_index().copy()
 
-    # Adaptieve drempel: nooit meer hits eisen dan er tokens in de vraag zitten (minimaal 1)
+    # Adaptieve drempel: nooit meer hits eisen dan aantal tokens in vraag (minimaal 1)
     q_tokens = set(_tokenize_clean(vraag))
     eff_min_hits = max(1, min(min_hits, len(q_tokens)))
 
@@ -290,7 +326,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
         q_lower = (vraag or "").strip().lower()
         sys_map = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
 
-        # 1) Speciaal: als vraag precies een systeemnaam is → toon top N van dat systeem
+        # 1) Als vraag precies een systeemnaam is → top N van dat systeem
         if q_lower in sys_map:
             sys = sys_map[q_lower]
             try:
@@ -305,7 +341,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
         if not nonzero.empty:
             return nonzero
 
-        # 3) Allerlaatste redmiddel: gewoon top N
+        # 3) Laatste redmiddel: gewoon top N
         return df.head(fallback_rows)
 
     return filtered
@@ -313,7 +349,6 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
 def vind_best_algemeen_AI(vraag: str) -> str:
     """Algemeen: géén CSV. Alleen AI + één verhelderende vraag max (of suggesties)."""
     if client is None:
-        # Zonder AI: basic echo/suggestie
         return "Kunt u uw vraag iets concreter maken (bijv. ‘DocBase wachtwoord resetten’ of ‘Exact bankkoppeling’)?"
     sys = (
         "Je helpt vrijwilligers van parochies. "
@@ -406,7 +441,7 @@ def add_msg(role: str, content: str):
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
 
 def with_info(text: str) -> str:
-    return (text or "").strip() + "\n\n" + AI_INFO
+    return clean_text((text or "").strip()) + "\n\n" + AI_INFO
 
 def _copy_button(text: str, key_suffix: str):
     # Client-side kopiëren naar klembord
@@ -641,9 +676,9 @@ def main():
         df_reset = results.reset_index(drop=True)
 
         def mk_label(i, row):
-            oms = str(row.get("Omschrijving melding", "")).strip()
-            toel = str(row.get("Toelichting melding", "")).strip()
-            preview = oms or toel or str(row.get("Antwoord of oplossing", "")).strip()
+            oms = clean_text(str(row.get("Omschrijving melding", "")).strip())
+            toel = clean_text(str(row.get("Toelichting melding", "")).strip())
+            preview = oms or toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
             preview = re.sub(r"\s+", " ", preview)[:140]
             return f"{i+1:02d}. {preview}"
 
@@ -655,12 +690,12 @@ def main():
         idx = int(keuze.split(".")[0]) - 1
         row = df_reset.iloc[idx]
         row_id = row.get("ID", idx)
-        ans = str(row.get("Antwoord of oplossing", "") or "").strip()
+        ans = clean_text(str(row.get("Antwoord of oplossing", "") or "").strip())
         if not ans:
-            oms = str(row.get("Omschrijving melding", "") or "").strip()
+            oms = clean_text(str(row.get("Omschrijving melding", "") or "").strip())
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(idx, row)
-        img = str(row.get("Afbeelding", "") or "").strip()
+        img = clean_text(str(row.get("Afbeelding", "") or "").strip())
         st.session_state["selected_image"] = img if img else None
 
         if st.session_state.get("selected_answer_id") != row_id:
@@ -798,11 +833,8 @@ def main():
     if not df_scope.empty and toe is not None and str(toe) != "":
         tm = (df_scope["Toelichting melding"]
               .astype(str)
-              .str.replace("\u00A0", " ", regex=False)
-              .str.strip()
-              .str.replace(r"\s+", " ", regex=True)
-              .str.casefold())
-        sel = re.sub(r"\s+", " ", str(toe).replace("\u00A0", " ").strip()).casefold()
+              .apply(clean_text))
+        sel = clean_text(str(toe))
         df_scope = df_scope[tm == sel]
 
     try:
@@ -820,9 +852,9 @@ def main():
     df_reset = df_scope.reset_index()
 
     def mk_label(i, row):
-        oms = str(row.get("Omschrijving melding", "")).strip()
-        toel = str(row.get("Toelichting melding", "")).strip()
-        preview = oms or toel or str(row.get("Antwoord of oplossing", "")).strip()
+        oms = clean_text(str(row.get("Omschrijving melding", "")).strip())
+        toel = clean_text(str(row.get("Toelichting melding", "")).strip())
+        preview = oms or toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
         preview = re.sub(r"\s+", " ", preview)[:140]
         return f"{i+1:02d}. {preview}"
 
@@ -833,13 +865,13 @@ def main():
         row = df_reset.iloc[i]
         row_id = row.get("ID", i)
 
-        ans = str(row.get("Antwoord of oplossing", "") or "").strip()
+        ans = clean_text(str(row.get("Antwoord of oplossing", "") or "").strip())
         if not ans:
-            oms = str(row.get("Omschrijving melding", "") or "").strip()
+            oms = clean_text(str(row.get("Omschrijving melding", "") or "").strip())
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(i, row)
 
-        img = str(row.get("Afbeelding", "") or "").strip()
+        img = clean_text(str(row.get("Afbeelding", "") or "").strip())
         st.session_state["selected_image"] = img if img else None
 
         if st.session_state.get("selected_answer_id") != row_id:
