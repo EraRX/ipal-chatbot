@@ -261,21 +261,54 @@ def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]")
         pass
     return None
 
-def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25) -> pd.DataFrame:
-    """Zoekt over hele CSV en geeft gefilterde, gesorteerde resultaten terug (DataFrame)."""
+def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback_rows: int = 50) -> pd.DataFrame:
+    """Zoek over hele CSV, met adaptieve drempels en zinnige fallback."""
     if faq_df.empty:
         return pd.DataFrame()
+
     df = faq_df.reset_index().copy()
+
+    # Adaptieve drempel: nooit meer hits eisen dan er tokens in de vraag zitten (minimaal 1)
+    q_tokens = set(_tokenize_clean(vraag))
+    eff_min_hits = max(1, min(min_hits, len(q_tokens)))
+
+    # Basisscore
     df["_score"] = df["combined"].apply(lambda t: _token_score(vraag, t))
+    df = df.sort_values("_score", ascending=False)
     if df.empty:
         return df
-    df = df.sort_values("_score", ascending=False)
-    # Relevantie-drempel
+
+    # Filter op relevantie
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
-        return hits >= min_hits and cov >= min_cov
-    df = df[df.apply(_ok, axis=1)]
-    return df
+        return hits >= eff_min_hits and cov >= min_cov
+
+    filtered = df[df.apply(_ok, axis=1)]
+
+    # Fallbacks bij lege hitlijst
+    if filtered.empty:
+        q_lower = (vraag or "").strip().lower()
+        sys_map = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
+
+        # 1) Speciaal: als vraag precies een systeemnaam is → toon top N van dat systeem
+        if q_lower in sys_map:
+            sys = sys_map[q_lower]
+            try:
+                subset = faq_df.xs(sys, level="Systeem", drop_level=False).reset_index()
+                subset["_score"] = subset["combined"].apply(lambda t: _token_score(vraag, t))
+                return subset.sort_values("_score", ascending=False).head(fallback_rows)
+            except KeyError:
+                pass
+
+        # 2) Anders: top N met _score > 0
+        nonzero = df[df["_score"] > 0].head(fallback_rows)
+        if not nonzero.empty:
+            return nonzero
+
+        # 3) Allerlaatste redmiddel: gewoon top N
+        return df.head(fallback_rows)
+
+    return filtered
 
 def vind_best_algemeen_AI(vraag: str) -> str:
     """Algemeen: géén CSV. Alleen AI + één verhelderende vraag max (of suggesties)."""
@@ -598,8 +631,9 @@ def main():
         if not q:
             return
 
-        # 2) Resultaten ophalen met drempels
+        # 2) Resultaten ophalen met adaptieve drempels + fallback
         results = zoek_hele_csv(q, min_hits=st.session_state["min_hits"], min_cov=st.session_state["min_cov"])
+        st.caption(f"Gevonden resultaten: {len(results)}")
         if results.empty:
             st.info("Geen resultaten gevonden. Pas je zoekterm aan of verlaag de drempels (sliders in de sidebar).")
             return
@@ -681,12 +715,18 @@ def main():
 
     # ── Exact/DocBase cascade ────────────────────────────────────────────────
     render_chat()
-    render_breadcrumbs()
+    # Breadcrumbs
+    syst = st.session_state.get("selected_product")
+    sub = st.session_state.get("selected_module") or ""
+    cat = st.session_state.get("selected_category") or ""
+    toe = st.session_state.get("selected_toelichting") or ""
+    parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
+    if parts:
+        st.caption(" › ".join(parts))
 
-    systeem = st.session_state.get("selected_product")
     # 1) Subthema
     if not st.session_state.get("selected_module"):
-        opts = list_subthema(systeem)
+        opts = list_subthema(syst)
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
@@ -701,7 +741,7 @@ def main():
 
     # 2) Categorie
     if not st.session_state.get("selected_category"):
-        cats = list_categorieen(systeem, st.session_state["selected_module"])
+        cats = list_categorieen(syst, st.session_state["selected_module"])
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state["selected_category"] = "alles"
@@ -724,7 +764,7 @@ def main():
     # 3) Toelichting (optioneel)
     if st.session_state.get("selected_toelichting") is None:
         toes = list_toelichtingen(
-            systeem,
+            syst,
             st.session_state["selected_module"],
             st.session_state.get("selected_category"),
         )
@@ -744,12 +784,11 @@ def main():
 
     # 4) Recordselectie binnen scope
     df_scope = faq_df
-    sub = st.session_state["selected_module"]
     cat = st.session_state["selected_category"]
     toe = st.session_state.get("selected_toelichting", "")
 
     try:
-        df_scope = df_scope.xs(systeem, level="Systeem", drop_level=False)
+        df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
         df_scope = df_scope.xs(sub, level="Subthema", drop_level=False)
         if cat and str(cat).lower() != "alles":
             df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
