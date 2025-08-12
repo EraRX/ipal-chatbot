@@ -137,13 +137,8 @@ def _strip_md(s: str) -> str:
     s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)              # [label](url) → label
     return s
 
-# ── Helper: parseer AI_INFO naar nette lijst + klikprompt ─────────────────────
 def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
-    """
-    Haalt de genummerde punten (1., 2., ...) uit AI_INFO.
-    Knipt 'Klik hieronder om de FAQ te openen' weg uit de punten
-    en zet een vlag om die regel later apart te tonen.
-    """
+    """Extract genummerde AI-info-regels en detecteer 'Klik hieronder...'."""
     numbered: list[str] = []
     show_click = False
     for raw in (ai_info or "").splitlines():
@@ -165,19 +160,14 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
             if txt:
                 numbered.append(txt)
         else:
-            # eventuele vervolgregels aan laatste item plakken
             if numbered:
                 extra = clean_text(_strip_md(line))
                 if extra:
                     numbered[-1] += " " + extra
-
-    # fallback: als de zin elders in AI_INFO staat
     if not show_click and "Klik hieronder om de FAQ te openen" in (ai_info or ""):
         show_click = True
     return numbered, show_click
 
-
-# ── PDF-maker: nettere AI-Info (genummerd + klikprompt + links) ──────────────
 def make_pdf(question: str, answer: str) -> bytes:
     question = clean_text(question or "")
     answer   = clean_text(_strip_md(answer or ""))
@@ -506,8 +496,9 @@ def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
 
+AI_INFO_MD = AI_INFO  # voor chatweergave
 def with_info(text: str) -> str:
-    return clean_text((text or "").strip()) + "\n\n" + AI_INFO
+    return clean_text((text or "").strip()) + "\n\n" + AI_INFO_MD
 
 def _copy_button(text: str, key_suffix: str):
     """Werkende copy-knop met JS (via components.html) + fallback textarea."""
@@ -540,13 +531,12 @@ def _copy_button(text: str, key_suffix: str):
   </script>
 </div>
 """
-    components.html(html_code, height=60, key=f"copy_html_{key_suffix}")
+    # Belangrijk: GEEN key= argument gebruiken i.v.m. Streamlit-versie
+    components.html(html_code, height=70)
 
+    # Fallback voor browsers zonder Clipboard-API of http:
     with st.expander("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren."):
-        st.text_area(
-            "Tekst", payload, height=150,
-            key=f"copy_fallback_{key_suffix}"
-        )
+        st.text_area("Tekst", payload, height=150, key=f"copy_fallback_{key_suffix}")
 
 def render_chat():
     for i, m in enumerate(st.session_state.history):
@@ -830,7 +820,11 @@ def main():
 
     # 1) Subthema
     if not st.session_state.get("selected_module"):
-        opts = list_subthema(syst)
+        # alleen subthema’s binnen gekozen systeem
+        try:
+            opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
+        except Exception:
+            opts = []
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
@@ -845,7 +839,13 @@ def main():
 
     # 2) Categorie
     if not st.session_state.get("selected_category"):
-        cats = list_categorieen(syst, st.session_state["selected_module"])
+        try:
+            cats = sorted(
+                faq_df.xs((syst, st.session_state["selected_module"]), level=["Systeem","Subthema"], drop_level=False)
+                .index.get_level_values("Categorie").dropna().unique()
+            )
+        except Exception:
+            cats = []
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state["selected_category"] = "alles"
@@ -923,7 +923,7 @@ def main():
     def mk_label(i, row):
         oms = clean_text(str(row.get("Omschrijving melding", "")).strip())
         toel = clean_text(str(row.get("Toelichting melding", "")).strip())
-        preview = oms or toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
+        preview = oms of toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
         preview = re.sub(r"\s+", " ", preview)[:140]
         return f"{i+1:02d}. {preview}"
 
