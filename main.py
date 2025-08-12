@@ -106,12 +106,12 @@ def clean_text(s: str) -> str:
     for k, v in repl.items():
         s = s.replace(k, v)
 
-    # Meervoudige whitespace terugbrengen naar 1 spatie
+    # Meervoudige whitespace → 1 spatie
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
 
-# ── PDF/AI-INFO constants (moeten vóór make_pdf staan) ──────────────────────
+# ── PDF/AI-INFO constants ───────────────────────────────────────────────────
 FAQ_LINKS = [
     ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
     ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
@@ -163,7 +163,7 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
             if numbered:
                 extra = clean_text(_strip_md(line))
                 if extra:
-                    numbered[-1] += " " + extra
+                    numbered[-1] += " + " + extra
     if not show_click and "Klik hieronder om de FAQ te openen" in (ai_info or ""):
         show_click = True
     return numbered, show_click
@@ -369,7 +369,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
 
     df = faq_df.reset_index().copy()
 
-    # Adaptieve drempel: nooit meer hits eisen dan aantal tokens in vraag (minimaal 1)
+    # Adaptieve drempel
     q_tokens = set(_tokenize_clean(vraag))
     eff_min_hits = max(1, min(min_hits, len(q_tokens)))
 
@@ -386,12 +386,11 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
 
     filtered = df[df.apply(_ok, axis=1)]
 
-    # Fallbacks bij lege hitlijst
+    # Fallbacks
     if filtered.empty:
         q_lower = (vraag or "").strip().lower()
         sys_map = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
 
-        # 1) Als vraag precies een systeemnaam is → top N van dat systeem
         if q_lower in sys_map:
             sys = sys_map[q_lower]
             try:
@@ -401,12 +400,10 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
             except KeyError:
                 pass
 
-        # 2) Anders: top N met _score > 0
         nonzero = df[df["_score"] > 0].head(fallback_rows)
         if not nonzero.empty:
             return nonzero
 
-        # 3) Laatste redmiddel: gewoon top N
         return df.head(fallback_rows)
 
     return filtered
@@ -476,10 +473,8 @@ DEFAULT_STATE = {
     "debug": False,
     "allow_ai": False,
     "allow_web": False,
-    # Zoeken (hele CSV) drempels:
     "min_hits": 2,
     "min_cov": 0.25,
-    # Voor Zoeken-mode:
     "search_query": "",
     "search_selection_index": None,
 }
@@ -496,14 +491,14 @@ def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
 
-AI_INFO_MD = AI_INFO  # voor chatweergave
+AI_INFO_MD = AI_INFO
 def with_info(text: str) -> str:
     return clean_text((text or "").strip()) + "\n\n" + AI_INFO_MD
 
 def _copy_button(text: str, key_suffix: str):
     """Werkende copy-knop met JS (via components.html) + fallback textarea."""
     payload = text or ""
-    js_text = json.dumps(payload)  # veilige JS-string
+    js_text = json.dumps(payload)
 
     html_code = f"""
 <div style="margin-top:8px;">
@@ -531,17 +526,14 @@ def _copy_button(text: str, key_suffix: str):
   </script>
 </div>
 """
-    # Belangrijk: GEEN key= argument gebruiken i.v.m. Streamlit-versie
     components.html(html_code, height=70)
 
-    # Fallback voor browsers zonder Clipboard-API of http:
     with st.expander("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren."):
         st.text_area("Tekst", payload, height=150, key=f"copy_fallback_{key_suffix}")
 
 def render_chat():
     for i, m in enumerate(st.session_state.history):
         st.chat_message(m["role"], avatar=get_avatar(m["role"])).markdown(f"{m['content']}\n\n_{m['time']}_")
-        # ✅ Altijd een PDF-knop + copy-knop bij het laatste assistentbericht
         if m["role"] == "assistant" and i == len(st.session_state.history) - 1:
             q = (
                 st.session_state.get("last_question")
@@ -552,11 +544,9 @@ def render_chat():
             btn_key = f"pdf_{i}_{m['time'].replace(':','-')}"
             st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf", key=btn_key)
 
-            # Copy knop (client-side)
             hash_key = hashlib.md5((m["time"] + m["content"]).encode("utf-8")).hexdigest()[:8]
             _copy_button(m["content"], hash_key)
 
-            # Afbeelding tonen indien gekozen record er één had
             img = st.session_state.get("selected_image")
             if img and isinstance(img, str) and img.strip():
                 try:
@@ -579,7 +569,6 @@ def main():
         st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
         st.session_state["allow_web"] = st.toggle("Web-fallback aan (Algemeen)", value=st.session_state.get("allow_web", False))
 
-        # Drempels voor Zoeken (hele CSV)
         st.session_state["min_hits"] = st.slider(
             "CSV minimum treffers (Zoeken)", min_value=0, max_value=6,
             value=int(st.session_state.get("min_hits", 2)), step=1
@@ -735,9 +724,9 @@ def main():
         df_reset = results.reset_index(drop=True)
 
         def mk_label(i, row):
-            oms = clean_text(str(row.get("Omschrijving melding", "")).strip())
-            toel = clean_text(str(row.get("Toelichting melding", "")).strip())
-            preview = oms or toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
+            oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+            toel = clean_text(str(row.get('Toelichting melding', '')).strip())
+            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
             preview = re.sub(r"\s+", " ", preview)[:140]
             return f"{i+1:02d}. {preview}"
 
@@ -749,12 +738,12 @@ def main():
         idx = int(keuze.split(".")[0]) - 1
         row = df_reset.iloc[idx]
         row_id = row.get("ID", idx)
-        ans = clean_text(str(row.get("Antwoord of oplossing", "") or "").strip())
+        ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
         if not ans:
-            oms = clean_text(str(row.get("Omschrijving melding", "") or "").strip())
+            oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(idx, row)
-        img = clean_text(str(row.get("Afbeelding", "") or "").strip())
+        img = clean_text(str(row.get('Afbeelding', '') or '').strip())
         st.session_state["selected_image"] = img if img else None
 
         if st.session_state.get("selected_answer_id") != row_id:
@@ -820,7 +809,6 @@ def main():
 
     # 1) Subthema
     if not st.session_state.get("selected_module"):
-        # alleen subthema’s binnen gekozen systeem
         try:
             opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
         except Exception:
@@ -921,9 +909,9 @@ def main():
     df_reset = df_scope.reset_index()
 
     def mk_label(i, row):
-        oms = clean_text(str(row.get("Omschrijving melding", "")).strip())
-        toel = clean_text(str(row.get("Toelichting melding", "")).strip())
-        preview = oms of toel or clean_text(str(row.get("Antwoord of oplossing", "")).strip())
+        oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+        toel = clean_text(str(row.get('Toelichting melding', '')).strip())
+        preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
         preview = re.sub(r"\s+", " ", preview)[:140]
         return f"{i+1:02d}. {preview}"
 
@@ -934,13 +922,13 @@ def main():
         row = df_reset.iloc[i]
         row_id = row.get("ID", i)
 
-        ans = clean_text(str(row.get("Antwoord of oplossing", "") or "").strip())
+        ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
         if not ans:
-            oms = clean_text(str(row.get("Omschrijving melding", "") or "").strip())
+            oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(i, row)
 
-        img = clean_text(str(row.get("Afbeelding", "") or "").strip())
+        img = clean_text(str(row.get('Afbeelding', '') or '').strip())
         st.session_state["selected_image"] = img if img else None
 
         if st.session_state.get("selected_answer_id") != row_id:
