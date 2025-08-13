@@ -689,6 +689,7 @@ def main():
     # ── ALGEMEEN (géén CSV) ────────────────────────────────────────────────
     if st.session_state.get("selected_product") == "Algemeen":
         render_chat()
+        st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen?")
         vraag = st.chat_input("Stel uw algemene vraag (zoeken algemeen):")
         if not vraag:
             return
@@ -1014,4 +1015,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
