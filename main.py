@@ -1,7 +1,3 @@
-
-============================================================================================
-werkend:
-
 """
 IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info netjes
 - Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
@@ -996,4 +992,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
