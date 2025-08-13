@@ -84,6 +84,19 @@ def clean_text(s: str) -> str:
         return ""
     s = str(s)
 
+    # --- Mojibake quick-fix: alleen toepassen als het duidelijk mis is ---
+    # Herkent o.a. "Ã", "Â", "â€¦" of jouw "Çî"-artefact.
+    if any(mark in s for mark in ("Ã", "Â", "â", "Çî")):
+        try:
+            s_try = s.encode("latin1", errors="ignore").decode("utf-8", errors="ignore")
+            # Alleen overnemen als het zichtbaar beter is (minder 'Ã'/'Â' en geen 'Çî')
+            if (("Ã" in s and "Ã" not in s_try) or
+                ("Â" in s and "Â" not in s_try) or
+                ("Çî" in s and "Çî" not in s_try)):
+                s = s_try
+        except Exception:
+            pass
+
     # NBSP → spatie
     s = s.replace("\u00A0", " ")
 
@@ -1001,6 +1014,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
