@@ -596,7 +596,7 @@ def main():
                 cnt_doc = 0
             st.caption(f"CSV records: {len(faq_df.reset_index())} | Exact: {cnt_exact} | DocBase: {cnt_doc}")
 
-    # Startscherm
+        # Startscherm
     if not st.session_state.get("selected_product"):
         video_path = "helpdesk.mp4"
         if os.path.exists(video_path):
@@ -613,7 +613,9 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        if c1.button("Exact", use_container_width=True):
+
+        # Knop 1: ExactOnline (alleen label + toast aangepast)
+        if c1.button("ExactOnline", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Exact",
                 "selected_image": None,
@@ -623,8 +625,10 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
             })
-            st.toast("Gekozen: Exact")
+            st.toast("Gekozen: ExactOnline")
             st.rerun()
+
+        # Knop 2: DocBase (ongewijzigde label)
         if c2.button("DocBase", use_container_width=True):
             st.session_state.update({
                 "selected_product": "DocBase",
@@ -637,7 +641,9 @@ def main():
             })
             st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Zoeken (hele CSV)", use_container_width=True):
+
+        # Knop 3: Zoeken Intern (was: Zoeken (hele CSV))
+        if c3.button("Zoeken Intern", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Zoeken",
                 "selected_image": None,
@@ -647,9 +653,11 @@ def main():
                 "selected_answer_text": None,
                 "last_item_label": "",
             })
-            st.toast("Gekozen: Zoeken (hele CSV)")
+            st.toast("Gekozen: Zoeken Intern")
             st.rerun()
-        if c4.button("Algemeen", use_container_width=True):
+
+        # Knop 4: Zoeken Algemeen (was: Algemeen)
+        if c4.button("Zoeken Algemeen", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Algemeen",
                 "selected_image": None,
@@ -659,8 +667,9 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
             })
-            st.toast("Gekozen: Algemeen (vrije vraag)")
+            st.toast("Gekozen: Zoeken Algemeen")
             st.rerun()
+
         render_chat()
         return
 
@@ -992,5 +1001,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
