@@ -686,56 +686,44 @@ def main():
         render_chat()
         return
 
-    # ── ALGEMEEN (géén CSV) ────────────────────────────────────────────────
-    if st.session_state.get("selected_product") == "Algemeen":
-        render_chat()
-        st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen:")
+# ── ALGEMEEN (géén CSV) ────────────────────────────────────────────────
+if st.session_state.get("selected_product") == "Algemeen":
+    render_chat()
+    st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen:")
 
-        # Zoekbalk bovenin i.p.v. chatbalk onderin
-        vraag = st.text_input(
-            " ",  # label verbergen
-            placeholder="Stel uw algemene vraag (zoeken algemeen):",
-            key="algemeen_top_input",
-            label_visibility="collapsed",
-        )
-        if not vraag:
-            return
+    # Zoekbalk bovenin (zelfde hoogte als Zoeken Intern)
+    algemeen_vraag = st.text_input(
+        " ",  # label verbergen
+        placeholder="Stel uw algemene vraag (zoeken algemeen):",
+        key="algemeen_top_input",
+        label_visibility="collapsed",
+    )
+    if not algemeen_vraag:
+        return
 
-        # UNIEKECODE123 direct (optioneel)
-        if (vraag or "").strip().upper() == "UNIEKECODE123":
-            cw = find_answer_by_codeword(faq_df.reset_index())
-            if cw:
-                st.session_state["last_question"] = vraag
-                add_msg("user", vraag)
-                add_msg("assistant", with_info(cw))
-                st.rerun()
-                return
-
-        st.session_state["last_question"] = vraag
-        add_msg("user", vraag)
-
-        ok, warn = filter_topics(vraag)
-        if not ok:
-            add_msg("assistant", warn)
+    # UNIEKECODE123 direct (optioneel)
+    if (algemeen_vraag or "").strip().upper() == "UNIEKECODE123":
+        cw = find_answer_by_codeword(faq_df.reset_index())
+        if cw:
+            st.session_state["last_question"] = algemeen_vraag
+            add_msg("user", algemeen_vraag)
+            add_msg("assistant", with_info(cw))
             st.rerun()
             return
 
-        # Alleen AI (+ optioneel web ter aanvulling)
-        antwoord = vind_best_algemeen_AI(vraag)
-        if not antwoord and st.session_state.get("allow_web"):
-            webbits = fetch_web_info_cached(vraag)
-            if webbits:
-                antwoord = webbits
+    st.session_state["last_question"] = algemeen_vraag
+    add_msg("user", algemeen_vraag)
 
-        add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
+    ok, warn = filter_topics(algemeen_vraag)
+    if not ok:
+        add_msg("assistant", warn)
         st.rerun()
         return
 
-
     # Alleen AI (+ optioneel web ter aanvulling)
-    antwoord = vind_best_algemeen_AI(vraag)
+    antwoord = vind_best_algemeen_AI(algemeen_vraag)
     if not antwoord and st.session_state.get("allow_web"):
-        webbits = fetch_web_info_cached(vraag)
+        webbits = fetch_web_info_cached(algemeen_vraag)
         if webbits:
             antwoord = webbits
 
@@ -1034,6 +1022,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
