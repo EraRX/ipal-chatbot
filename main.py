@@ -1,3 +1,7 @@
+
+============================================================================================
+werkend:
+
 """
 IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info netjes
 - Start: Exact | DocBase | Zoeken (hele CSV) | Algemeen
@@ -303,7 +307,7 @@ def list_categorieen(systeem: str, subthema: str) -> List[str]:
 @st.cache_data(show_spinner=False)
 def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
     try:
-        if not categorie of str(categorie).lower() == "alles":
+        if not categorie or str(categorie).lower() == "alles":
             scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
         else:
             scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
@@ -613,8 +617,7 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        # Alleen knoplabels aangepast:
-        if c1.button("ExactOnline", use_container_width=True):
+        if c1.button("Exact", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Exact",
                 "selected_image": None,
@@ -638,7 +641,7 @@ def main():
             })
             st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Zoeken Intern", use_container_width=True):
+        if c3.button("Zoeken (hele CSV)", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Zoeken",
                 "selected_image": None,
@@ -650,7 +653,7 @@ def main():
             })
             st.toast("Gekozen: Zoeken (hele CSV)")
             st.rerun()
-        if c4.button("Zoeken Algemeen", use_container_width=True):
+        if c4.button("Algemeen", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Algemeen",
                 "selected_image": None,
@@ -993,3 +996,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
