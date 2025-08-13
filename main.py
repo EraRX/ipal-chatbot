@@ -1,9 +1,9 @@
 """
 IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Info netjes
-- Start: ExactOnline | DocBase | Zoeken Intern | Zoeken Algemeen
+- Start: Exact | DocBase | Zoeken Intern | Zoeken Algemeen
 - Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
 - Zoeken Intern: vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
-- Zoeken Algemeen: géén CSV, alleen AI (en optioneel Web-fallback)
+- Zoeken Algemeen: géén CSV, alleen AI (en optioneel Web-fallback), invoerveld bovenaan
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
 - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
 - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
@@ -382,6 +382,11 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
     # Filter op relevantie
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
+        return hits >= eff_min_hits en cov >= min_cov  # NL comment; Python gebruikt 'and'
+
+    # Let op: bovenstaande regel moet Python 'and' gebruiken, geen NL 'en'
+    def _ok(row):
+        hits, cov = _relevance(vraag, str(row["combined"]))
         return hits >= eff_min_hits and cov >= min_cov
 
     filtered = df[df.apply(_ok, axis=1)]
@@ -419,7 +424,7 @@ def vind_best_algemeen_AI(vraag: str) -> str:
     )
     user = (
         f"Vraag: {vraag}\n\n"
-        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1-2 praktische vervolgsuggesties "
+        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1- of 2 praktische vervolgsuggesties "
         "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag."
     )
     try:
@@ -477,6 +482,7 @@ DEFAULT_STATE = {
     "min_cov": 0.25,
     "search_query": "",
     "search_selection_index": None,
+    "last_processed_algemeen": "",   # <— debounce Algemeen
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
@@ -613,9 +619,9 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        if c1.button("ExactOnline", use_container_width=True):
+        if c1.button("Exact", use_container_width=True):
             st.session_state.update({
-                "selected_product": "Exact",   # intern/csv
+                "selected_product": "Exact",
                 "selected_image": None,
                 "selected_module": None,
                 "selected_category": None,
@@ -623,7 +629,7 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
             })
-            st.toast("Gekozen: ExactOnline")
+            st.toast("Gekozen: Exact")
             st.rerun()
         if c2.button("DocBase", use_container_width=True):
             st.session_state.update({
@@ -639,7 +645,7 @@ def main():
             st.rerun()
         if c3.button("Zoeken Intern", use_container_width=True):
             st.session_state.update({
-                "selected_product": "Zoeken",  # intern/csv search
+                "selected_product": "Zoeken",
                 "selected_image": None,
                 "search_query": "",
                 "search_selection_index": None,
@@ -651,15 +657,16 @@ def main():
             st.rerun()
         if c4.button("Zoeken Algemeen", use_container_width=True):
             st.session_state.update({
-                "selected_product": "Algemeen",  # AI-only
+                "selected_product": "Algemeen",
                 "selected_image": None,
                 "selected_module": None,
                 "selected_category": None,
                 "selected_toelichting": None,
                 "selected_answer_id": None,
                 "selected_answer_text": None,
+                "last_processed_algemeen": "",
             })
-            st.toast("Gekozen: Zoeken Algemeen")
+            st.toast("Gekozen: Zoeken Algemeen (vrije vraag)")
             st.rerun()
         render_chat()
         return
@@ -669,14 +676,17 @@ def main():
         render_chat()
         st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen:")
 
-        # Zoekbalk bovenin (zelfde hoogte als Zoeken Intern)
+        # Zoekbalk bovenin (zelfde hoogte/stijl als Zoeken Intern)
         algemeen_vraag = st.text_input(
             " ",
             placeholder="Stel uw algemene vraag (Zoeken Algemeen):",
             key="algemeen_top_input",
             label_visibility="collapsed",
         )
-        if not algemeen_vraag:
+
+        # Debounce: alleen doorgaan als er iets nieuws staat
+        last = st.session_state.get("last_processed_algemeen", "")
+        if not algemeen_vraag or algemeen_vraag == last:
             return
 
         # UNIEKECODE123 direct (optioneel)
@@ -686,15 +696,19 @@ def main():
                 st.session_state["last_question"] = algemeen_vraag
                 add_msg("user", algemeen_vraag)
                 add_msg("assistant", with_info(cw))
+                st.session_state["algemeen_top_input"] = ""
+                st.session_state["last_processed_algemeen"] = algemeen_vraag
                 st.rerun()
                 return
 
+        st.session_state["last_processed_algemeen"] = algemeen_vraag
         st.session_state["last_question"] = algemeen_vraag
         add_msg("user", algemeen_vraag)
 
         ok, warn = filter_topics(algemeen_vraag)
         if not ok:
             add_msg("assistant", warn)
+            st.session_state["algemeen_top_input"] = ""
             st.rerun()
             return
 
@@ -706,6 +720,9 @@ def main():
                 antwoord = webbits
 
         add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
+
+        # Belangrijk: input leegmaken om herhaling te voorkomen
+        st.session_state["algemeen_top_input"] = ""
         st.rerun()
         return
 
@@ -714,13 +731,9 @@ def main():
         render_chat()
 
         # 1) Zoekterm
-        st.caption("Zoek intern in de volledige CSV (Exact & DocBase):")
         st.session_state["search_query"] = st.text_input(
-            " ",
-            value=st.session_state.get("search_query", ""),
-            placeholder="Typ hier je zoekterm(en)…",
-            label_visibility="collapsed",
-            key="zoeken_intern_top_input",
+            "Waar wil je in de volledige CSV op zoeken?",
+            value=st.session_state.get("search_query", "")
         )
         q = st.session_state["search_query"].strip()
         if not q:
