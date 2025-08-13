@@ -1703,46 +1703,30 @@ factureren van uitvaarten, grafrechten, parochiebladen etc. d) het bieden van in
 openstaande posten e) de transparantie van uw administratie.";
 8947;Exact;1 Inrichting;1.2 Dagboeken;1.2.2 “Mag ik bestaande dagboeken aanpassen?”;1.2 Dagboeken;1.2.2 “Mag ik bestaande dagboeken aanpassen?”;"Ja. Het is zelfs aan te raden om eerst (de omschrijvingen en IBAN-nummers van) de 
 bestaande dagboeken aan te passen voordat er nieuwe dagboeken worden aangemaakt.";
-8948;Exact;1 Inrichting;1.2 Dagboeken;1.2.3 “Hoe maak ik zelf extra dagboeken aan?”;1.2 Dagboeken;1.2.3 “Hoe maak ik zelf extra dagboeken aan?”;"Hieronder staat een korte, duidelijke instructie om in Exact Online een bank-dagboek aan te maken en te koppelen aan de juiste grootboekrekening.
+8948;Exact;1 Inrichting;1.2 Dagboeken;1.2.3 “Hoe maak ik zelf extra dagboeken aan?”;1.2 Dagboeken;1.2.3 “Hoe maak ik zelf extra dagboeken aan?”;"ID,Systeem,Subthema,Categorie,Omschrijving melding,Toelichting melding,Soort melding,Antwoord of oplossing,Afbeelding
+EXACT-DB-001,Exact Online,Inrichting,Dagboeken,Bank-dagboek aanmaken en koppelen,Stap-voor-stap handleiding voor het aanmaken van een bank-dagboek en koppelen aan grootboekrekening.,How-to,""# Doel
+Een nieuw dagboek van het type **Bank** toevoegen en koppelen aan uw (viercijferige) grootboekrekening.
 
-Doel
-Een nieuw dagboek van het type Bank toevoegen en koppelen aan uw (viercijferige) grootboekrekening.
+## Stappen
+1. **Open het scherm Dagboeken**  
+   Ga naar: **[Administratienaam] ? Stamgegevens ? Financieel ? Dagboeken**.
+2. **Kies “Nieuw” (pijltje)**  
+   Klik op het **kleine pijltje naast “Nieuw”** en kies **Bank**.
+3. **Vul de basisgegevens in**  
+   - **IBAN-nummer**: voer het volledige IBAN in van de bankrekening.  
+   - **Omschrijving**: geef een duidelijke naam, bijv. *“Rabobank betaalrekening •••123”*.
+4. **Koppel de juiste grootboekrekening (viercijferig)**  
+   - Klik **halverwege het scherm** op het **kleine pijltje** bij **“Geavanceerde opties”** om het scherm open te klappen.  
+   - Ga naar het kopje **“Financieel”**.  
+   - Daar staat vaak standaard een **driecijferige** grootboekrekening ingevuld. **Overschrijf** deze met de **juiste viercijferige** grootboekrekening die u eerder heeft aangemaakt (zie 1.1.2 en 1.1.3).
+5. **Opslaan**  
+   - Controleer IBAN, Omschrijving en de **viercijferige** grootboekrekening.  
+   - Klik op **Opslaan**.
 
-Stappen
-Open het scherm Dagboeken
-Ga naar: [Administratienaam] ? Stamgegevens ? Financieel ? Dagboeken.
-
-Kies “Nieuw” (pijltje)
-Klik op het kleine pijltje naast “Nieuw” en kies Bank.
-
-Vul de basisgegevens in
-
-IBAN-nummer: voer het volledige IBAN in van de bankrekening.
-
-Omschrijving: geef een duidelijke naam, bijv. “Rabobank betaalrekening •••123”.
-
-Koppel de juiste grootboekrekening (viercijferig)
-
-Klik halverwege het scherm op het kleine pijltje bij “Geavanceerde opties” om het scherm open te klappen.
-
-Ga naar het kopje “Financieel”.
-
-Daar staat vaak standaard een driecijferige grootboekrekening ingevuld. Overschrijf deze met de juiste viercijferige grootboekrekening die u eerder heeft aangemaakt (zie 1.1.2 en 1.1.3).
-
-Opslaan
-
-Controleer IBAN, Omschrijving en de viercijferige grootboekrekening.
-
-Klik op Opslaan.
-
-Tips & controles
-Klopt het IBAN exact met uw bank?
-
-Is de Omschrijving herkenbaar voor collega’s (bank + rekeningtype + laatste 3 cijfers)?
-
-Is de grootboekrekening viercijferig en bedoeld voor bankrekeningen (zoals opgezet in 1.1.2/1.1.3)?
-
-Zo staat uw bank-dagboek goed ingericht en correct gekoppeld.";
+## Tips & controles
+- Klopt het **IBAN** exact met uw bank?  
+- Is de **Omschrijving** herkenbaar voor collega’s (bank + rekeningtype + laatste 3 cijfers)?  
+- Is de **grootboekrekening viercijferig** en bedoeld voor bankrekeningen (zoals opgezet in 1.1.2/1.1.3)?"",";
 8949;Exact;1 Inrichting;1.2 Dagboeken;1.2.4 “Maak ik voor spaarrekeningen ook een dagboek aan?”;1.2 Dagboeken;1.2.4 “Maak ik voor spaarrekeningen ook een dagboek aan?”;"Ja. Let op: de ING-bank hanteert vaak dezelfde rekeningnummers voor betaal- en 
 spaarrekeningen. In dat geval kan er voor de spaarrekening bij “Bankrekeningnummer” 
 het nummer van het dagboek worden ingevuld en bij de omschrijving het betreffende 
