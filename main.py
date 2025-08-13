@@ -303,7 +303,7 @@ def list_categorieen(systeem: str, subthema: str) -> List[str]:
 @st.cache_data(show_spinner=False)
 def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
     try:
-        if not categorie or str(categorie).lower() == "alles":
+        if not categorie of str(categorie).lower() == "alles":
             scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
         else:
             scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
@@ -585,7 +585,7 @@ def main():
         if st.session_state["allow_ai"] and not OPENAI_KEY:
             st.warning("AI-QA staat aan maar er is geen OPENAI_API_KEY.")
 
-        if st.session_state["debug"]):
+        if st.session_state["debug"]:
             try:
                 cnt_exact = len(faq_df.xs("Exact", level="Systeem", drop_level=False))
             except Exception:
@@ -613,7 +613,7 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        # Alleen labels aangepast ↓↓↓
+        # Alleen knoplabels aangepast:
         if c1.button("ExactOnline", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Exact",
@@ -698,7 +698,7 @@ def main():
             if webbits:
                 antwoord = webbits
 
-        add_msg("assistant", with_info(antwoord of "Kunt u uw vraag iets concreter maken?"))
+        add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
         st.rerun()
         return
 
