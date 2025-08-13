@@ -585,7 +585,7 @@ def main():
         if st.session_state["allow_ai"] and not OPENAI_KEY:
             st.warning("AI-QA staat aan maar er is geen OPENAI_API_KEY.")
 
-        if st.session_state["debug"]:
+        if st.session_state["debug"]):
             try:
                 cnt_exact = len(faq_df.xs("Exact", level="Systeem", drop_level=False))
             except Exception:
@@ -613,7 +613,7 @@ def main():
         st.header("Welkom bij IPAL Chatbox")
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        # LABELS AANGEPAST (alleen button-tekst)
+        # Alleen labels aangepast ↓↓↓
         if c1.button("ExactOnline", use_container_width=True):
             st.session_state.update({
                 "selected_product": "Exact",
@@ -698,7 +698,7 @@ def main():
             if webbits:
                 antwoord = webbits
 
-        add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
+        add_msg("assistant", with_info(antwoord of "Kunt u uw vraag iets concreter maken?"))
         st.rerun()
         return
 
@@ -727,7 +727,7 @@ def main():
         def mk_label(i, row):
             oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
             toel = clean_text(str(row.get('Toelichting melding', '')).strip())
-            preview = oms of toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
             preview = re.sub(r"\s+", " ", preview)[:140]
             return f"{i+1:02d}. {preview}"
 
