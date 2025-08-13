@@ -3,7 +3,7 @@ IPAL Chatbox — Definitieve main.py (4 knoppen) + smart quotes fix + PDF AI-Inf
 - Start: Exact | DocBase | Zoeken Intern | Zoeken Algemeen
 - Exact/DocBase: cascade → item → PDF + vervolgvraag (op basis van dat item)
 - Zoeken Intern: vrije zoekterm over hele CSV → kies item → PDF + vervolgvraag
-- Zoeken Algemeen: géén CSV, alleen AI (en optioneel Web-fallback), invoerveld bovenaan
+- Zoeken Algemeen: géén CSV, alleen AI (en optioneel Web-fallback) met zoekbalk bovenaan
 - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
 - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
 - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
@@ -379,7 +379,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
     if df.empty:
         return df
 
-    # Filter op relevantie  (LET OP: Python gebruikt 'and')
+    # Filter op relevantie
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
         return hits >= eff_min_hits and cov >= min_cov
@@ -419,7 +419,7 @@ def vind_best_algemeen_AI(vraag: str) -> str:
     )
     user = (
         f"Vraag: {vraag}\n\n"
-        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1- of 2 praktische vervolgsuggesties "
+        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1-2 praktische vervolgsuggesties "
         "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag."
     )
     try:
@@ -477,7 +477,7 @@ DEFAULT_STATE = {
     "min_cov": 0.25,
     "search_query": "",
     "search_selection_index": None,
-    "last_processed_algemeen": "",   # debounce Algemeen
+    "last_processed_algemeen": "",   # debounce voor Zoeken Algemeen
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
@@ -638,9 +638,9 @@ def main():
             })
             st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Zoeken Intern", use_container_width=True):
+        if c3.button("Zoeken Intern", use_container_width=True):   # label aangepast
             st.session_state.update({
-                "selected_product": "Zoeken",
+                "selected_product": "Zoeken",   # logica blijft 'Zoeken'
                 "selected_image": None,
                 "search_query": "",
                 "search_selection_index": None,
@@ -650,16 +650,15 @@ def main():
             })
             st.toast("Gekozen: Zoeken Intern")
             st.rerun()
-        if c4.button("Zoeken Algemeen", use_container_width=True):
+        if c4.button("Zoeken Algemeen", use_container_width=True): # label aangepast
             st.session_state.update({
-                "selected_product": "Algemeen",
+                "selected_product": "Algemeen", # logica blijft 'Algemeen'
                 "selected_image": None,
                 "selected_module": None,
                 "selected_category": None,
                 "selected_toelichting": None,
                 "selected_answer_id": None,
                 "selected_answer_text": None,
-                "last_processed_algemeen": "",
             })
             st.toast("Gekozen: Zoeken Algemeen (vrije vraag)")
             st.rerun()
@@ -671,7 +670,7 @@ def main():
         render_chat()
         st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen:")
 
-        # Zoekbalk bovenin (zelfde hoogte/stijl als Zoeken Intern)
+        # Zoekbalk bovenaan (zelfde hoogte/stijl als Zoeken Intern)
         algemeen_vraag = st.text_input(
             " ",
             placeholder="Stel uw algemene vraag (Zoeken Algemeen):",
@@ -679,7 +678,7 @@ def main():
             label_visibility="collapsed",
         )
 
-        # Debounce: alleen doorgaan als er iets nieuws staat
+        # Debounce: verwerk alleen nieuw ingevulde tekst
         last = st.session_state.get("last_processed_algemeen", "")
         if not algemeen_vraag or algemeen_vraag == last:
             return
@@ -689,10 +688,9 @@ def main():
             cw = find_answer_by_codeword(faq_df.reset_index())
             if cw:
                 st.session_state["last_question"] = algemeen_vraag
+                st.session_state["last_processed_algemeen"] = algemeen_vraag
                 add_msg("user", algemeen_vraag)
                 add_msg("assistant", with_info(cw))
-                st.session_state["algemeen_top_input"] = ""
-                st.session_state["last_processed_algemeen"] = algemeen_vraag
                 st.rerun()
                 return
 
@@ -703,7 +701,6 @@ def main():
         ok, warn = filter_topics(algemeen_vraag)
         if not ok:
             add_msg("assistant", warn)
-            st.session_state["algemeen_top_input"] = ""
             st.rerun()
             return
 
@@ -715,9 +712,6 @@ def main():
                 antwoord = webbits
 
         add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
-
-        # Belangrijk: input leegmaken om herhaling te voorkomen
-        st.session_state["algemeen_top_input"] = ""
         st.rerun()
         return
 
