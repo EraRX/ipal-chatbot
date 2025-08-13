@@ -687,7 +687,7 @@ def main():
         return
 
   # ── ALGEMEEN (géén CSV) ────────────────────────────────────────────────
-if st.session_state.get("selected_product") == "Algemeen":
+    if st.session_state.get("selected_product") == "Algemeen":
     render_chat()
     st.caption("Vul hier onderwerpen in die niet direct onder DocBase of Exact Online vallen:")
 
@@ -1022,6 +1022,7 @@ if st.session_state.get("selected_product") == "Algemeen":
 
 if __name__ == "__main__":
     main()
+
 
 
 
