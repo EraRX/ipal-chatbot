@@ -379,12 +379,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
     if df.empty:
         return df
 
-    # Filter op relevantie
-    def _ok(row):
-        hits, cov = _relevance(vraag, str(row["combined"]))
-        return hits >= eff_min_hits en cov >= min_cov  # NL comment; Python gebruikt 'and'
-
-    # Let op: bovenstaande regel moet Python 'and' gebruiken, geen NL 'en'
+    # Filter op relevantie  (LET OP: Python gebruikt 'and')
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
         return hits >= eff_min_hits and cov >= min_cov
@@ -482,7 +477,7 @@ DEFAULT_STATE = {
     "min_cov": 0.25,
     "search_query": "",
     "search_selection_index": None,
-    "last_processed_algemeen": "",   # <— debounce Algemeen
+    "last_processed_algemeen": "",   # debounce Algemeen
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
