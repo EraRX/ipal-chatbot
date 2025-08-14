@@ -1635,7 +1635,7 @@ Let op
 Wanneer u een bestand verwijdert, is dit bestand ook Ç¸cht verwijderd. Er is dus geen prullenbak
 waaruit de bestanden kunnen worden hersteld.
 ";
-8944;Exact;1 Inrichting;1.1 Grootboekrekeningen;1.1.2 ?Mag ik bestaande grootboekrekeningen aanpassen en/of extra grootboekrekeningen;1.1 Grootboekrekeningen;1.1.2 ?Mag ik bestaande grootboekrekeningen aanpassen en/of extra grootboekrekeningen;"aanmaken?? 
+8944;Exact;0. Inrichting;1.1 Grootboekrekeningen;1.1.2 ?Mag ik bestaande grootboekrekeningen aanpassen en/of extra grootboekrekeningen;1.1 Grootboekrekeningen;1.1.2 ?Mag ik bestaande grootboekrekeningen aanpassen en/of extra grootboekrekeningen;"aanmaken?? 
  
  Wat mag wel? 
  Wat mag niet? 
@@ -1688,7 +1688,7 @@ koppeling DocBase)
 Extra grootboekclassificaties (= verdichtingen) 
 aanmaken (in verband met de jaarrekening-
 rapportage)";
-8945;Exact;1 Inrichting;1.1 Grootboekrekeningen;1.1.3 ?Hoe maak ik een grootboekrekening aan??;1.1 Grootboekrekeningen;1.1.3 ?Hoe maak ik een grootboekrekening aan??;"Als u een grootboekrekening wilt toevoegen, doe dit dan bij voorkeur door een kopie 
+8945;Exact;0. Inrichting;1.1 Grootboekrekeningen;1.1.3 ?Hoe maak ik een grootboekrekening aan??;1.1 Grootboekrekeningen;1.1.3 ?Hoe maak ik een grootboekrekening aan??;"Als u een grootboekrekening wilt toevoegen, doe dit dan bij voorkeur door een kopie 
 te maken van een grootboekrekening van hetzelfde type en classificatie. 
 Bijvoorbeeld; u wilt een grootboekrekening toevoegen voor een kerkgebouw. Ga naar 
 Financieel > Boekingen en grootboekrekeningen > Grootboekrekeningen > Overzicht. 
@@ -1697,13 +1697,13 @@ die ligt in dezelfde volgorde als ?0100? (denk in dit geval aan de voorloop nul)
 ?0102?. Pas de omschrijving en eventueel de zoekcode aan. Klik op Opslaan. 
 Let op: Overleg met uw bisdom of het toegestaan is om grootboekrekeningen toe te 
 voegen in verband met de jaarrekening-rapportage!";
-8946;Exact;1 Inrichting;1.2 Dagboeken;1.2.1 ?Moet ik met een inkoop- en verkoopboek gaan werken??;1.2 Dagboeken;1.2.1 ?Moet ik met een inkoop- en verkoopboek gaan werken??;"Dit is niet verplicht, maar wel wenselijk o.a. met het oog op: a) het automatisch 
+8946;Exact;0. Inrichting;1.2 Dagboeken;1.2.1 ?Moet ik met een inkoop- en verkoopboek gaan werken??;1.2 Dagboeken;1.2.1 ?Moet ik met een inkoop- en verkoopboek gaan werken??;"Dit is niet verplicht, maar wel wenselijk o.a. met het oog op: a) het automatisch 
 incasseren van kerkbijdragen b) het kunnen verrichten van betalingen c) het kunnen 
 factureren van uitvaarten, grafrechten, parochiebladen etc. d) het bieden van inzicht in 
 openstaande posten e) de transparantie van uw administratie.";
-8947;Exact;1 Inrichting;1.2 Dagboeken;1.2.2 ?Mag ik bestaande dagboeken aanpassen??;1.2 Dagboeken;1.2.2 ?Mag ik bestaande dagboeken aanpassen??;"Ja. Het is zelfs aan te raden om eerst (de omschrijvingen en IBAN-nummers van) de 
+8947;Exact;0. Inrichting;1.2 Dagboeken;1.2.2 ?Mag ik bestaande dagboeken aanpassen??;1.2 Dagboeken;1.2.2 ?Mag ik bestaande dagboeken aanpassen??;"Ja. Het is zelfs aan te raden om eerst (de omschrijvingen en IBAN-nummers van) de 
 bestaande dagboeken aan te passen voordat er nieuwe dagboeken worden aangemaakt.";
-8948;Exact;1 Inrichting;1.2 Dagboeken;1.2.3 ?Hoe maak ik zelf extra dagboeken aan??;1.2 Dagboeken;1.2.3 ?Hoe maak ik zelf extra dagboeken aan??;"Hieronder staat een korte, duidelijke instructie om in Exact Online een bank-dagboek aan te maken en te koppelen aan de juiste grootboekrekening.
+8948;Exact;0. Inrichting;1.2 Dagboeken;1.2.3 ?Hoe maak ik zelf extra dagboeken aan??;1.2 Dagboeken;1.2.3 ?Hoe maak ik zelf extra dagboeken aan??;"Hieronder staat een korte, duidelijke instructie om in Exact Online een bank-dagboek aan te maken en te koppelen aan de juiste grootboekrekening.
 
 Doel
 Een nieuw dagboek van het type Bank toevoegen en koppelen aan uw (viercijferige) grootboekrekening.
@@ -1743,17 +1743,17 @@ Is de Omschrijving herkenbaar voor collega?s (bank + rekeningtype + laatste 3 ci
 Is de grootboekrekening viercijferig en bedoeld voor bankrekeningen (zoals opgezet in 1.1.2/1.1.3)?
 
 Zo staat uw bank-dagboek goed ingericht en correct gekoppeld.";
-8949;Exact;1 Inrichting;1.2 Dagboeken;1.2.4 ?Maak ik voor spaarrekeningen ook een dagboek aan??;1.2 Dagboeken;1.2.4 ?Maak ik voor spaarrekeningen ook een dagboek aan??;"Ja. Let op: de ING-bank hanteert vaak dezelfde rekeningnummers voor betaal- en 
+8949;Exact;0. Inrichting;1.2 Dagboeken;1.2.4 ?Maak ik voor spaarrekeningen ook een dagboek aan??;1.2 Dagboeken;1.2.4 ?Maak ik voor spaarrekeningen ook een dagboek aan??;"Ja. Let op: de ING-bank hanteert vaak dezelfde rekeningnummers voor betaal- en 
 spaarrekeningen. In dat geval kan er voor de spaarrekening bij ?Bankrekeningnummer? 
 het nummer van het dagboek worden ingevuld en bij de omschrijving het betreffende 
 IBAN-nummer met de toevoeging ?Spaarrekening?. In dat geval is er geen mogelijkheid 
 een bankkoppeling aan te leggen met de spaarrekening.";
-8950;Exact;1 Inrichting;1.2 Dagboeken;1.2.5 ?Kan ik aan een bankrekening/-dagboek een vaste kostenplaats koppelen??;1.2 Dagboeken;1.2.5 ?Kan ik aan een bankrekening/-dagboek een vaste kostenplaats koppelen??;"Nee. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per 
+8950;Exact;0. Inrichting;1.2 Dagboeken;1.2.5 ?Kan ik aan een bankrekening/-dagboek een vaste kostenplaats koppelen??;1.2 Dagboeken;1.2.5 ?Kan ik aan een bankrekening/-dagboek een vaste kostenplaats koppelen??;"Nee. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per 
 geloofsgemeenschap inzichtelijk te maken. Idealiter wordt de kostenplaats ingevuld bij 
 het boeken van de kosten en opbrengsten in het inkoopboek en verkoopboek (zie 1.2.1). 
 Lees ook: https://www.rkk-online.nl/single-post/2018/04/04/Het-waarom-van- 
 %C3%A9%C3%A9n-financi%C3%ABle-administratie";
-8951;Exact;1 Inrichting;1.3 Bankkoppelingen;1.3.1 ?Hoe vraag ik een bankkoppeling aan??;1.3 Bankkoppelingen;1.3.1 ?Hoe vraag ik een bankkoppeling aan??;"Klik hier voor een uitleg over het bankieren in Exact Online waarin onder andere wordt 
+8951;Exact;0. Inrichting;1.3 Bankkoppelingen;1.3.1 ?Hoe vraag ik een bankkoppeling aan??;1.3 Bankkoppelingen;1.3.1 ?Hoe vraag ik een bankkoppeling aan??;"Klik hier voor een uitleg over het bankieren in Exact Online waarin onder andere wordt 
 uitgelegd hoe u de bankkoppeling eenmalig aanlegt en vervolgens de bankmutaties kunt 
 importeren en afletteren. Het is voor parochies vooralsnog niet mogelijk een PSD2-
 koppeling te maken. Een PSD2-koppeling vereist een bedrijfsscreening en een UBO-
@@ -1777,11 +1777,11 @@ Klik op de administratienaam > Stamgegevens > Bank > Oude generatie
 bankkoppelingen beheren. Klik op de bank waarvoor u de koppeling wilt maken. Volg de 
 stappen die daar beschreven staan. Let op: zodra u doorgeleid bent naar de 
 bankomgeving, dient u uit te loggen in Exact!";
-8952;Exact;1 Inrichting;1.3 Bankkoppelingen;1.3.2 ?Ik heb geen bankrekening bij Rabobank, ABN-Amro, ING, Bunq of Knab, wat nu??;1.3 Bankkoppelingen;1.3.2 ?Ik heb geen bankrekening bij Rabobank, ABN-Amro, ING, Bunq of Knab, wat nu??;"Het is op dit moment nog onduidelijk welke andere banken er wanneer kunnen worden 
+8952;Exact;0. Inrichting;1.3 Bankkoppelingen;1.3.2 ?Ik heb geen bankrekening bij Rabobank, ABN-Amro, ING, Bunq of Knab, wat nu??;1.3 Bankkoppelingen;1.3.2 ?Ik heb geen bankrekening bij Rabobank, ABN-Amro, ING, Bunq of Knab, wat nu??;"Het is op dit moment nog onduidelijk welke andere banken er wanneer kunnen worden 
 gekoppeld. Tot dat moment is het uiteraard wel mogelijk om voor alle Nederlandse 
 banken de bankmutaties met een bankbestand (MT940) binnen te halen. Het handmatig 
 boeken van de bank is dus absoluut niet meer nodig.";
-8953;Exact;1 Inrichting;1.3 Bankkoppelingen;1.3.3 ?Waar moet ik nog meer op letten??;1.3 Bankkoppelingen;1.3.3 ?Waar moet ik nog meer op letten??;"- Zorg dat u volledig bij bent met het boeken van de bank. Een bankkoppeling haalt 
+8953;Exact;0. Inrichting;1.3 Bankkoppelingen;1.3.3 ?Waar moet ik nog meer op letten??;1.3 Bankkoppelingen;1.3.3 ?Waar moet ik nog meer op letten??;"- Zorg dat u volledig bij bent met het boeken van de bank. Een bankkoppeling haalt 
 namelijk geen historische bankmutaties op. Als u bijvoorbeeld op 1 maart de 
 bankkoppeling activeert, dient u met een handmatig import van een bankbestand 
 (MT940) alle gewenste mutaties van v¢¢r 1 maart binnen te halen. 
@@ -1790,7 +1790,7 @@ bankkoppeling activeert, dient u met een handmatig import van een bankbestand
 (meestal de houder van de zgn. Eigenaarspas) hiervoor eenmalig toestemming te 
 geven. De vorm van deze goedkeuring is afhankelijk van de bank (reader/tan-
 code/app/schriftelijk).";
-8954;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8954;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.1 ?Wat zijn kostenplaatsen en kostendragers??;"1.4 Kostenplaatsen en
 
@@ -1800,12 +1800,12 @@ opbrengsten en kosten per geloofsgemeenschap inzichtelijk te maken.
 Een kostendrager gebruiken we om kosten en opbrengsten van een bepaalde persoon, 
 een bepaald gebouw, een bepaalde begraafplaats, een bepaalde groep, product of 
 dienst inzichtelijk te maken.";
-8955;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8955;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.2 ?Waar vind ik de kostenplaatsen en kostendragers??;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.2 ?Waar vind ik de kostenplaatsen en kostendragers??;Administratienaam > Stamgegevens > Financieel > Kostenplaatsen of Kostendragers;
-8956;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8956;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.3 ?Mag ik zelf kostenplaatsen en kostendragers aanmaken of wijzigen??;"1.4 Kostenplaatsen en
 
@@ -1835,7 +1835,7 @@ Let op 2: In Exact Online kan per boeking/mutatie maximaal maar ‚‚n kostenplaats
 inrichting van de kostendragers en vooral NIET de kostenplaatsen te ?misbruiken? als 
 extra kostendragers. Zo kunnen van een persoon de naam en functie worden 
 gecombineerd in ‚‚n kostendrager (bv. H. Jacobs, pastoor?).";
-8957;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8957;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.4 ?Waartoe dienen de kostenplaats en de kostendrager ????;"1.4 Kostenplaatsen en
 
@@ -1852,7 +1852,7 @@ Als een kostenplaats of kostendrager bij een boeking niet wordt ingevuld, terwij
 verplicht is, wordt deze automatisch ingevuld met vraagtekens (????). Op die manier is 
 voor u snel inzichtelijk in welke boekingen alsnog de (juiste) kostenplaats of kostendrager 
 moet worden ingevuld.";
-8958;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8958;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.5 ?Kan ik de beginbalans uitsplitsen naar kostenplaatsen??;"1.4 Kostenplaatsen en
 
@@ -1861,7 +1861,7 @@ gekoppeld. Kostenplaatsen zijn bedoeld om de kosten en opbrengsten per
 geloofsgemeenschap/voormalige parochie/locatie inzichtelijk te maken. Zie ook 1.2.5 en 
 1.4.1. Lees ook: https://www.rkk-online.nl/single-post/2018/04/04/Het-waarom-van- 
 %C3%A9%C3%A9n-financi%C3%ABle-administratie";
-8959;Exact;1 Inrichting;"1.4 Kostenplaatsen en
+8959;Exact;0. Inrichting;"1.4 Kostenplaatsen en
 
 kostendragers";1.4.6 ?Kan ik de beginbalans uitsplitsen naar kostendragers??;"1.4 Kostenplaatsen en
 
@@ -1873,7 +1873,7 @@ uitsplitsing naar kostendragers te maken waarmee in feite de beginbalans wordt
 gecorrigeerd; 
 c) als er afschrijvingen van toepassing zijn, de Activa-module binnen Exact Online 
 gebruiken (onder Financieel > Activa)";
-8960;Exact;1 Inrichting;1.5 Relaties;1.5.1 ?Moet/mag ik zelf debiteuren aanmaken??;1.5 Relaties;1.5.1 ?Moet/mag ik zelf debiteuren aanmaken??;"Ja en nee. Voor parochianen die kerkbijdrage aan uw parochie betalen worden (vanaf 
+8960;Exact;0. Inrichting;1.5 Relaties;1.5.1 ?Moet/mag ik zelf debiteuren aanmaken??;1.5 Relaties;1.5.1 ?Moet/mag ik zelf debiteuren aanmaken??;"Ja en nee. Voor parochianen die kerkbijdrage aan uw parochie betalen worden (vanaf 
 het moment dat Exact Online en DocBase gekoppeld zijn) op initiatief van DocBase 
 automatisch debiteuren-/relatienummers aangemaakt in Exact Online. Zie ook 5.4. Het is 
 dus NIET de bedoeling dat u voor deze parochianen zelf debiteuren gaat aanmaken. Zo 
@@ -1881,9 +1881,9 @@ voorkomt u dat ‚‚n parochiaan onder verschillende nummers in uw debiteuren-
 /relatiebestand wordt opgenomen. Andere debiteuren (bv. uitvaartondernemingen, 
 telecombedrijven), niet zijnde kerkbijdrage-deelnemers, dient u wel zelf aan te maken in 
 Exact Online, ook als hun gegevens reeds zijn opgeslagen in DocBase. Zie ook 1.5.3.";
-8961;Exact;1 Inrichting;1.5 Relaties;1.5.2 ?Moet/mag ik zelf crediteuren aanmaken??;1.5 Relaties;1.5.2 ?Moet/mag ik zelf crediteuren aanmaken??;"Ja. Er zijn verschillende manieren om op een effici‰nte manier crediteuren aan te maken. 
+8961;Exact;0. Inrichting;1.5 Relaties;1.5.2 ?Moet/mag ik zelf crediteuren aanmaken??;1.5 Relaties;1.5.2 ?Moet/mag ik zelf crediteuren aanmaken??;"Ja. Er zijn verschillende manieren om op een effici‰nte manier crediteuren aan te maken. 
 Zie 1.5.3.";
-8962;Exact;1 Inrichting;1.5 Relaties;1.5.3 ?Hoe kan ik crediteuren of debiteuren aanmaken??;1.5 Relaties;1.5.3 ?Hoe kan ik crediteuren of debiteuren aanmaken??;"Via het pad Relaties > Klanten (=debiteuren) of Leveranciers (=crediteuren) > Aanmaken 
+8962;Exact;0. Inrichting;1.5 Relaties;1.5.3 ?Hoe kan ik crediteuren of debiteuren aanmaken??;1.5 Relaties;1.5.3 ?Hoe kan ik crediteuren of debiteuren aanmaken??;"Via het pad Relaties > Klanten (=debiteuren) of Leveranciers (=crediteuren) > Aanmaken 
 komt u bij de opties: 
 o 
 Handmatig: u vult dan alle gegevens zelf in 
@@ -1911,7 +1911,7 @@ voor kiezen om middels de F2-toets naar het scherm Relaties te gaan en vervolgen
 de optie Nieuw de gegevens handmatig in te vullen dan wel via het pad Nieuw > Zoeken: 
 Adres de gegevens op te halen van de website van de Kamer van Koophandel. Middels 
 de optie Sluiten keert u weer terug in het inkoopboek.";
-8963;Exact;1 Inrichting;1.5 Relaties;1.5.4 ?Welke nummering moet ik geven aan debiteuren??;1.5 Relaties;1.5.4 ?Welke nummering moet ik geven aan debiteuren??;"Debiteuren (parochianen) die in DocBase worden geregistreerd ten behoeve van de 
+8963;Exact;0. Inrichting;1.5 Relaties;1.5.4 ?Welke nummering moet ik geven aan debiteuren??;1.5 Relaties;1.5.4 ?Welke nummering moet ik geven aan debiteuren??;"Debiteuren (parochianen) die in DocBase worden geregistreerd ten behoeve van de 
 kerkbijdragen worden automatisch overgezet naar Exact Online. Echter alle overige 
 debiteuren worden niet in DocBase geregistreerd. Denk hierbij aan debiteuren voor 
 grafrechten, parochiebladen, uitvaarten etc. Om deze debiteuren op een praktische 
@@ -1919,7 +1919,7 @@ manier te kunnen scheiden van de debiteuren ten behoeve van de kerkbijdragen, is
 van belang om deze een specifieke nummering te geven. De notatie die u dient te 
 hanteren is het KASKI-nummer gevolgd door een volgnummer van 4 cijfers. Bijvoorbeeld: 
 999990001";
-8964;Exact;1 Inrichting;"1.6 Digitale brievenbus/
+8964;Exact;0. Inrichting;"1.6 Digitale brievenbus/
 
 Scan en herken";1.6.1 ?Wat is een digitale brievenbus??;"1.6 Digitale brievenbus/
 
@@ -1928,7 +1928,7 @@ Online. Dit kan vanuit een e-mailprogramma of direct vanuit een scanner. Dit hee
 voordeel dat de facturen digitaal en veilig worden opgeslagen en dat de digitale factuur 
 direct aan de boeking kan worden gekoppeld. Later is het dan eenvoudiger om een 
 factuur terug te vinden in Exact Online.";
-8965;Exact;1 Inrichting;"1.6 Digitale brievenbus/
+8965;Exact;0. Inrichting;"1.6 Digitale brievenbus/
 
 Scan en herken";1.6.2 ?Mag ik zelf een digitale brievenbus aanmaken??;"1.6 Digitale brievenbus/
 
@@ -1936,13 +1936,13 @@ Scan en herken";1.6.2 ?Mag ik zelf een digitale brievenbus aanmaken??;"Nee. IPAL
 helpdesk@ipal.nu met daarin uw parochienummer en ‚‚n of meerdere e-mailadressen waar 
 vanaf het toegestaan is om naar de digitale brievenbus te mailen. IPAL zal dan de digitale 
 brievenbus voor u aanmaken.";
-8966;Exact;1 Inrichting;"1.6 Digitale brievenbus/
+8966;Exact;0. Inrichting;"1.6 Digitale brievenbus/
 
 Scan en herken";1.6.3 ?Kan ik gebruik maken van Scan & Herken??;"1.6 Digitale brievenbus/
 
 Scan en herken";1.6.3 ?Kan ik gebruik maken van Scan & Herken??;"Voor enkele bisdommen is deze functionaliteit centraal ingeschakeld. Neem contact op 
 met uw bisdom over de mogelijkheden.";
-8967;Exact;1 Inrichting;"1.7 BTW
+8967;Exact;0. Inrichting;"1.7 BTW
 
 2. Boeken";1.7.1 ?Is de administratie geschikt voor het werken met BTW??;"1.7 BTW
 
