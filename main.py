@@ -1,15 +1,15 @@
-"""
-IPAL Chatbox — Definitieve main.py (4 knoppen) + Conversatie‑wizard (échte chat) + smart quotes fix + PDF AI-Info netjes
-- Startopties (bestaand): Exact | DocBase | Zoeken Intern | Zoeken Algemeen
-- NIEUW: Conversatie‑modus (wizard) met natuurlijke dialoog:
-  • Assistent: "Waarmee kan ik u van dienst zijn?" → quick replies + chat_input
-  • Gebruiker: "Ik heb een vraag" → Assistent: "Gaat uw vraag over Exact, DocBase of iets anders?"
-  • Daarna: één zin over het onderwerp → top‑matches uit CSV (binnen gekozen scope) → kies item → Antwoord + PDF + vervolgvraag
-  • Werkt ook voor: “Zoek in CSV” (onbeperkt) en “Algemene vraag” (AI‑only)
-- CSV‑robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
-- Altijd PDF‑knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
-- Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
-"""
+# """ 
+# IPAL Chatbox — Definitieve main.py (4 knoppen) + Conversatie-wizard (échte chat) + smart quotes fix + PDF AI-Info netjes
+# - Startopties (bestaand): Exact | DocBase | Zoeken Intern | Zoeken Algemeen
+# - NIEUW: Conversatie-modus (wizard) met natuurlijke dialoog:
+#   • Assistent: "Waarmee kan ik u van dienst zijn?" → quick replies + chat_input
+#   • Gebruiker: "Ik heb een vraag" → Assistent: "Gaat uw vraag over Exact, DocBase of iets anders?"
+#   • Daarna: één zin over het onderwerp → top-matches uit CSV (binnen gekozen scope) → kies item → Antwoord + PDF + vervolgvraag
+#   • Werkt ook voor: “Zoek in CSV” (onbeperkt) en “Algemene vraag” (AI-only)
+# - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
+# - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
+# - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
+# """
 
 import os
 import re
@@ -496,7 +496,7 @@ DEFAULT_STATE = {
     "search_query": "",
     "search_selection_index": None,
     "last_processed_algemeen": "",   # debounce voor Zoeken Algemeen
-    # Nieuw voor conversatie‑wizard
+    # Nieuw voor conversatie-wizard
     "chat_mode": True,                 # standaard AAN voor échte chat
     "chat_step": "greet",            # greet → ask_scope → ask_topic → pick_item → followup
     "chat_scope": None,               # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
@@ -524,36 +524,41 @@ def with_info(text: str) -> str:
 
 
 def _copy_button(text: str, key_suffix: str):
-    """Werkende copy-knop met JS (via components.html) + fallback textarea."""
+    """Werkende copy-knop met JS (via components.html) + fallback textarea.
+    Deze versie gebruikt GEEN f-string voor het HTML/JS-blok, zodat { } in JS geen SyntaxError geven.
+    """
     payload = text or ""
     js_text = json.dumps(payload)
 
-    html_code = f"""
+    html_code = """
 <div style="margin-top:8px;">
-  <button id="copybtn-{key_suffix}" style="padding:6px 10px;font-size:16px;">
+  <button id="COPY_BTN_ID" style="padding:6px 10px;font-size:16px;">
     Kopieer antwoord
   </button>
-  <span id="copystate-{key_suffix}" style="margin-left:8px;font-size:14px;"></span>
+  <span id="COPY_STATE_ID" style="margin-left:8px;font-size:14px;"></span>
   <script>
     (function(){
-      const btn = document.getElementById('copybtn-{key_suffix}');
-      const state = document.getElementById('copystate-{key_suffix}');
+      const btn = document.getElementById('COPY_BTN_ID');
+      const state = document.getElementById('COPY_STATE_ID');
       if (btn) {
         btn.addEventListener('click', async () => {
           try {
-            await navigator.clipboard.writeText({js_text});
+            await navigator.clipboard.writeText(JS_TEXT);
             state.textContent = 'Gekopieerd!';
-            setTimeout(() => state.textContent = '', 1500);
+            setTimeout(() => { state.textContent = ''; }, 1500);
           } catch (e) {
             state.textContent = 'Niet gelukt — gebruik de tekst hieronder.';
-            setTimeout(() => state.textContent = '', 3000);
+            setTimeout(() => { state.textContent = ''; }, 3000);
           }
         });
       }
     })();
   </script>
 </div>
-"""
+""".replace("COPY_BTN_ID", f"copybtn-{key_suffix}") \
+   .replace("COPY_STATE_ID", f"copystate-{key_suffix}") \
+   .replace("JS_TEXT", js_text)
+
     components.html(html_code, height=70)
 
     with st.expander("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren."):
@@ -586,7 +591,7 @@ def render_chat():
                     pass
 
 
-# ── Conversatie‑wizard (échte chatbox) ───────────────────────────────────────
+# ── Conversatie-wizard (échte chatbox) ───────────────────────────────────────
 
 def _detect_scope(msg: str) -> Optional[str]:
     t = (msg or "").lower()
@@ -662,7 +667,7 @@ def chat_wizard():
 
     user_text = st.chat_input(placeholders.get(step, "Stel uw vraag…"))
     if not user_text:
-        # Als we nog in pick_item zitten, toon selectie‑UI
+        # Als we nog in pick_item zitten, toon selectie-UI
         if step == "pick_item" and st.session_state.get("chat_results"):
             opts = st.session_state["chat_results"]
             labels = [ _mk_label(i, pd.Series(r)) for i, r in enumerate(opts) ]
@@ -746,7 +751,7 @@ def chat_wizard():
     if step == "ask_topic":
         scope = st.session_state.get("chat_scope")
         if scope == "Algemeen":
-            # AI‑only (optioneel web)
+            # AI-only (optioneel web)
             st.session_state["last_question"] = user_text
             antwoord = vind_best_algemeen_AI(user_text)
             if not antwoord and st.session_state.get("allow_web"):
@@ -775,7 +780,7 @@ def chat_wizard():
             return
 
     if step == "pick_item":
-        # De radio‑UI handelt de keuze af; als de gebruiker toch typt (bijv. "2"):
+        # De radio-UI handelt de keuze af; als de gebruiker toch typt (bijv. "2"):
         m = re.search(r"\b(\d{1,2})\b", user_text)
         if m and st.session_state.get("chat_results"):
             idx = int(m.group(1)) - 1
@@ -797,7 +802,7 @@ def chat_wizard():
                 st.session_state["chat_step"] = "followup"
                 st.rerun()
                 return
-        # Anders: laat de radio‑UI het afhandelen (bovenaan deze functie)
+        # Anders: laat de radio-UI het afhandelen (bovenaan deze functie)
         st.session_state["pdf_ready"] = False
         add_msg("assistant", "Gebruik de selectie hierboven om een item te kiezen, of typ het nummer (bijv. 2).")
         st.rerun()
@@ -850,7 +855,7 @@ def main():
                     st.session_state[k] = v
             st.rerun()
 
-        st.session_state["chat_mode"] = st.toggle("Conversatie‑modus (chat wizard)", value=st.session_state.get("chat_mode", True))
+        st.session_state["chat_mode"] = st.toggle("Conversatie-modus (chat wizard)", value=st.session_state.get("chat_mode", True))
         st.session_state["debug"] = st.toggle("Debug info", value=st.session_state.get("debug", False))
         st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
         st.session_state["allow_web"] = st.toggle("Web-fallback aan (Zoeken Algemeen)", value=st.session_state.get("allow_web", False))
@@ -882,9 +887,9 @@ def main():
                 cnt_doc = 0
             st.caption(f"CSV records: {len(faq_df.reset_index())} | Exact: {cnt_exact} | DocBase: {cnt_doc}")
 
-    # Als conversatie‑modus actief is → gebruik de wizard en stop verder
+    # Als conversatie-modus actief is → gebruik de wizard en stop verder
     if st.session_state.get("chat_mode", True):
-        # Intro‑visual (video of logo)
+        # Intro-visual (video of logo)
         video_path = "helpdesk.mp4"
         if os.path.exists(video_path):
             try:
@@ -900,7 +905,7 @@ def main():
         chat_wizard()
         return
 
-    # ── (OUDE) KNOP‑FLOW ONDERSTAAND BLIJFT BESCHIKBAAR ─────────────────────
+    # ── (OUDE) KNOP-FLOW ONDERSTAAND BLIJFT BESCHIKBAAR ─────────────────────
 
     # Startscherm
     if not st.session_state.get("selected_product"):
@@ -1328,4 +1333,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
