@@ -7,7 +7,7 @@
 #   • Daarna: één zin over het onderwerp → top-matches uit CSV (binnen gekozen scope) → kies item → Antwoord + PDF + vervolgvraag
 #   • Werkt ook voor: “Zoek in CSV” (onbeperkt) en “Algemene vraag” (AI-only)
 # - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
-# - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding + scope teller
+# - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding
 # - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
 # """
 
@@ -95,7 +95,8 @@ def clean_text(s: str) -> str:
         "\u00AD": "", "\u2026": "...",
         "\u00B4": "'", "\u02BC": "'", "\u02BB": "'",
     }
-    for k, v in repl.items(): s = s.replace(k, v)
+    for k, v in repl.items():
+        s = s.replace(k, v)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
@@ -127,21 +128,27 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
     numbered, show_click = [], False
     for raw in (ai_info or "").splitlines():
         line = raw.strip()
-        if not line: continue
-        if line.startswith("- ["): break
-        if line.lower().startswith("ai-antwoord info"): continue
+        if not line:
+            continue
+        if line.startswith("- ["):
+            break
+        if line.lower().startswith("ai-antwoord info"):
+            continue
         m = re.match(r"^(\d+)\.\s*(.*)$", line)
         if m:
             txt = m.group(2)
             key = "Klik hieronder om de FAQ te openen"
             if key in txt:
-                txt = txt.split(key, 1)[0].strip(); show_click = True
+                txt = txt.split(key, 1)[0].strip()
+                show_click = True
             txt = clean_text(_strip_md(txt))
-            if txt: numbered.append(txt)
+            if txt:
+                numbered.append(txt)
         else:
             if numbered:
                 extra = clean_text(_strip_md(line))
-                if extra: numbered[-1] += " + " + extra
+                if extra:
+                    numbered[-1] += " + " + extra
     if not show_click and "Klik hieronder om de FAQ te openen" in (ai_info or ""):
         show_click = True
     return numbered, show_click
@@ -151,14 +158,20 @@ def make_pdf(question: str, answer: str) -> bytes:
     answer   = clean_text(_strip_md(answer or ""))
     numbered_items, show_click = _parse_ai_info(AI_INFO)
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4,
-                            leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm)
+    doc = SimpleDocTemplate(
+        buffer, pagesize=A4,
+        leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm
+    )
     styles = getSampleStyleSheet()
-    body_style = ParagraphStyle("Body", parent=styles["Normal"], fontName="Helvetica",
-                                fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT)
-    heading_style = ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
-                                   fontSize=14, leading=18, textColor=colors.HexColor("#333"),
-                                   spaceBefore=12, spaceAfter=6)
+    body_style = ParagraphStyle(
+        "Body", parent=styles["Normal"], fontName="Helvetica",
+        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
+    )
+    heading_style = ParagraphStyle(
+        "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
+        fontSize=14, leading=18, textColor=colors.HexColor("#333"),
+        spaceBefore=12, spaceAfter=6
+    )
     story = []
     if os.path.exists("logopdf.png"):
         logo = Image("logopdf.png", width=124, height=52)
@@ -172,7 +185,8 @@ def make_pdf(question: str, answer: str) -> bytes:
     story.append(Paragraph("Antwoord:", heading_style))
     for line in (answer.split("\n") if answer else []):
         line = line.strip()
-        if line: story.append(Paragraph(line, body_style))
+        if line:
+            story.append(Paragraph(line, body_style))
     if numbered_items:
         story.append(Spacer(1, 12))
         story.append(Paragraph("AI-Antwoord Info:", heading_style))
@@ -204,7 +218,8 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     except UnicodeDecodeError:
         df = pd.read_csv(path, encoding="windows-1252", sep=";")
     for c in cols:
-        if c not in df.columns: df[c] = None
+        if c not in df.columns:
+            df[c] = None
     norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding",
                  "Soort melding","Antwoord of oplossing","Afbeelding"]
     for c in norm_cols:
@@ -277,18 +292,22 @@ def _token_score(q: str, text: str) -> int:
 def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]") -> Optional[str]:
     try:
         mask = df["Antwoord of oplossing"].astype(str).str.contains(codeword, case=False, na=False)
-        if mask.any(): return str(df.loc[mask].iloc[0]["Antwoord of oplossing"]).strip()
-    except Exception: pass
+        if mask.any():
+            return str(df.loc[mask].iloc[0]["Antwoord of oplossing"]).strip()
+    except Exception:
+        pass
     return None
 
 def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback_rows: int = 50) -> pd.DataFrame:
-    if faq_df.empty: return pd.DataFrame()
+    if faq_df.empty:
+        return pd.DataFrame()
     df = faq_df.reset_index().copy()
     q_tokens = set(_tokenize_clean(vraag))
     eff_min_hits = max(1, min(min_hits, len(q_tokens)))
     df["_score"] = df["combined"].apply(lambda t: _token_score(vraag, t))
     df = df.sort_values("_score", ascending=False)
-    if df.empty: return df
+    if df.empty:
+        return df
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
         return hits >= eff_min_hits and cov >= min_cov
@@ -312,7 +331,8 @@ def zoek_in_scope(scope: Optional[str], vraag: str, topn: int = 8) -> pd.DataFra
     base = faq_df.reset_index()
     if scope in ("Exact","DocBase"):
         base = base[base["Systeem"].astype(str).str.lower() == scope.lower()]
-    if base.empty: return base
+    if base.empty:
+        return base
     base = base.copy()
     base["_score"] = base["combined"].apply(lambda t: _token_score(vraag, t))
     base = base.sort_values(["_score"], ascending=False)
@@ -459,8 +479,10 @@ def render_chat():
             _copy_button(m["content"], hash_key)
             img = st.session_state.get("selected_image")
             if img and isinstance(img, str) and img.strip():
-                try: st.image(img, caption="Afbeelding bij dit antwoord", use_column_width=True)
-                except Exception: pass
+                try:
+                    st.image(img, caption="Afbeelding bij dit antwoord", use_column_width=True)
+                except Exception:
+                    pass
 
 # ── Conversatie-wizard ───────────────────────────────────────────────────────
 def _detect_scope(msg: str) -> Optional[str]:
@@ -480,7 +502,7 @@ def _mk_label(i: int, row: pd.Series) -> str:
 
 def chat_wizard():
     render_chat()
-    # Snelkeuzes (chips) — labels vast: Exact / DocBase / Zoeken Intern / Zoeken Algemeen
+    # Snelkeuzes (chips) — labels vast
     with st.container():
         c1, c2, c3, c4, c5 = st.columns(5)
         if c1.button("Exact", use_container_width=True):
@@ -662,11 +684,12 @@ def main():
     col1, col2 = st.columns([1,1])
     with col1:
         if st.button("🔄 Nieuw gesprek", use_container_width=True):
-            # Reset alles behalve niet-functionele keys
+            # Reset sessiestate
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             for k, v in DEFAULT_STATE.items():
-                if k not in st.session_state: st.session_state[k] = v
+                if k not in st.session_state:
+                    st.session_state[k] = v
             st.rerun()
     with col2:
         if st.button("🧹 Cache legen", use_container_width=True):
@@ -679,7 +702,8 @@ def main():
     video_path = "helpdesk.mp4"
     if os.path.exists(video_path):
         try:
-            with open(video_path, "rb") as f: st.video(f.read(), format="video/mp4", start_time=0)
+            with open(video_path, "rb") as f:
+                st.video(f.read(), format="video/mp4", start_time=0)
         except Exception as e:
             logging.error(f"Introvideo kon niet worden afgespeeld: {e}")
     elif os.path.exists("logo.png"):
@@ -733,10 +757,14 @@ def main():
         st.session_state["min_hits"] = st.slider("CSV minimum treffers (Zoeken Intern)", 0, 6, int(st.session_state.get("min_hits", 2)), 1)
         st.session_state["min_cov"] = st.slider("CSV minimale dekking (Zoeken Intern)", 0.0, 1.0, float(st.session_state.get("min_cov", 0.25)), 0.05)
         if st.session_state.get("debug", False):
-            try: cnt_exact = len(faq_df.xs("Exact", level="Systeem", drop_level=False))
-            except Exception: cnt_exact = 0
-            try: cnt_doc = len(faq_df.xs("DocBase", level="Systeem", drop_level=False))
-            except Exception: cnt_doc = 0
+            try:
+                cnt_exact = len(faq_df.xs("Exact", level="Systeem", drop_level=False))
+            except Exception:
+                cnt_exact = 0
+            try:
+                cnt_doc = len(faq_df.xs("DocBase", level="Systeem", drop_level=False))
+            except Exception:
+                cnt_doc = 0
             st.caption(f"CSV records: {len(faq_df.reset_index())} | Exact: {cnt_exact} | DocBase: {cnt_doc}")
 
     # Als conversatie-modus actief is → wizard, anders de klassieke flows
@@ -821,7 +849,7 @@ def main():
         def mk_label(i, row):
             oms = clean_text(str(row.get('Omschrijving melding','')).strip())
             toel = clean_text(str(row.get('Toelichting melding','')).strip())
-            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
+            preview = oms of toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
             preview = re.sub(r"\\s+"," ", preview)[:140]
             return f"{i+1:02d}. {preview}"
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
@@ -958,11 +986,6 @@ def main():
         sel = clean_text(str(toe))
         df_scope = df_scope[tm == sel]
 
-    try:
-        st.sidebar.metric("Records in scope", len(df_scope))
-    except Exception:
-        pass
-
     if st.session_state.get("debug"):
         st.caption(f"Scope rows vóór itemkeuze: {len(df_scope)}")
 
@@ -1060,9 +1083,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
