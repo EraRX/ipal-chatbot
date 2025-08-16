@@ -599,9 +599,11 @@ def _detect_scope(msg: str) -> Optional[str]:
         return "Exact"
     if any(w in t for w in ["docbase", "doc base"]):
         return "DocBase"
-    if any(w in t for w in ["csv", "zoeken", "zoek in csv", "zoeken intern"]):
+    # "Zoeken Intern" (voor CSV)
+    if any(w in t for w in ["csv", "zoeken intern", "zoek in csv", "zoeken in csv"]):
         return "Zoeken"
-    if any(w in t for w in ["algemeen", "overig", "anders", "ik weet het niet"]):
+    # "Zoeken Algemeen" (vrije vraag = Algemeen)
+    if any(w in t for w in ["zoeken algemeen", "algemene vraag", "algemeen", "overig", "anders", "ik weet het niet"]):
         return "Algemeen"
     return None
 
@@ -631,12 +633,12 @@ def chat_wizard():
             add_msg("assistant", "Dank u. Kunt u in één zin beschrijven waar uw vraag over DocBase over gaat?")
             st.session_state["pdf_ready"] = False
             st.rerun()
-        if c3.button("Zoek in CSV", use_container_width=True):
+        if c3.button("Zoeken Intern", use_container_width=True):
             st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
             add_msg("assistant", "Waar wilt u in de CSV op zoeken? Typ een korte zoekterm.")
             st.session_state["pdf_ready"] = False
             st.rerun()
-        if c4.button("Algemene vraag", use_container_width=True):
+        if c4.button("Zoeken Algemeen", use_container_width=True):
             st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
             add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
             st.session_state["pdf_ready"] = False
@@ -647,12 +649,17 @@ def chat_wizard():
                     st.session_state[k] = v
             st.rerun()
 
+
     # Eénmalige begroeting
     if not st.session_state.get("chat_greeted", False):
-        add_msg("assistant", "👋 Waarmee kan ik u van dienst zijn? U kunt hieronder typen of een snelkeuze gebruiken (Exact, DocBase, Zoeken in CSV of Algemene vraag).")
+        add_msg(
+            "assistant",
+            "👋 Waarmee kan ik u van dienst zijn? U kunt hieronder typen of een snelkeuze gebruiken (Exact, DocBase, Zoeken Intern of Zoeken Algemeen)."
+        )
         st.session_state["chat_greeted"] = True
         st.session_state["pdf_ready"] = False
         render_chat()
+
 
     # Placeholder per stap
     step = st.session_state.get("chat_step", "greet")
@@ -1324,6 +1331,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
