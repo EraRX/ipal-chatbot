@@ -887,7 +887,8 @@ def main():
                 cnt_doc = 0
             st.caption(f"CSV records: {len(faq_df.reset_index())} | Exact: {cnt_exact} | DocBase: {cnt_doc}")
 
-    # Als conversatie-modus actief is → gebruik de wizard en stop verder
+       # Als conversatie-modus actief is → gebruik de wizard,
+    # maar toon ook snelknoppen om direct naar de klassieke cascade te gaan.
     if st.session_state.get("chat_mode", True):
         # Intro-visual (video of logo)
         video_path = "helpdesk.mp4"
@@ -901,31 +902,16 @@ def main():
             st.image("logo.png", width=244)
         else:
             st.info("Welkom bij IPAL Chatbox")
-        st.header("Welkom bij IPAL Chatbox")
-        chat_wizard()
-        return
-
-    # ── (OUDE) KNOP-FLOW ONDERSTAAND BLIJFT BESCHIKBAAR ─────────────────────
-
-    # Startscherm
-    if not st.session_state.get("selected_product"):
-        video_path = "helpdesk.mp4"
-        if os.path.exists(video_path):
-            try:
-                with open(video_path, "rb") as f:
-                    st.video(f.read(), format="video/mp4", start_time=0)
-            except Exception as e:
-                logging.error(f"Introvideo kon niet worden afgespeeld: {e}")
-        elif os.path.exists("logo.png"):
-            st.image("logo.png", width=244)
-        else:
-            st.info("Welkom bij IPAL Chatbox")
 
         st.header("Welkom bij IPAL Chatbox")
-        c1, c2 = st.columns(2)
-        c3, c4 = st.columns(2)
-        if c1.button("Exact", use_container_width=True):
+
+        # ➜ NIEUW: snelknoppen die direct de klassieke cascade openen
+        st.markdown("#### Liever de **klassieke cascade** met knoppen?")
+        cc1, cc2, cc3, cc4 = st.columns(4)
+
+        if cc1.button("↳ Cascade: Exact", use_container_width=True):
             st.session_state.update({
+                "chat_mode": False,              # schakel chat-wizard uit
                 "selected_product": "Exact",
                 "selected_image": None,
                 "selected_module": None,
@@ -936,10 +922,11 @@ def main():
                 "last_item_label": "",
                 "last_question": ""
             })
-            st.toast("Gekozen: Exact")
             st.rerun()
-        if c2.button("DocBase", use_container_width=True):
+
+        if cc2.button("↳ Cascade: DocBase", use_container_width=True):
             st.session_state.update({
+                "chat_mode": False,
                 "selected_product": "DocBase",
                 "selected_image": None,
                 "selected_module": None,
@@ -950,11 +937,12 @@ def main():
                 "last_item_label": "",
                 "last_question": ""
             })
-            st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Zoeken Intern", use_container_width=True):   # label aangepast
+
+        if cc3.button("↳ Cascade: Zoeken Intern", use_container_width=True):
             st.session_state.update({
-                "selected_product": "Zoeken",   # logica blijft 'Zoeken'
+                "chat_mode": False,
+                "selected_product": "Zoeken",
                 "selected_image": None,
                 "search_query": "",
                 "search_selection_index": None,
@@ -963,11 +951,12 @@ def main():
                 "last_item_label": "",
                 "last_question": ""
             })
-            st.toast("Gekozen: Zoeken Intern")
             st.rerun()
-        if c4.button("Zoeken Algemeen", use_container_width=True): # label aangepast
+
+        if cc4.button("↳ Cascade: Zoeken Algemeen", use_container_width=True):
             st.session_state.update({
-                "selected_product": "Algemeen", # logica blijft 'Algemeen'
+                "chat_mode": False,
+                "selected_product": "Algemeen",
                 "selected_image": None,
                 "selected_module": None,
                 "selected_category": None,
@@ -977,10 +966,12 @@ def main():
                 "last_item_label": "",
                 "last_question": ""
             })
-            st.toast("Gekozen: Zoeken Algemeen (vrije vraag)")
             st.rerun()
-        render_chat()
+
+        # Daarna gewoon de chat-wizard tonen (blijft de standaardervaring)
+        chat_wizard()
         return
+
 
     # ── ZOEKEN ALGEMEEN (géén CSV) ──────────────────────────────────────────
     if st.session_state.get("selected_product") == "Algemeen":
@@ -1333,5 +1324,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
