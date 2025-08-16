@@ -905,72 +905,72 @@ def main():
 
         st.header("Welkom bij IPAL Chatbox")
 
-        # ➜ NIEUW: snelknoppen die direct de klassieke cascade openen
-        st.markdown("#### Liever de **klassieke cascade** met knoppen?")
-        cc1, cc2, cc3, cc4 = st.columns(4)
+        # ► Optioneel: klassieke cascade in een expander (niet standaard zichtbaar)
+        with st.expander("Liever de klassieke cascade openen?"):
+            keuze = st.radio(
+                "Kies cascade:",
+                ["Exact", "DocBase", "Zoeken Intern", "Zoeken Algemeen"],
+                horizontal=True,
+            )
+            start = st.button("Start cascade", use_container_width=True)
+            if start:
+                if keuze == "Exact":
+                    st.session_state.update({
+                        "chat_mode": False,
+                        "selected_product": "Exact",
+                        "selected_image": None,
+                        "selected_module": None,
+                        "selected_category": None,
+                        "selected_toelichting": None,
+                        "selected_answer_id": None,
+                        "selected_answer_text": None,
+                        "last_item_label": "",
+                        "last_question": ""
+                    })
+                elif keuze == "DocBase":
+                    st.session_state.update({
+                        "chat_mode": False,
+                        "selected_product": "DocBase",
+                        "selected_image": None,
+                        "selected_module": None,
+                        "selected_category": None,
+                        "selected_toelichting": None,
+                        "selected_answer_id": None,
+                        "selected_answer_text": None,
+                        "last_item_label": "",
+                        "last_question": ""
+                    })
+                elif keuze == "Zoeken Intern":
+                    st.session_state.update({
+                        "chat_mode": False,
+                        "selected_product": "Zoeken",
+                        "selected_image": None,
+                        "search_query": "",
+                        "search_selection_index": None,
+                        "selected_answer_id": None,
+                        "selected_answer_text": None,
+                        "last_item_label": "",
+                        "last_question": ""
+                    })
+                else:  # Zoeken Algemeen
+                    st.session_state.update({
+                        "chat_mode": False,
+                        "selected_product": "Algemeen",
+                        "selected_image": None,
+                        "selected_module": None,
+                        "selected_category": None,
+                        "selected_toelichting": None,
+                        "selected_answer_id": None,
+                        "selected_answer_text": None,
+                        "last_item_label": "",
+                        "last_question": ""
+                    })
+                st.rerun()
 
-        if cc1.button("↳ Cascade: Exact", use_container_width=True):
-            st.session_state.update({
-                "chat_mode": False,              # schakel chat-wizard uit
-                "selected_product": "Exact",
-                "selected_image": None,
-                "selected_module": None,
-                "selected_category": None,
-                "selected_toelichting": None,
-                "selected_answer_id": None,
-                "selected_answer_text": None,
-                "last_item_label": "",
-                "last_question": ""
-            })
-            st.rerun()
-
-        if cc2.button("↳ Cascade: DocBase", use_container_width=True):
-            st.session_state.update({
-                "chat_mode": False,
-                "selected_product": "DocBase",
-                "selected_image": None,
-                "selected_module": None,
-                "selected_category": None,
-                "selected_toelichting": None,
-                "selected_answer_id": None,
-                "selected_answer_text": None,
-                "last_item_label": "",
-                "last_question": ""
-            })
-            st.rerun()
-
-        if cc3.button("↳ Cascade: Zoeken Intern", use_container_width=True):
-            st.session_state.update({
-                "chat_mode": False,
-                "selected_product": "Zoeken",
-                "selected_image": None,
-                "search_query": "",
-                "search_selection_index": None,
-                "selected_answer_id": None,
-                "selected_answer_text": None,
-                "last_item_label": "",
-                "last_question": ""
-            })
-            st.rerun()
-
-        if cc4.button("↳ Cascade: Zoeken Algemeen", use_container_width=True):
-            st.session_state.update({
-                "chat_mode": False,
-                "selected_product": "Algemeen",
-                "selected_image": None,
-                "selected_module": None,
-                "selected_category": None,
-                "selected_toelichting": None,
-                "selected_answer_id": None,
-                "selected_answer_text": None,
-                "last_item_label": "",
-                "last_question": ""
-            })
-            st.rerun()
-
-        # Daarna gewoon de chat-wizard tonen (blijft de standaardervaring)
+        # Daarna: gewoon de chat-wizard met 4 snelknoppen (Exact / DocBase / Zoek in CSV / Algemene vraag)
         chat_wizard()
         return
+
 
 
     # ── ZOEKEN ALGEMEEN (géén CSV) ──────────────────────────────────────────
@@ -1324,6 +1324,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
