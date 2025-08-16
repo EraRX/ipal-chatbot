@@ -849,7 +849,7 @@ def main():
         def mk_label(i, row):
             oms = clean_text(str(row.get('Omschrijving melding','')).strip())
             toel = clean_text(str(row.get('Toelichting melding','')).strip())
-            preview = oms of toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
+            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
             preview = re.sub(r"\\s+"," ", preview)[:140]
             return f"{i+1:02d}. {preview}"
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
@@ -1083,3 +1083,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
