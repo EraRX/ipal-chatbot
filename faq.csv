@@ -14,7 +14,7 @@ ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort mel
 8618;DocBase;DocBase Ledenadministratie;Ledenbeheer;Zoekfunctie;Snel leden vinden op basis van criteria;Maakt de administratie efficint en toegankelijk;Typ in zoekveld bovenaan scherm: 1. Vul criteria in zoals naam, geboortedatum, of Rel-ID. 2. Klik op de zoekresultaten om het lid te openen.;
 8619;DocBase;DocBase Ledenadministratie;Ledenbeheer;Ontdubbelen;Dubbele leden samenvoegen;Voorkomt fouten en verwarring in de administratie;Ga naar Beheer ? Ontdubbelen: 1. Selecteer de dubbele records. 2. Vergelijk de gegevens en klik op Samenvoegen. Controleer eerst de gegevens voor je ze samenvoegt.;
 8624;DocBase;DocBase Ledenadministratie;Documentbeheer;Documenten uploaden;Bestanden koppelen aan lid of graf;Duidelijke dossiervorming (bijv. scans van machtigingen of brieven);Open een lid of graf: 1. Ga naar tabblad Documenten. 2. Klik op Voeg document toe en selecteer het bestand dat je wilt uploaden.;
-8625;Exact;DocBase Ledenadministratie;Synchronisatie;Handmatig synchroniseren met Exact;Updates pushen naar Exact;Zorgt voor consistente gegevens;Ga naar Instellingen ? Koppelingen ? Synchronisatie starten: 1. Klik op Synchroniseren om de handmatige synchronisatie tussen DocBase en Exact Online te starten.;
+8625;Exact;3. Koppelingen & Synchronisatie (DocBase/SILA/Rel-ID);DocBase Ledenadministratie;Handmatig synchroniseren met Exact;Updates pushen naar Exact;Zorgt voor consistente gegevens;Ga naar Instellingen ? Koppelingen ? Synchronisatie starten: 1. Klik op Synchroniseren om de handmatige synchronisatie tussen DocBase en Exact Online te starten.;
 8626;DocBase;DocBase Ledenadministratie;Synchronisatie;Koppeling met Exact controleren;Nagaan of koppeling goed werkt;Verhelpt fouten in dataoverdracht;Instellingen ? Koppelingen ? Status en foutmeldingen controleren: 1. Bekijk de status van de koppeling. 2. Indien er fouten zijn, los deze op volgens de foutmeldingen.;
 8627;DocBase;DocBase Ledenadministratie;Beheer;Controle duplicaten;Dubbele invoer van personen opsporen;Houdt administratie schoon en betrouwbaar;Instellingen ? Beheer ? Ontdubbelen: 1. Klik op Controleer en vergelijk records om dubbele leden in de database te vinden.;
 8628;DocBase;DocBase Ledenadministratie;Beheer;Gebruikersrechten beheren;Instellen wie wat mag zien of doen;Beschermt gevoelige informatie;Instellingen ? Gebruikers ? Rollen en rechten aanpassen: 1. Ga naar Instellingen ? Gebruikersbeheer. 2. Selecteer de gebruiker en kies de gewenste rol (bijv. administrateur, medewerker). 3. Pas de rechten aan per module en sla op.;
@@ -2071,11 +2071,11 @@ Jaarbedragen kunnen worden ingevoerd bij periode 12. Het is dus niet verplicht d
 begroting te verdelen over de 12 perioden. Bij uitsplitsing van de begroting over 
 kostenplaatsen kunt u helemaal onderaan de lijst met het plusje (+) de betreffende 
 verdeling over kostenplaatsen invoeren.";
-8980;Exact;10. Overzichten;4 OVERZICHTEN;3.1 ?Hoe maak ik een boekingsverslag?? ;4 OVERZICHTEN;3.1 ?Hoe maak ik een boekingsverslag?? ;"Via Financieel > Boekingen en grootboekrekeningen > Overzichten > Boekingsverslag 
+8980;Exact;91. Overzichten;4 OVERZICHTEN;3.1 ?Hoe maak ik een boekingsverslag?? ;4 OVERZICHTEN;3.1 ?Hoe maak ik een boekingsverslag?? ;"Via Financieel > Boekingen en grootboekrekeningen > Overzichten > Boekingsverslag 
 Let op: Om ook kostenplaatsen en kostendragers zichtbaar te maken in het 
 boekingsverslag, dient onder het kopje ?Aanvullende informatie? bij de optie 
 ?Kostenanalyse? te worden gekozen voor ?Code + Omschrijving?.";
-8981;Exact;11. TIPS EN TRICKS;5 TIPS EN TRICKS;4.1 ?Waar vind ik uitleg over het scherm waarin ik aan het werken ben?? ;5 TIPS EN TRICKS;4.1 ?Waar vind ik uitleg over het scherm waarin ik aan het werken ben?? ;"Als u in een bepaald scherm in Exact Online documentatie over dit specifieke scherm wilt 
+8981;Exact;92. TIPS EN TRICKS;5 TIPS EN TRICKS;4.1 ?Waar vind ik uitleg over het scherm waarin ik aan het werken ben?? ;5 TIPS EN TRICKS;4.1 ?Waar vind ik uitleg over het scherm waarin ik aan het werken ben?? ;"Als u in een bepaald scherm in Exact Online documentatie over dit specifieke scherm wilt 
 opvragen kunt u via F1 op het toetsenbord deze documentatie oproepen. Hetzelfde 
 bereikt u als u rechts bovenin op Help klikt gevolgd door ?Help bij: {onderwerp}?. Behalve 
 informatie over het scherm krijgt u ook informatie over onderwerpen die hieraan 
@@ -2087,7 +2087,7 @@ Standaard is er een veld ingeschakeld genaamd ?Bedrag?. Echter kunt u klikken op
 ?gereedschapsicoontje? rechts bovenin en vervolgens op Aanpassen klikken waarna 
 de optie Bedrag kan worden omgezet naar Bedrag in + Bedrag uit. Vanaf nu zijn er 2 
 kolommen beschikbaar in de boeking voor zowel ?bedrag in? als ?bedrag uit?.";
-8982;Exact;12. Spelregels;6 SPELREGELS;5.1 ?Mag ik mijn eigen gebruikersgegevens aanpassen?? ;6 SPELREGELS;5.1 ?Mag ik mijn eigen gebruikersgegevens aanpassen?? ;"Nadat de inloggegevens aan u zijn verstuurd, worden uw gebruikersgegevens om 
+8982;Exact;93. Spelregels;6 SPELREGELS;5.1 ?Mag ik mijn eigen gebruikersgegevens aanpassen?? ;6 SPELREGELS;5.1 ?Mag ik mijn eigen gebruikersgegevens aanpassen?? ;"Nadat de inloggegevens aan u zijn verstuurd, worden uw gebruikersgegevens om 
 privacy-redenen door ons gecodeerd en daarmee geanonimiseerd. Hoewel u als 
 gebruiker zelf uw eigen profiel in Exact Online kunt aanpassen, verzoeken we u dringend 
 in elk geval uw gecodeerde voor- en achternaam NIET te wijzigen! 
