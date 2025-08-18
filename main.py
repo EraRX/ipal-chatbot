@@ -714,7 +714,7 @@ def main():
     st.header("Welkom bij IPAL Chatbox")
 
     # Expander: klassieke cascade starten
-    with st.expander("Liever de klassieke cascade openen?"):
+    with st.expander("Maak uw keuze of liever de klassieke cascade openen?"):
         keuze = st.radio("Kies cascade:", ["Exact","DocBase","Zoeken Intern","Zoeken Algemeen"], horizontal=True)
         start = st.button("Start cascade", use_container_width=True)
         if start:
@@ -1178,4 +1178,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
