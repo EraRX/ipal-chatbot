@@ -174,7 +174,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     )
     story = []
     if os.path.exists("logopdf.png"):
-        logo = Image("logopdf.png", width=124, height=52)
+        logo = Image("logopdf.png", width=307, height=205)
         story.append(Table([[logo]], colWidths=[124], style=TableStyle([
             ("ALIGN",(0,0),(-1,-1),"LEFT"),("VALIGN",(0,0),(-1,-1),"TOP"),
             ("LEFTPADDING",(0,0),(-1,-1),0),("RIGHTPADDING",(0,0),(-1,-1),0),
@@ -1178,6 +1178,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
