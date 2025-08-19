@@ -617,6 +617,9 @@ def _mk_label(i: int, row: pd.Series) -> str:
 
 
 def chat_wizard():
+    # Laat altijd de gespreksgeschiedenis zien
+    render_chat()
+
     # Snelkeuzes (chips) — labels vast: Exact / DocBase / Zoeken / Internet
     with st.container():
         c1, c2, c3, c4, c5 = st.columns(5)
@@ -656,6 +659,9 @@ def chat_wizard():
             except Exception:
                 pass
             st.rerun()
+
+    # ... rest van je chat_wizard() ongewijzigd ...
+
 
 
 
@@ -1353,6 +1359,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
