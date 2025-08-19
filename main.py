@@ -46,15 +46,6 @@ if os.path.exists("logopdf.png"):
     story.append(logo)
     story.append(Spacer(1, 6))
 
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.units import cm
-from reportlab.lib import colors
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-
-
 # ── UI-config ────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown(
@@ -1183,6 +1174,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
