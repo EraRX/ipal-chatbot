@@ -38,13 +38,14 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from reportlab.platypus import Paragraph, Spacer
+from reportlab.platypus import Image, Spacer
 
 if os.path.exists("logopdf.png"):
     logo = Image("logopdf.png", width=181, height=125)
     logo.hAlign = "LEFT"   # forceer links uitlijnen
     story.append(logo)
     story.append(Spacer(1, 6))
+
 
 # ── UI-config ────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
@@ -1174,6 +1175,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
