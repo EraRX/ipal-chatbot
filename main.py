@@ -859,40 +859,6 @@ def chat_wizard():
 # ── App ──────────────────────────────────────────────────────────────────────
 
 def main():
-    # Topbar: alleen RESET (leeg ook cache)
-    st.markdown('<div class="topbar tight">', unsafe_allow_html=True)
-    if st.button("🔄 Reset", use_container_width=True):
-        try:
-            st.cache_data.clear()
-        except Exception:
-            pass
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
-        for k, v in DEFAULT_STATE.items():
-            if k not in st.session_state:
-                st.session_state[k] = v
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Geavanceerd (beheer) — ingeklapt bovenaan
-    with st.expander("Geavanceerd (beheer)"):
-        st.session_state["chat_mode"] = st.toggle("Conversatie-modus (chat wizard)", value=st.session_state.get("chat_mode", True))
-        st.session_state["debug"] = st.toggle("Debug info", value=st.session_state.get("debug", False))
-        st.session_state["allow_ai"] = st.toggle("AI-QA aan", value=st.session_state.get("allow_ai", False))
-        st.session_state["allow_web"] = st.toggle("Web-fallback aan (Internet)", value=st.session_state.get("allow_web", False))
-        st.session_state["min_hits"] = st.slider("CSV minimum treffers (Zoeken)", 0, 6, int(st.session_state.get("min_hits", 2)), 1)
-        st.session_state["min_cov"] = st.slider("CSV minimale dekking (Zoeken)", 0.0, 1.0, float(st.session_state.get("min_cov", 0.25)), 0.05)
-        if st.session_state.get("debug", False):
-            try:
-                cnt_exact = len(faq_df.xs("Exact", level="Systeem", drop_level=False))
-            except Exception:
-                cnt_exact = 0
-            try:
-                cnt_doc = len(faq_df.xs("DocBase", level="Systeem", drop_level=False))
-            except Exception:
-                cnt_doc = 0
-            st.caption(f"CSV records: {len(faq_df.reset_index())} | Exact: {cnt_exact} | DocBase: {cnt_doc}")
-
     # Intro (video of logo)
     video_path = "helpdesk.mp4"
     if os.path.exists(video_path):
@@ -906,54 +872,80 @@ def main():
     else:
         st.info("Welkom bij IPAL Chatbox")
 
+    # Titel
     st.header("Welkom bij IPAL Chatbox")
 
-    # Expander: klassieke cascade starten
+    # (optioneel) klassieke cascade starten via expander
     with st.expander("Liever de klassieke cascade openen?"):
-        keuze = st.radio("Kies:", ["Exact","DocBase","Zoeken","Internet"], horizontal=True)
-        if st.button("Start cascade", use_container_width=True):
+        keuze = st.radio(
+            "Kies cascade:", ["Exact", "DocBase", "Zoeken", "Internet"],
+            horizontal=True, index=0, key="cascade_radio"
+        )
+        if st.button("Start cascade", use_container_width=True, key="cascade_start"):
             if keuze == "Exact":
                 st.session_state.update({
-                    "chat_mode": False, "selected_product": "Exact",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
+                    "chat_mode": False,
+                    "selected_product": "Exact",
+                    "selected_image": None,
+                    "selected_module": None,
+                    "selected_category": None,
+                    "selected_toelichting": None,
+                    "selected_answer_id": None,
+                    "selected_answer_text": None,
+                    "last_item_label": "",
+                    "last_question": "",
                 })
             elif keuze == "DocBase":
                 st.session_state.update({
-                    "chat_mode": False, "selected_product": "DocBase",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
+                    "chat_mode": False,
+                    "selected_product": "DocBase",
+                    "selected_image": None,
+                    "selected_module": None,
+                    "selected_category": None,
+                    "selected_toelichting": None,
+                    "selected_answer_id": None,
+                    "selected_answer_text": None,
+                    "last_item_label": "",
+                    "last_question": "",
                 })
             elif keuze == "Zoeken":
                 st.session_state.update({
-                    "chat_mode": False, "selected_product": "Zoeken",
-                    "selected_image": None, "search_query": "", "search_selection_index": None,
-                    "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
+                    "chat_mode": False,
+                    "selected_product": "Zoeken",   # intern CSV
+                    "selected_image": None,
+                    "search_query": "",
+                    "search_selection_index": None,
+                    "selected_answer_id": None,
+                    "selected_answer_text": None,
+                    "last_item_label": "",
+                    "last_question": "",
                 })
-            else:  # Internet  (oude 'Algemeen')
+            else:  # Internet (algemene vraag)
                 st.session_state.update({
-                    "chat_mode": False, "selected_product": "Algemeen",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
+                    "chat_mode": False,
+                    "selected_product": "Algemeen",
+                    "selected_image": None,
+                    "selected_module": None,
+                    "selected_category": None,
+                    "selected_toelichting": None,
+                    "selected_answer_id": None,
+                    "selected_answer_text": None,
+                    "last_item_label": "",
+                    "last_question": "",
                 })
             st.rerun()
 
-    # Als conversatie-modus actief is → wizard, anders de klassieke flows
+    # Als conversatie-modus actief is → gebruik de wizard en stop verder
     if st.session_state.get("chat_mode", True):
         chat_wizard()
         return
 
-    # ── (OUDE) KNOP-FLOW ONDERSTAAND BLIJFT BESCHIKBAAR ─────────────────────
-
-    # Startscherm
+    # ------ vanaf hier je bestaande "klassieke" flows ------
+    # 1) Startscherm klassieke flow (als er nog geen product is gekozen)
     if not st.session_state.get("selected_product"):
         c1, c2 = st.columns(2)
         c3, c4 = st.columns(2)
-        if c1.button("Exact", use_container_width=True):
+        if c1.button("Exact", use_container_width=True, key="classic_exact"):
             st.session_state.update({
                 "selected_product": "Exact",
                 "selected_image": None,
@@ -963,11 +955,10 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
                 "last_item_label": "",
-                "last_question": ""
+                "last_question": "",
             })
-            st.toast("Gekozen: Exact")
             st.rerun()
-        if c2.button("DocBase", use_container_width=True):
+        if c2.button("DocBase", use_container_width=True, key="classic_docbase"):
             st.session_state.update({
                 "selected_product": "DocBase",
                 "selected_image": None,
@@ -977,11 +968,10 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
                 "last_item_label": "",
-                "last_question": ""
+                "last_question": "",
             })
-            st.toast("Gekozen: DocBase")
             st.rerun()
-        if c3.button("Zoeken", use_container_width=True):
+        if c3.button("Zoeken", use_container_width=True, key="classic_zoeken"):
             st.session_state.update({
                 "selected_product": "Zoeken",
                 "selected_image": None,
@@ -990,11 +980,10 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
                 "last_item_label": "",
-                "last_question": ""
+                "last_question": "",
             })
-            st.toast("Gekozen: Zoeken")
             st.rerun()
-        if c4.button("Internet", use_container_width=True):
+        if c4.button("Internet", use_container_width=True, key="classic_internet"):
             st.session_state.update({
                 "selected_product": "Algemeen",
                 "selected_image": None,
@@ -1004,12 +993,19 @@ def main():
                 "selected_answer_id": None,
                 "selected_answer_text": None,
                 "last_item_label": "",
-                "last_question": ""
+                "last_question": "",
             })
-            st.toast("Gekozen: Internet")
             st.rerun()
+
+        # Toon de chatgeschiedenis onder de knoppen
         render_chat()
         return
+
+    # 2) Hierna blijft je bestaande klassieke logica ongewijzigd
+    #    (Algemeen, Zoeken/CSV, en Exact/DocBase cascade)
+    #    -> laat dit gedeelte in je bestand zoals je het al had.
+    #    (Het roept o.a. render_chat(), zoek_hele_csv(), etc.)
+
 
     # ── INTERNET (géén CSV) ─────────────────────────────────────────────────
     if st.session_state.get("selected_product") == "Algemeen":
@@ -1357,5 +1353,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
