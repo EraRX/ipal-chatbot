@@ -1,14 +1,11 @@
 # """
-# IPAL Chatbox — Definitieve main.py (4 knoppen) + Conversatie-wizard (échte chat) + smart quotes fix + PDF AI-Info netjes
-# - Startopties (bestaand): Exact | DocBase | Zoeken Intern | Zoeken Algemeen
-# - NIEUW: Conversatie-modus (wizard) met natuurlijke dialoog:
-#   • Assistent: "Waarmee kan ik u van dienst zijn?" → quick replies + chat_input
-#   • Gebruiker: "Ik heb een vraag" → Assistent: "Gaat uw vraag over Exact, DocBase of iets anders?"
-#   • Daarna: één zin over het onderwerp → top-matches uit CSV (binnen gekozen scope) → kies item → Antwoord + PDF + vervolgvraag
-#   • Werkt ook voor: “Zoek in CSV” (onbeperkt) en “Algemene vraag” (AI-only)
-# - CSV-robustheid: trim, NBSP→spatie, multi-spaces→één, casefold-matches + smart quotes cleanup
-# - Altijd PDF-knop (unieke key) + “Kopieer antwoord” (werkend) + optionele Afbeelding
-# - Algemeen: stelt max. 1 verhelderende vraag, maar blijft niet doorvragen uit zichzelf
+# IPAL Chatbox — main.py
+# - 4 vaste startknoppen: Exact | DocBase | Zoeken Intern | Zoeken Algemeen
+# - Conversatie-wizard (échte chat) + klassieke cascade via expander
+# - Geen sidebar: Geavanceerd (beheer) expander bovenaan, dan "Nieuw gesprek" (legt cache ook leeg)
+# - CSV cleaning & zoeken
+# - PDF: logo als banner (volle tekstbreedte, auto-schaal) + AI-Info blok
+# - Werkende “Kopieer antwoord”-knop (JS) zonder f-string-valkuil
 # """
 
 import os
@@ -38,14 +35,22 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from reportlab.platypus import Image, Spacer
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, Table, TableStyle
+)
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.units import cm
+from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
-if os.path.exists("logopdf.png"):
-    logo = Image("logopdf.png", width=181, height=125)
-    logo.hAlign = "LEFT"   # forceer links uitlijnen
-    story.append(logo)
-    story.append(Spacer(1, 6))
-
+# Probeer PIL te laden voor aspect-ratio van banner
+try:
+    from PIL import Image as PILImage
+except Exception:
+    PILImage = None
 
 # ── UI-config ────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
@@ -102,6 +107,7 @@ FAQ_LINKS = [
     ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
     ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
 ]
+
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
@@ -116,13 +122,15 @@ if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
 def _strip_md(s: str) -> str:
-    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)
-    s = re.sub(r"#+\s*([^\n]+)", r"\1", s)
-    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)
+    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)  # **bold** → plain
+    s = re.sub(r"#+\s*([^\n]+)", r"\1", s)    # # heading → plain
+    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)  # [label](url) → label
     return s
 
 def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
-    numbered, show_click = [], False
+    """Extract genummerde AI-info-regels en detecteer 'Klik hieronder...'."""
+    numbered: list[str] = []
+    show_click = False
     for raw in (ai_info or "").splitlines():
         line = raw.strip()
         if not line:
@@ -151,9 +159,12 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
     return numbered, show_click
 
 def make_pdf(question: str, answer: str) -> bytes:
+    """Genereer PDF met bannerlogo over volle tekstbreedte + AI-Info + links."""
     question = clean_text(question or "")
     answer   = clean_text(_strip_md(answer or ""))
+
     numbered_items, show_click = _parse_ai_info(AI_INFO)
+
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer, pagesize=A4,
@@ -169,14 +180,29 @@ def make_pdf(question: str, answer: str) -> bytes:
         fontSize=14, leading=18, textColor=colors.HexColor("#333"),
         spaceBefore=12, spaceAfter=6
     )
+
     story = []
+
+    # Banner (volle tekstbreedte)
     if os.path.exists("logopdf.png"):
-        logo = Image("logopdf.png", width=451, height=125)
-        story.append(Table([[logo]], colWidths=[124], style=TableStyle([
-            ("ALIGN",(0,0),(-1,-1),"LEFT"),("VALIGN",(0,0),(-1,-1),"TOP"),
-            ("LEFTPADDING",(0,0),(-1,-1),0),("RIGHTPADDING",(0,0),(-1,-1),0),
-            ("TOPPADDING",(0,0),(-1,-1),0),("BOTTOMPADDING",(0,0),(-1,-1),6),
-        ])))
+        page_width = A4[0] - (doc.leftMargin + doc.rightMargin)
+        if PILImage is not None:
+            try:
+                img_info = PILImage.open("logopdf.png")
+                aspect = img_info.height / img_info.width if img_info.width else 0.25
+                banner_h = max(40, min(180, int(page_width * aspect)))
+            except Exception:
+                aspect = 0.25
+                banner_h = int(page_width * aspect)
+        else:
+            banner_h = 90  # fallback
+
+        banner = Image("logopdf.png", width=page_width, height=banner_h)
+        banner.hAlign = "CENTER"
+        story.append(banner)
+        story.append(Spacer(1, 12))
+
+    # Vraag + Antwoord
     story.append(Paragraph(f"Vraag: {question}", heading_style))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Antwoord:", heading_style))
@@ -184,19 +210,25 @@ def make_pdf(question: str, answer: str) -> bytes:
         line = line.strip()
         if line:
             story.append(Paragraph(line, body_style))
+
+    # AI-Antwoord Info (genummerd)
     if numbered_items:
         story.append(Spacer(1, 12))
         story.append(Paragraph("AI-Antwoord Info:", heading_style))
         list_items = [ListItem(Paragraph(item, body_style), leftIndent=12) for item in numbered_items]
         story.append(ListFlowable(list_items, bulletType="1"))
+
+    # Klikprompt + Links
     story.append(Spacer(1, 12))
     if show_click:
         story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+
     link_items = []
     for label, url in FAQ_LINKS:
         p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
         link_items.append(ListItem(p, leftIndent=12))
     story.append(ListFlowable(link_items, bulletType="bullet"))
+
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
@@ -204,31 +236,43 @@ def make_pdf(question: str, answer: str) -> bytes:
 # ── CSV laden + normaliseren ─────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
-    cols = ["ID","Systeem","Subthema","Categorie",
-            "Omschrijving melding","Toelichting melding","Soort melding",
-            "Antwoord of oplossing","Afbeelding"]
+    cols = [
+        "ID","Systeem","Subthema","Categorie",
+        "Omschrijving melding","Toelichting melding","Soort melding",
+        "Antwoord of oplossing","Afbeelding"
+    ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=cols).set_index(["Systeem","Subthema","Categorie"])
+
     try:
         df = pd.read_csv(path, encoding="utf-8", sep=";")
     except UnicodeDecodeError:
         df = pd.read_csv(path, encoding="windows-1252", sep=";")
+
     for c in cols:
         if c not in df.columns:
             df[c] = None
-    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding",
-                 "Soort melding","Antwoord of oplossing","Afbeelding"]
+
+    # Basis normalisatie: strip + spaties + smart quotes
+    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
     for c in norm_cols:
-        df[c] = (df[c].fillna("").astype(str)
-                 .str.replace("\u00A0"," ", regex=False)
+        df[c] = (df[c]
+                 .fillna("")
+                 .astype(str)
+                 .str.replace("\u00A0", " ", regex=False)
                  .str.strip()
-                 .str.replace(r"\s+"," ", regex=True))
+                 .str.replace(r"\s+", " ", regex=True))
         df[c] = df[c].apply(clean_text)
-    mapping = {"exact":"Exact","docbase":"DocBase","algemeen":"Algemeen"}
+
+    # Standaardiseer Systeem
+    mapping = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
     df["Systeem"] = df["Systeem"].str.lower().map(mapping).fillna(df["Systeem"]).astype(str)
+
+    # Combined voor ranking
     keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
     df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+
     return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
 
 faq_df = load_faq()
@@ -256,15 +300,20 @@ def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) ->
             scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
         else:
             scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
-        vals = (scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique())
+        vals = (scope["Toelichting melding"]
+                .dropna()
+                .astype(str)
+                .apply(clean_text)
+                .unique())
         return sorted(vals)
     except Exception:
         return []
 
 # ── Veiligheidsfilter & relevance helpers ────────────────────────────────────
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
+
 def filter_topics(msg: str):
-    found = [t for t in BLACKLIST if re.search(r"\b"+re.escape(t)+r"\b", (msg or "").lower())]
+    found = [t for t in BLACKLIST if re.search(r"\b" + re.escape(t) + r"\b", (msg or "").lower())]
     return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
 STOPWORDS_NL = {
@@ -275,14 +324,19 @@ STOPWORDS_NL = {
     "is","was","wordt","zijn","heeft","heb","hebben","doe","doet","doen","kan","kunnen","moet","moeten"
 }
 def _tokenize_clean(text: str) -> list[str]:
-    return [w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
-            if len(w) > 2 and w not in STOPWORDS_NL]
+    return [
+        w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
+        if len(w) > 2 and w not in STOPWORDS_NL
+    ]
 def _relevance(q: str, t: str) -> tuple[int, float]:
-    qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(t))
-    hits = len(qs & ts); coverage = hits / max(1, len(qs))
+    qs = set(_tokenize_clean(q))
+    ts = set(_tokenize_clean(t))
+    hits = len(qs & ts)
+    coverage = hits / max(1, len(qs))
     return hits, coverage
 def _token_score(q: str, text: str) -> int:
-    qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(text))
+    qs = set(_tokenize_clean(q))
+    ts = set(_tokenize_clean(text))
     return len(qs & ts)
 
 # ── Zoekfuncties ─────────────────────────────────────────────────────────────
@@ -298,20 +352,26 @@ def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]")
 def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback_rows: int = 50) -> pd.DataFrame:
     if faq_df.empty:
         return pd.DataFrame()
+
     df = faq_df.reset_index().copy()
     q_tokens = set(_tokenize_clean(vraag))
     eff_min_hits = max(1, min(min_hits, len(q_tokens)))
+
     df["_score"] = df["combined"].apply(lambda t: _token_score(vraag, t))
     df = df.sort_values("_score", ascending=False)
     if df.empty:
         return df
+
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
         return hits >= eff_min_hits and cov >= min_cov
+
     filtered = df[df.apply(_ok, axis=1)]
+
     if filtered.empty:
         q_lower = (vraag or "").strip().lower()
-        sys_map = {"exact":"Exact","docbase":"DocBase","algemeen":"Algemeen"}
+        sys_map = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
+
         if q_lower in sys_map:
             sys = sys_map[q_lower]
             try:
@@ -320,13 +380,15 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
                 return subset.sort_values("_score", ascending=False).head(fallback_rows)
             except KeyError:
                 pass
+
         nonzero = df[df["_score"] > 0].head(fallback_rows)
         return nonzero if not nonzero.empty else df.head(fallback_rows)
+
     return filtered
 
 def zoek_in_scope(scope: Optional[str], vraag: str, topn: int = 8) -> pd.DataFrame:
     base = faq_df.reset_index()
-    if scope in ("Exact","DocBase"):
+    if scope in ("Exact", "DocBase"):
         base = base[base["Systeem"].astype(str).str.lower() == scope.lower()]
     if base.empty:
         return base
@@ -339,12 +401,16 @@ def zoek_in_scope(scope: Optional[str], vraag: str, topn: int = 8) -> pd.DataFra
 def vind_best_algemeen_AI(vraag: str) -> str:
     if client is None:
         return "Kunt u uw vraag iets concreter maken (bijv. ‘DocBase wachtwoord resetten’ of ‘Exact bankkoppeling’)?"
-    sys = ("Je helpt vrijwilligers van parochies. "
-           "Beantwoord kort en concreet. Stel maximaal één verhelderende vraag als dat echt nodig is. "
-           "Noem geen niet-bestaande bronnen.")
-    user = (f"Vraag: {vraag}\n\n"
-            "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1-2 praktische vervolgsuggesties "
-            "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag.")
+    sys = (
+        "Je helpt vrijwilligers van parochies. "
+        "Beantwoord kort en concreet. Stel maximaal één verhelderende vraag als dat echt nodig is. "
+        "Noem geen niet-bestaande bronnen."
+    )
+    user = (
+        f"Vraag: {vraag}\n\n"
+        "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1-2 praktische vervolgsuggesties "
+        "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag."
+    )
     try:
         return chatgpt_cached(
             [{"role":"system","content":sys},{"role":"user","content":user}],
@@ -499,7 +565,7 @@ def _mk_label(i: int, row: pd.Series) -> str:
 
 def chat_wizard():
     render_chat()
-    # Snelkeuzes (chips) — labels vast
+    # Snelkeuzes — labels vast: Exact / DocBase / Zoeken Intern / Zoeken Algemeen
     with st.container():
         c1, c2, c3, c4, c5 = st.columns(5)
         if c1.button("Exact", use_container_width=True):
@@ -676,76 +742,6 @@ def chat_wizard():
 
 # ── App ──────────────────────────────────────────────────────────────────────
 def main():
-    # Topbar: Nieuw gesprek + Cache legen (geen sidebar meer)
-    st.markdown('<div class="topbar">', unsafe_allow_html=True)
-    col1, col2 = st.columns([1,1])
-    with col1:
-        if st.button("🔄 Nieuw gesprek", use_container_width=True):
-            # Reset sessiestate
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
-            for k, v in DEFAULT_STATE.items():
-                if k not in st.session_state:
-                    st.session_state[k] = v
-            st.rerun()
-    with col2:
-        if st.button("🧹 Cache legen", use_container_width=True):
-            st.cache_data.clear()
-            st.toast("Cache is leeggemaakt.")
-            st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Intro (video of logo)
-    video_path = "helpdesk.mp4"
-    if os.path.exists(video_path):
-        try:
-            with open(video_path, "rb") as f:
-                st.video(f.read(), format="video/mp4", start_time=0)
-        except Exception as e:
-            logging.error(f"Introvideo kon niet worden afgespeeld: {e}")
-    elif os.path.exists("logo.png"):
-        st.image("logo.png", width=244)
-    else:
-        st.info("Welkom bij IPAL Chatbox")
-
-    st.header("Welkom bij IPAL Chatbox")
-
-    # Expander: klassieke cascade starten
-    with st.expander("Maak uw keuze of liever de klassieke cascade openen?"):
-        keuze = st.radio("Kies cascade:", ["Exact","DocBase","Zoeken Intern","Zoeken Algemeen"], horizontal=True)
-        start = st.button("Start cascade", use_container_width=True)
-        if start:
-            if keuze == "Exact":
-                st.session_state.update({
-                    "chat_mode": False, "selected_product": "Exact",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
-                })
-            elif keuze == "DocBase":
-                st.session_state.update({
-                    "chat_mode": False, "selected_product": "DocBase",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
-                })
-            elif keuze == "Zoeken Intern":
-                st.session_state.update({
-                    "chat_mode": False, "selected_product": "Zoeken",
-                    "selected_image": None, "search_query": "", "search_selection_index": None,
-                    "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
-                })
-            else:  # Zoeken Algemeen
-                st.session_state.update({
-                    "chat_mode": False, "selected_product": "Algemeen",
-                    "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
-                    "last_item_label": "", "last_question": ""
-                })
-            st.rerun()
-
-def main():
     # 1) Geavanceerd (beheer) – nu bovenaan
     with st.expander("Geavanceerd (beheer)"):
         st.session_state["chat_mode"] = st.toggle(
@@ -786,9 +782,8 @@ def main():
     # 2) Topbar met alléén 'Nieuw gesprek' (cache wordt automatisch geleegd)
     st.markdown('<div class="topbar">', unsafe_allow_html=True)
     if st.button("🔄 Nieuw gesprek", use_container_width=True):
-        # Cache legen integraal onderdeel van 'Nieuw gesprek'
         try:
-            st.cache_data.clear()
+            st.cache_data.clear()     # Cache legen integraal onderdeel van 'Nieuw gesprek'
         except Exception:
             pass
 
@@ -818,27 +813,23 @@ def main():
     st.header("Welkom bij IPAL Chatbox")
 
     # Optionele quick-starter voor de klassieke cascade
-    with st.expander("Maak uw keuze of liever de klassieke cascade openen?"):
-        keuze = st.radio(
-            "Kies cascade:",
-            ["Exact", "DocBase", "Zoeken Intern", "Zoeken Algemeen"],
-            horizontal=True
-        )
+    with st.expander("Liever de klassieke cascade openen?"):
+        keuze = st.radio("Kies cascade:", ["Exact","DocBase","Zoeken Intern","Zoeken Algemeen"], horizontal=True)
         start = st.button("Start cascade", use_container_width=True)
         if start:
             if keuze == "Exact":
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "Exact",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None,
-                    "selected_answer_text": None, "last_item_label": "", "last_question": ""
+                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "last_item_label": "", "last_question": ""
                 })
             elif keuze == "DocBase":
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "DocBase",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None,
-                    "selected_answer_text": None, "last_item_label": "", "last_question": ""
+                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "last_item_label": "", "last_question": ""
                 })
             elif keuze == "Zoeken Intern":
                 st.session_state.update({
@@ -851,8 +842,8 @@ def main():
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "Algemeen",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None,
-                    "selected_answer_text": None, "last_item_label": "", "last_question": ""
+                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "last_item_label": "", "last_question": ""
                 })
             st.rerun()
 
@@ -861,7 +852,7 @@ def main():
         chat_wizard()
         return
 
-    # — klassieke UI (ongewijzigd verder)
+    # ── (OUDE) KNOP-FLOW (zonder sidebar) ───────────────────────────────────
     if not st.session_state.get("selected_product"):
         c1, c2 = st.columns(2); c3, c4 = st.columns(2)
         if c1.button("Exact", use_container_width=True):
@@ -893,9 +884,6 @@ def main():
                 "last_item_label": "", "last_question": ""
             }); st.toast("Gekozen: Zoeken Algemeen"); st.rerun()
         render_chat(); return
-
-    # … (rest van je bestaande klassieke cascade/zoek-logica blijft ongewijzigd)
-
 
     # ── ZOEKEN ALGEMEEN (géén CSV) ──────────────────────────────────────────
     if st.session_state.get("selected_product") == "Algemeen":
@@ -942,7 +930,7 @@ def main():
             oms = clean_text(str(row.get('Omschrijving melding','')).strip())
             toel = clean_text(str(row.get('Toelichting melding','')).strip())
             preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
-            preview = re.sub(r"\\s+"," ", preview)[:140]
+            preview = re.sub(r"\s+"," ", preview)[:140]
             return f"{i+1:02d}. {preview}"
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
         keuze = st.selectbox("Kies een item uit de zoekresultaten:", ["(Kies)"] + opties)
@@ -980,11 +968,11 @@ def main():
             except Exception as e:
                 logging.error(f"AI-QA fout: {e}"); reactie = None
         if not reactie:
-            zinnen = re.split(r"(?<=[.!?])\\s+", bron)
+            zinnen = re.split(r"(?<=[.!?])\s+", bron)
             scores = [(_token_score(vraag2, z), z) for z in zinnen]
             scores.sort(key=lambda x: x[0], reverse=True)
             top = [z for s, z in scores if s > 0][:3]
-            reactie = "\\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
+            reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
         st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun(); return
 
     # ── Exact/DocBase cascade ────────────────────────────────────────────────
@@ -996,10 +984,12 @@ def main():
     parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
     if parts: st.caption(" › ".join(parts))
 
+    # 1) Subthema
     if not st.session_state.get("selected_module"):
         try:
             opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
-        except Exception: opts = []
+        except Exception:
+            opts = []
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
@@ -1011,13 +1001,15 @@ def main():
             st.toast(f"Gekozen subthema: {sel}"); st.rerun()
         return
 
+    # 2) Categorie
     if not st.session_state.get("selected_category"):
         try:
             cats = sorted(
                 faq_df.xs((syst, st.session_state["selected_module"]), level=["Systeem","Subthema"], drop_level=False)
                 .index.get_level_values("Categorie").dropna().unique()
             )
-        except Exception: cats = []
+        except Exception:
+            cats = []
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state["selected_category"] = "alles"
@@ -1125,7 +1117,6 @@ def main():
     if not vraag:
         return
 
-    # UNIEKECODE123 ook hier toestaan
     if (vraag or "").strip().upper() == "UNIEKECODE123":
         cw = find_answer_by_codeword(faq_df.reset_index())
         if cw:
@@ -1175,14 +1166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
