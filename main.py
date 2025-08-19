@@ -826,40 +826,71 @@ def chat_wizard():
         st.rerun()
         return
 
-    if step == "followup":
-        vraag2 = user_text
-        st.session_state["last_question"] = vraag2
-        ok, warn = filter_topics(vraag2)
-        if not ok:
+if step == "followup":
+    vraag2 = user_text
+    st.session_state["last_question"] = vraag2
+
+    # 2a) intent 'ander antwoord' → opnieuw zoeken in dezelfde scope
+    low = vraag2.strip().lower()
+    if any(k in low for k in ["ander", "andere", "volgende", "nog een", "iets anders"]):
+        scope = st.session_state.get("chat_scope")  # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
+        # zoek opnieuw binnen dezelfde scope, met de follow-up tekst als query
+        hits = zoek_in_scope(None if scope == "Zoeken" else scope, vraag2, topn=8)
+        if hits.empty:
+            add_msg("assistant", "Ik vond geen andere goede match. Formuleer het anders of kies **Internet**.")
             st.session_state["pdf_ready"] = False
-            add_msg("assistant", warn)
-            st.rerun()
-            return
-        bron = str(st.session_state.get("selected_answer_text") or "")
-        reactie = None
-        if st.session_state.get("allow_ai") and client is not None and bron:
-            try:
-                reactie = chatgpt_cached(
-                    [
-                        {"role": "system", "content": "Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                        {"role": "user", "content": f"Bron:\n{bron}\n\nVraag: {vraag2}"},
-                    ],
-                    temperature=0.1, max_tokens=600,
-                )
-            except Exception as e:
-                logging.error(f"AI-QA fout: {e}")
-                reactie = None
-        if not reactie:
-            # Kleine extractieve fallback
-            zinnen = re.split(r"(?<=[.!?])\s+", bron)
-            scores = [(_token_score(vraag2, z), z) for z in zinnen]
-            scores.sort(key=lambda x: x[0], reverse=True)
-            top = [z for s, z in scores if s > 0][:3]
-            reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
-        st.session_state["pdf_ready"] = True
-        add_msg("assistant", with_info(reactie))
+        else:
+            st.session_state["chat_results"] = hits.to_dict("records")
+            st.session_state["chat_step"] = "pick_item"
+            st.session_state["pdf_ready"] = False
+            add_msg("assistant", "Ik heb nieuwe opties gevonden. Kies hieronder een ander item.")
         st.rerun()
         return
+
+    # 2b) normale verduidelijkingsvraag over het gekozen antwoord
+    ok, warn = filter_topics(vraag2)
+    if not ok:
+        st.session_state["pdf_ready"] = False
+        add_msg("assistant", warn)
+        st.rerun()
+        return
+
+    bron = str(st.session_state.get("selected_answer_text") or "").strip()
+    reactie = None
+
+    # Probeer AI als toegestaan
+    if st.session_state.get("allow_ai") and client is not None and bron:
+        try:
+            reactie = chatgpt_cached(
+                [
+                    {"role": "system",
+                     "content": "Beantwoord uitsluitend op basis van de meegegeven bron. "
+                                "Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                    {"role": "user", "content": f"Bron:\n{bron}\n\nVervolgvraag: {vraag2}"}
+                ],
+                temperature=0.1, max_tokens=600,
+            )
+        except Exception as e:
+            logging.error(f"AI-QA fout: {e}")
+            reactie = None
+
+    # Betere fallback zónder AI: laat gewoon het bron-antwoord (of de kern) zien
+    if not reactie:
+        if bron:
+            # geef maximaal ~120 woorden als ‘kern’
+            woorden = bron.split()
+            kern = " ".join(woorden[:120])
+            if len(woorden) > 120:
+                kern += " …"
+            reactie = kern
+        else:
+            reactie = "Ik heb geen detail voor dit item in de CSV. Kies a.u.b. een ander item of stel de vraag via **Internet**."
+
+    st.session_state["pdf_ready"] = True
+    add_msg("assistant", with_info(reactie))
+    st.rerun()
+    return
+
 
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -1359,6 +1390,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
