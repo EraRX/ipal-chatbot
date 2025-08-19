@@ -1,10 +1,10 @@
 # """
-# IPAL Chatbox — main.py (clean)
+# IPAL Chatbox — main.py
 # - Chat-wizard met 4 knoppen: Exact | DocBase | Zoeken | Internet
 # - Klassieke cascade via expander
-# - Geen sidebar-topbar knoppen
 # - PDF met banner/logo over de volle contentbreedte (hoogte schaalt)
 # - CSV-robustheid + smart quotes fix + werkende “Kopieer antwoord”
+# - AI standaard AAN + “dit snap ik niet” → eenvoudige uitleg + stappenplan
 # """
 
 import os
@@ -46,6 +46,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+
 # ── UI-config ────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IPAL Chatbox", layout="centered")
 st.markdown(
@@ -59,6 +60,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 # ── OpenAI (optioneel) ───────────────────────────────────────────────────────
 load_dotenv()
@@ -74,12 +76,13 @@ def chatgpt_cached(messages, temperature=0.2, max_tokens=700) -> str:
     )
     return resp.choices[0].message.content.strip()
 
+
 # ── Smart punctuation / Windows-1252 opschonen ──────────────────────────────
 def clean_text(s: str) -> str:
     if s is None:
         return ""
     s = str(s)
-    s = s.replace("\u00A0", " ")  # NBSP → spatie
+    s = s.replace("\u00A0", " ")
     repl = {
         "\u0091": "'", "\u0092": "'", "\u0093": '"', "\u0094": '"',
         "\u0096": "-", "\u0097": "-", "\u0085": "...",
@@ -95,11 +98,13 @@ def clean_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
+
 # ── PDF/AI-INFO constants ───────────────────────────────────────────────────
 FAQ_LINKS = [
     ("Veelgestelde vragen DocBase nieuw 2024", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1"),
     ("Veelgestelde vragen Exact Online", "https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1"),
 ]
+
 AI_INFO = """
 AI-Antwoord Info:  
 1. Dit is het AI-antwoord vanuit de IPAL chatbox van het Interdiocesaan Platform Automatisering & Ledenadministratie. Het is altijd een goed idee om de meest recente informatie te controleren via officiële bronnen.  
@@ -108,6 +113,7 @@ AI-Antwoord Info:
 - [Veelgestelde vragen DocBase nieuw 2024](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328526&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.07961651005089099&EC=1)
 - [Veelgestelde vragen Exact Online](https://parochie-automatisering.nl/docbase/Templates/docbase?action=SelOpenDocument&DetailsMode=2&Docname=00328522&Type=INSTR_DOCS&LoginMode=1&LinkToVersion=1&OpenFileMode=2&password=%3Auzt7hs%23qL%2A%28&username=Externehyperlink&ID=0.8756321684738348&EC=1)
 """
+
 
 # ── PDF helpers ──────────────────────────────────────────────────────────────
 if os.path.exists("Calibri.ttf"):
@@ -175,15 +181,12 @@ def make_pdf(question: str, answer: str) -> bytes:
     )
 
     story = []
-
-    # Banner/logo (optioneel) – breedte = content_width, hoogte schaalt automatisch
     if os.path.exists("logopdf.png"):
         try:
             banner = Image("logopdf.png")
-            banner._restrictSize(content_width, 10000)
+            banner._restrictSize(content_width, 10000)  # breedte = content_width; hoogte schaalt
             banner.hAlign = "LEFT"
-            story.append(banner)
-            story.append(Spacer(1, 8))
+            story.append(banner); story.append(Spacer(1, 8))
         except Exception as e:
             logging.error(f"Kon banner niet laden: {e}")
 
@@ -214,6 +217,7 @@ def make_pdf(question: str, answer: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
+
 # ── CSV laden + normaliseren ─────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
@@ -225,6 +229,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
         return pd.DataFrame(columns=cols).set_index(["Systeem","Subthema","Categorie"])
+
     try:
         df = pd.read_csv(path, encoding="utf-8", sep=";")
     except UnicodeDecodeError:
@@ -252,22 +257,8 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
 
 faq_df = load_faq()
 
+
 # ── Cascade helpers ──────────────────────────────────────────────────────────
-@st.cache_data(show_spinner=False)
-def list_subthema(systeem: str) -> List[str]:
-    try:
-        return sorted(faq_df.xs(systeem, level="Systeem").index.get_level_values("Subthema").dropna().unique())
-    except Exception:
-        return []
-
-@st.cache_data(show_spinner=False)
-def list_categorieen(systeem: str, subthema: str) -> List[str]:
-    try:
-        subset = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
-        return sorted(subset.index.get_level_values("Categorie").dropna().unique())
-    except Exception:
-        return []
-
 @st.cache_data(show_spinner=False)
 def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
     try:
@@ -279,6 +270,7 @@ def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) ->
         return sorted(vals)
     except Exception:
         return []
+
 
 # ── Veiligheidsfilter & relevance helpers ────────────────────────────────────
 BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
@@ -294,16 +286,64 @@ STOPWORDS_NL = {
     "ook","nog","al","wel","niet","nooit","altijd","hier","daar","ergens","niets","iets","alles",
     "is","was","wordt","zijn","heeft","heb","hebben","doe","doet","doen","kan","kunnen","moet","moeten"
 }
+
 def _tokenize_clean(text: str) -> list[str]:
     return [w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
             if len(w) > 2 and w not in STOPWORDS_NL]
+
 def _relevance(q: str, t: str) -> tuple[int, float]:
     qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(t))
     hits = len(qs & ts); coverage = hits / max(1, len(qs))
     return hits, coverage
+
 def _token_score(q: str, text: str) -> int:
     qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(text))
     return len(qs & ts)
+
+
+# ── Clarify intent helpers ───────────────────────────────────────────────────
+CLARIFY_TRIGGERS = [
+    "dit snap ik niet","ik snap het niet","onduidelijk","leg uit","uitleg",
+    "begrijp ik niet","simpel uitleggen","simpel uitleg","in eenvoudige woorden",
+    "stappenplan","kan je dit uitleggen","ik begrijp dit niet","wat bedoel je",
+    "kunt u dit uitleggen","kunt u het uitleggen","kan je het uitleggen"
+]
+
+def is_clarify(msg: str) -> bool:
+    t = (msg or "").strip().lower()
+    return any(k in t for k in CLARIFY_TRIGGERS)
+
+def simplify_text(text: str) -> str:
+    """Zonder AI: korte, eenvoudige uitleg + stappenplan vanuit bron."""
+    txt = clean_text(text or "")
+    if not txt:
+        return "Er staat geen aanvullende detailuitleg in dit item."
+    zinnen = re.split(r"(?<=[.!?])\s+", txt)
+    bullets = []
+    for z in zinnen:
+        z = re.sub(r"\([^)]*\)", "", z)
+        z = re.sub(r"\s+", " ", z).strip()
+        if 0 < len(z) <= 160:
+            bullets.append(f"- {z}")
+        if len(bullets) >= 5:
+            break
+    if not bullets:
+        bullets = ["- In het kort: " + (txt[:150] + ("…" if len(txt) > 150 else ""))]
+    stappen = []
+    for z in zinnen:
+        if any(x in z.lower() for x in ["klik","ga naar","open","selecteer","vul","druk","kies","bewaar","opslaan"]):
+            stappen.append(z.strip())
+        if len(stappen) >= 6:
+            break
+    if not stappen:
+        stappen = [
+            "Open de juiste functie/pagina.",
+            "Volg de aanwijzingen in het scherm voor dit onderwerp.",
+            "Controleer of het resultaat is wat u verwacht."
+        ]
+    stappen_md = "\n".join([f"{i+1}. {s}" for i, s in enumerate(stappen)])
+    return f"**In eenvoudige woorden:**\n\n" + "\n".join(bullets) + "\n\n**Stappenplan:**\n" + stappen_md
+
 
 # ── Zoekfuncties ─────────────────────────────────────────────────────────────
 def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]") -> Optional[str]:
@@ -363,8 +403,8 @@ def vind_best_algemeen_AI(vraag: str) -> str:
            "Beantwoord kort en concreet. Stel maximaal één verhelderende vraag als dat echt nodig is. "
            "Noem geen niet-bestaande bronnen.")
     user = (f"Vraag: {vraag}\n\n"
-            "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1- of 2 vervolgsuggesties "
-            "of verwijs vriendelijk naar het juiste kanaal. Stel hoogstens één verhelderende vraag.")
+            "Als de vraag niet direct over DocBase/Exact/IPAL-onderwerpen gaat, geef dan 1- of 2 praktische vervolgsuggesties "
+            "of verwijs vriendelijk naar het juiste kanaal.")
     try:
         return chatgpt_cached(
             [{"role":"system","content":sys},{"role":"user","content":user}],
@@ -374,27 +414,6 @@ def vind_best_algemeen_AI(vraag: str) -> str:
         logging.error(f"AI (Internet) fout: {e}")
         return "Kunt u uw vraag iets concreter maken?"
 
-# ── Web-fallback ─────────────────────────────────────────────────────────────
-@st.cache_data(show_spinner=False)
-def fetch_web_info_cached(query: str) -> Optional[str]:
-    result = []
-    try:
-        r = requests.get("https://docbase.nl", timeout=5); r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
-        if txt and (query or "").lower() in txt.lower():
-            result.append(f"Vanuit docbase.nl: {txt[:200]}... (verkort)")
-    except Exception:
-        pass
-    try:
-        r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=5); r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
-        if txt and (query or "").lower() in txt.lower():
-            result.append(f"Vanuit Exact Online Knowledge Base: {txt[:200]}... (verkort)")
-    except Exception:
-        pass
-    return "\n".join(result) if result else None
 
 # ── UI helpers & state ───────────────────────────────────────────────────────
 TIMEZONE = pytz.timezone("Europe/Amsterdam")
@@ -403,7 +422,7 @@ USER_AVATAR = "parochie.png" if os.path.exists("parochie.png") else None
 
 DEFAULT_STATE = {
     "history": [],
-    "selected_product": None,     # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
+    "selected_product": None,
     "selected_module": None,
     "selected_category": None,
     "selected_toelichting": None,
@@ -413,7 +432,7 @@ DEFAULT_STATE = {
     "last_question": "",
     "last_item_label": "",
     "debug": False,
-    "allow_ai": False,
+    "allow_ai": True,          # <— AI standaard AAN
     "allow_web": False,
     "min_hits": 2,
     "min_cov": 0.25,
@@ -422,9 +441,9 @@ DEFAULT_STATE = {
     "last_processed_algemeen": "",
     # Conversatie-wizard
     "chat_mode": True,
-    "chat_step": "greet",            # greet → ask_scope → ask_topic → pick_item → followup
-    "chat_scope": None,              # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
-    "chat_results": [],              # DataFrame.to_dict('records')
+    "chat_step": "greet",
+    "chat_scope": None,        # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
+    "chat_results": [],
     "chat_greeted": False,
     "pdf_ready": False,
 }
@@ -498,13 +517,14 @@ def render_chat():
                 except Exception:
                     pass
 
-# ── Conversatie-wizard ───────────────────────────────────────────────────────
+
+# ── Conversatie-wizard (échte chatbox) ───────────────────────────────────────
 def _detect_scope(msg: str) -> Optional[str]:
     t = (msg or "").lower()
-    if any(w in t for w in ["exact", "eol", "e-online", "exact online"]): return "Exact"
-    if any(w in t for w in ["docbase", "doc base"]): return "DocBase"
-    if any(w in t for w in ["csv", "zoeken intern", "zoek in csv", "zoeken in csv", "zoeken"]): return "Zoeken"
-    if any(w in t for w in ["internet", "web", "algemeen", "overig", "anders", "ik weet het niet"]): return "Algemeen"
+    if any(w in t for w in ["exact","eol","e-online","exact online"]): return "Exact"
+    if any(w in t for w in ["docbase","doc base"]): return "DocBase"
+    if any(w in t for w in ["csv","zoeken intern","zoek in csv","zoeken in csv","zoeken"]): return "Zoeken"
+    if any(w in t for w in ["internet","web","algemeen","overig","anders","ik weet het niet"]): return "Algemeen"
     return None
 
 def _mk_label(i: int, row: pd.Series) -> str:
@@ -515,49 +535,45 @@ def _mk_label(i: int, row: pd.Series) -> str:
     return f"{i+1:02d}. {preview}"
 
 def chat_wizard():
-    # Altijd eerst de chat
     render_chat()
 
-    # initialize
-    if "chat_step" not in st.session_state: st.session_state["chat_step"] = "greet"
-    if "chat_scope" not in st.session_state: st.session_state["chat_scope"] = None
-    step = st.session_state.get("chat_step", "greet")
-    scope = st.session_state.get("chat_scope")
-
-    # Snelkeuzes (vaste keys)
+    # Snelkeuzes
     with st.container():
         c1, c2, c3, c4, c5 = st.columns(5)
         if c1.button("Exact", key="wizard_exact", use_container_width=True):
-            st.session_state.update({"chat_scope": "Exact", "chat_step": "ask_topic", "pdf_ready": False})
+            st.session_state.update({"chat_scope": "Exact", "chat_step": "ask_topic"})
             add_msg("assistant", "Prima. Kunt u in één zin beschrijven waar uw vraag over Exact Online over gaat?")
-            st.rerun()
+            st.session_state["pdf_ready"] = False; st.rerun()
         if c2.button("DocBase", key="wizard_docbase", use_container_width=True):
-            st.session_state.update({"chat_scope": "DocBase", "chat_step": "ask_topic", "pdf_ready": False})
+            st.session_state.update({"chat_scope": "DocBase", "chat_step": "ask_topic"})
             add_msg("assistant", "Dank u. Kunt u in één zin beschrijven waar uw vraag over DocBase over gaat?")
-            st.rerun()
+            st.session_state["pdf_ready"] = False; st.rerun()
         if c3.button("Zoeken", key="wizard_search", use_container_width=True):
-            st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic", "pdf_ready": False})
+            st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
             add_msg("assistant", "Waar wilt u in de CSV op zoeken? Typ een korte zoekterm.")
-            st.rerun()
+            st.session_state["pdf_ready"] = False; st.rerun()
         if c4.button("Internet", key="wizard_internet", use_container_width=True):
-            st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic", "pdf_ready": False})
+            st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
             add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
-            st.rerun()
+            st.session_state["pdf_ready"] = False; st.rerun()
         if c5.button("🔄 Reset", key="wizard_reset", use_container_width=True):
+            for k in list(st.session_state.keys()):
+                del st.session_state[k]
+            for k, v in DEFAULT_STATE.items():
+                if k not in st.session_state:
+                    st.session_state[k] = v
             try: st.cache_data.clear()
             except Exception: pass
-            for k in list(st.session_state.keys()): del st.session_state[k]
-            for k, v in DEFAULT_STATE.items():
-                if k not in st.session_state: st.session_state[k] = v
             st.rerun()
 
-    # Begroeting
     if not st.session_state.get("chat_greeted", False):
         add_msg("assistant", "👋 Waarmee kan ik u van dienst zijn? U kunt hieronder typen of een snelkeuze gebruiken (Exact, DocBase, Zoeken of Internet).")
         st.session_state["chat_greeted"] = True
         st.session_state["pdf_ready"] = False
         render_chat()
 
+    step = st.session_state.get("chat_step", "greet")
+    scope = st.session_state.get("chat_scope")
     placeholders = {
         "greet": "Typ uw bericht…",
         "ask_scope": "Gaat uw vraag over Exact, DocBase of iets anders?",
@@ -565,33 +581,30 @@ def chat_wizard():
         "pick_item": "Kies een van de opties of stel uw vraag anders.",
         "followup": "Heeft u een vervolgvraag over dit antwoord?",
     }
-    user_text = st.chat_input(placeholders.get(step, "Stel uw vraag…"))
 
-    # Geen input: toon pick-UI indien nodig
+    user_text = st.chat_input(placeholders.get(step, "Stel uw vraag…"))
     if not user_text:
         if step == "pick_item" and st.session_state.get("chat_results"):
             opts = st.session_state["chat_results"]
             labels = [_mk_label(i, pd.Series(r)) for i, r in enumerate(opts)]
-            chosen = st.radio("Kies het beste passende item:", labels, index=0, key="pickitem_radio")
-            if st.button("Toon antwoord", key="pickitem_show"):
+            chosen = st.radio("Kies het beste passende item:", labels, index=0)
+            if st.button("Toon antwoord", key="wizard_show_answer"):
                 idx = labels.index(chosen); row = pd.Series(opts[idx])
-                ans = clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+                ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
                 if not ans:
-                    oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+                    oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
                     ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
                 label = _mk_label(idx, row)
-                img = clean_text(str(row.get('Afbeelding', '')).strip())
+                img = clean_text(str(row.get('Afbeelding', '') or '').strip())
                 st.session_state["selected_image"] = img if img else None
                 st.session_state["last_item_label"] = label
                 st.session_state["last_question"] = f"Gekozen item: {label}"
                 st.session_state["selected_answer_text"] = ans
                 st.session_state["pdf_ready"] = True
                 add_msg("assistant", with_info(ans))
-                st.session_state["chat_step"] = "followup"
-                st.rerun()
+                st.session_state["chat_step"] = "followup"; st.rerun()
         return
 
-    # Verwerk input
     add_msg("user", user_text)
 
     if (user_text or "").strip().upper() == "UNIEKECODE123":
@@ -600,23 +613,17 @@ def chat_wizard():
             st.session_state["last_question"] = user_text
             st.session_state["pdf_ready"] = True
             add_msg("assistant", with_info(cw))
-            st.session_state["chat_step"] = "followup"
-            st.rerun(); return
+            st.session_state["chat_step"] = "followup"; st.rerun(); return
 
     ok, warn = filter_topics(user_text)
     if not ok:
-        st.session_state["pdf_ready"] = False
-        add_msg("assistant", warn)
-        st.rerun(); return
+        st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
 
-    # Routering per stap
     if step in ("greet","ask_scope"):
         scope_guess = _detect_scope(user_text)
         if scope_guess is None and user_text.strip().lower() in ("ik heb een vraag","ik heb een vraag.","vraag","hallo","goedemiddag"):
-            st.session_state["chat_step"] = "ask_scope"
-            st.session_state["pdf_ready"] = False
-            add_msg("assistant","Gaat uw vraag over **Exact**, **DocBase** of **iets anders**?")
-            st.rerun(); return
+            st.session_state["chat_step"] = "ask_scope"; st.session_state["pdf_ready"] = False
+            add_msg("assistant","Gaat uw vraag over **Exact**, **DocBase** of **iets anders**?"); st.rerun(); return
         if scope_guess is None:
             hits = zoek_in_scope(None, user_text, topn=6)
             if not hits.empty:
@@ -641,26 +648,27 @@ def chat_wizard():
 
     if step == "ask_topic":
         scope = st.session_state.get("chat_scope")
-        st.session_state["last_question"] = user_text
         if scope == "Algemeen":
+            st.session_state["last_question"] = user_text
             antwoord = vind_best_algemeen_AI(user_text)
             if not antwoord and st.session_state.get("allow_web"):
                 webbits = fetch_web_info_cached(user_text)
                 if webbits: antwoord = webbits
             st.session_state["pdf_ready"] = True
             add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
-            st.session_state["chat_step"] = "followup"
-            st.rerun(); return
-        hits = zoek_in_scope(None if scope == "Zoeken" else scope, user_text, topn=8)
-        if hits.empty:
+            st.session_state["chat_step"] = "followup"; st.rerun(); return
+        else:
+            st.session_state["last_question"] = user_text
+            hits = zoek_in_scope(None if scope == "Zoeken" else scope, user_text, topn=8)
+            if hits.empty:
+                st.session_state["pdf_ready"] = False
+                add_msg("assistant","Ik vond geen goede match in de CSV. Formuleer het iets anders of kies **Internet**.")
+                st.rerun(); return
+            st.session_state["chat_results"] = hits.to_dict("records")
+            st.session_state["chat_step"] = "pick_item"
             st.session_state["pdf_ready"] = False
-            add_msg("assistant","Ik vond geen goede match in de CSV. Formuleer het iets anders of kies **Internet**.")
+            add_msg("assistant","Ik heb een aantal mogelijke matches gevonden. Kies hieronder het beste passende item.")
             st.rerun(); return
-        st.session_state["chat_results"] = hits.to_dict("records")
-        st.session_state["chat_step"] = "pick_item"
-        st.session_state["pdf_ready"] = False
-        add_msg("assistant","Ik heb een aantal mogelijke matches gevonden. Kies hieronder het beste passende item.")
-        st.rerun(); return
 
     if step == "pick_item":
         m = re.search(r"\b(\d{1,2})\b", user_text)
@@ -668,20 +676,19 @@ def chat_wizard():
             idx = int(m.group(1)) - 1; opts = st.session_state["chat_results"]
             if 0 <= idx < len(opts):
                 row = pd.Series(opts[idx])
-                ans = clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+                ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
                 if not ans:
-                    oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+                    oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
                     ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
                 label = _mk_label(idx, row)
-                img = clean_text(str(row.get('Afbeelding', '')).strip())
+                img = clean_text(str(row.get('Afbeelding', '') or '').strip())
                 st.session_state["selected_image"] = img if img else None
                 st.session_state["last_item_label"] = label
                 st.session_state["last_question"] = f"Gekozen item: {label}"
                 st.session_state["selected_answer_text"] = ans
                 st.session_state["pdf_ready"] = True
                 add_msg("assistant", with_info(ans))
-                st.session_state["chat_step"] = "followup"
-                st.rerun(); return
+                st.session_state["chat_step"] = "followup"; st.rerun(); return
         st.session_state["pdf_ready"] = False
         add_msg("assistant","Gebruik de selectie hierboven om een item te kiezen, of typ het nummer (bijv. 2).")
         st.rerun(); return
@@ -689,50 +696,58 @@ def chat_wizard():
     if step == "followup":
         vraag2 = user_text
         st.session_state["last_question"] = vraag2
-        low = vraag2.strip().lower()
-        if any(k in low for k in ["ander","andere","volgende","nog een","iets anders"]):
-            scope = st.session_state.get("chat_scope")
-            hits = zoek_in_scope(None if scope == "Zoeken" else scope, vraag2, topn=8)
-            if hits.empty:
-                add_msg("assistant","Ik vond geen andere goede match. Formuleer het anders of kies **Internet**.")
-                st.session_state["pdf_ready"] = False
-            else:
-                st.session_state["chat_results"] = hits.to_dict("records")
-                st.session_state["chat_step"] = "pick_item"
-                st.session_state["pdf_ready"] = False
-                add_msg("assistant","Ik heb nieuwe opties gevonden. Kies hieronder een ander item.")
+
+        # Verduidelijkings-intent: eenvoudige uitleg + stappenplan
+        bron = str(st.session_state.get("selected_answer_text") or "").strip()
+        if is_clarify(vraag2):
+            reactie = None
+            if client is not None:
+                try:
+                    reactie = chatgpt_cached(
+                        [
+                            {"role":"system","content":
+                             "Leg in eenvoudige Nederlandse woorden uit voor een vrijwilliger zonder technische kennis. "
+                             "Gebruik maximaal 5 bullets en, indien nuttig, een kort stappenplan. "
+                             "Baseer ALLES uitsluitend op de gegeven bron; geen aannames."},
+                            {"role":"user","content": f"Bron:\n{bron}\n\nMaak het simpel en concreet; voeg een stappenplan toe als dat helpt."}
+                        ],
+                        temperature=0.2, max_tokens=600
+                    )
+                except Exception:
+                    reactie = None
+            if not reactie:
+                reactie = simplify_text(bron)
+            st.session_state["pdf_ready"] = True
+            add_msg("assistant", with_info(reactie))
             st.rerun(); return
 
         ok, warn = filter_topics(vraag2)
         if not ok:
-            st.session_state["pdf_ready"] = False
-            add_msg("assistant", warn)
-            st.rerun(); return
+            st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
 
-        bron = str(st.session_state.get("selected_answer_text") or "").strip()
         reactie = None
         if st.session_state.get("allow_ai") and client is not None and bron:
             try:
                 reactie = chatgpt_cached(
-                    [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                     {"role":"user","content":f"Bron:\n{bron}\n\nVervolgvraag: {vraag2}"}],
-                    temperature=0.1, max_tokens=600
+                    [
+                        {"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                        {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag2}"}
+                    ],
+                    temperature=0.1, max_tokens=600,
                 )
             except Exception as e:
                 logging.error(f"AI-QA fout: {e}")
                 reactie = None
         if not reactie:
-            if bron:
-                zinnen = re.split(r"(?<=[.!?])\s+", bron)
-                scores = [(_token_score(vraag2, z), z) for z in zinnen]
-                scores.sort(key=lambda x: x[0], reverse=True)
-                top = [z for s, z in scores if s > 0][:3]
-                reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
-            else:
-                reactie = "Ik heb geen detail voor dit item in de CSV. Kies een ander item of stel de vraag via **Internet**."
+            zinnen = re.split(r"(?<=[.!?])\s+", bron)
+            scores = [(_token_score(vraag2, z), z) for z in zinnen]
+            scores.sort(key=lambda x: x[0], reverse=True)
+            top = [z for s, z in scores if s > 0][:3]
+            reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
         st.session_state["pdf_ready"] = True
         add_msg("assistant", with_info(reactie))
         st.rerun(); return
+
 
 # ── App ──────────────────────────────────────────────────────────────────────
 def main():
@@ -740,8 +755,7 @@ def main():
     video_path = "helpdesk.mp4"
     if os.path.exists(video_path):
         try:
-            with open(video_path, "rb") as f:
-                st.video(f.read(), format="video/mp4", start_time=0)
+            with open(video_path, "rb") as f: st.video(f.read(), format="video/mp4", start_time=0)
         except Exception as e:
             logging.error(f"Introvideo kon niet worden afgespeeld: {e}")
     elif os.path.exists("logo.png"):
@@ -751,7 +765,7 @@ def main():
 
     st.header("Welkom bij IPAL Chatbox")
 
-    # Klassieke cascade via expander (optioneel)
+    # Expander: klassieke cascade starten (optioneel)
     with st.expander("Liever de klassieke cascade openen?"):
         keuze = st.radio("Kies cascade:", ["Exact","DocBase","Zoeken","Internet"], horizontal=True, index=0, key="cascade_radio")
         if st.button("Start cascade", use_container_width=True, key="cascade_start"):
@@ -776,7 +790,7 @@ def main():
                     "selected_answer_id": None, "selected_answer_text": None,
                     "last_item_label": "", "last_question": ""
                 })
-            else:  # Internet
+            else:
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "Algemeen",
                     "selected_image": None, "selected_module": None, "selected_category": None,
@@ -785,10 +799,9 @@ def main():
                 })
             st.rerun()
 
-    # Conversatie-modus actief?
+    # Wizard modus
     if st.session_state.get("chat_mode", True):
-        chat_wizard()
-        return
+        chat_wizard(); return
 
     # ------ Klassieke flows ------
     render_chat()
@@ -807,46 +820,38 @@ def main():
                 st.session_state["last_processed_algemeen"] = algemeen_vraag
                 add_msg("user", algemeen_vraag)
                 st.session_state["pdf_ready"] = True
-                add_msg("assistant", with_info(cw))
-                st.rerun(); return
+                add_msg("assistant", with_info(cw)); st.rerun(); return
         st.session_state["last_processed_algemeen"] = algemeen_vraag
         st.session_state["last_question"] = algemeen_vraag
         add_msg("user", algemeen_vraag)
         ok, warn = filter_topics(algemeen_vraag)
         if not ok:
-            st.session_state["pdf_ready"] = False
-            add_msg("assistant", warn)
-            st.rerun(); return
+            st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
         antwoord = vind_best_algemeen_AI(algemeen_vraag)
         if not antwoord and st.session_state.get("allow_web"):
             webbits = fetch_web_info_cached(algemeen_vraag)
             if webbits: antwoord = webbits
-        st.session_state["pdf_ready"] = True
-        add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?"))
-        st.rerun(); return
+        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?")); st.rerun(); return
 
     # ZOEKEN (hele CSV)
     if st.session_state.get("selected_product") == "Zoeken":
         st.session_state["search_query"] = st.text_input("Waar wil je in de volledige CSV op zoeken?", value=st.session_state.get("search_query",""))
         q = st.session_state["search_query"].strip()
-        if not q:
-            return
+        if not q: return
         results = zoek_hele_csv(q, min_hits=st.session_state["min_hits"], min_cov=st.session_state["min_cov"])
         st.caption(f"Gevonden resultaten: {len(results)}")
         if results.empty:
-            st.info("Geen resultaten gevonden. Pas je zoekterm aan of verlaag de drempels (Geavanceerd).")
-            return
+            st.info("Geen resultaten gevonden. Pas je zoekterm aan of verlaag de drempels (Geavanceerd)."); return
         df_reset = results.reset_index(drop=True)
         def mk_label(i, row):
-            oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
-            toel = clean_text(str(row.get('Toelichting melding', '')).strip())
-            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+            oms = clean_text(str(row.get('Omschrijving melding','')).strip())
+            toel = clean_text(str(row.get('Toelichting melding','')).strip())
+            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
             preview = re.sub(r"\s+"," ", preview)[:140]
             return f"{i+1:02d}. {preview}"
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
         keuze = st.selectbox("Kies een item uit de zoekresultaten:", ["(Kies)"] + opties)
-        if keuze == "(Kies)":
-            return
+        if keuze == "(Kies)": return
         idx = int(keuze.split(".")[0]) - 1
         row = df_reset.iloc[idx]; row_id = row.get("ID", idx)
         ans = clean_text(str(row.get('Antwoord of oplossing','') or '').strip())
@@ -862,39 +867,59 @@ def main():
             st.session_state["last_item_label"] = label
             st.session_state["last_question"] = f"Gekozen item: {label}"
             st.session_state["pdf_ready"] = True
-            add_msg("assistant", with_info(ans))
-            st.rerun(); return
+            add_msg("assistant", with_info(ans)); st.rerun(); return
+
         vraag2 = st.chat_input("Stel uw vraag over dit antwoord:")
-        if not vraag2:
-            return
-        st.session_state["last_question"] = vraag2
-        add_msg("user", vraag2)
+        if not vraag2: return
+        st.session_state["last_question"] = vraag2; add_msg("user", vraag2)
+
+        bron = str(st.session_state.get("selected_answer_text") or "").strip()
+        if is_clarify(vraag2):
+            reactie = None
+            if client is not None:
+                try:
+                    reactie = chatgpt_cached(
+                        [
+                            {"role":"system","content":
+                             "Leg in eenvoudige Nederlandse woorden uit voor een vrijwilliger zonder technische kennis. "
+                             "Gebruik maximaal 5 bullets en, indien nuttig, een kort stappenplan. "
+                             "Baseer ALLES uitsluitend op de gegeven bron; geen aannames."},
+                            {"role":"user","content": f"Bron:\n{bron}\n\nMaak het simpel en concreet; voeg een stappenplan toe als dat helpt."}
+                        ],
+                        temperature=0.2, max_tokens=600
+                    )
+                except Exception:
+                    reactie = None
+            if not reactie:
+                reactie = simplify_text(bron)
+            st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun(); return
+
         ok, warn = filter_topics(vraag2)
         if not ok:
-            st.session_state["pdf_ready"] = False
-            add_msg("assistant", warn)
-            st.rerun(); return
-        bron = str(st.session_state.get("selected_answer_text") or ""); reactie = None
+            st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
+
+        reactie = None
         if st.session_state.get("allow_ai") and client is not None:
             try:
                 reactie = chatgpt_cached(
-                    [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                     {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag2}"}],
-                    temperature=0.1, max_tokens=600
+                    [
+                        {"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                        {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag2}"}
+                    ],
+                    temperature=0.1, max_tokens=600,
                 )
             except Exception as e:
-                logging.error(f"AI-QA fout: {e}"); reactie = None
+                logging.error(f"AI-QA fout: {e}")
+                reactie = None
         if not reactie:
             zinnen = re.split(r"(?<=[.!?])\s+", bron)
             scores = [(_token_score(vraag2, z), z) for z in zinnen]
             scores.sort(key=lambda x: x[0], reverse=True)
             top = [z for s, z in scores if s > 0][:3]
             reactie = "\n".join(top) if top else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
-        st.session_state["pdf_ready"] = True
-        add_msg("assistant", with_info(reactie))
-        st.rerun(); return
+        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun(); return
 
-    # EXACT/DOCBASE CASCADE
+    # Exact/DocBase (klassiek)
     syst = st.session_state.get("selected_product")
     sub  = st.session_state.get("selected_module") or ""
     cat  = st.session_state.get("selected_category") or ""
@@ -903,10 +928,8 @@ def main():
     if parts: st.caption(" › ".join(parts))
 
     if not st.session_state.get("selected_module"):
-        try:
-            opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
-        except Exception:
-            opts = []
+        try: opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
+        except Exception: opts = []
         sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
@@ -963,8 +986,6 @@ def main():
             return
 
     df_scope = faq_df
-    cat = st.session_state["selected_category"]
-    toe = st.session_state.get("selected_toelichting", "")
     try:
         df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
         df_scope = df_scope.xs(sub, level="Subthema", drop_level=False)
@@ -972,19 +993,21 @@ def main():
             df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
     except KeyError:
         df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
     if not df_scope.empty and toe is not None and str(toe) != "":
         tm = (df_scope["Toelichting melding"].astype(str).apply(clean_text))
         sel = clean_text(str(toe))
         df_scope = df_scope[tm == sel]
+
     if df_scope.empty:
         st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting.")
         return
 
     df_reset = df_scope.reset_index()
     def mk_label(i, row):
-        oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
-        toel = clean_text(str(row.get('Toelichting melding', '')).strip())
-        preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+        oms = clean_text(str(row.get('Omschrijving melding','')).strip())
+        toel = clean_text(str(row.get('Toelichting melding','')).strip())
+        preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing','')).strip())
         preview = re.sub(r"\s+"," ", preview)[:140]
         return f"{i+1:02d}. {preview}"
     opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
@@ -992,12 +1015,12 @@ def main():
     if keuze != "(Kies)":
         i = int(keuze.split(".")[0]) - 1
         row = df_reset.iloc[i]; row_id = row.get("ID", i)
-        ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
+        ans = clean_text(str(row.get('Antwoord of oplossing','') or '').strip())
         if not ans:
-            oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+            oms = clean_text(str(row.get('Omschrijving melding','') or '').strip())
             ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
         label = mk_label(i, row)
-        img = clean_text(str(row.get('Afbeelding', '')).strip())
+        img = clean_text(str(row.get('Afbeelding','') or '').strip())
         st.session_state["selected_image"] = img if img else None
         if st.session_state.get("selected_answer_id") != row_id:
             st.session_state["selected_answer_id"] = row_id
@@ -1005,8 +1028,7 @@ def main():
             st.session_state["last_item_label"] = label
             st.session_state["last_question"] = f"Gekozen item: {label}"
             st.session_state["pdf_ready"] = True
-            add_msg("assistant", with_info(ans))
-            st.rerun(); return
+            add_msg("assistant", with_info(ans)); st.rerun(); return
 
     vraag = st.chat_input("Stel uw vraag over dit antwoord:")
     if not vraag: return
@@ -1016,26 +1038,49 @@ def main():
             st.session_state["last_question"] = vraag
             add_msg("user", vraag)
             st.session_state["pdf_ready"] = True
-            add_msg("assistant", with_info(cw))
-            st.rerun(); return
+            add_msg("assistant", with_info(cw)); st.rerun(); return
+
     st.session_state["last_question"] = vraag
     add_msg("user", vraag)
     ok, warn = filter_topics(vraag)
     if not ok:
-        st.session_state["pdf_ready"] = False
-        add_msg("assistant", warn)
-        st.rerun(); return
-    bron = str(st.session_state.get("selected_answer_text") or "")
+        st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
+
+    bron = str(st.session_state.get("selected_answer_text") or "").strip()
+    if is_clarify(vraag):
+        reactie = None
+        if client is not None:
+            try:
+                reactie = chatgpt_cached(
+                    [
+                        {"role":"system","content":
+                         "Leg in eenvoudige Nederlandse woorden uit voor een vrijwilliger zonder technische kennis. "
+                         "Gebruik maximaal 5 bullets en, indien nuttig, een kort stappenplan. "
+                         "Baseer ALLES uitsluitend op de gegeven bron; geen aannames."},
+                        {"role":"user","content": f"Bron:\n{bron}\n\nMaak het simpel en concreet; voeg een stappenplan toe als dat helpt."}
+                    ],
+                    temperature=0.2, max_tokens=600
+                )
+            except Exception:
+                reactie = None
+        if not reactie:
+            reactie = simplify_text(bron)
+        st.session_state["pdf_ready"] = True
+        add_msg("assistant", with_info(reactie)); st.rerun(); return
+
     reactie = None
     if st.session_state.get("allow_ai") and client is not None:
         try:
             reactie = chatgpt_cached(
-                [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                 {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag}"}],
-                temperature=0.1, max_tokens=600
+                [
+                    {"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                    {"role":"user","content": f"Bron:\n{bron}\n\nVraag: {vraag}"}
+                ],
+                temperature=0.1, max_tokens=600,
             )
         except Exception as e:
-            logging.error(f"AI-QA fout: {e}"); reactie = None
+            logging.error(f"AI-QA fout: {e}")
+            reactie = None
     if not reactie:
         zinnen = re.split(r"(?<=[.!?])\s+", bron)
         scores = [(_token_score(vraag, z), z) for z in zinnen]
@@ -1045,6 +1090,7 @@ def main():
     st.session_state["pdf_ready"] = True
     add_msg("assistant", with_info(reactie))
     st.rerun()
+
 
 if __name__ == "__main__":
     main()
