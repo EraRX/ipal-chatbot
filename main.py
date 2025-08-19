@@ -38,9 +38,14 @@ except ImportError:
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, Table, TableStyle
-)
+from reportlab.platypus import Paragraph, Spacer
+
+if os.path.exists("logopdf.png"):
+    logo = Image("logopdf.png", width=181, height=125)
+    logo.hAlign = "LEFT"   # forceer links uitlijnen
+    story.append(logo)
+    story.append(Spacer(1, 6))
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT
@@ -1178,6 +1183,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
