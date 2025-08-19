@@ -620,40 +620,47 @@ def chat_wizard():
     """Échte chatervaring met intake → scope → onderwerp → resultaat → vervolgvraag."""
     render_chat()
 
-    # Snelkeuzes (chips) — labels vast: Exact / DocBase / Zoeken / Internet
-    with st.container():
-        c1, c2, c3, c4, c5 = st.columns(5)
-        if c1.button("Exact", use_container_width=True):
-            st.session_state.update({"chat_scope": "Exact", "chat_step": "ask_topic"})
-            add_msg("assistant", "Prima. Kunt u in één zin beschrijven waar uw vraag over Exact Online over gaat?")
-            st.session_state["pdf_ready"] = False
-            st.rerun()
-        if c2.button("DocBase", use_container_width=True):
-            st.session_state.update({"chat_scope": "DocBase", "chat_step": "ask_topic"})
-            add_msg("assistant", "Dank u. Kunt u in één zin beschrijven waar uw vraag over DocBase over gaat?")
-            st.session_state["pdf_ready"] = False
-            st.rerun()
-        if c3.button("Zoeken", use_container_width=True):  # i.p.v. “Zoeken Intern”
-            st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
-            add_msg("assistant", "Waar wilt u in de CSV op zoeken? Typ een korte zoekterm.")
-            st.session_state["pdf_ready"] = False
-            st.rerun()
-        if c4.button("Internet", use_container_width=True):  # i.p.v. “Zoeken Algemeen”
-            st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
-            add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
-            st.session_state["pdf_ready"] = False
-            st.rerun()
-        if c5.button("🔄 Reset", use_container_width=True):
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
-            for k, v in DEFAULT_STATE.items():
-                if k not in st.session_state:
-                    st.session_state[k] = v
-            try:
-                st.cache_data.clear()
-            except Exception:
-                pass
-            st.rerun()
+# Snelkeuzes (chips) — labels vast: Exact / DocBase / Zoeken / Internet
+with st.container():
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    if c1.button("Exact", key="wizard_exact", use_container_width=True):
+        st.session_state.update({"chat_scope": "Exact", "chat_step": "ask_topic"})
+        add_msg("assistant", "Prima. Kunt u in één zin beschrijven waar uw vraag over Exact Online over gaat?")
+        st.session_state["pdf_ready"] = False
+        st.rerun()
+
+    if c2.button("DocBase", key="wizard_docbase", use_container_width=True):
+        st.session_state.update({"chat_scope": "DocBase", "chat_step": "ask_topic"})
+        add_msg("assistant", "Dank u. Kunt u in één zin beschrijven waar uw vraag over DocBase over gaat?")
+        st.session_state["pdf_ready"] = False
+        st.rerun()
+
+    if c3.button("Zoeken", key="wizard_search", use_container_width=True):  # i.p.v. “Zoeken Intern”
+        st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
+        add_msg("assistant", "Waar wilt u in de CSV op zoeken? Typ een korte zoekterm.")
+        st.session_state["pdf_ready"] = False
+        st.rerun()
+
+    if c4.button("Internet", key="wizard_internet", use_container_width=True):  # i.p.v. “Zoeken Algemeen”
+        st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
+        add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
+        st.session_state["pdf_ready"] = False
+        st.rerun()
+
+    if c5.button("🔄 Reset", key="wizard_reset", use_container_width=True):
+        # alles resetten + cache legen
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        for k, v in DEFAULT_STATE.items():
+            if k not in st.session_state:
+                st.session_state[k] = v
+        try:
+            st.cache_data.clear()
+        except Exception:
+            pass
+        st.rerun()
+
 
     # Eénmalige begroeting
     if not st.session_state.get("chat_greeted", False):
@@ -1353,3 +1360,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
