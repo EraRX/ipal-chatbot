@@ -474,6 +474,7 @@ DEFAULT_STATE = {
     "selected_product": None,     # "Exact" | "DocBase" | "Zoeken" | "Algemeen"
     "selected_module": None,
     "selected_category": None,
+    "selected_omschrijving": None,  # <-- NIEUW (stap 4)
     "selected_toelichting": None,
     "selected_answer_id": None,
     "selected_answer_text": None,
@@ -857,6 +858,69 @@ def main():
 
     st.header("Welkom bij IPAL Chatbox")
 
+    # ── Persistente knoppenbalk in klassieke flow (blijft zichtbaar) ──
+    if not st.session_state.get("chat_mode", True):
+        c1, c2, c3, c4, c5 = st.columns(5)
+        if c1.button("Exact", use_container_width=True, key="top_exact"):
+            st.session_state.update({
+                "selected_product": "Exact",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_omschrijving": None,   # nieuw
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+                "last_item_label": "",
+                "last_question": "",
+            }); st.rerun()
+        if c2.button("DocBase", use_container_width=True, key="top_docbase"):
+            st.session_state.update({
+                "selected_product": "DocBase",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_omschrijving": None,   # nieuw
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+                "last_item_label": "",
+                "last_question": "",
+            }); st.rerun()
+        if c3.button("Zoeken", use_container_width=True, key="top_zoek"):
+            st.session_state.update({
+                "selected_product": "Zoeken",
+                "selected_image": None,
+                "search_query": "",
+                "search_selection_index": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+                "last_item_label": "",
+                "last_question": "",
+            }); st.rerun()
+        if c4.button("Internet", use_container_width=True, key="top_internet"):
+            st.session_state.update({
+                "selected_product": "Algemeen",
+                "selected_image": None,
+                "selected_module": None,
+                "selected_category": None,
+                "selected_omschrijving": None,   # nieuw
+                "selected_toelichting": None,
+                "selected_answer_id": None,
+                "selected_answer_text": None,
+                "last_item_label": "",
+                "last_question": "",
+            }); st.rerun()
+        if c5.button("🔄 Reset", use_container_width=True, key="top_reset"):
+            for k in list(st.session_state.keys()):
+                del st.session_state[k]
+            for k,v in DEFAULT_STATE.items():
+                if k not in st.session_state:
+                    st.session_state[k] = v
+            try: st.cache_data.clear()
+            except Exception: pass
+            st.rerun()
+
     # Klassieke cascade (optioneel)
     with st.expander("Liever de klassieke cascade openen?"):
         keuze = st.radio(
@@ -868,14 +932,16 @@ def main():
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "Exact",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "selected_omschrijving": None, "selected_toelichting": None,
+                    "selected_answer_id": None, "selected_answer_text": None,
                     "last_item_label": "", "last_question": "",
                 })
             elif keuze == "DocBase":
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "DocBase",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "selected_omschrijving": None, "selected_toelichting": None,
+                    "selected_answer_id": None, "selected_answer_text": None,
                     "last_item_label": "", "last_question": "",
                 })
             elif keuze == "Zoeken":
@@ -889,7 +955,8 @@ def main():
                 st.session_state.update({
                     "chat_mode": False, "selected_product": "Algemeen",
                     "selected_image": None, "selected_module": None, "selected_category": None,
-                    "selected_toelichting": None, "selected_answer_id": None, "selected_answer_text": None,
+                    "selected_omschrijving": None, "selected_toelichting": None,
+                    "selected_answer_id": None, "selected_answer_text": None,
                     "last_item_label": "", "last_question": "",
                 })
             st.rerun()
@@ -905,13 +972,15 @@ def main():
         if c1.button("Exact", use_container_width=True, key="classic_exact"):
             st.session_state.update({"selected_product": "Exact",
                                      "selected_image": None, "selected_module": None, "selected_category": None,
-                                     "selected_toelichting": None, "selected_answer_id": None,
+                                     "selected_omschrijving": None, "selected_toelichting": None,
+                                     "selected_answer_id": None,
                                      "selected_answer_text": None, "last_item_label": "", "last_question": ""})
             st.rerun()
         if c2.button("DocBase", use_container_width=True, key="classic_docbase"):
             st.session_state.update({"selected_product": "DocBase",
                                      "selected_image": None, "selected_module": None, "selected_category": None,
-                                     "selected_toelichting": None, "selected_answer_id": None,
+                                     "selected_omschrijving": None, "selected_toelichting": None,
+                                     "selected_answer_id": None,
                                      "selected_answer_text": None, "last_item_label": "", "last_question": ""})
             st.rerun()
         if c3.button("Zoeken", use_container_width=True, key="classic_zoeken"):
@@ -923,7 +992,8 @@ def main():
         if c4.button("Internet", use_container_width=True, key="classic_internet"):
             st.session_state.update({"selected_product": "Algemeen",
                                      "selected_image": None, "selected_module": None, "selected_category": None,
-                                     "selected_toelichting": None, "selected_answer_id": None,
+                                     "selected_omschrijving": None, "selected_toelichting": None,
+                                     "selected_answer_id": None,
                                      "selected_answer_text": None, "last_item_label": "", "last_question": ""})
             st.rerun()
         render_chat()
@@ -956,7 +1026,7 @@ def main():
         if not antwoord and st.session_state.get("allow_web"):
             webbits = fetch_web_info_cached(algemeen_vraag)
             if webbits: antwoord = webbits
-        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?")); st.rerun(); return
+        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(antwoord of "Kunt u uw vraag iets concreter maken?")); st.rerun(); return
 
     # ZOEKEN (hele CSV)
     if st.session_state.get("selected_product") == "Zoeken":
@@ -1017,7 +1087,7 @@ def main():
             reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
         st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun(); return
 
-    # Exact/DocBase cascade
+    # Exact/DocBase cascade — 1 Systeem → 2 Subthema → 3 Categorie → 4 Omschrijving → 5 Toelichting → 6 Antwoord
     render_chat()
     syst = st.session_state.get("selected_product")
     sub  = st.session_state.get("selected_module") or ""
@@ -1034,6 +1104,7 @@ def main():
         if sel != "(Kies)":
             st.session_state["selected_module"] = sel
             st.session_state["selected_category"] = None
+            st.session_state["selected_omschrijving"] = None  # reset stap 4
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
@@ -1051,6 +1122,7 @@ def main():
         if len(cats) == 0:
             st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
             st.session_state["selected_category"] = "alles"
+            st.session_state["selected_omschrijving"] = None  # reset
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
@@ -1059,6 +1131,7 @@ def main():
         selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
         if selc != "(Kies)":
             st.session_state["selected_category"] = selc
+            st.session_state["selected_omschrijving"] = None  # reset
             st.session_state["selected_toelichting"] = None
             st.session_state["selected_answer_id"] = None
             st.session_state["selected_answer_text"] = None
@@ -1066,18 +1139,55 @@ def main():
             st.toast(f"Gekozen categorie: {selc}"); st.rerun()
         return
 
+    # --- STAP 4 Omschrijving ---
+    if st.session_state.get("selected_omschrijving") is None:
+        try:
+            if cat and str(cat).lower() != "alles":
+                scope = faq_df.xs((syst, st.session_state["selected_module"], cat),
+                                  level=["Systeem","Subthema","Categorie"], drop_level=False)
+            else:
+                scope = faq_df.xs((syst, st.session_state["selected_module"]),
+                                  level=["Systeem","Subthema"], drop_level=False)
+        except Exception:
+            scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
+        oms_list = sorted(
+            scope["Omschrijving melding"].dropna().astype(str).apply(clean_text).unique()
+        )
+        if len(oms_list) == 0:
+            st.info("Geen omschrijvingen gevonden — stap wordt overgeslagen.")
+            st.session_state["selected_omschrijving"] = ""
+        else:
+            oms_sel = st.selectbox("Kies omschrijving:", ["(Kies)"] + oms_list)
+            if oms_sel != "(Kies)":
+                st.session_state["selected_omschrijving"] = oms_sel
+                st.session_state["selected_toelichting"] = None
+                st.session_state["selected_answer_id"] = None
+                st.session_state["selected_answer_text"] = None
+                st.session_state["selected_image"] = None
+                st.toast(f"Gekozen omschrijving: {oms_sel}")
+                st.rerun()
+        return
+
+    # --- STAP 5 Toelichting ---
     if st.session_state.get("selected_toelichting") is None:
-        def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
-            try:
-                if not categorie or str(categorie).lower() == "alles":
-                    scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
-                else:
-                    scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
-                vals = (scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique())
-                return sorted(vals)
-            except Exception:
-                return []
-        toes = list_toelichtingen(syst, st.session_state["selected_module"], st.session_state.get("selected_category"))
+        try:
+            if cat and str(cat).lower() != "alles":
+                scope = faq_df.xs((syst, st.session_state["selected_module"], cat),
+                                  level=["Systeem","Subthema","Categorie"], drop_level=False)
+            else:
+                scope = faq_df.xs((syst, st.session_state["selected_module"]),
+                                  level=["Systeem","Subthema"], drop_level=False)
+        except Exception:
+            scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
+        sel_oms = clean_text(str(st.session_state.get("selected_omschrijving","")))
+        if sel_oms:
+            scope = scope[scope["Omschrijving melding"].astype(str).apply(clean_text) == sel_oms]
+
+        toes = sorted(
+            scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique()
+        )
         if len(toes) == 0:
             st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
             st.session_state["selected_toelichting"] = ""
@@ -1090,10 +1200,10 @@ def main():
                 st.session_state["selected_image"] = None
                 st.toast(f"Gekozen toelichting: {toe_sel}")
                 st.rerun()
-            return
+        return
 
+    # Filter voor stap 6 (antwoord tonen)
     df_scope = faq_df
-    cat = st.session_state["selected_category"]
     toe = st.session_state.get("selected_toelichting", "")
     try:
         df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
@@ -1102,12 +1212,21 @@ def main():
             df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
     except KeyError:
         df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
+    # Filter op Omschrijving (stap 4)
+    sel_oms = clean_text(str(st.session_state.get("selected_omschrijving","")))
+    if not df_scope.empty and sel_oms:
+        om = df_scope["Omschrijving melding"].astype(str).apply(clean_text)
+        df_scope = df_scope[om == sel_oms]
+
+    # Filter op Toelichting (stap 5)
     if not df_scope.empty and toe is not None and str(toe) != "":
         tm = (df_scope["Toelichting melding"].astype(str).apply(clean_text))
         sel = clean_text(str(toe))
         df_scope = df_scope[tm == sel]
+
     if df_scope.empty:
-        st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting."); return
+        st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Omschrijving/Toelichting."); return
 
     df_reset = df_scope.reset_index()
     def mk_label(i, row):
@@ -1124,8 +1243,8 @@ def main():
         row_id = row.get("ID", i)
         ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
         if not ans:
-            oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
-            ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
+            oms2 = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
+            ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms2})"
         label = mk_label(i, row)
         img = clean_text(str(row.get('Afbeelding', '') or '').strip())
         st.session_state["selected_image"] = img if img else None
@@ -1169,4 +1288,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
