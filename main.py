@@ -1207,13 +1207,37 @@ def main():
         st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Omschrijving/Toelichting.")
         return
 
-    # 6. Antwoord of oplossing (selecteer item en toon)
-    df_reset = df_scope.reset_index()
+# 6. Antwoord of oplossing (selecteer item en toon)
+df_reset = df_scope.reset_index()
 
+# Als er nog maar één record is, toon direct het antwoord
+if len(df_reset) == 1:
+    row = df_reset.iloc[0]
+    row_id = row.get("ID", 0)
+    ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
+    if not ans:
+        oms_txt = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
+        ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms_txt})"
+    label = f"01. {re.sub(r'\\s+', ' ', clean_text(ans))[:140]}"
+    img = clean_text(str(row.get('Afbeelding', '') or '').strip())
+    st.session_state["selected_image"] = img if img else None
+    if st.session_state.get("selected_answer_id") != row_id:
+        st.session_state["selected_answer_id"] = row_id
+        st.session_state["selected_answer_text"] = ans
+        st.session_state["last_item_label"] = label
+        st.session_state["last_question"] = f"Gekozen item: {label}"
+        final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
+        st.session_state["pdf_ready"] = True
+        add_msg("assistant", with_info(final_ans))
+        st.rerun()
+    # als hetzelfde record al getoond was, ga door met vervolginput
+else:
     def mk_label(i, row):
-        omsx = clean_text(str(row.get('Omschrijving melding', '')).strip())
+        # *** Belangrijk: Antwoord → Toelichting → Omschrijving ***
+        ansx  = clean_text(str(row.get('Antwoord of oplossing', '')).strip())
         toelx = clean_text(str(row.get('Toelichting melding', '')).strip())
-        preview = omsx or toelx or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+        omsx  = clean_text(str(row.get('Omschrijving melding', '')).strip())
+        preview = ansx or toelx or omsx
         preview = re.sub(r"\s+", " ", preview)[:140]
         return f"{i+1:02d}. {preview}"
 
@@ -1241,45 +1265,8 @@ def main():
             st.rerun()
             return
 
-    # Vervolgvraag over getoond antwoord
-    vraag = st.chat_input("Stel uw vraag over dit antwoord:")
-    if not vraag:
-        return
-    if (vraag or "").strip().upper() == "UNIEKECODE123":
-        cw = find_answer_by_codeword(faq_df.reset_index())
-        if cw:
-            st.session_state["last_question"] = vraag
-            add_msg("user", vraag)
-            st.session_state["pdf_ready"] = True
-            add_msg("assistant", with_info(cw))
-            st.rerun()
-            return
-    st.session_state["last_question"] = vraag
-    add_msg("user", vraag)
-    ok, warn = filter_topics(vraag)
-    if not ok:
-        st.session_state["pdf_ready"] = False
-        add_msg("assistant", warn)
-        st.rerun()
-        return
-    bron = str(st.session_state.get("selected_answer_text") or "")
-    reactie = None
-    if st.session_state.get("allow_ai") and client is not None:
-        try:
-            reactie = chatgpt_cached(
-                [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                 {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag}"}],
-                temperature=0.1, max_tokens=600,
-            )
-        except Exception as e:
-            logging.error(f"AI-QA fout: {e}")
-            reactie = None
-    if not reactie:
-        reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
-    st.session_state["pdf_ready"] = True
-    add_msg("assistant", with_info(reactie))
-    st.rerun()
 
 
 if __name__ == "__main__":
     main()
+
