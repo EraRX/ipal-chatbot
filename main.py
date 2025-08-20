@@ -304,7 +304,7 @@ def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]")
     try:
         mask = df["Antwoord of oplossing"].astype(str).str.contains(codeword, case=False, na=False)
         if mask.any():
-            return str(df.loc[mask].iloc[0]["Antwoord of oplossing"]).strip()
+            return str(df.loc[mask].iloc[0][" oplossing"]).strip()
     except Exception:
         pass
     return None
@@ -1026,7 +1026,7 @@ def main():
         if not antwoord and st.session_state.get("allow_web"):
             webbits = fetch_web_info_cached(algemeen_vraag)
             if webbits: antwoord = webbits
-        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(antwoord of "Kunt u uw vraag iets concreter maken?")); st.rerun(); return
+        st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(antwoord or "Kunt u uw vraag iets concreter maken?")); st.rerun(); return
 
     # ZOEKEN (hele CSV)
     if st.session_state.get("selected_product") == "Zoeken":
@@ -1302,4 +1302,5 @@ if (
 
 if __name__ == "__main__":
     main()
+
 
