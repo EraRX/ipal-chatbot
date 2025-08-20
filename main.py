@@ -1265,8 +1265,25 @@ else:
             st.rerun()
             return
 
-
+bron = str(st.session_state.get("selected_answer_text") or "")
+    reactie = None
+    if st.session_state.get("allow_ai") and client is not None:
+        try:
+            reactie = chatgpt_cached(
+                [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                 {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag}"}],
+                temperature=0.1, max_tokens=600,
+            )
+        except Exception as e:
+            logging.error(f"AI-QA fout: {e}")
+            reactie = None
+    if not reactie:
+        reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
+    st.session_state["pdf_ready"] = True
+    add_msg("assistant", with_info(reactie))
+    st.rerun()
 
 if __name__ == "__main__":
     main()
+
 
