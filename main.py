@@ -1139,68 +1139,82 @@ def main():
             st.toast(f"Gekozen categorie: {selc}"); st.rerun()
         return
 
-    # --- STAP 4 Omschrijving ---
-    if st.session_state.get("selected_omschrijving") is None:
-        try:
-            if cat and str(cat).lower() != "alles":
-                scope = faq_df.xs((syst, st.session_state["selected_module"], cat),
-                                  level=["Systeem","Subthema","Categorie"], drop_level=False)
-            else:
-                scope = faq_df.xs((syst, st.session_state["selected_module"]),
-                                  level=["Systeem","Subthema"], drop_level=False)
-        except Exception:
-            scope = pd.DataFrame(columns=faq_df.reset_index().columns)
-
-        oms_list = sorted(
-            scope["Omschrijving melding"].dropna().astype(str).apply(clean_text).unique()
-        )
-        if len(oms_list) == 0:
-            st.info("Geen omschrijvingen gevonden — stap wordt overgeslagen.")
-            st.session_state["selected_omschrijving"] = ""
+# --- STAP 4 Omschrijving ---
+if st.session_state.get("selected_omschrijving") is None:
+    try:
+        if cat and str(cat).lower() != "alles":
+            scope = faq_df.xs(
+                (syst, st.session_state["selected_module"], cat),
+                level=["Systeem","Subthema","Categorie"], drop_level=False
+            )
         else:
-            oms_sel = st.selectbox("Kies omschrijving:", ["(Kies)"] + oms_list)
-            if oms_sel != "(Kies)":
-                st.session_state["selected_omschrijving"] = oms_sel
-                st.session_state["selected_toelichting"] = None
-                st.session_state["selected_answer_id"] = None
-                st.session_state["selected_answer_text"] = None
-                st.session_state["selected_image"] = None
-                st.toast(f"Gekozen omschrijving: {oms_sel}")
-                st.rerun()
-        return
+            scope = faq_df.xs(
+                (syst, st.session_state["selected_module"]),
+                level=["Systeem","Subthema"], drop_level=False
+            )
+    except Exception:
+        scope = pd.DataFrame(columns=faq_df.reset_index().columns)
 
-    # --- STAP 5 Toelichting ---
-    if st.session_state.get("selected_toelichting") is None:
-        try:
-            if cat and str(cat).lower() != "alles":
-                scope = faq_df.xs((syst, st.session_state["selected_module"], cat),
-                                  level=["Systeem","Subthema","Categorie"], drop_level=False)
-            else:
-                scope = faq_df.xs((syst, st.session_state["selected_module"]),
-                                  level=["Systeem","Subthema"], drop_level=False)
-        except Exception:
-            scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+    oms_list = sorted(
+        scope["Omschrijving melding"].dropna().astype(str).apply(clean_text).unique()
+    )
 
-        sel_oms = clean_text(str(st.session_state.get("selected_omschrijving","")))
-        if sel_oms:
-            scope = scope[scope["Omschrijving melding"].astype(str).apply(clean_text) == sel_oms]
+    if len(oms_list) == 0:
+        st.info("Geen omschrijvingen gevonden — stap wordt overgeslagen.")
+        st.session_state["selected_omschrijving"] = ""   # skip stap 4
+    else:
+        oms_sel = st.selectbox("Kies omschrijving:", ["(Kies)"] + oms_list)
+        if oms_sel != "(Kies)":
+            st.session_state["selected_omschrijving"] = oms_sel
+            st.session_state["selected_toelichting"] = None
+            st.session_state["selected_answer_id"] = None
+            st.session_state["selected_answer_text"] = None
+            st.session_state["selected_image"] = None
+            st.toast(f"Gekozen omschrijving: {oms_sel}")
+            st.rerun()
+    return
 
-        toes = sorted(
-            scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique()
-        )
-        if len(toes) == 0:
-            st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
-            st.session_state["selected_toelichting"] = ""
+# --- STAP 5 Toelichting ---
+if (
+    st.session_state.get("selected_omschrijving") is not None   # <-- zorg dat stap 4 klaar is
+    and st.session_state.get("selected_toelichting") is None
+):
+    try:
+        if cat and str(cat).lower() != "alles":
+            scope = faq_df.xs(
+                (syst, st.session_state["selected_module"], cat),
+                level=["Systeem","Subthema","Categorie"], drop_level=False
+            )
         else:
-            toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
-            if toe_sel != "(Kies)":
-                st.session_state["selected_toelichting"] = toe_sel
-                st.session_state["selected_answer_id"] = None
-                st.session_state["selected_answer_text"] = None
-                st.session_state["selected_image"] = None
-                st.toast(f"Gekozen toelichting: {toe_sel}")
-                st.rerun()
-        return
+            scope = faq_df.xs(
+                (syst, st.session_state["selected_module"]),
+                level=["Systeem","Subthema"], drop_level=False
+            )
+    except Exception:
+        scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
+    sel_oms = clean_text(str(st.session_state.get("selected_omschrijving","")))
+    if sel_oms:
+        scope = scope[scope["Omschrijving melding"].astype(str).apply(clean_text) == sel_oms]
+
+    toes = sorted(
+        scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique()
+    )
+
+    if len(toes) == 0:
+        st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
+        st.session_state["selected_toelichting"] = ""   # skip stap 5
+    else:
+        toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
+        if toe_sel != "(Kies)":
+            st.session_state["selected_toelichting"] = toe_sel
+            st.session_state["selected_answer_id"] = None
+            st.session_state["selected_answer_text"] = None
+            st.session_state["selected_image"] = None
+            st.toast(f"Gekozen toelichting: {toe_sel}")
+            st.rerun()
+    return
+
 
     # Filter voor stap 6 (antwoord tonen)
     df_scope = faq_df
@@ -1288,3 +1302,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
