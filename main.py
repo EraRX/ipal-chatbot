@@ -281,9 +281,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     except Exception:
         st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
         df = df.reset_index(drop=True)
-
     return df
-
 
 # Fallbacks voor onverwachte schrijfwijzen
 mask_na = df["Systeem"].isna() | (df["Systeem"] == "")
@@ -1214,6 +1212,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
