@@ -1040,173 +1040,227 @@ def main():
             reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
         st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun(); return
 
-    # Exact/DocBase cascade
-    render_chat()
-    syst = st.session_state.get("selected_product")
-    sub  = st.session_state.get("selected_module") or ""
-    cat  = st.session_state.get("selected_category") or ""
-    toe  = st.session_state.get("selected_toelichting") or ""
-    parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
-    if parts: st.caption(" › ".join(parts))
+    # --- Exact/DocBase cascade ---
+    if st.session_state.get("selected_product") in ("Exact", "DocBase"):
+        render_chat()
 
-    if not st.session_state.get("selected_module"):
-        try:
-            opts = sorted(faq_df.xs(syst, level="Systeem").index.get_level_values("Subthema").dropna().unique())
-        except Exception: opts = []
-        sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
-        if sel != "(Kies)":
-            st.session_state["selected_module"] = sel
-            st.session_state["selected_category"] = None
-            st.session_state["selected_toelichting"] = None
-            st.session_state["selected_answer_id"] = None
-            st.session_state["selected_answer_text"] = None
-            st.session_state["selected_image"] = None
-            st.toast(f"Gekozen subthema: {sel}"); st.rerun()
-        return
+        syst = st.session_state.get("selected_product")
+        sub  = st.session_state.get("selected_module") or ""
+        cat  = st.session_state.get("selected_category") or ""
+        toe  = st.session_state.get("selected_toelichting") or ""
 
-    if not st.session_state.get("selected_category"):
-        try:
-            cats = sorted(
-                faq_df.xs((syst, st.session_state["selected_module"]), level=["Systeem","Subthema"], drop_level=False)
-                .index.get_level_values("Categorie").dropna().unique()
-            )
-        except Exception: cats = []
-        if len(cats) == 0:
-            st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
-            st.session_state["selected_category"] = "alles"
-            st.session_state["selected_toelichting"] = None
-            st.session_state["selected_answer_id"] = None
-            st.session_state["selected_answer_text"] = None
-            st.session_state["selected_image"] = None
-            st.rerun()
-        selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
-        if selc != "(Kies)":
-            st.session_state["selected_category"] = selc
-            st.session_state["selected_toelichting"] = None
-            st.session_state["selected_answer_id"] = None
-            st.session_state["selected_answer_text"] = None
-            st.session_state["selected_image"] = None
-            st.toast(f"Gekozen categorie: {selc}"); st.rerun()
-        return
+        # broodkruimel
+        parts = [p for p in [syst, sub, (None if cat in ("", None, "alles") else cat), (toe or None)] if p]
+        if parts:
+            st.caption(" › ".join(parts))
 
-    if st.session_state.get("selected_toelichting") is None:
-        def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
+        # 1) Subthema
+        if not st.session_state.get("selected_module"):
             try:
-                if not categorie or str(categorie).lower() == "alles":
-                    scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
-                else:
-                    scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
-                vals = (scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique())
-                return sorted(vals)
+                opts = sorted(
+                    faq_df.xs(syst, level="Systeem")
+                          .index.get_level_values("Subthema")
+                          .dropna().unique()
+                )
             except Exception:
-                return []
-        toes = list_toelichtingen(syst, st.session_state["selected_module"], st.session_state.get("selected_category"))
-        if len(toes) == 0:
-            st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
-            st.session_state["selected_toelichting"] = ""
-        else:
-            toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
-            if toe_sel != "(Kies)":
-                st.session_state["selected_toelichting"] = toe_sel
+                opts = []
+            sel = st.selectbox("Kies subthema:", ["(Kies)"] + list(opts))
+            if sel != "(Kies)":
+                st.session_state["selected_module"] = sel
+                st.session_state["selected_category"] = None
+                st.session_state["selected_toelichting"] = None
                 st.session_state["selected_answer_id"] = None
                 st.session_state["selected_answer_text"] = None
                 st.session_state["selected_image"] = None
-                st.toast(f"Gekozen toelichting: {toe_sel}")
+                st.toast(f"Gekozen subthema: {sel}")
                 st.rerun()
             return
 
-    df_scope = faq_df
-    cat = st.session_state["selected_category"]
-    toe = st.session_state.get("selected_toelichting", "")
-    try:
-        df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
-        df_scope = df_scope.xs(sub, level="Subthema", drop_level=False)
-        if cat and str(cat).lower() != "alles":
-            df_scope = df_scope.xs(cat, level="Categorie", drop_level=False)
-    except KeyError:
-        df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
-    if not df_scope.empty and toe is not None and str(toe) != "":
-        tm = (df_scope["Toelichting melding"].astype(str).apply(clean_text))
-        sel = clean_text(str(toe))
-        df_scope = df_scope[tm == sel]
-    if df_scope.empty:
-        st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting."); return
+        # 2) Categorie
+        if not st.session_state.get("selected_category"):
+            try:
+                cats = sorted(
+                    faq_df.xs((syst, st.session_state["selected_module"]),
+                              level=["Systeem","Subthema"], drop_level=False)
+                          .index.get_level_values("Categorie")
+                          .dropna().unique()
+                )
+            except Exception:
+                cats = []
+            if len(cats) == 0:
+                st.info("Geen categorieën voor dit subthema — stap wordt overgeslagen.")
+                st.session_state["selected_category"] = "alles"
+                st.session_state["selected_toelichting"] = None
+                st.session_state["selected_answer_id"] = None
+                st.session_state["selected_answer_text"] = None
+                st.session_state["selected_image"] = None
+                st.rerun()
+            selc = st.selectbox("Kies categorie:", ["(Kies)"] + list(cats))
+            if selc != "(Kies)":
+                st.session_state["selected_category"] = selc
+                st.session_state["selected_toelichting"] = None
+                st.session_state["selected_answer_id"] = None
+                st.session_state["selected_answer_text"] = None
+                st.session_state["selected_image"] = None
+                st.toast(f"Gekozen categorie: {selc}")
+                st.rerun()
+            return
 
-if not df_scope.empty:
-    df_reset = df_scope.reset_index()
-
-    def mk_label(i, row):
-        oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
-        toel = clean_text(str(row.get('Toelichting melding', '')).strip())
-        preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
-        preview = re.sub(r"\s+", " ", preview)[:140]
-        return f"{i+1:02d}. {preview}"
-
-    opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
-    keuze = st.selectbox("Kies een item:", ["(Kies)"] + opties)
-
-    if keuze != "(Kies)":
-        m = re.match(r"^\s*(\d+)\.", keuze)
-        if not m:
-            st.warning("Kon de selectie niet interpreteren. Kies het item opnieuw.")
-            st.stop()
-
-        i = int(m.group(1)) - 1
-        if i < 0 or i >= len(df_reset):
-            st.warning("Ongeldige selectie.")
-            st.stop()
-
-        row = df_reset.iloc[i]
-        row_id = row.get("ID", i)
-
-        ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
-        if not ans:
-            oms_txt = clean_text(str(row.get('Omschrijving melding', '')).strip())
-            ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms_txt})"
-
-        label = mk_label(i, row)
-        img = clean_text(str(row.get('Afbeelding', '') or '').strip())
-        st.session_state["selected_image"] = img if img else None
-
-        st.session_state["selected_answer_id"] = row_id
-        st.session_state["selected_answer_text"] = ans
-        st.session_state["last_item_label"] = label
-        st.session_state["last_question"] = f"Gekozen item: {label}"
-
-        final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
-        st.session_state["pdf_ready"] = True
-        add_msg("assistant", with_info(final_ans))
-        st.rerun()
-        return
-
-    vraag = st.chat_input("Stel uw vraag over dit antwoord:")
-    if not vraag: return
-    if (vraag or "").strip().upper() == "UNIEKECODE123":
-        cw = find_answer_by_codeword(faq_df.reset_index())
-        if cw:
-            st.session_state["last_question"] = vraag; add_msg("user", vraag)
-            st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(cw)); st.rerun(); return
-    st.session_state["last_question"] = vraag; add_msg("user", vraag)
-    ok, warn = filter_topics(vraag)
-    if not ok:
-        st.session_state["pdf_ready"] = False; add_msg("assistant", warn); st.rerun(); return
-    bron = str(st.session_state.get("selected_answer_text") or ""); reactie = None
-    if st.session_state.get("allow_ai") and client is not None:
+        # 3) Scope opbouwen (Systeem/Subthema/Categorie)
+        df_scope = faq_df
         try:
-            reactie = chatgpt_cached(
-                [{"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
-                 {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag}"}],
-                temperature=0.1, max_tokens=600,
+            df_scope = df_scope.xs(syst, level="Systeem", drop_level=False)
+            df_scope = df_scope.xs(st.session_state["selected_module"], level="Subthema", drop_level=False)
+            if st.session_state["selected_category"] and str(st.session_state["selected_category"]).lower() != "alles":
+                df_scope = df_scope.xs(st.session_state["selected_category"], level="Categorie", drop_level=False)
+        except KeyError:
+            df_scope = pd.DataFrame(columns=faq_df.reset_index().columns)
+
+        # 4) Toelichting (optioneel filter)
+        if st.session_state.get("selected_toelichting") is None:
+            def list_toelichtingen(systeem: str, subthema: str, categorie: Optional[str]) -> List[str]:
+                try:
+                    if not categorie or str(categorie).lower() == "alles":
+                        scope = faq_df.xs((systeem, subthema), level=["Systeem","Subthema"], drop_level=False)
+                    else:
+                        scope = faq_df.xs((systeem, subthema, categorie), level=["Systeem","Subthema","Categorie"], drop_level=False)
+                    vals = scope["Toelichting melding"].dropna().astype(str).apply(clean_text).unique()
+                    return sorted(vals)
+                except Exception:
+                    return []
+
+            toes = list_toelichtingen(
+                syst,
+                st.session_state["selected_module"],
+                st.session_state.get("selected_category")
             )
-        except Exception as e:
-            logging.error(f"AI-QA fout: {e}"); reactie = None
-    if not reactie:
-        reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
-    st.session_state["pdf_ready"] = True; add_msg("assistant", with_info(reactie)); st.rerun()
+            if len(toes) == 0:
+                st.info("Geen toelichtingen gevonden — stap wordt overgeslagen.")
+                st.session_state["selected_toelichting"] = ""
+            else:
+                toe_sel = st.selectbox("Kies toelichting:", ["(Kies)"] + list(toes))
+                if toe_sel != "(Kies)":
+                    st.session_state["selected_toelichting"] = toe_sel
+                    st.session_state["selected_answer_id"] = None
+                    st.session_state["selected_answer_text"] = None
+                    st.session_state["selected_image"] = None
+                    st.toast(f"Gekozen toelichting: {toe_sel}")
+                    st.rerun()
+            return
+
+        # toepassen toelichting-filter
+        toe = st.session_state.get("selected_toelichting", "")
+        if not df_scope.empty and toe is not None and str(toe) != "":
+            tm = df_scope["Toelichting melding"].astype(str).apply(clean_text)
+            sel = clean_text(str(toe))
+            df_scope = df_scope[tm == sel]
+
+        if df_scope.empty:
+            st.info("Geen records gevonden binnen de gekozen Systeem/Subthema/Categorie/Toelichting.")
+            return
+
+        # 5) Item kiezen en antwoord tonen
+        df_reset = df_scope.reset_index()
+
+        def mk_label(i, row):
+            oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
+            toel = clean_text(str(row.get('Toelichting melding', '')).strip())
+            preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+            preview = re.sub(r"\s+", " ", preview)[:140]
+            return f"{i+1:02d}. {preview}"
+
+        opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
+        keuze = st.selectbox("Kies een item:", ["(Kies)"] + opties)
+
+        if keuze != "(Kies)":
+            m = re.match(r"^\s*(\d+)\.", keuze)
+            if not m:
+                st.warning("Kon de selectie niet interpreteren. Kies het item opnieuw.")
+                st.stop()
+
+            i = int(m.group(1)) - 1
+            if i < 0 or i >= len(df_reset):
+                st.warning("Ongeldige selectie.")
+                st.stop()
+
+            row = df_reset.iloc[i]
+            row_id = row.get("ID", i)
+
+            ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
+            if not ans:
+                oms_txt = clean_text(str(row.get('Omschrijving melding', '')).strip())
+                ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms_txt})"
+
+            label = mk_label(i, row)
+            img = clean_text(str(row.get('Afbeelding', '') or '').strip())
+            st.session_state["selected_image"] = img if img else None
+
+            st.session_state["selected_answer_id"] = row_id
+            st.session_state["selected_answer_text"] = ans
+            st.session_state["last_item_label"] = label
+            st.session_state["last_question"] = f"Gekozen item: {label}"
+
+            final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
+            st.session_state["pdf_ready"] = True
+            add_msg("assistant", with_info(final_ans))
+            st.rerun()
+            return
+
+        # 6) Vervolgvraag
+        vraag = st.chat_input("Stel uw vraag over dit antwoord:")
+        if not vraag:
+            return
+
+        if (vraag or "").strip().upper() == "UNIEKECODE123":
+            cw = find_answer_by_codeword(faq_df.reset_index())
+            if cw:
+                st.session_state["last_question"] = vraag
+                add_msg("user", vraag)
+                st.session_state["pdf_ready"] = True
+                add_msg("assistant", with_info(cw))
+                st.rerun()
+                return
+
+        st.session_state["last_question"] = vraag
+        add_msg("user", vraag)
+        ok, warn = filter_topics(vraag)
+        if not ok:
+            st.session_state["pdf_ready"] = False
+            add_msg("assistant", warn)
+            st.rerun()
+            return
+
+        bron = str(st.session_state.get("selected_answer_text") or "")
+        reactie = None
+        if st.session_state.get("allow_ai") and client is not None:
+            try:
+                reactie = chatgpt_cached(
+                    [
+                        {"role":"system","content":"Beantwoord uitsluitend op basis van de meegegeven bron. Geen aannames buiten de bron. Schrijf kort en duidelijk in het Nederlands."},
+                        {"role":"user","content":f"Bron:\n{bron}\n\nVraag: {vraag}"}
+                    ],
+                    temperature=0.1, max_tokens=600,
+                )
+            except Exception as e:
+                logging.error(f"AI-QA fout: {e}")
+                reactie = None
+
+        if not reactie:
+            reactie = simplify_text(bron) if bron else "Ik kan zonder AI geen betere toelichting uit het gekozen antwoord halen."
+
+        st.session_state["pdf_ready"] = True
+        add_msg("assistant", with_info(reactie))
+        st.rerun()
+        return  # einde Exact/DocBase cascade
+
+    # (geen Exact/DocBase meer te doen)
+    return
 
 
 if __name__ == "__main__":
     main()
+
+
 
 
 
