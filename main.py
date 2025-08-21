@@ -1074,6 +1074,7 @@ def main():
                 st.session_state["selected_image"] = None
                 st.toast(f"Gekozen subthema: {sel}")
                 st.rerun()
+                st.stop()
             return
 
         # 2) Categorie
@@ -1104,6 +1105,7 @@ def main():
                 st.session_state["selected_image"] = None
                 st.toast(f"Gekozen categorie: {selc}")
                 st.rerun()
+                st.stop()
             return
 
         # 3) Scope opbouwen (Systeem/Subthema/Categorie)
@@ -1146,6 +1148,7 @@ def main():
                     st.session_state["selected_image"] = None
                     st.toast(f"Gekozen toelichting: {toe_sel}")
                     st.rerun()
+                    st.stop()
             return
 
         # toepassen toelichting-filter
@@ -1259,6 +1262,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
