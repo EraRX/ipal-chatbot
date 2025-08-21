@@ -236,7 +236,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         return pd.DataFrame(columns=cols).set_index(["Systeem","Subthema","Categorie"])
 
     try:
-        df = pd.read_csv(path, encoding="utf-8", sep=None, engine="python")
+        df = pd.read_csv(path, encoding="utf-8", sep=";")
     except UnicodeDecodeError:
         df = pd.read_csv(path, encoding="windows-1252", sep=";")
 
@@ -1169,4 +1169,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
