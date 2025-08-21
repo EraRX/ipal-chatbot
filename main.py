@@ -302,7 +302,7 @@ except Exception:
     st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
     df = df.reset_index(drop=True)
 
-return df
+    return df
 
 
 faq_df = load_faq()
@@ -1212,6 +1212,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
