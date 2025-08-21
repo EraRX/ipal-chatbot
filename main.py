@@ -278,11 +278,18 @@ df.loc[df["Systeem"].str.contains(r"\bdoc\s*base\b|\bsila\b", na=False), "Systee
 
 df["Systeem"] = df["Systeem"].astype(str)
 
-# gecombineerd zoekveld en index blijven hetzelfde:
+# gecombineerd zoekveld
 keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
 df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
-return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+# Index voor cascade
+try:
+    df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+except Exception:
+    st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
+    df = df.reset_index(drop=True)
+
+return df
 
 
 faq_df = load_faq()
@@ -1192,5 +1199,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
