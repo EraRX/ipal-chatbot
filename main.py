@@ -1175,7 +1175,7 @@ def main():
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
         keuze = st.selectbox("Kies een item:", ["(Kies)"] + opties)
 
-if keuze != "(Kies)":
+        if keuze != "(Kies)":
     m = re.match(r"^\s*(\d+)\.", keuze)
     if not m:
         st.warning("Kon de selectie niet interpreteren. Kies het item opnieuw.")
@@ -1212,6 +1212,7 @@ if keuze != "(Kies)":
 
     # Als hetzelfde item opnieuw gekozen is: niets posten.
     return
+   
 
 
         # 6) Vervolgvraag
@@ -1267,6 +1268,7 @@ if keuze != "(Kies)":
 
 if __name__ == "__main__":
     main()
+
 
 
 
