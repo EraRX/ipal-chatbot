@@ -254,13 +254,36 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
                  .str.replace(r"\s+", " ", regex=True))
         df[c] = df[c].apply(clean_text)
 
-    mapping = {"exact": "Exact", "docbase": "DocBase", "algemeen": "Algemeen"}
-    df["Systeem"] = df["Systeem"].str.lower().map(mapping).fillna(df["Systeem"]).astype(str)
+# Normaliseer Systeem → Exact | DocBase | Algemeen
+sys_raw = df["Systeem"].astype(str).str.lower().str.strip()
 
-    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
-    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+direct_map = {
+    "exact": "Exact",
+    "exact online": "Exact",
+    "eol": "Exact",
+    "e-online": "Exact",
+    "e online": "Exact",
+    "docbase": "DocBase",
+    "doc base": "DocBase",
+    "sila": "DocBase",        # SILA valt onder DocBase
+    "algemeen": "Algemeen",
+}
+df["Systeem"] = sys_raw.replace(direct_map)
 
-    return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+# Fallbacks voor onverwachte schrijfwijzen
+mask_na = df["Systeem"].isna() | (df["Systeem"] == "")
+df.loc[mask_na, "Systeem"] = sys_raw
+df.loc[df["Systeem"].str.contains(r"\bexact\b", na=False), "Systeem"] = "Exact"
+df.loc[df["Systeem"].str.contains(r"\bdoc\s*base\b|\bsila\b", na=False), "Systeem"] = "DocBase"
+
+df["Systeem"] = df["Systeem"].astype(str)
+
+# gecombineerd zoekveld en index blijven hetzelfde:
+keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+
+return df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+
 
 faq_df = load_faq()
 
@@ -1169,4 +1192,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
