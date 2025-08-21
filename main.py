@@ -296,13 +296,14 @@ keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting mel
 df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
 # Index voor cascade
-try:
-    df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
-except Exception:
-    st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
-    df = df.reset_index(drop=True)
+    try:
+        df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+    except Exception:
+        st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
+        df = df.reset_index(drop=True)
 
     return df
+
 
 
 faq_df = load_faq()
@@ -1212,6 +1213,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
