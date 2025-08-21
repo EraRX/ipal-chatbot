@@ -219,13 +219,13 @@ def make_pdf(question: str, answer: str) -> bytes:
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     cols = [
-        "ID","Systeem","Subthema","Categorie",
-        "Omschrijving melding","Toelichting melding","Soort melding",
-        "Antwoord of oplossing","Afbeelding"
+        "ID", "Systeem", "Subthema", "Categorie",
+        "Omschrijving melding", "Toelichting melding", "Soort melding",
+        "Antwoord of oplossing", "Afbeelding"
     ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=cols).set_index(["Systeem","Subthema","Categorie"])
+        return pd.DataFrame(columns=cols).set_index(["Systeem", "Subthema", "Categorie"])
 
     try:
         df = pd.read_csv(path, encoding="utf-8", sep=None, engine="python")
@@ -237,9 +237,9 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
             df[c] = None
 
     norm_cols = [
-        "Systeem","Subthema","Categorie",
-        "Omschrijving melding","Toelichting melding",
-        "Soort melding","Antwoord of oplossing","Afbeelding"
+        "Systeem", "Subthema", "Categorie",
+        "Omschrijving melding", "Toelichting melding",
+        "Soort melding", "Antwoord of oplossing", "Afbeelding"
     ]
     for c in norm_cols:
         df[c] = (df[c]
@@ -251,7 +251,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         df[c] = df[c].apply(clean_text)
 
     # Normalize Systeem → Exact | DocBase | Algemeen
-    sys_raw = df["Systeem"]. astrocytes(str).str.lower().str.strip()
+    sys_raw = df["Systeem"].astype(str).str.lower().str.strip()
     direct_map = {
         "exact": "Exact",
         "exact online": "Exact",
@@ -266,12 +266,12 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     df["Systeem"] = sys_raw.replace(direct_map)
 
     # Combined search field
-    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+    keep = ["Systeem", "Subthema", "Categorie", "Omschrijving melding", "Toelichting melding"]
     df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
     # Index for cascade
     try:
-        df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+        df = df.set_index(["Systeem", "Subthema", "Categorie"], drop=True)
     except Exception:
         st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
         df = df.reset_index(drop=True)
@@ -1249,3 +1249,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
