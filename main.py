@@ -1175,39 +1175,44 @@ def main():
         opties = [mk_label(i, r) for i, r in df_reset.iterrows()]
         keuze = st.selectbox("Kies een item:", ["(Kies)"] + opties)
 
-        if keuze != "(Kies)":
-            m = re.match(r"^\s*(\d+)\.", keuze)
-            if not m:
-                st.warning("Kon de selectie niet interpreteren. Kies het item opnieuw.")
-                st.stop()
+if keuze != "(Kies)":
+    m = re.match(r"^\s*(\d+)\.", keuze)
+    if not m:
+        st.warning("Kon de selectie niet interpreteren. Kies het item opnieuw.")
+        st.stop()
 
-            i = int(m.group(1)) - 1
-            if i < 0 or i >= len(df_reset):
-                st.warning("Ongeldige selectie.")
-                st.stop()
+    i = int(m.group(1)) - 1
+    if i < 0 or i >= len(df_reset):
+        st.warning("Ongeldige selectie.")
+        st.stop()
 
-            row = df_reset.iloc[i]
-            row_id = row.get("ID", i)
+    row = df_reset.iloc[i]
+    row_id = row.get("ID", i)
 
-            ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
-            if not ans:
-                oms_txt = clean_text(str(row.get('Omschrijving melding', '')).strip())
-                ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms_txt})"
+    ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
+    if not ans:
+        oms_txt = clean_text(str(row.get('Omschrijving melding', '')).strip())
+        ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms_txt})"
 
-            label = mk_label(i, row)
-            img = clean_text(str(row.get('Afbeelding', '') or '').strip())
-            st.session_state["selected_image"] = img if img else None
+    label = mk_label(i, row)
+    img = clean_text(str(row.get('Afbeelding', '') or '').strip())
+    st.session_state["selected_image"] = img if img else None
 
-            st.session_state["selected_answer_id"] = row_id
-            st.session_state["selected_answer_text"] = ans
-            st.session_state["last_item_label"] = label
-            st.session_state["last_question"] = f"Gekozen item: {label}"
+    # DEDUPE: alleen posten als dit een nieuw (ander) item is
+    if st.session_state.get("selected_answer_id") != row_id:
+        st.session_state["selected_answer_id"] = row_id
+        st.session_state["selected_answer_text"] = ans
+        st.session_state["last_item_label"] = label
+        st.session_state["last_question"] = f"Gekozen item: {label}"
 
-            final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
-            st.session_state["pdf_ready"] = True
-            add_msg("assistant", with_info(final_ans))
-            st.rerun()
-            return
+        final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
+        st.session_state["pdf_ready"] = True
+        add_msg("assistant", with_info(final_ans))
+        st.rerun()
+
+    # Als hetzelfde item opnieuw gekozen is: niets posten.
+    return
+
 
         # 6) Vervolgvraag
         vraag = st.chat_input("Stel uw vraag over dit antwoord:")
@@ -1262,6 +1267,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
