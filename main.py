@@ -291,11 +291,11 @@ df.loc[df["Systeem"].str.contains(r"\bdoc\s*base\b|\bsila\b", na=False), "Systee
 
 df["Systeem"] = df["Systeem"].astype(str)
 
-# gecombineerd zoekveld
-keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
-df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+    # gecombineerd zoekveld
+    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
-# Index voor cascade
+    # Index voor cascade
     try:
         df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
     except Exception:
@@ -304,17 +304,10 @@ df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
     return df
 
-
+# einde functie load_faq
 
 faq_df = load_faq()
 
-
-# ── Relevance helpers ────────────────────────────────────────────────────────
-BLACKLIST = ["persoonlijke gegevens","medische gegevens","gezondheid","privacy schending"]
-
-def filter_topics(msg: str):
-    found = [t for t in BLACKLIST if re.search(r"\b" + re.escape(t) + r"\b", (msg or "").lower())]
-    return (False, f"Je bericht bevat gevoelige onderwerpen: {', '.join(found)}.") if found else (True, "")
 
 STOPWORDS_NL = {
     "de","het","een","en","of","maar","want","dus","als","dan","dat","die","dit","deze",
@@ -1213,6 +1206,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
