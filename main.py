@@ -240,11 +240,14 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     except UnicodeDecodeError:
         df = pd.read_csv(path, encoding="windows-1252", sep=";")
 
+    # Alle verwachte kolommen aanvullen
     for c in cols:
         if c not in df.columns:
             df[c] = None
 
-    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
+    # Basis normalisatie
+    norm_cols = ["Systeem","Subthema","Categorie","Omschrijving melding",
+                 "Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
     for c in norm_cols:
         df[c] = (df[c]
                  .fillna("")
@@ -254,21 +257,33 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
                  .str.replace(r"\s+", " ", regex=True))
         df[c] = df[c].apply(clean_text)
 
-# Normaliseer Systeem → Exact | DocBase | Algemeen
-sys_raw = df["Systeem"].astype(str).str.lower().str.strip()
+    # Normaliseer Systeem → Exact | DocBase | Algemeen
+    mapping = {
+        "exact": "Exact",
+        "exact online": "Exact",
+        "eol": "Exact",
+        "e-online": "Exact",
+        "e online": "Exact",
+        "docbase": "DocBase",
+        "doc base": "DocBase",
+        "sila": "DocBase",        # SILA valt onder DocBase
+        "algemeen": "Algemeen",
+    }
+    df["Systeem"] = df["Systeem"].str.lower().map(mapping).fillna(df["Systeem"]).astype(str)
 
-direct_map = {
-    "exact": "Exact",
-    "exact online": "Exact",
-    "eol": "Exact",
-    "e-online": "Exact",
-    "e online": "Exact",
-    "docbase": "DocBase",
-    "doc base": "DocBase",
-    "sila": "DocBase",        # SILA valt onder DocBase
-    "algemeen": "Algemeen",
-}
-df["Systeem"] = sys_raw.replace(direct_map)
+    # Gecombineerd veld voor zoeken
+    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+
+    # Index voor cascade
+    try:
+        df = df.set_index(["Systeem","Subthema","Categorie"], drop=True)
+    except Exception:
+        st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
+        df = df.reset_index(drop=True)
+
+    return df
+
 
 # Fallbacks voor onverwachte schrijfwijzen
 mask_na = df["Systeem"].isna() | (df["Systeem"] == "")
@@ -1199,6 +1214,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
