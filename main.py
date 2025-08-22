@@ -69,15 +69,6 @@ st.markdown(
 )
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-/* Sidebar en hamburger volledig verbergen */
-[data-testid="stSidebar"],
-[data-testid="stSidebarNav"],
-[data-testid="collapsedControl"] { display: none !important; }
-
-/* Optioneel: standaard menu/footers weg */
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-
 # ── OpenAI (optional) ────────────────────────────────────────────────────────
 load_dotenv()
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
@@ -1279,6 +1270,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
