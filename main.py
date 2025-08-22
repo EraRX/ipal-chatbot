@@ -46,18 +46,36 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 # ── UI-config ────────────────────────────────────────────────────────────────
-st.set_page_config(page_title="IPAL Chatbox", layout="centered")
+st.set_page_config(page_title="IPAL Chatbox", layout="centered", initial_sidebar_state="collapsed")
 st.markdown(
     """
     <style>
       html, body, [class*="css"] { font-size:20px; }
       button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
       video { width: 600px !important; height: auto !important; max-width: 100%; }
+
+      /* Sidebar en hamburger volledig verbergen */
+      [data-testid="stSidebar"],
+      [data-testid="stSidebarNav"],
+      [data-testid="collapsedControl"] { display: none !important; }
+
+      /* Optioneel: standaard menu/footers weg */
+      #MainMenu { visibility: hidden; }
+      footer { visibility: hidden; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+/* Sidebar en hamburger volledig verbergen */
+[data-testid="stSidebar"],
+[data-testid="stSidebarNav"],
+[data-testid="collapsedControl"] { display: none !important; }
+
+/* Optioneel: standaard menu/footers weg */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
 
 # ── OpenAI (optional) ────────────────────────────────────────────────────────
 load_dotenv()
@@ -288,6 +306,17 @@ STOPWORDS_NL = {
     "ook","nog","al","wel","niet","nooit","altijd","hier","daar","ergens","niets","iets","alles",
     "is","was","wordt","zijn","heeft","heb","hebben","doe","doet","doen","kan","kunnen","moet","moeten"
 }
+
+def filter_topics(text: str) -> tuple[bool, str]:
+    """Eenvoudige veiligheidscheck. Retourneert (OK, waarschuwing_tekst)."""
+    t = (text or "").lower()
+    verboden = [
+        "wachtwoord", "password", "pin", "pincode", "bsn",
+        "creditcard", "cvv", "iban", "token", "api key", "apikey", "geheim"
+    ]
+    if any(w in t for w in verboden):
+        return (False, "Voor uw veiligheid: deel geen wachtwoorden, codes of privégegevens. Formuleer uw vraag zonder deze gegevens.")
+    return (True, "")
 
 def _tokenize_clean(text: str) -> list[str]:
     return [
@@ -723,7 +752,7 @@ def chat_wizard():
                     st.rerun()
                     return
             else:
-                st.session_state["CHAT_SCOPE"] = scope_guess
+                st.session_state["chat_scope"] = scope_guess
                 st.session_state["chat_step"] = "ask_topic"
                 st.session_state["pdf_ready"] = False
                 add_msg("assistant", f"Prima. Kunt u in één zin beschrijven waar uw vraag over **{scope_guess}** over gaat?")
@@ -1249,4 +1278,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
