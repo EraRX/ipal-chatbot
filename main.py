@@ -47,6 +47,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 # ── UI-config ────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="IPAL Chatbox", layout="centered", initial_sidebar_state="collapsed")
+
 st.markdown(
     """
     <style>
@@ -1278,5 +1279,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
