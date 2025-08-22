@@ -1218,8 +1218,21 @@ def main():
             final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
             st.session_state["pdf_ready"] = True
             add_msg("assistant", with_info(final_ans))
+
+            # ⬇ NIEUW: sluit cascade en ga naar wizard, net als bij 'Zoeken'
+            st.session_state["chat_mode"] = True
+            st.session_state["chat_step"] = "followup"                       # toont: “Heeft u een vervolgvraag…”
+            st.session_state["chat_scope"] = st.session_state.get("selected_product")  # bv. "Exact" of "DocBase"
+
+            # verberg cascade-UI en voorkom dat je er terug in valt
+            st.session_state["selected_product"] = None
+            st.session_state["selected_module"] = None
+            st.session_state["selected_category"] = None
+            st.session_state["selected_toelichting"] = None
+
             st.rerun()
             return
+
 
         # 6) Vervolgvraag
         vraag = st.chat_input("Stel uw vraag over dit antwoord:", key=f"followup_{syst}_{sub}_{cat}_{toe}")
@@ -1270,6 +1283,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
