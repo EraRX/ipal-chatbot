@@ -338,33 +338,14 @@ else:
     sel_toe_raw = "" if sel_toe_disp == "(Leeg)" else sel_toe_disp
     step5 = step4[_norm(step4["Toelichting melding"]) == _norm(sel_toe_raw)]
 
-    # 6) Soort melding
-    soort_vals = step5["Soort melding"].astype(str).fillna("").map(_display_val).unique()
-    soort_opts = sorted(soort_vals, key=lambda x: x.lower())
-    sel_soort_disp = st.selectbox("6) Soort melding", soort_opts, key="c6_soort")
-    sel_soort_raw = "" if sel_soort_disp == "(Leeg)" else sel_soort_disp
-    step6 = step5[_norm(step5["Soort melding"]) == _norm(sel_soort_raw)]
+    # 7) Antwoord of oplossing
+    st.markdown("**7) Antwoord of oplossing**")
+    st.write((row.get("Antwoord of oplossing", "") or "").strip())
 
-    # Resultaat (verwacht 1 rij; bij >1 pakken we de eerste zonder terugstap)
-    if step6.empty:
-        st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
-    else:
-        row = step6.iloc[0]
-
-        # 7) Antwoord of oplossing
-        st.markdown("**7) Antwoord of oplossing**")
-        st.write((row.get("Antwoord of oplossing", "") or "").strip())
-
-        # (Optioneel) context tonen
-        st.markdown("**Toelichting melding**")
-        st.write(_display_val(row.get("Toelichting melding","")))
-        st.markdown("**Soort melding**")
-        st.write(_display_val(row.get("Soort melding","")))
-
-        # Afbeelding indien aanwezig
-        img = str(row.get("Afbeelding","") or "").strip()
-        if img:
-            st.image(img, use_column_width=True)
+    # Afbeelding indien aanwezig
+    img = str(row.get("Afbeelding","") or "").strip()
+    if img:
+    st.image(img, use_column_width=True)
 
 
 # ── (optioneel) dezelfde helpers laten bestaan als elders gebruikt ─────
@@ -1348,6 +1329,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
