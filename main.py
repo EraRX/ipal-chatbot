@@ -226,43 +226,59 @@ def make_pdf(question: str, answer: str) -> bytes:
     return buffer.getvalue()
 
 # ── CSV loading + normalization ──────────────────────────────────────────────
+# ── CSV loading + cascade (REPLACE OLD BLOCK) ──────────────────────────
+import os, re
+import pandas as pd
+import streamlit as st
+
+def clean_text(s: str) -> str:
+    if s is None:
+        return ""
+    s = str(s)
+    s = s.replace("\ufeff", "").replace("\u00A0", " ")
+    s = s.replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     cols = [
-        "ID", "Systeem", "Subthema", "Categorie",
-        "Omschrijving melding", "Toelichting melding", "Soort melding",
-        "Antwoord of oplossing", "Afbeelding"
+        "ID","Systeem","Subthema","Categorie",
+        "Omschrijving melding","Toelichting melding","Soort melding",
+        "Antwoord of oplossing","Afbeelding"
     ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=cols).set_index(["Systeem", "Subthema", "Categorie"])
+        return pd.DataFrame(columns=cols)
 
-    try:
-        df = pd.read_csv(path, encoding="utf-8", sep=None, engine="python")
-    except UnicodeDecodeError:
-        df = pd.read_csv(path, encoding="windows-1252", sep=";")
+    # Robuust inlezen: probeer BOM/UTF-8 autodetect, val terug op CP1252 ; of ,
+    for enc, sep in [("utf-8-sig", None),
+                     ("utf-8", None),
+                     ("cp1252", ";"),
+                     ("cp1252", ",")]:
+        try:
+            df = pd.read_csv(path, encoding=enc, sep=sep, engine="python")
+            break
+        except Exception:
+            df = None
+    if df is None:
+        st.error("Kon CSV niet lezen. Bewaar bij voorkeur als UTF-8 met ; als scheidingsteken.")
+        return pd.DataFrame(columns=cols)
 
+    # Ontbrekende kolommen toevoegen
     for c in cols:
         if c not in df.columns:
-            df[c] = None
+            df[c] = ""
 
-    norm_cols = [
-        "Systeem", "Subthema", "Categorie",
-        "Omschrijving melding", "Toelichting melding",
-        "Soort melding", "Antwoord of oplossing", "Afbeelding"
-    ]
-    for c in norm_cols:
-        df[c] = (df[c]
-                 .fillna("")
-                 .astype(str)
-                 .str.replace("\u00A0", " ", regex=False)
-                 .str.strip()
-                 .str.replace(r"\s+", " ", regex=True))
+    # Normaliseren
+    for c in ["Systeem","Subthema","Categorie",
+              "Omschrijving melding","Toelichting melding",
+              "Soort melding","Antwoord of oplossing","Afbeelding"]:
         df[c] = df[c].apply(clean_text)
 
-    # Normalize Systeem → Exact | DocBase | Algemeen
-    sys_raw = df["Systeem"].astype(str).str.lower().str.strip()
-    direct_map = {
+    # Systeem consistent maken
+    sys_raw = df["Systeem"].str.lower().str.strip()
+    df["Systeem"] = sys_raw.replace({
         "exact": "Exact",
         "exact online": "Exact",
         "eol": "Exact",
@@ -272,25 +288,86 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         "doc base": "DocBase",
         "sila": "DocBase",
         "algemeen": "Algemeen",
-    }
-    df["Systeem"] = sys_raw.replace(direct_map)
+    })
 
-    # Combined search field
-    keep = ["Systeem", "Subthema", "Categorie", "Omschrijving melding", "Toelichting melding"]
-    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
+    # Samengesteld veld voor eventuele vrije zoekfunctie
+    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1).apply(clean_text)
 
-    # Index for cascade
-    try:
-        df = df.set_index(["Systeem", "Subthema", "Categorie"], drop=True)
-    except Exception:
-        st.warning("Kon index niet goed zetten — controleer CSV kolommen Systeem/Subthema/Categorie")
-        df = df.reset_index(drop=True)
+    # ID als integer waar mogelijk
+    with pd.option_context("mode.chained_assignment", None):
+        df["ID"] = pd.to_numeric(df["ID"], errors="coerce").astype("Int64")
 
     return df
 
-# Data loading
+# Data inladen
 faq_df = load_faq()
 
+# ── CASCADE UI: Systeem → Subthema → Categorie → Omschrijving ─────────
+if not faq_df.empty:
+    def _norm(v: str) -> str:
+        v = (v or "")
+        v = v.replace("\ufeff","").replace("\u00A0"," ")
+        v = v.replace("\r\n"," ").replace("\n"," ").replace("\r"," ")
+        return re.sub(r"\s+"," ", v).strip().lower()
+
+    w = faq_df.copy()
+    w["sys_n"] = w["Systeem"].map(_norm)
+    w["sub_n"] = w["Subthema"].map(_norm)
+    w["cat_n"] = w["Categorie"].map(_norm)
+    w["oms_n"] = w["Omschrijving melding"].map(_norm)
+
+    st.subheader("Zoeken via stappen")
+
+    # 1) Systeem
+    sys_opts = sorted(w["Systeem"].dropna().unique().tolist(), key=lambda x: str(x).lower())
+    sel_sys = st.selectbox("Systeem", sys_opts, key="sys")
+    sub_df = w[w["sys_n"] == _norm(sel_sys)]
+
+    # 2) Subthema
+    sub_opts = sorted(sub_df["Subthema"].dropna().unique().tolist(), key=lambda x: str(x).lower())
+    sel_sub = st.selectbox("Subthema", sub_opts, key="sub")
+    cat_df = sub_df[sub_df["sub_n"] == _norm(sel_sub)]
+
+    # 3) Categorie
+    cat_opts = sorted(cat_df["Categorie"].dropna().unique().tolist(), key=lambda x: str(x).lower())
+    sel_cat = st.selectbox("Categorie", cat_opts, key="cat")
+    leaf_df = cat_df[cat_df["cat_n"] == _norm(sel_cat)][
+        ["ID","Omschrijving melding","Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
+    ].dropna(subset=["Omschrijving melding"]).sort_values("Omschrijving melding")
+
+    # 4) Omschrijving melding — koppel op ID (geen omleiding)
+    label_to_id = {
+        (f'{row["Omschrijving melding"]} (ID {int(row["ID"])})' if pd.notna(row["ID"]) else row["Omschrijving melding"]):
+        (int(row["ID"]) if pd.notna(row["ID"]) else None)
+        for _, row in leaf_df.iterrows()
+    }
+    sel_label = st.selectbox("Omschrijving melding", list(label_to_id.keys()), key="oms")
+    sel_id = label_to_id[sel_label]
+
+    if sel_id is not None:
+        row = w.loc[w["ID"] == sel_id].iloc[0]
+    else:
+        # Fallback op unieke combinatie als ID ontbreekt
+        row = leaf_df.loc[leaf_df["Omschrijving melding"] == sel_label].iloc[0]
+
+    # Resultaat (velden leeg laten als er geen waarde is)
+    st.markdown("**Toelichting melding**")
+    st.write((row.get("Toelichting melding", "") or "").strip())
+
+    st.markdown("**Soort melding**")
+    st.write((row.get("Soort melding", "") or "").strip())
+
+    st.markdown("**Antwoord of oplossing**")
+    st.write((row.get("Antwoord of oplossing", "") or "").strip())
+
+    img = (row.get("Afbeelding", "") or "").strip()
+    if img:
+        st.image(img, use_column_width=True)
+else:
+    st.info("Geen FAQ-gegevens gevonden.")
+
+# ── (optioneel) dezelfde helpers laten bestaan als elders gebruikt ─────
 STOPWORDS_NL = {
     "de","het","een","en","of","maar","want","dus","als","dan","dat","die","dit","deze",
     "ik","jij","hij","zij","wij","jullie","u","ze","je","mijn","jouw","zijn","haar","ons","hun",
@@ -298,35 +375,23 @@ STOPWORDS_NL = {
     "ook","nog","al","wel","niet","nooit","altijd","hier","daar","ergens","niets","iets","alles",
     "is","was","wordt","zijn","heeft","heb","hebben","doe","doet","doen","kan","kunnen","moet","moeten"
 }
-
 def filter_topics(text: str) -> tuple[bool, str]:
-    """Eenvoudige veiligheidscheck. Retourneert (OK, waarschuwing_tekst)."""
     t = (text or "").lower()
-    verboden = [
-        "wachtwoord", "password", "pin", "pincode", "bsn",
-        "creditcard", "cvv", "iban", "token", "api key", "apikey", "geheim"
-    ]
+    verboden = ["wachtwoord","password","pin","pincode","bsn","creditcard","cvv","iban","token","api key","apikey","geheim"]
     if any(w in t for w in verboden):
         return (False, "Voor uw veiligheid: deel geen wachtwoorden, codes of privégegevens. Formuleer uw vraag zonder deze gegevens.")
     return (True, "")
-
 def _tokenize_clean(text: str) -> list[str]:
-    return [
-        w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
-        if len(w) > 2 and w not in STOPWORDS_NL
-    ]
-
+    return [w for w in re.findall(r"[0-9A-Za-zÀ-ÿ_]+", (text or "").lower())
+            if len(w) > 2 and w not in STOPWORDS_NL]
 def _relevance(q: str, t: str) -> tuple[int, float]:
-    qs = set(_tokenize_clean(q))
-    ts = set(_tokenize_clean(t))
-    hits = len(qs & ts)
-    coverage = hits / max(1, len(qs))
+    qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(t))
+    hits = len(qs & ts); coverage = hits / max(1, len(qs))
     return hits, coverage
-
 def _token_score(q: str, text: str) -> int:
-    qs = set(_tokenize_clean(q))
-    ts = set(_tokenize_clean(text))
+    qs = set(_tokenize_clean(q)); ts = set(_tokenize_clean(text))
     return len(qs & ts)
+
 
 # ── Search functions ─────────────────────────────────────────────────────────
 def find_answer_by_codeword(df: pd.DataFrame, codeword: str = "[UNIEKECODE123]") -> Optional[str]:
@@ -1283,6 +1348,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
