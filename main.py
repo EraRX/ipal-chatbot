@@ -295,13 +295,17 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
 
 faq_df = load_faq()
 
+# ── STRICTE CASCADE 1→7 ──────────────────────────────────────────────────────
 def _norm(v: str) -> str:
-    v = str(v).replace("\ufeff","").replace("\u00A0"," ")
-    return re.sub(r"\s+"," ", v).strip().lower()
+    v = str(v).replace("\ufeff", "").replace("\u00A0", " ")
+    return re.sub(r"\s+", " ", v).strip().lower()
 
 def _display_val(v: str) -> str:
     v = (v or "").strip()
     return v if v else "(Leeg)"
+
+def _normkey(x):  # voor nette sortering
+    return _norm("" if x is None else str(x))
 
 if faq_df.empty:
     st.info("Geen FAQ-gegevens gevonden.")
@@ -311,42 +315,47 @@ else:
     df_view = faq_df.reset_index(drop=True)
 
     # 1) Systeem
-    sys_opts = sorted(df_view["Systeem"].unique(), key=lambda x: str(x).lower())
+    sys_opts = sorted(df_view["Systeem"].dropna().unique(), key=_normkey)
     sel_sys = st.selectbox("1) Systeem", sys_opts, key="c1_sys")
-    step1 = df_view[_norm(df_view["Systeem"]) == _norm(sel_sys)]
+    step1 = df_view[df_view["Systeem"].apply(_norm) == _norm(sel_sys)]
 
     # 2) Subthema
-    sub_opts = sorted(step1["Subthema"].unique(), key=lambda x: str(x).lower())
+    sub_opts = sorted(step1["Subthema"].dropna().unique(), key=_normkey)
     sel_sub = st.selectbox("2) Subthema", sub_opts, key="c2_sub")
-    step2 = step1[_norm(step1["Subthema"]) == _norm(sel_sub)]
+    step2 = step1[step1["Subthema"].apply(_norm) == _norm(sel_sub)]
 
     # 3) Categorie
-    cat_opts = sorted(step2["Categorie"].unique(), key=lambda x: str(x).lower())
+    cat_opts = sorted(step2["Categorie"].dropna().unique(), key=_normkey)
     sel_cat = st.selectbox("3) Categorie", cat_opts, key="c3_cat")
-    step3 = step2[_norm(step2["Categorie"]) == _norm(sel_cat)]
+    step3 = step2[step2["Categorie"].apply(_norm) == _norm(sel_cat)]
 
     # 4) Omschrijving melding
-    oms_vals = step3["Omschrijving melding"].astype(str).fillna("")
-    oms_opts = sorted(oms_vals.unique(), key=lambda x: x.lower())
+    oms_opts = sorted(step3["Omschrijving melding"].fillna("").unique(), key=_normkey)
     sel_oms = st.selectbox("4) Omschrijving melding", oms_opts, key="c4_oms")
-    step4 = step3[_norm(step3["Omschrijving melding"]) == _norm(sel_oms)]
+    step4 = step3[step3["Omschrijving melding"].apply(_norm) == _norm(sel_oms)]
 
     # 5) Toelichting melding
-    toe_vals = step4["Toelichting melding"].astype(str).fillna("").map(_display_val).unique()
-    toe_opts = sorted(toe_vals, key=lambda x: x.lower())
+    toe_vals = step4["Toelichting melding"].fillna("").map(_display_val).unique()
+    toe_opts = sorted(toe_vals, key=_normkey)
     sel_toe_disp = st.selectbox("5) Toelichting melding", toe_opts, key="c5_toe")
     sel_toe_raw = "" if sel_toe_disp == "(Leeg)" else sel_toe_disp
-    step5 = step4[_norm(step4["Toelichting melding"]) == _norm(sel_toe_raw)]
+    step5 = step4[step4["Toelichting melding"].fillna("").apply(_norm) == _norm(sel_toe_raw)]
 
-    # 7) Antwoord of oplossing
-    st.markdown("**7) Antwoord of oplossing**")
-    st.write((row.get("Antwoord of oplossing", "") or "").strip())
+    # 6) Soort melding
+    soort_vals = step5["Soort melding"].fillna("").map(_display_val).unique()
+    soort_opts = sorted(soort_vals, key=_normkey)
+    sel_soort_disp = st.selectbox("6) Soort melding", soort_opts, key="c6_soort")
+    sel_soort_raw = "" if sel_soort_disp == "(Leeg)" else sel_soort_disp
+    step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)]
 
-    # Afbeelding indien aanwezig
-    img = str(row.get("Afbeelding","") or "").strip()
-    if img:
-    st.image(img, use_column_width=True)
-
+    # 7) Antwoord of oplossing (één richting, geen terugstap/omleiding)
+    if step6.empty:
+        st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
+    else:
+        row = step6.iloc[0]
+        st.markdown("**7) Antwoord of oplossing**")
+        st.write((row.get("Antwoord of oplossing", "") or "").strip())
+        # Niets meer tonen hierna (dus geen Toelichting/Soort opnieuw etc.)
 
 # ── (optioneel) dezelfde helpers laten bestaan als elders gebruikt ─────
 STOPWORDS_NL = {
@@ -1329,6 +1338,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
