@@ -227,139 +227,122 @@ def make_pdf(question: str, answer: str) -> bytes:
 
 # ── CSV loading + normalization ──────────────────────────────────────────────
 # ── CSV loading + cascade (REPLACE OLD BLOCK) ──────────────────────────
+# ── CSV inlezen + cascade: Systeem → Subthema → Categorie → Omschrijving → (Toelichting, Soort, Antwoord) ──
 import os, re
 import pandas as pd
 import streamlit as st
 
-def clean_text(s: str) -> str:
-    if s is None:
-        return ""
-    s = str(s)
-    s = s.replace("\ufeff", "").replace("\u00A0", " ")
-    s = s.replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
-
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
-    cols = [
-        "ID","Systeem","Subthema","Categorie",
-        "Omschrijving melding","Toelichting melding","Soort melding",
-        "Antwoord of oplossing","Afbeelding"
+    wanted_cols = [
+        "ID",
+        "Systeem",
+        "Subthema",
+        "Categorie",
+        "Omschrijving melding",
+        "Toelichting melding",
+        "Soort melding",
+        "Antwoord of oplossing",
     ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=cols)
+        return pd.DataFrame(columns=wanted_cols)
 
-    # Robuust inlezen: probeer BOM/UTF-8 autodetect, val terug op CP1252 ; of ,
-    for enc, sep in [("utf-8-sig", None),
-                     ("utf-8", None),
-                     ("cp1252", ";"),
-                     ("cp1252", ",")]:
+    # Robuust inlezen (probeer meerdere encodings/separators)
+    attempts = [
+        ("utf-8-sig", None),
+        ("utf-8", None),
+        ("cp1252", ";"),
+        ("cp1252", ","),
+        ("latin1", ";"),
+    ]
+    df = None
+    for enc, sep in attempts:
         try:
             df = pd.read_csv(path, encoding=enc, sep=sep, engine="python")
             break
         except Exception:
             df = None
     if df is None:
-        st.error("Kon CSV niet lezen. Bewaar bij voorkeur als UTF-8 met ; als scheidingsteken.")
-        return pd.DataFrame(columns=cols)
+        st.error("Kon CSV niet lezen. Sla bij voorkeur op als UTF-8 (met ; als scheidingsteken).")
+        return pd.DataFrame(columns=wanted_cols)
 
-    # Ontbrekende kolommen toevoegen
-    for c in cols:
+    # Headers opschonen en ontbrekende kolommen toevoegen
+    df.columns = [c.strip() for c in df.columns]
+    for c in wanted_cols:
         if c not in df.columns:
             df[c] = ""
 
-    # Normaliseren
-    for c in ["Systeem","Subthema","Categorie",
-              "Omschrijving melding","Toelichting melding",
-              "Soort melding","Antwoord of oplossing","Afbeelding"]:
-        df[c] = df[c].apply(clean_text)
-
-    # Systeem consistent maken
-    sys_raw = df["Systeem"].str.lower().str.strip()
-    df["Systeem"] = sys_raw.replace({
-        "exact": "Exact",
-        "exact online": "Exact",
-        "eol": "Exact",
-        "e-online": "Exact",
-        "e online": "Exact",
-        "docbase": "DocBase",
-        "doc base": "DocBase",
-        "sila": "DocBase",
-        "algemeen": "Algemeen",
-    })
-
-    # Samengesteld veld voor eventuele vrije zoekfunctie
-    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
-    df["combined"] = df[keep].fillna("").agg(" ".join, axis=1).apply(clean_text)
-
-    # ID als integer waar mogelijk
+    # Type/lege waarden netjes
     with pd.option_context("mode.chained_assignment", None):
         df["ID"] = pd.to_numeric(df["ID"], errors="coerce").astype("Int64")
+        for c in wanted_cols:
+            df[c] = df[c].fillna("")
 
-    return df
+    return df[wanted_cols]
 
-# Data inladen
 faq_df = load_faq()
 
-# ── CASCADE UI: Systeem → Subthema → Categorie → Omschrijving ─────────
-if not faq_df.empty:
-    def _norm(v: str) -> str:
-        v = (v or "")
-        v = v.replace("\ufeff","").replace("\u00A0"," ")
-        v = v.replace("\r\n"," ").replace("\n"," ").replace("\r"," ")
-        return re.sub(r"\s+"," ", v).strip().lower()
+def _norm(v: str) -> str:
+    # Alleen voor vergelijken/filteren (display-waarde blijft origineel)
+    v = str(v).replace("\ufeff", "").replace("\u00A0", " ")
+    v = re.sub(r"\s+", " ", v).strip().lower()
+    return v
 
-    w = faq_df.copy()
-    w["sys_n"] = w["Systeem"].map(_norm)
-    w["sub_n"] = w["Subthema"].map(_norm)
-    w["cat_n"] = w["Categorie"].map(_norm)
-    w["oms_n"] = w["Omschrijving melding"].map(_norm)
-
+if faq_df.empty:
+    st.info("Geen FAQ-gegevens gevonden.")
+else:
     st.subheader("Zoeken via stappen")
 
     # 1) Systeem
-    sys_opts = sorted(w["Systeem"].dropna().unique().tolist(), key=lambda x: str(x).lower())
-    sel_sys = st.selectbox("Systeem", sys_opts, key="sys")
-    sub_df = w[w["sys_n"] == _norm(sel_sys)]
+    sys_opts = sorted(faq_df["Systeem"].unique(), key=lambda x: str(x).lower())
+    sel_sys = st.selectbox("Systeem", sys_opts, key="cascade_sys")
+
+    step1 = faq_df[_norm(faq_df["Systeem"]) == _norm(sel_sys)]
 
     # 2) Subthema
-    sub_opts = sorted(sub_df["Subthema"].dropna().unique().tolist(), key=lambda x: str(x).lower())
-    sel_sub = st.selectbox("Subthema", sub_opts, key="sub")
-    cat_df = sub_df[sub_df["sub_n"] == _norm(sel_sub)]
+    sub_opts = sorted(step1["Subthema"].unique(), key=lambda x: str(x).lower())
+    sel_sub = st.selectbox("Subthema", sub_opts, key="cascade_sub")
+
+    step2 = step1[_norm(step1["Subthema"]) == _norm(sel_sub)]
 
     # 3) Categorie
-    cat_opts = sorted(cat_df["Categorie"].dropna().unique().tolist(), key=lambda x: str(x).lower())
-    sel_cat = st.selectbox("Categorie", cat_opts, key="cat")
-    leaf_df = cat_df[cat_df["cat_n"] == _norm(sel_cat)][
-        ["ID","Omschrijving melding","Toelichting melding","Soort melding","Antwoord of oplossing","Afbeelding"]
-    ].dropna(subset=["Omschrijving melding"]).sort_values("Omschrijving melding")
+    cat_opts = sorted(step2["Categorie"].unique(), key=lambda x: str(x).lower())
+    sel_cat = st.selectbox("Categorie", cat_opts, key="cascade_cat")
 
-    # 4) Omschrijving melding — koppel op ID (geen omleiding)
-    label_to_id = {
-        (f'{row["Omschrijving melding"]} (ID {int(row["ID"])})' if pd.notna(row["ID"]) else row["Omschrijving melding"]):
-        (int(row["ID"]) if pd.notna(row["ID"]) else None)
-        for _, row in leaf_df.iterrows()
-    }
-    sel_label = st.selectbox("Omschrijving melding", list(label_to_id.keys()), key="oms")
-    sel_id = label_to_id[sel_label]
+    step3 = step2[_norm(step2["Categorie"]) == _norm(sel_cat)]
 
-    if sel_id is not None:
-        row = w.loc[w["ID"] == sel_id].iloc[0]
+    # 4) Omschrijving melding
+    # (Bij dubbele omschrijvingen tonen we “Omschrijving (ID 123)” om uniek te zijn.)
+    def _label(row):
+        if pd.notna(row["ID"]) and str(row["ID"]) != "<NA>":
+            return f'{row["Omschrijving melding"]} (ID {int(row["ID"])})'
+        return row["Omschrijving melding"]
+
+    leaf = step3.copy()
+    leaf["__label__"] = leaf.apply(_label, axis=1)
+    oms_opts = sorted(leaf["__label__"].unique(), key=lambda x: str(x).lower())
+    sel_oms_label = st.selectbox("Omschrijving melding", oms_opts, key="cascade_oms")
+
+    # De gekozen rij terugvinden (zonder omleiding of 'terugstap')
+    if sel_oms_label.endswith(")") and "(ID " in sel_oms_label:
+        # gekozen via uniek ID
+        id_val = int(sel_oms_label.rsplit("(ID ", 1)[1].rstrip(")"))
+        row = leaf.loc[leaf["ID"] == id_val].iloc[0]
     else:
-        # Fallback op unieke combinatie als ID ontbreekt
-        row = leaf_df.loc[leaf_df["Omschrijving melding"] == sel_label].iloc[0]
+        # gekozen via exacte omschrijving binnen de gefilterde set
+        row = leaf.loc[_norm(leaf["Omschrijving melding"]) == _norm(sel_oms_label)].iloc[0]
 
-    # Resultaat (velden leeg laten als er geen waarde is)
+    # 5) Resultaatvelden tonen in JOUW volgorde
     st.markdown("**Toelichting melding**")
-    st.write((row.get("Toelichting melding", "") or "").strip())
+    st.write((row.get("Toelichting melding", "") or ""))
 
     st.markdown("**Soort melding**")
-    st.write((row.get("Soort melding", "") or "").strip())
+    st.write((row.get("Soort melding", "") or ""))
 
     st.markdown("**Antwoord of oplossing**")
-    st.write((row.get("Antwoord of oplossing", "") or "").strip())
+    st.write((row.get("Antwoord of oplossing", "") or ""))
+
 
     img = (row.get("Afbeelding", "") or "").strip()
     if img:
@@ -1348,6 +1331,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
