@@ -225,9 +225,8 @@ def make_pdf(question: str, answer: str) -> bytes:
     buffer.seek(0)
     return buffer.getvalue()
 
-# ── CSV loading + normalization ──────────────────────────────────────────────
 # ── CSV loading + cascade (REPLACE OLD BLOCK) ──────────────────────────
-# ── CSV inlezen + cascade: Systeem → Subthema → Categorie → Omschrijving → (Toelichting, Soort, Antwoord) ──
+# ── CSV inlezen + cascade: Systeem → Subthema → Categorie → Omschrijving → (Toelichting, Soort, Antwoord, Afbeelding) ──
 import os, re
 import pandas as pd
 import streamlit as st
@@ -243,6 +242,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         "Toelichting melding",
         "Soort melding",
         "Antwoord of oplossing",
+        "Afbeelding",  # <- belangrijk: niet vergeten
     ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
@@ -275,7 +275,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
 
     # Type/lege waarden netjes
     with pd.option_context("mode.chained_assignment", None):
-        df["ID"] = pd.to_numeric(df["ID"], errors="coerce").astype("Int64")
+        df["ID"] = pd.to_numeric(df.get("ID", ""), errors="coerce").astype("Int64")
         for c in wanted_cols:
             df[c] = df[c].fillna("")
 
@@ -297,23 +297,19 @@ else:
     # 1) Systeem
     sys_opts = sorted(faq_df["Systeem"].unique(), key=lambda x: str(x).lower())
     sel_sys = st.selectbox("Systeem", sys_opts, key="cascade_sys")
-
     step1 = faq_df[_norm(faq_df["Systeem"]) == _norm(sel_sys)]
 
     # 2) Subthema
     sub_opts = sorted(step1["Subthema"].unique(), key=lambda x: str(x).lower())
     sel_sub = st.selectbox("Subthema", sub_opts, key="cascade_sub")
-
     step2 = step1[_norm(step1["Subthema"]) == _norm(sel_sub)]
 
     # 3) Categorie
     cat_opts = sorted(step2["Categorie"].unique(), key=lambda x: str(x).lower())
     sel_cat = st.selectbox("Categorie", cat_opts, key="cascade_cat")
-
     step3 = step2[_norm(step2["Categorie"]) == _norm(sel_cat)]
 
-    # 4) Omschrijving melding
-    # (Bij dubbele omschrijvingen tonen we “Omschrijving (ID 123)” om uniek te zijn.)
+    # 4) Omschrijving melding (label met ID om dubbelingen uniek te maken)
     def _label(row):
         if pd.notna(row["ID"]) and str(row["ID"]) != "<NA>":
             return f'{row["Omschrijving melding"]} (ID {int(row["ID"])})'
@@ -324,16 +320,14 @@ else:
     oms_opts = sorted(leaf["__label__"].unique(), key=lambda x: str(x).lower())
     sel_oms_label = st.selectbox("Omschrijving melding", oms_opts, key="cascade_oms")
 
-    # De gekozen rij terugvinden (zonder omleiding of 'terugstap')
+    # Gekozen rij terugvinden (zonder omleiding/terugstap)
     if sel_oms_label.endswith(")") and "(ID " in sel_oms_label:
-        # gekozen via uniek ID
         id_val = int(sel_oms_label.rsplit("(ID ", 1)[1].rstrip(")"))
         row = leaf.loc[leaf["ID"] == id_val].iloc[0]
     else:
-        # gekozen via exacte omschrijving binnen de gefilterde set
         row = leaf.loc[_norm(leaf["Omschrijving melding"]) == _norm(sel_oms_label)].iloc[0]
 
-    # 5) Resultaatvelden tonen in JOUW volgorde
+    # 5) Resultaatvelden tonen in jouw volgorde
     st.markdown("**Toelichting melding**")
     st.write((row.get("Toelichting melding", "") or ""))
 
@@ -343,12 +337,11 @@ else:
     st.markdown("**Antwoord of oplossing**")
     st.write((row.get("Antwoord of oplossing", "") or ""))
 
-
+    # 6) Optioneel: Afbeelding weergeven indien aanwezig
     img = (row.get("Afbeelding", "") or "").strip()
     if img:
         st.image(img, use_column_width=True)
-else:
-    st.info("Geen FAQ-gegevens gevonden.")
+
 
 # ── (optioneel) dezelfde helpers laten bestaan als elders gebruikt ─────
 STOPWORDS_NL = {
@@ -1331,6 +1324,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
