@@ -226,7 +226,8 @@ def make_pdf(question: str, answer: str) -> bytes:
     return buffer.getvalue()
 
 # ── CSV loading + cascade (REPLACE OLD BLOCK) ──────────────────────────
-# ── CSV inlezen + cascade: Systeem → Subthema → Categorie → Omschrijving → (Toelichting, Soort, Antwoord, Afbeelding) ──
+# Volgorde: 1) Systeem → 2) Subthema → 3) Categorie → 4) Omschrijving melding
+#           5) Toelichting melding → 6) Soort melding → 7) Antwoord of oplossing
 import os, re
 import pandas as pd
 import streamlit as st
@@ -242,13 +243,15 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         "Toelichting melding",
         "Soort melding",
         "Antwoord of oplossing",
-        "Afbeelding",  # <- belangrijk: niet vergeten
+        "Afbeelding",
     ]
     if not os.path.exists(path):
         st.error(f"FAQ-bestand '{path}' niet gevonden.")
-        return pd.DataFrame(columns=wanted_cols)
+        return pd.DataFrame(columns=wanted_cols + ["combined"]).set_index(
+            ["Systeem","Subthema","Categorie"], drop=False
+        )
 
-    # Robuust inlezen (probeer meerdere encodings/separators)
+    # Robuust inlezen (encodings/separators)
     attempts = [
         ("utf-8-sig", None),
         ("utf-8", None),
@@ -265,82 +268,103 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
             df = None
     if df is None:
         st.error("Kon CSV niet lezen. Sla bij voorkeur op als UTF-8 (met ; als scheidingsteken).")
-        return pd.DataFrame(columns=wanted_cols)
+        return pd.DataFrame(columns=wanted_cols + ["combined"]).set_index(
+            ["Systeem","Subthema","Categorie"], drop=False
+        )
 
-    # Headers opschonen en ontbrekende kolommen toevoegen
-    df.columns = [c.strip() for c in df.columns]
+    # Headers opschonen + ontbrekende kolommen
+    df.columns = [str(c).strip() for c in df.columns]
     for c in wanted_cols:
         if c not in df.columns:
             df[c] = ""
 
-    # Type/lege waarden netjes
+    # Waarden opschonen
     with pd.option_context("mode.chained_assignment", None):
         df["ID"] = pd.to_numeric(df.get("ID", ""), errors="coerce").astype("Int64")
         for c in wanted_cols:
-            df[c] = df[c].fillna("")
+            df[c] = df[c].fillna("").astype(str).str.replace("\ufeff","",regex=False).str.replace("\u00A0"," ",regex=False)
 
-    return df[wanted_cols]
+    # combined t.b.v. zoeken
+    keep = ["Systeem","Subthema","Categorie","Omschrijving melding","Toelichting melding"]
+    df["combined"] = df[keep].fillna("").astype(str).agg(" ".join, axis=1)
+
+    # MultiIndex zodat xs(...) elders blijft werken
+    df = df.set_index(["Systeem","Subthema","Categorie"], drop=False)
+
+    return df[wanted_cols + ["combined"]]
 
 faq_df = load_faq()
 
 def _norm(v: str) -> str:
-    # Alleen voor vergelijken/filteren (display-waarde blijft origineel)
-    v = str(v).replace("\ufeff", "").replace("\u00A0", " ")
-    v = re.sub(r"\s+", " ", v).strip().lower()
-    return v
+    v = str(v).replace("\ufeff","").replace("\u00A0"," ")
+    return re.sub(r"\s+"," ", v).strip().lower()
+
+def _display_val(v: str) -> str:
+    v = (v or "").strip()
+    return v if v else "(Leeg)"
 
 if faq_df.empty:
     st.info("Geen FAQ-gegevens gevonden.")
 else:
-    st.subheader("Zoeken via stappen")
+    st.subheader("Zoeken via stappen (1→7)")
+
+    df_view = faq_df.reset_index(drop=True)
 
     # 1) Systeem
-    sys_opts = sorted(faq_df["Systeem"].unique(), key=lambda x: str(x).lower())
-    sel_sys = st.selectbox("Systeem", sys_opts, key="cascade_sys")
-    step1 = faq_df[_norm(faq_df["Systeem"]) == _norm(sel_sys)]
+    sys_opts = sorted(df_view["Systeem"].unique(), key=lambda x: str(x).lower())
+    sel_sys = st.selectbox("1) Systeem", sys_opts, key="c1_sys")
+    step1 = df_view[_norm(df_view["Systeem"]) == _norm(sel_sys)]
 
     # 2) Subthema
     sub_opts = sorted(step1["Subthema"].unique(), key=lambda x: str(x).lower())
-    sel_sub = st.selectbox("Subthema", sub_opts, key="cascade_sub")
+    sel_sub = st.selectbox("2) Subthema", sub_opts, key="c2_sub")
     step2 = step1[_norm(step1["Subthema"]) == _norm(sel_sub)]
 
     # 3) Categorie
     cat_opts = sorted(step2["Categorie"].unique(), key=lambda x: str(x).lower())
-    sel_cat = st.selectbox("Categorie", cat_opts, key="cascade_cat")
+    sel_cat = st.selectbox("3) Categorie", cat_opts, key="c3_cat")
     step3 = step2[_norm(step2["Categorie"]) == _norm(sel_cat)]
 
-    # 4) Omschrijving melding (label met ID om dubbelingen uniek te maken)
-    def _label(row):
-        if pd.notna(row["ID"]) and str(row["ID"]) != "<NA>":
-            return f'{row["Omschrijving melding"]} (ID {int(row["ID"])})'
-        return row["Omschrijving melding"]
+    # 4) Omschrijving melding
+    oms_vals = step3["Omschrijving melding"].astype(str).fillna("")
+    oms_opts = sorted(oms_vals.unique(), key=lambda x: x.lower())
+    sel_oms = st.selectbox("4) Omschrijving melding", oms_opts, key="c4_oms")
+    step4 = step3[_norm(step3["Omschrijving melding"]) == _norm(sel_oms)]
 
-    leaf = step3.copy()
-    leaf["__label__"] = leaf.apply(_label, axis=1)
-    oms_opts = sorted(leaf["__label__"].unique(), key=lambda x: str(x).lower())
-    sel_oms_label = st.selectbox("Omschrijving melding", oms_opts, key="cascade_oms")
+    # 5) Toelichting melding
+    toe_vals = step4["Toelichting melding"].astype(str).fillna("").map(_display_val).unique()
+    toe_opts = sorted(toe_vals, key=lambda x: x.lower())
+    sel_toe_disp = st.selectbox("5) Toelichting melding", toe_opts, key="c5_toe")
+    sel_toe_raw = "" if sel_toe_disp == "(Leeg)" else sel_toe_disp
+    step5 = step4[_norm(step4["Toelichting melding"]) == _norm(sel_toe_raw)]
 
-    # Gekozen rij terugvinden (zonder omleiding/terugstap)
-    if sel_oms_label.endswith(")") and "(ID " in sel_oms_label:
-        id_val = int(sel_oms_label.rsplit("(ID ", 1)[1].rstrip(")"))
-        row = leaf.loc[leaf["ID"] == id_val].iloc[0]
+    # 6) Soort melding
+    soort_vals = step5["Soort melding"].astype(str).fillna("").map(_display_val).unique()
+    soort_opts = sorted(soort_vals, key=lambda x: x.lower())
+    sel_soort_disp = st.selectbox("6) Soort melding", soort_opts, key="c6_soort")
+    sel_soort_raw = "" if sel_soort_disp == "(Leeg)" else sel_soort_disp
+    step6 = step5[_norm(step5["Soort melding"]) == _norm(sel_soort_raw)]
+
+    # Resultaat (verwacht 1 rij; bij >1 pakken we de eerste zonder terugstap)
+    if step6.empty:
+        st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
     else:
-        row = leaf.loc[_norm(leaf["Omschrijving melding"]) == _norm(sel_oms_label)].iloc[0]
+        row = step6.iloc[0]
 
-    # 5) Resultaatvelden tonen in jouw volgorde
-    st.markdown("**Toelichting melding**")
-    st.write((row.get("Toelichting melding", "") or ""))
+        # 7) Antwoord of oplossing
+        st.markdown("**7) Antwoord of oplossing**")
+        st.write((row.get("Antwoord of oplossing", "") or "").strip())
 
-    st.markdown("**Soort melding**")
-    st.write((row.get("Soort melding", "") or ""))
+        # (Optioneel) context tonen
+        st.markdown("**Toelichting melding**")
+        st.write(_display_val(row.get("Toelichting melding","")))
+        st.markdown("**Soort melding**")
+        st.write(_display_val(row.get("Soort melding","")))
 
-    st.markdown("**Antwoord of oplossing**")
-    st.write((row.get("Antwoord of oplossing", "") or ""))
-
-    # 6) Optioneel: Afbeelding weergeven indien aanwezig
-    img = (row.get("Afbeelding", "") or "").strip()
-    if img:
-        st.image(img, use_column_width=True)
+        # Afbeelding indien aanwezig
+        img = str(row.get("Afbeelding","") or "").strip()
+        if img:
+            st.image(img, use_column_width=True)
 
 
 # ── (optioneel) dezelfde helpers laten bestaan als elders gebruikt ─────
@@ -1324,6 +1348,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
