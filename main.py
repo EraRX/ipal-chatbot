@@ -616,7 +616,7 @@ def chat_wizard():
             st.rerun()
         if c3.button("Zoeken", key="wizard_search", use_container_width=True):
             st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
-            add_msg("assistant", "Waar wilt u in de CSV op zoeken? Typ een korte zoekterm.")
+            add_msg("assistant", "Waar wilt u in de kennisbank op zoeken? Typ een korte zoekterm.")
             st.rerun()
         if c4.button("Internet", key="wizard_internet", use_container_width=True):
             st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
@@ -692,7 +692,7 @@ def chat_wizard():
                 st.session_state["chat_scope"] = "Zoeken"
                 st.session_state["chat_results"] = hits.to_dict("records")
                 st.session_state["chat_step"] = "pick_item"
-                add_msg("assistant", "Ik heb een aantal mogelijke matches gevonden in onze CSV. Kies er één hieronder.")
+                add_msg("assistant", "Ik heb een aantal mogelijke matches gevonden in onze kennisbank. Kies er één hieronder.")
                 st.rerun(); return
             else:
                 st.session_state["chat_scope"] = "Algemeen"
@@ -728,7 +728,7 @@ def chat_wizard():
             st.session_state["last_question"] = user_text
             hits = zoek_in_scope(None if scope == "Zoeken" else scope, user_text, topn=8)
             if hits.empty:
-                add_msg("assistant", "Ik vond geen goede match in de CSV. Formuleer het iets anders of kies **Internet**.")
+                add_msg("assistant", "Ik vond geen goede match in de kennisbank. Formuleer het iets anders of kies **Internet**.")
                 st.rerun(); return
             st.session_state["chat_results"] = hits.to_dict("records")
             st.session_state["chat_step"] = "pick_item"
@@ -780,7 +780,7 @@ def chat_wizard():
                 reactie = None
 
         if not reactie:
-            reactie = simplify_text(bron) if bron else "Ik heb geen detail voor dit item in de CSV. Kies een ander item of stel de vraag via **Internet**."
+            reactie = simplify_text(bron) if bron else "Ik heb geen detail voor dit item in de kennisbank. Kies een ander item of stel de vraag via **Internet**."
 
         content = with_info(reactie)
         add_msg("assistant", content)
@@ -802,7 +802,7 @@ def _show_item_answer(idx: int):
     ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
     if not ans:
         oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
-        ans = f"(Geen uitgewerkt antwoord in CSV voor: {oms})"
+        ans = f"(Geen uitgewerkt antwoord in onze kennisbank voor: {oms})"
     label = _mk_label(idx, row)
     img = clean_text(str(row.get('Afbeelding', '') or '').strip())
     st.session_state["selected_image"] = img if img else None
@@ -939,3 +939,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
