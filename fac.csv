@@ -3695,7 +3695,7 @@ De vraag is : hoe kan ik die mutaties wel voor elkaar krijgen : is dat een kwest
 659;Exact;Exact Online;Exact Online;Negatief bedrag verwijderen in Exact Online;Mevr. Pouch Sobota (relatie 910176) betaalde kerkbijdrage per automatische incasso. Zij is verhuisd buiten de parochie en vorig jaar is de automatische incasso niet meer geïnd. Bij het aanmaken van de incassobatch voor 2025 stond ze er nog steeds bij. Ik heb in DocBase haar abonnement stopgezet, maar in Exact Online staat er een bedrag van € -60. Hoe kan ik dat verwijderen. Zie ook bijlage;"Ga in Exact naar de factuur via Verkoop > Facturen > Overzicht. Zoek via de debiteur de factuur op. Klik op de omschrijving van de foute factuur. Klik hierna op ""Aanmaken; Creditfactuur verkoop"". Dat klikt tegenstijdig maar Exact maakt dan een tegenboeking en zal later ook vragen of het goed is om er een debetfactuur van de maken. Volg de verdere stappen om de factuur aan te maken. Zorg ervoor dat de creditfactuur en de debetfactuur met elkaar worden afgeletterd.";;
 660;DocBase;DocBase algemeen;DocBase algemeen;Gebruiker verwijderen;Kunt HCL Dijkhuizen als gebruker van DocBase verwijderen. Hij is al enige tijd geen bestuurslid meer;de gebruiker is verwijderd uit DocBase.;;
 661;DocBase;DB Sjablonen;DB Sjablonen;KB lijst;"Bij het maken van een looplijst voor de bezorgers van de KB brief krijg ik na een lange lijst nog een aantal bladzijden met een paar namen er op. Dit zijn geen dubbele namen. Hoe komt dat deze apart worden geselecteerd. Hoe kan ik deze selectie aanpassen.
-Graag uw reactie.  Gr. Mieke van der Hulst tel. 0224540079 of 0612519935";U maakt geen gebruik van wijkgegevens. Toch zijn bij de selectie die u gemaakt heeft enkele parochianen waarbij de wijkgegevens wel gevuld zijn (omdat ze bijvoorbeeld voorkeurslid zijn van een andere parochie). U kunt nadat u de selectie heeft geëxporteerd naar Excel een kolom van de wijkgegevens bijv. Wijksectie leegmaken (niet de kolom verwijderen). Als u daarna een looplijst maakt kies dan voor sortering op Wijksectie.;;
+";U maakt geen gebruik van wijkgegevens. Toch zijn bij de selectie die u gemaakt heeft enkele parochianen waarbij de wijkgegevens wel gevuld zijn (omdat ze bijvoorbeeld voorkeurslid zijn van een andere parochie). U kunt nadat u de selectie heeft geëxporteerd naar Excel een kolom van de wijkgegevens bijv. Wijksectie leegmaken (niet de kolom verwijderen). Als u daarna een looplijst maakt kies dan voor sortering op Wijksectie.;;
 662;DocBase;DocBase algemeen;DocBase algemeen;Nieuwe wijk in Roosendaal: Flaviadonk nr 1-43 en nummers 2-36. Ze hebben de postcode 4707VV. Wilt u die aan het systeem toevoegen?;;"Postcode 4707VV staat al in de postcodecheck en in de tabellen van Kaski. Er stonden ook al twee regels in tabel 07. Bezorging - wijkgegevens met deze postcode.  de huisnummerreeks hiervan aangepast.
 Omdat het maar een paar leden betreft heb ik bij de ledenkaarten een postcodecheck gedaan zodat ook daar de wijkgegevens gevuld zijn.";;
 663;Exact;Exact Online;Exact Online;EO: lay-out van Analytische Waarden veranderd?;"Voor het maken van mijn jaarrekening maak ik uitdraaien mbv Analytische Waarden.
@@ -3720,12 +3720,7 @@ Yvonne Kroeze";"U kunt bij 02. Kerkelijke data alleen de ""eigen"" kerkelijke da
 666;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;leden verwijderen die zijn verhuisd zonder voorkeur parochie;"Goedemorgen,
 In onze administratie zijn nog leden zichtbaar die niet meer in Ridderkerk wonen (langer dan 3 maanden geleden verhuisd) en Ridderkerk niet als voorkeurparochie hebben. Het blijkt dat in de ledenkaarten van deze parochianen het kaskinummer 42509 nog is vermeld. Door dit kaskinummer te verwijderen heb ik de meeste van deze leden uit onze administratie kunnen weghalen. Er zijn echter nog een aantal leden waar ik niet in kan omdat er wordt aangegeven dat ik geen rechten hebt om de ledenkaart in te zien. 
 Graag het verzoek deze voor ons uit de administratie te verwijderen.
-Het betreft de volgende leden:
-5241673
-5302532
-5571956
-6485624
-7406305";"U kunt deze leden wel in de zgn. view zien maar de ledenkaarten zijn voor u niet zichtbaar. Het is bekend dat er een probleem is met de view. DocBase werkt momenteel aan een oplossing.
+";"U kunt deze leden wel in de zgn. view zien maar de ledenkaarten zijn voor u niet zichtbaar. Het is bekend dat er een probleem is met de view. DocBase werkt momenteel aan een oplossing.
 AANVULLING; u mag deze leden eigenlijk niet zien in de view. Dat is nu opgelost. U kunt deze leden niet meer zien.";;
 667;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;leden verwijderen uit administratie met kerkelijke data;"Goedemiddag,
 In bijgaand overzicht vindt u leden die niet meer in Ridderkerkwonen en Sint Jorisparochie niet als voorkeur hebben. Deze leden bevatten kerkelijke data. Wilt u het kaskinummer 42509 weghalen zodat dze niet meer zichtbaar zijn in onze administratie?
@@ -3796,18 +3791,8 @@ Hoe zit dit nu in elkaar. Is er door jullie nog een selectie opvraagbaar met geg
 691;DocBase;DocBase Grafbeheer;DocBase Grafbeheer;er wordt geen grafnummer aangemaakt;Er wordt niet automatisch een grafnummer aangemaakt.;Dat klopt. Het grafnummer werd eerder automatisch gevuld maar werd door de meeste parochies meteen aangepast naar een eigen nummering. We hebben dit veld nu leeggelaten zodat u dit zelf kunt vullen.;;
 692;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;Ontbrekende locatie nummers;Zie ook mijn eerdere email over dit onderwerp. Ik wilde nu onder 03. Debiteuren de ontbrekende locatie nummers toevoegen. Dat lukt mij niet aangezien dit veld geblokkeerd is. Is dit op te lossen? Het gaat om 16 debiteuren, waarvan 13 loc 31002 2 loc 31003 en 1 loc 31004. Bij een aantal zit is hier ook nog een incasso aan gekoppeld.;Graag een excelbestand van de debiteuren waarvan de kostenplaats/locatie niet gevuld is en op het bestand aangeven welke locatie/kostenplaats het moet zijn. Dan zal ik deze voor u toevoegen.;;
 693;Exact;Exact Online;Exact Online;Sluiten bankrekening;De Rabobankrekening eindigende op 8289, dagboek 30, is sinds oktober 2023 beeindigd.  Kan de rekening ook binnen Exact gesloten worden?; zowel de grootboekrekening als ook het dagboek op geblokkeerd gezet.;;
-694;Exact;Exact Online;Exact Online;Bankkoppeling meerdere parochies;"Hoi Angelique,
-Kun jij voor de bankkoppeling zorgen voor een paar parochies tbv kerkbijdrage?!
-H. Medardus - Wessem       rek.nr.:  NL40RABO0157502503
-H. Michael - Thorn               rek.nr.: NL09RABO0151002606
-St. Stephanus - Heel            rek.nr.: NL32RABO0119600285
-H. Martinus - Beegden        rek.nr.: NL14RABO0104891238
-H. Margarita - Ittervoort     rek.nr.: NL24RABO0135900891
-H. Lambertus - Neeritter     rek.nr.: NL24RABO0135900212
-
-Alvast bedankt.
-groet,
-Judith";Dit ticket telefonische besproken. Het blijkt te gaan om de 2e toewijzingsregel bij gebruik QR-code.  deze regels toegevoegd.;;
+694;Exact;Exact Online;Exact Online;Bankkoppeling meerdere parochies;"Kun jij voor de bankkoppeling zorgen voor een paar parochies tbv kerkbijdrage?!
+";Dit ticket telefonische besproken. Het blijkt te gaan om de 2e toewijzingsregel bij gebruik QR-code.  deze regels toegevoegd.;;
 695;DocBase;DocBase algemeen;DocBase algemeen;Zoekopdrachten kopiëren of beschikbaar maken voor medegebruikers DocBase binnen parochie.;"Geachte medewerker,
 
 Is het mogelijk om een zoekopdracht die door mij of iemand anders binnen de parochie gemaakt is te kopiëren of beschikbaar te maken binnen de parochie voor andere Docbase gebruikers.
@@ -3832,17 +3817,9 @@ Wilt u zo vriendelijk zijn deze ook nog te verwijderen
 Hartelijk dank wederom";Dit zijn kerkelijke data die aan een lidnummer hangen dat niet meer bestaat. Daarom bleven deze nog achter.  ze alsnog aangepast.;;
 700;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;parochiaan verhuisd naar Duitsland;"Een parochiaan is verhuisd naar Duitsland en staat nu geregistreerd in DB als: Via Sila      RNI (afmelding) met Postcode ZZZZ 
 Deze meneer wil voorkeurlid van onze parochie/locatie (St. Willehadus) blijven.
-Hoe lossen we dit op?
-Hierbij zijn gegevens:
-• Rel.nr. 6516045
-• Zoeknaam M.M. Hoesen (Menno Marcel
-• Geb.dat. 09-01-1966
-• Mob. Telnr 0615314899 (=gewijzigd t.o.v. nr in DB)
-• marcelhoesen@hotmail.com
-• Adres Sudstrasse 242, 49767 Twist Duitsland"; de adresgegevens op de ledenkaart gezet, maar dat had u zelf ook kunnen doen. Tevens heb ik de voorkeursgegevens ingevuld zodat dit lid zichtbaar blijft voor uw parochie.;;
-701;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;Per ongeluk iemand ingevoerd die al bekend was als parochiaan;"Vanmorgen heb ik per mevrouw S.F.  Mohede (geboren 06-06-1997) ingevoerd als parochiaan en aanmelding bij sila aangevraagd; het bijbehorende DocBase-id is 15357653. Mevrouw is gehuwd met de heer Stijn Huuskes, DocBase-id 7201194.
-Helaas zal ik later pas dat mevrouw Mohede al bekend was als parochiaan onder DocBase-id 9165733.
-Kunt u de gegevens van mevrouw Mohede met DocBase-id 9165733 voor ons verwijderen? We zien de gegevens van mevrouw Mohede die vandaag zijn ingevoerd graag gehandhaafd (adres: Kolthofhorst 19)."; lid 9165733 verwijderd.;;
+
+
+"; de adresgegevens op de ledenkaart gezet, maar dat had u zelf ook kunnen doen. Tevens heb ik de voorkeursgegevens ingevuld zodat dit lid zichtbaar blijft voor uw parochie.;;
 702;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;aanmaken Excel-bestand selectie;Verzoek om een selectie aan te maken vanuit DocBase waarin alle parochianen worden geselecteerd (met N.A.W.-gegevens) die in 2024 en/of in 2023 een kerkbijdrage hebben gedaan. En die per heden nog in leven zijn. Een vergelijkbaar verzoek heb ik gedaan begin 2024.;Bestand toegevoegd. Vergeet niet eventuele partners van overleden personen die wel kerkbijdrage hebben betaald ook mee te nemen in aktie Kerkbalans.;;
 703;Exact;Exact Online;Exact Online;verkeerd dagboek;"Bij het inlezen van een factuur is over het hoofd gezien dat er een verkeerd dagboek is gebruikt.
 In plaats van dagboek 62 is dagboek 60 gebruikt.
@@ -3855,10 +3832,7 @@ Waarom kan dat nu niet meer? Wilt u dat a.u.b. oplossen.";Het lukt mij ook niet 
 705;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;Dopeling aanmelden;"We krijgen steeds meldingen over niet aangemelde dopelingen, maar kunnen deze niet traceren.
 Hoe lossen we dat op?";Deze pop-up is enkel om u eraan te herinneren dat indien er een doopsel plaatsvind in uw parochie, dat u deze dopeling toevoegt aan DocBase, aanmeldt bij Sila en de kerkelijke data van het doopsel toevoegt. De gezamelijke Bisdommen hechten er veel waarde aan dat dopelingen worden toegevoegd aan de ledenadministratie.;;
 706;DocBase;DocBase Grafbeheer;DocBase Grafbeheer;Invoeren nieuw graf;"Ik kan geen nieuw graf meer invoeren, omdat ik ook een grafnummer moet invoeren. Ik heb altijd ""locatie graf"" ingevuld. Gafnummer werd automatisch ingevuld. Is er iets gewijzigd. zoja hoe kom ik aan een grafnummer?
-Ik hoor het graag van u. Zo nodig ben ik telefonisch bereikbaar op tel. 06-46189786.
-Alvast bedankt,
-Hanneke van Veen
-Administratie Kerkhofzaken.";Er is inderdaad iets gewijzigd. De meeste parochies passen het parochienummer aan naar een eigen nummering. U kunt daar dus zelf een grafnummer invullen.;;
+";Er is inderdaad iets gewijzigd. De meeste parochies passen het parochienummer aan naar een eigen nummering. U kunt daar dus zelf een grafnummer invullen.;;
 707;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;Debiteurnummer 610898 wordt niet herkend in Exact;"C.E.J. Melissen Kerketiend 3 Oudenbosch / abonnement wordt niet getoond in Exact Online / debiteur 610898 
 Incasso abonnement "" zetje ""geven aub";Debiteur zat in de prullenbak. Die heb ik eruit gehaald. Het abonnement heeft een ingangsdatum van 01-04-2024 dus dat heeft weinig zit om deze alsnog een zetje te geven. U kunt dit abonnement verwijderen en een nieuw abonnement aanmaken per 01-01-2025.;;
 708;Exact;Exact Online;Exact Online;Grootboekrekening “Juridisch kosten” in het standaard rekeningschema?;"Naar aanleiding van de onderstaande vraag: is er grootboekrekening “Juridisch kosten” in het standaard rekeningschema? Zo niet, dan zouden we graag toegevoegd zien bij de parochies van het Bisdom Haarlem-Amsterdam. Indien mogelijk: wat zou dit kosten en wanneer dit kunnen worden uitgevoerd? In eerste instantie zou het handmatig bij 30114 kunnen worden uitgevoerd; en daarna bij de overige parochies ""geautomatiseerd?
@@ -3930,7 +3904,7 @@ Eigenlijk had dit bedrag op debiteur 909109 moeten worden geboekt. Deze debiteur
 Ik heb geprobeerd de betreffende IBAN als tekst in te voegen, maar dan gaat de afdruk op Grijs en is niet meer te lezen, het lijkt erop dat dat niet toegestaan wordt. Ik heb er onder support niets over kunnen vinden."; een kopie gemaakt van de lay-out en daarin het bankrekeningnummer als tekstveld toegevoegd.;;
 740;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;persoon verhuisd;"Lid is volgens onze informatie verhuisd. Hij heeft een Silastip. Kennelijk is de verhuizing niet doorgekomen? 
 Graag uit ons bestand verwijderen.";Wij kunnen een lid met Sila-stip niet zomaar verwijderen. Ik adviseer u af te wachten of de verhuizing alsnog via Sila doorkomt. Ondertussen kunt u proberen het nieuwe adres te achterhalen en eventueel op de ledenkaart aanpassen. U heeft nog een actief abonnement aan dit lid hangen.;;
-741;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;kerkbijdrage niet zichtbaar in L parochie;de administratie van de L Parochie is vorig jaar overgenomen;De kerkbijdrage is geboekt op debiteur 792123. Deze debiteur hangt aan kostenplaats/locatie 50644 en is daarom niet zichtbaar voor locatie 50690.;;
+741;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;kerkbijdrage niet zichtbaar in L parochie;de administratie van de L Parochie is vorig jaar overgenomen;De kerkbijdrage is geboekt op debiteur xxxxx. Deze debiteur hangt aan kostenplaats/locatie yyyyyy en is daarom niet zichtbaar voor locatie .;;
 745;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;anuleren voorkeursparochie;" vrijwilliger in geloofsgemeenschap H. Jozef.  Kunnen wij nu de voorkeursparochie annuleren zodat hij ingedeeld kan worden in een PB-looplijst van onze geloofsgemeenschap?
 ";U mag de voorkeursgegevens niet verwijderen als deze van een andere parochie zijn. Om toch deze persoon op de juiste looplijst te krijgen kunt u nadat u een export naar Excel heeft gemaakt maar voordat u de looplijst maakt bij deze persoon de wijkgegevens in het Excelbestand aanpassen. Als u daarna de looplijst maakt komt deze persoon toch op de juiste looplijst.;;
 746;DocBase;DocBase Ledenadministratie;DocBase Ledenadministratie;voorkeurslid;"Verkeerd aangemeld. Hij heeft al een Sila nummer, dus ik had hem niet hoeven aanmelden.
