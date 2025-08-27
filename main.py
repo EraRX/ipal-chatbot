@@ -537,8 +537,11 @@ def with_info(text: str) -> str:
     return clean_text((text or "").strip()) + "\n\n" + AI_INFO_MD
 
 def _copy_button(text: str, key_suffix: str):
+    """Toon een kopieerknop (via HTML/JS). Fallback met checkbox i.p.v. expander
+    zodat dit ook binnen st.chat_message werkt (geen nested-block error)."""
     payload = text or ""
     js_text = json.dumps(payload)
+
     html_code = """
 <div style="margin-top:8px;">
   <button id="COPY_BTN_ID" style="padding:6px 10px;font-size:16px;">
@@ -567,9 +570,18 @@ def _copy_button(text: str, key_suffix: str):
 """.replace("COPY_BTN_ID", f"copybtn-{key_suffix}") \
    .replace("COPY_STATE_ID", f"copystate-{key_suffix}") \
    .replace("JS_TEXT", js_text)
-    components.html(html_code, height=70)
-    with st.expander("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren."):
+
+    # Unieke key voorkomt clashes als er meerdere berichten zijn
+    components.html(html_code, height=70, key=f"copyhtml-{key_suffix}")
+
+    # Fallback zonder st.expander (want die mag niet binnen st.chat_message)
+    show_fallback = st.checkbox(
+        "Kopiëren lukt niet? Toon tekst om handmatig te kopiëren.",
+        key=f"copy_show_{key_suffix}"
+    )
+    if show_fallback:
         st.text_area("Tekst", payload, height=150, key=f"copy_fallback_{key_suffix}")
+
 
 def render_chat():
     logging.info(f"Rendering chat with history length: {len(st.session_state.history)}")
@@ -971,3 +983,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
