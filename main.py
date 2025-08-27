@@ -1,10 +1,11 @@
 # IPAL Chatbox — main.py
-# - Chat-wizard with 4 buttons: Exact | DocBase | Zoeken | Internet
-# - Classic cascade via expander (volgorde: Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
-# - No sidebar
+# - Chat-wizard met 4 knoppen: Exact | DocBase | Zoeken | Internet
+# - Klassieke cascade via expander (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
+# - Geen sidebar
 # - PDF met full-width banner/logo (hoogte schaalt)
 # - CSV robustness + smart quotes fix + "Copy answer"
 # - Auto-simple uitleg onder elk CSV-antwoord
+# - FIX: PDF/Kopieer UI buiten st.chat_message (voorkomt Streamlit nested-block/type errors)
 
 import os
 import re
@@ -525,7 +526,6 @@ def get_avatar(role: str):
 
 def add_msg(role: str, content: str):
     ts = datetime.now(TIMEZONE).strftime("%d-%m-%Y %H:%M")
-    # Prevent duplicate messages
     if st.session_state.history and st.session_state.history[-1].get("content") == content and st.session_state.history[-1].get("role") == role:
         logging.info("Skipped duplicate message")
         return
@@ -537,8 +537,8 @@ def with_info(text: str) -> str:
     return clean_text((text or "").strip()) + "\n\n" + AI_INFO_MD
 
 def _copy_button(text: str, key_suffix: str):
-    """Toon een kopieerknop (via HTML/JS). Fallback met checkbox i.p.v. expander
-    zodat dit ook binnen st.chat_message werkt (geen nested-block error)."""
+    """Kopieerknop via HTML/JS. Render buiten st.chat_message.
+    Val terug op textarea als components niet toegestaan zijn."""
     payload = text or ""
     js_text = json.dumps(payload)
 
@@ -571,10 +571,11 @@ def _copy_button(text: str, key_suffix: str):
    .replace("COPY_STATE_ID", f"copystate-{key_suffix}") \
    .replace("JS_TEXT", js_text)
 
-    # Unieke key voorkomt clashes als er meerdere berichten zijn
-    components.html(html_code, height=70, key=f"copyhtml-{key_suffix}")
+    try:
+        components.html(html_code, height=70)  # geen key => betere compat
+    except Exception:
+        st.info("Automatisch kopiëren niet beschikbaar. Gebruik de tekst hieronder.")
 
-    # Fallback zonder st.expander (want die mag niet binnen st.chat_message)
     show_fallback = st.checkbox(
         "Kopiëren lukt niet? Toon tekst om handmatig te kopiëren.",
         key=f"copy_show_{key_suffix}"
@@ -582,31 +583,54 @@ def _copy_button(text: str, key_suffix: str):
     if show_fallback:
         st.text_area("Tekst", payload, height=150, key=f"copy_fallback_{key_suffix}")
 
-
 def render_chat():
     logging.info(f"Rendering chat with history length: {len(st.session_state.history)}")
     seen = set()
+    toolbar_data = None  # gegevens voor laatste assistant-antwoord
+
     for i, m in enumerate(st.session_state.history):
         key = (m["role"], m["content"], m["time"])
         if key in seen:
             logging.info(f"Skipped duplicate message in render: {m['content'][:50]}...")
             continue
         seen.add(key)
+
         st.chat_message(m["role"], avatar=get_avatar(m["role"]))\
             .markdown(f"{m['content']}\n\n_{m['time']}_")
-        if m["role"] == "assistant" and i == len(st.session_state.history) - 1 and st.session_state.get("pdf_ready", False):
-            q = (st.session_state.get("last_question") or st.session_state.get("last_item_label") or "Vraag")
-            pdf = make_pdf(q, m["content"])
-            btn_key = f"pdf_{i}_{m['time'].replace(':','-')}"
-            st.download_button("📄 Download PDF", data=pdf, file_name="antwoord.pdf", mime="application/pdf", key=btn_key)
-            hash_key = hashlib.md5((m["time"] + m["content"]).encode("utf-8")).hexdigest()[:8]
-            _copy_button(m["content"], hash_key)
-            img = st.session_state.get("selected_image")
-            if img and isinstance(img, str) and img.strip():
-                try:
-                    st.image(img, caption="Afbeelding bij dit antwoord", use_column_width=True)
-                except Exception:
-                    pass
+
+        if (
+            m["role"] == "assistant"
+            and i == len(st.session_state.history) - 1
+            and st.session_state.get("pdf_ready", False)
+        ):
+            toolbar_data = {
+                "question": (st.session_state.get("last_question") or st.session_state.get("last_item_label") or "Vraag"),
+                "content": m["content"],
+                "time": m["time"],
+                "image": st.session_state.get("selected_image"),
+            }
+
+    # Actie-balk buiten de chat message
+    if toolbar_data:
+        st.divider()
+        st.caption("Acties voor het laatste antwoord:")
+
+        pdf = make_pdf(toolbar_data["question"], toolbar_data["content"])
+        btn_key = f"pdf_{toolbar_data['time'].replace(':','-')}"
+        st.download_button(
+            "📄 Download PDF", data=pdf, file_name="antwoord.pdf",
+            mime="application/pdf", key=btn_key
+        )
+
+        hash_key = hashlib.md5((toolbar_data["time"] + toolbar_data["content"]).encode("utf-8")).hexdigest()[:8]
+        _copy_button(toolbar_data["content"], hash_key)
+
+        img = toolbar_data["image"]
+        if img and isinstance(img, str) and img.strip():
+            try:
+                st.image(img, caption="Afbeelding bij dit antwoord", use_column_width=True)
+            except Exception:
+                pass
 
 # ── Conversatie-wizard ───────────────────────────────────────────────────────
 def _detect_scope(msg: str) -> Optional[str]:
@@ -633,10 +657,8 @@ def chat_wizard():
         return
     st.session_state["processing"] = True
     try:
-        # Gespreksgeschiedenis
         render_chat()
 
-        # Knoppen
         with st.container():
             c1, c2, c3, c4, c5 = st.columns(5)
             if c1.button("Exact", key="wizard_exact", use_container_width=True):
@@ -663,14 +685,12 @@ def chat_wizard():
                 st.cache_data.clear()
                 st.rerun()
 
-        # Begroeting
         if not st.session_state.get("chat_greeted", False):
             add_msg("assistant", "👋 Waarmee kan ik u van dienst zijn? U kunt hieronder typen of een snelkeuze gebruiken (Exact, DocBase, Zoeken of Internet).")
             st.session_state["chat_greeted"] = True
             st.session_state["pdf_ready"] = False
             render_chat()
 
-        # Placeholder per stap
         step = st.session_state.get("chat_step", "greet")
         scope = st.session_state.get("chat_scope")
         placeholders = {
@@ -707,10 +727,8 @@ def chat_wizard():
                     st.rerun()
             return
 
-        # Verwerk gebruikersinvoer
         add_msg("user", user_text)
 
-        # UNIEKECODE123
         if (user_text or "").strip().upper() == "UNIEKECODE123":
             cw = find_answer_by_codeword(faq_df.reset_index())
             if cw:
@@ -721,7 +739,6 @@ def chat_wizard():
                 st.rerun()
                 return
 
-        # Veiligheidsfilter
         ok, warn = filter_topics(user_text)
         if not ok:
             st.session_state["pdf_ready"] = False
@@ -729,7 +746,6 @@ def chat_wizard():
             st.rerun()
             return
 
-        # Staplogica
         if step in ("greet", "ask_scope"):
             scope_guess = _detect_scope(user_text)
             if scope_guess is None and user_text.strip().lower() in ("ik heb een vraag", "ik heb een vraag.", "vraag", "hallo", "goedemiddag"):
@@ -888,12 +904,11 @@ def main():
 
     st.header("Welkom bij IPAL Chatbox")
 
-    # ── Classic cascade (expander) ───────────────────────────────────────────
+    # ── Klassieke cascade (expander) ─────────────────────────────────────────
     with st.expander("Liever de klassieke cascade openen?"):
         if faq_df is None or faq_df.empty:
             st.info("Geen FAQ-gegevens gevonden.")
         else:
-            # Werk in de cascade altijd met reset_index zodat kolommen bestaan.
             dfv = faq_df.reset_index(drop=False).copy()
 
             def _norm(v: str) -> str:
@@ -960,7 +975,6 @@ def main():
                         except Exception:
                             pass
 
-                    # PDF + kopieer-knop
                     label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
                     st.session_state["last_item_label"] = label
                     st.session_state["last_question"] = label
@@ -983,4 +997,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
