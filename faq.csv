@@ -10816,3 +10816,4304 @@ Een consequente maandafsluiting en controleproces beperken fouten en maken uw ci
 - Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
 - Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
 ";
+D181;DocBase;Rapportage;Rapportage;Rapport: leeftijdsopbouw per categorie;Ik wil leden per leeftijdsgroep (0–12, 13–17, 18–64, 65+).;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: leeftijdsopbouw per categorie
+
+- Open Rapportage → Leden per leeftijdscategorie
+- Stel de grenzen/perioden in en filter op status Actief
+- Genereer rapport en exporteer naar PDF/Excel
+- Leg afwijkingen vast voor beleid/planning
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D182;DocBase;Rapportage;Rapportage;Rapport: vrijwilligers per vaardigheid/rol;Ik wil zien wie welke taak kan uitvoeren.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: vrijwilligers per vaardigheid/rol
+
+- Filter op Rollen/Functies en (indien beschikbaar) vaardigheidslabels
+- Segmenteer op locatie/wijk
+- Genereer overzicht en exporteer voor planning
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D183;DocBase;Rapportage;Rapportage;Rapport: catechese deelname per jaar;Ik wil deelname aantallen per schooljaar.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: catechese deelname per jaar
+
+- Filter catechesegroepen op schooljaar
+- Tel deelnemers en aanwezigheid per groep
+- Exporteer resultaten en vergelijk met vorig jaar
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D184;DocBase;Rapportage;Rapportage;Rapport: ontbrekende huisnummers/postcodes;Ik wil adressen met ontbrekende velden herstellen.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: ontbrekende huisnummers/postcodes
+
+- Filter op ‘Huisnummer leeg’ of ‘Postcode leeg’
+- Exporteer lijst en vul gegevens aan (navragen/BRP bron indien toegestaan)
+- Werk adressen bij en controleer opnieuw
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D185;DocBase;Rapportage;Rapportage;Rapport: herkomst instroom (aanmeldkanaal);Ik wil zien via welk kanaal nieuwe leden komen.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: herkomst instroom (aanmeldkanaal)
+
+- Zorg dat het veld ‘Aanmeldkanaal’ wordt bijgehouden
+- Rapporteer instroom per kanaal en periode
+- Gebruik inzichten voor gerichte communicatie
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D186;DocBase;Rapportage;Rapportage;Rapport: leden met dubbele e-mail;Ik wil dubbele e-mailadressen opsporen.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: leden met dubbele e-mail
+
+- Exporteer ledenlijst met e-mailadres
+- Groepeer in Excel op e-mail en markeer dubbelen
+- Corrigeer e-mails en pas voorkeuren aan
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D187;DocBase;Vrijwilligersplanning;Vrijwilligersplanning;Vrijwilligersplanning: agenda-export (ICS);Ik wil roosters delen via agenda-bestand.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Vrijwilligersplanning: agenda-export (ICS)
+
+- Maak rooster per rol/periode
+- Kies Export → ICS/Agenda (indien beschikbaar)
+- Deel bestand of publiceer via afgesproken kanaal
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D188;DocBase;Vrijwilligersplanning;Vrijwilligersplanning;Vrijwilliger ruil/vervanging inrooster;"Iemand kan niet; vervanger zoeken en vastleggen.";Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Vrijwilliger ruil/vervanging inrooster
+
+- Zoek een vervanger binnen dezelfde rol
+- Pas de roosterinschrijving aan en bevestig per e-mail
+- Noteer de wijziging in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D189;DocBase;Vrijwilligersplanning;Vrijwilligersplanning;Ziekmelding vrijwilliger: continuïteit borgen;Ik wil tijdelijke afwezigheid verwerken.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Ziekmelding vrijwilliger: continuïteit borgen
+
+- Markeer de vrijwilliger tijdelijk onbeschikbaar
+- Vervang geplande diensten in het rooster
+- Herstel beschikbaarheid wanneer mogelijk
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D190;DocBase;Verhuisstromen;Verhuisstromen;Verhuisstromen: binnen/buiten parochie;Ik wil inzicht in verhuizingen per periode.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Verhuisstromen: binnen/buiten parochie
+
+- Rapporteer mutaties ‘Adres gewijzigd’ per kwartaal/jaar
+- Segmenteer binnen vs buiten parochiegebied
+- Gebruik data voor bezoek/communicatieplanning
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D191;DocBase;Verhuisstromen;Verhuisstromen;Gezin verhuist in één keer verwerken;Ik wil alle gezinsleden met één adreswijziging bijwerken.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Gezin verhuist in één keer verwerken
+
+- Open gezinshoofd en kies ‘Adres toepassen op gezin’ (indien beschikbaar)
+- Controleer uitzonderingen (studerende kinderen)
+- Sla op en verifieer bij alle gezinskaarten
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D192;DocBase;Voorkeursparochie;Voorkeursparochie;Voorkeursparochie bij verhuizing herzien;Ik wil beleid toepassen bij verhuisd lid.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Voorkeursparochie bij verhuizing herzien
+
+- Bespreek met het lid of Voorkeursparochie blijft
+- Pas voorkeursparochie aan of verwijder deze
+- Leg de afspraak vast in Notitie
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D193;DocBase;Audit & Logging;Audit & Logging;Auditspoor per lid raadplegen;Ik wil zien wie wat heeft gewijzigd.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Auditspoor per lid raadplegen
+
+- Open (indien beschikbaar) Audit/Log-tab bij de ledenkaart
+- Filter op datum/gebruiker en bekijk veldenwijzigingen
+- Gebruik info voor herstel of training
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D194;DocBase;Audit & Logging;Audit & Logging;Audit-export per periode (CSV);Ik wil wijzigingen over een periode exporteren.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Audit-export per periode (CSV)
+
+- Open audit-overzicht en filter op periode/gebruiker
+- Exporteer naar CSV/Excel
+- Bewaar export veilig en deel met auditteam
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D195;DocBase;Audit & Logging;Audit & Logging;Logging-bewaartermijn en AVG;Hoe lang bewaren we logs?;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Logging-bewaartermijn en AVG
+
+- Volg uw interne bewaarbeleid en AVG-richtlijnen
+- Beperk toegang tot logs tot bevoegden
+- Schoon oude logs op conform beleid
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D196;DocBase;Audit & Logging;Audit & Logging;Notities: wijzigingsgeschiedenis en beleid;Ik wil weten hoe notitiewijzigingen worden gelogd.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Notities: wijzigingsgeschiedenis en beleid
+
+- Controleer of het systeem versies van notities bijhoudt
+- Houd notities kort en feitelijk (dataminimalisatie)
+- Documenteer wie-wat-wanneer bij belangrijke aanpassingen
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D197;DocBase;Beveiliging;Beveiliging;Beveiliging: wachtwoordbeleid vrijwilligers;Welke eisen stellen we aan wachtwoorden?;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Beveiliging: wachtwoordbeleid vrijwilligers
+
+- Hanteer minimale lengte en complexiteit (bijv. 12+ tekens)
+- Adviseer wachtwoordmanagers en geen hergebruik
+- Wijzig bij twijfel of incidenten direct
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D198;DocBase;Beveiliging;Beveiliging;Beveiliging: sessietime-out en schermvergrendeling;Hoe voorkomen we meekijken/misbruik?;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Beveiliging: sessietime-out en schermvergrendeling
+
+- Gebruik automatische time-out waar mogelijk
+- Vergrendel scherm bij verlaten werkplek
+- Deel in team het beveiligingsbeleid
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D199;DocBase;Beveiliging;Beveiliging;Toegangslogboek per gebruiker opvragen;Ik wil logins van een gebruiker bekijken.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Toegangslogboek per gebruiker opvragen
+
+- Open gebruikersbeheer en kies Log/Activiteit
+- Filter op datum/IP en bekijk afwijkingen
+- Onderneem actie bij verdachte inlogpogingen
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D200;DocBase;Vrijwilligersplanning;Vrijwilligersplanning;Roosters: lectoren/kosters plannen;Ik wil schema’s maken per rol en datum.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Roosters: lectoren/kosters plannen
+
+- Maak per rol een roosterperiode aan
+- Plan vrijwilligers in en bevestig per e-mail
+- Exporteer/print overzicht voor kerkruimte
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D201;DocBase;Communicatie;Communicatie;Mass-mailing: testgroep/A-B test;Ik wil eerst klein testen voor ik iedereen mail.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Mass-mailing: testgroep/A-B test
+
+- Maak een testsegment (10–20 adressen)
+- Verstuur variant A/B en meet bounces/open (indien beschikbaar)
+- Kies beste versie voor de volledige mailing
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D202;DocBase;Verhuisstromen;Verhuisstromen;Rapport: verhuisd in laatste 12 maanden;Ik wil recente verhuizers zien.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: verhuisd in laatste 12 maanden
+
+- Filter op ‘Adres gewijzigd’ binnen 12 maanden
+- Segmenteer op wijk/gebied
+- Gebruik lijst voor welkomsbrief/visitatie
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D203;DocBase;SILA;SILA;Rapport: afgemelden per maand (SILA 12);Ik wil overzicht van kerkverlaters.;Vraag;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Rapport: afgemelden per maand (SILA 12)
+
+- Rapporteer op statuswijzigingen naar ‘Afgemeld/kerkverlater’
+- Vergelijk met SILA 12-meldingen
+- Deel trendoverzicht met bestuur
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D204;DocBase;Etiketten;Etiketten;Etiketten: dynamische aanhef (familie/individueel);Ik wil juiste aanhef per adres.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Etiketten: dynamische aanhef (familie/individueel)
+
+- Gebruik velden voor gezin/partner om aanhef te bepalen
+- Test een proefpagina voor uitzonderingen
+- Print de volledige set na controle
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D205;DocBase;Rapportage & AVG;Rapportage & AVG;Verjaardagslijst privacyvriendelijk delen;Ik wil jarigen delen zonder te veel data.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Verjaardagslijst privacyvriendelijk delen
+
+- Beperk kolommen tot naam en maand/dag (geen jaar)
+- Deel via beveiligd kanaal
+- Verwijder bestand na gebruik volgens beleid
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D206;DocBase;Vrijwilligersplanning;Vrijwilligersplanning;Vrijwilligersrooster export naar extern systeem;Ik wil CSV export voor externe planning.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Vrijwilligersrooster export naar extern systeem
+
+- Selecteer periode/rollen en kies Export → CSV
+- Controleer kolommen (naam, rol, datum, tijd)
+- Importeer in extern systeem en test een week
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D207;DocBase;Koppelingen;Koppelingen;Impactanalyse wijziging op Exact-koppeling;Ik wil weten wat een wijziging doet in Exact.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Impactanalyse wijziging op Exact-koppeling
+
+- Bekijk veldmapping van de koppeling
+- Test in kleine set en controleer logs in beide systemen
+- Documenteer impact en plan communicatie
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D208;DocBase;Communicatie & Beleid;Communicatie & Beleid;Notitie-templates voor veelvoorkomende meldingen;Ik wil vaste notitieteksten gebruiken.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Notitie-templates voor veelvoorkomende meldingen
+
+- Maak korte, feitelijke sjablonen (bijv. verhuis, overlijden)
+- Gebruik variabelen (naam, datum) en vermijd gevoelige details
+- Evalueer periodiek op duidelijkheid
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D209;DocBase;Audit & Logging;Audit & Logging;Audittrail export voor verwerkersregister;Ik wil activiteiten koppelen aan verwerkingsdoelen.;Procedure;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Audittrail export voor verwerkersregister
+
+- Exporteer audit-data per proces (leden, vrijwilligers)
+- Koppel aan verwerkingsdoelen in uw register
+- Bewaar export veilig en versieer met datum
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+D210;DocBase;Kwaliteitscontrole;Kwaliteitscontrole;Periodieke kwaliteitsscan – checklist;Ik wil een vaste maandelijkse scan uitvoeren.;Uitleg;"### Kort vooraf (waarom)
+Door een vaste werkwijze te volgen blijven rapportages, roosters en koppelingen betrouwbaar. U voorkomt dubbele invoer en borgt AVG en auditsporen.
+
+## Stappenplan
+**Onderwerp:** Periodieke kwaliteitsscan – checklist
+
+- Controle op lege kernvelden, bounces, open SILA
+- Controle op dubbelen en adresvalidatie
+- Documenteer acties en voortgang per maand
+
+## Veelgemaakte fouten
+- Selecties verkeerd gefilterd of niet opgeslagen.
+- Voorkeursparochie niet afgestemd bij verhuizing.
+- Mailings/roosters zonder actuele contactgegevens.
+- Audit/log niet geraadpleegd bij herstel.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG- en loggingbeleid.
+";
+E121;Exact;BTW & ICP;BTW & ICP;BTW/ICP maandelijkse controle;Ik wil vaste controles per maand.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** BTW/ICP maandelijkse controle
+
+- Genereer btw-aangifte en ICP-opgave
+- Vergelijk met omzet per btw-code en relaties
+- Noteer verschillen, corrigeer en archiveer rapporten
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E122;Exact;BTW & ICP;BTW & ICP;VIES-controle btw-nummers (registratie);Ik wil btw-nummers van EU-relaties controleren.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** VIES-controle btw-nummers (registratie)
+
+- Verzamel btw-nummers van betrokken relaties
+- Controleer via uw vaste, toegestane methode en leg bewijs vast
+- Update relatiekaart bij fouten en pas boekingen aan
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E123;Exact;Debiteuren;Debiteuren;Debiteuren: light 3-way match (factuur/betaling);Ik wil facturen matchen met betalingen en leveringen.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Debiteuren: light 3-way match (factuur/betaling)
+
+- Match bankbetalingen met openstaande facturen
+- Controleer leverings-/dienstbevestiging (indien van toepassing)
+- Documenteer uitzonderingen voor follow-up
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E124;Exact;Crediteuren;Crediteuren;Crediteuren: light 3-way match (PO/factuur);Ik wil inkoopfacturen toetsen aan order/ontvangst.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Crediteuren: light 3-way match (PO/factuur)
+
+- Vergelijk factuur met inkooporder/afspraak
+- Controleer prijzen, hoeveelheden en btw
+- Accordeer of stuur terug met toelichting
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E125;Exact;Cashflow;Cashflow;Cashflow-weekforecast opzetten;Ik wil wekelijks een kasstroomoverzicht.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Cashflow-weekforecast opzetten
+
+- Combineer banksaldo, openstaande posten en vaste betalingen
+- Voeg verwachte donaties/opbrengsten toe
+- Update en deel een 8-weken forecast
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E126;Exact;Cashflow;Cashflow;Bankforecast: vaste lasten en periodieke giften;Ik wil terugkerende betalingen voorspellen.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Bankforecast: vaste lasten en periodieke giften
+
+- Inventariseer periodieke lasten en vaste donaties
+- Projecteer op kalenderweken en koppel aan forecast
+- Evalueer verschillen met realisatie
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E127;Exact;Documenten;Documenten;Documentmanagement bij boekingen (best practices);Ik wil documenten slim koppelen en terugvinden.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Documentmanagement bij boekingen (best practices)
+
+- Gebruik uniforme bestandsnamen en categorieën
+- Koppel documenten aan de bronboeking
+- Maak zoekrapporten op datum/relatie/bedrag
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E128;Exact;Documenten;Documenten;OCR-kwaliteit controleren (Scan & Herken);Ik wil uitleesfouten tijdig zien.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** OCR-kwaliteit controleren (Scan & Herken)
+
+- Check steekproefsgewijs velden (datum, leverancier, bedrag)
+- Corrigeer en train herkenningsregels waar mogelijk
+- Log structurele fouten en stel leveranciers op de hoogte
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E129;Exact;Crediteuren;Crediteuren;Stamgegevens leveranciers opschonen;Ik wil dubbele/onvolledige leveranciers corrigeren.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Stamgegevens leveranciers opschonen
+
+- Zoek op naam/IBAN/KvK en markeer dubbelen
+- Voeg samen of deactiveer en werk contactgegevens bij
+- Controleer koppeling met openstaande posten
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E130;Exact;Debiteuren;Debiteuren;Stamgegevens klanten opschonen;Ik wil dubbele/onvolledige klanten corrigeren.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Stamgegevens klanten opschonen
+
+- Zoek op naam/IBAN/kvk/e-mail
+- Voeg samen of deactiveer doublures
+- Pas facturatie- en aanmaningsgegevens aan
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E131;Exact;Debiteuren;Debiteuren;DSO (Days Sales Outstanding) berekenen;Ik wil de omloopsnelheid van vorderingen meten.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** DSO (Days Sales Outstanding) berekenen
+
+- Gebruik formule: (Gem. debiteurenstand / Omzet op rekening) × aantal dagen
+- Bereken per maand/kwartaal
+- Gebruik trend voor aanmaningsbeleid
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E132;Exact;Crediteuren;Crediteuren;Betaaltermijnen optimaliseren;Ik wil betalingen plannen zonder boetes.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Betaaltermijnen optimaliseren
+
+- Leg standaardtermijnen per leverancier vast
+- Gebruik betalingsbatch om op vervaldatum te plannen
+- Benut korting voor vervroegde betaling waar nuttig
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E133;Exact;Crediteuren;Crediteuren;Dubbele inkoopfacturen voorkomen/herkennen;Ik wil dubbele boekingen tegenhouden.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Dubbele inkoopfacturen voorkomen/herkennen
+
+- Activeer controles op factuurnummer/bedrag/leverancier
+- Check verdachte doublures rapport
+- Corrigeer en documenteer policy bij afwijkingen
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E134;Exact;Crediteuren;Crediteuren;Korting voor snelle betaling verwerken;Hoe verwerk ik betalingskorting?;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Korting voor snelle betaling verwerken
+
+- Leg korting vast in condities of bij betaling
+- Boek verschil op een kortingsrekening
+- Documenteer in factuur-/betalingsdossier
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E135;Exact;Bankreconciliatie;Bankreconciliatie;Ongeclassificeerde bankregels (suspense) opschonen;Ik wil onbekende bankregels wegwerken.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Ongeclassificeerde bankregels (suspense) opschonen
+
+- Filter op bankregels zonder categorie/relatie
+- Zoek de juiste tegenrekening/relatie en boek
+- Escaleer blijvende onbekenden voor onderzoek
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E136;Exact;Financieel;Financieel;Wisselkoersbeleid: maandkoersen bijwerken;Ik wil uniforme koersen gebruiken.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Wisselkoersbeleid: maandkoersen bijwerken
+
+- Kies een vaste bron/moment voor koersupdates
+- Werk maandkoersen bij en documenteer bron
+- Herwaardeer posten indien beleid dat vereist
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E137;Exact;Consolidatie;Consolidatie;Consolidatiemap per maand bijwerken;Ik wil een consistente mapping onderhouden.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Consolidatiemap per maand bijwerken
+
+- Beheer mapping lokaal → groepsrekeningen in een tabel
+- Pas aan bij nieuw grootboek en test op kleine set
+- Versiebeheer en deel met betrokkenen
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E138;Exact;Bankreconciliatie;Bankreconciliatie;Bankreconciliatie: controle op eindsaldo;Ik wil eindsaldo exact sluiten.;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Bankreconciliatie: controle op eindsaldo
+
+- Vergelijk banksaldo per afschriftdatum met GL-saldo
+- Onderzoek verschillen (openstaande regels, datums)
+- Documenteer reconcilestatus in maandpack
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E139;Exact;Crediteuren;Crediteuren;Leveranciersafstemming (supplier statement);Ik wil openstaande posten afstemmen met statement.;Procedure;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Leveranciersafstemming (supplier statement)
+
+- Vraag statement op per kwartaal/jaar
+- Stem verschillen af (kredietnota’s, ontbrekende facturen)
+- Leg uitkomst vast in dossier
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+E140;Exact;Documenten;Documenten;Bewaartermijn financiële documenten;Hoe lang bewaar ik facturen/rapporten?;Uitleg;"### Kort vooraf (waarom)
+Met een consequente controlerituele en duidelijke documentatie houdt u cijfers voorspelbaar en audit-proof, en voorkomt u btw/ICP- en betaalfouten.
+
+## Stappenplan
+**Onderwerp:** Bewaartermijn financiële documenten
+
+- Volg uw interne en wettelijke bewaartermijnen
+- Archiveer met versie/peildatum en toegangsrechten
+- Plan periodieke opschoning
+
+## Veelgemaakte fouten
+- Periode of btw-code onjuist.
+- Dubbele of ontbrekende facturen in AP/AR.
+- Bankregels dubbel of onjuist gematcht.
+- Ontbrekende documentatie bij journaalposten.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten.
+- Bij koppelingsstoringen: tijdelijk handmatig verwerken en melden.
+";
+D211;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: C/O aanduiding toevoegen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: C/O aanduiding toevoegen
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D212;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: gezinslabel met partnernamen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: gezinslabel met partnernamen
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D213;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: taalafhankelijke aanhef (NL/EN/PL);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: taalafhankelijke aanhef (NL/EN/PL)
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D214;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: marges en uitlijning corrigeren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: marges en uitlijning corrigeren
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D215;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: dubbele adressen onderdrukken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: dubbele adressen onderdrukken
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D216;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: proefpagina en printprofiel;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: proefpagina en printprofiel
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D217;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: P6 + huisnummer sortering;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: P6 + huisnummer sortering
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D218;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: envelopformaten instellen (DL/C5);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: envelopformaten instellen (DL/C5)
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D219;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Etiketten: afwijkende straatnotatie (appartement);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten: afwijkende straatnotatie (appartement)
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D220;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: brief met dynamische placeholders;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: brief met dynamische placeholders
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D221;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: logo/briefpapier per locatie;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: logo/briefpapier per locatie
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D222;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: QR‑code voor RSVP toevoegen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: QR‑code voor RSVP toevoegen
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D223;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: variabele ondertekening (pastoor/diaken);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: variabele ondertekening (pastoor/diaken)
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D224;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: meertalige varianten beheren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: meertalige varianten beheren
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D225;DocBase;Etiketten & Sjablonen;Etiketten & Sjablonen;Sjablonen: versiebeheer en testgroep;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Sjablonen: versiebeheer en testgroep
+
+- Open Beheer → Etiketten/Sjablonen
+- Kies het betreffende sjabloon en bewerk de instelling/placeholder
+- Genereer een proef (1–2 adressen) en controleer op scherm
+- Voer proefprint uit en pas marges of velden aan indien nodig
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D226;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Wijkcodes hernoemen volgens nieuw beleid;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Wijkcodes hernoemen volgens nieuw beleid
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D227;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Parochiecodes samenvoegen na fusie;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Parochiecodes samenvoegen na fusie
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D228;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Postcode‑naar‑wijk mapping bijwerken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Postcode‑naar‑wijk mapping bijwerken
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D229;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Huishoudens herverdelen op basis van postcodewijziging;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Huishoudens herverdelen op basis van postcodewijziging
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D230;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Grenzen herindelen: impact op looplijsten;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Grenzen herindelen: impact op looplijsten
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D231;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Historische wijkcode archiveren (niet verwijderen);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Historische wijkcode archiveren (niet verwijderen)
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D232;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Rapport effect herindeling per wijk;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Rapport effect herindeling per wijk
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D233;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Rollback‑plan bij foutieve herlabeling;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Rollback‑plan bij foutieve herlabeling
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D234;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Communicatieplan bij herindeling (brief/mail);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Communicatieplan bij herindeling (brief/mail)
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D235;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Controlelijst: consistent gebruik nieuwe codes;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Controlelijst: consistent gebruik nieuwe codes
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D236;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Export mapping oud→nieuw voor audit;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Export mapping oud→nieuw voor audit
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D237;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Opschonen ‘vervallen’ wijkcodes;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Opschonen ‘vervallen’ wijkcodes
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D238;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Looplijsten naar nieuwe wijken regenereren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Looplijsten naar nieuwe wijken regenereren
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D239;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Etiketten aansluiten op nieuwe indeling;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Etiketten aansluiten op nieuwe indeling
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D240;DocBase;Parochie & Wijkherindeling;Parochie & Wijkherindeling;Nazorg: dubbelen na herindeling opsporen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Nazorg: dubbelen na herindeling opsporen
+
+- Maak een mappingtabel oud→nieuw (parochie/wijk)
+- Test met een kleine selectie en controleer rapportages
+- Pas de volledige set toe en documenteer wijzigingen
+- Draai controlelijsten (looplijsten/etiketten) en corrigeer afwijkingen
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D241;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat Eerste Communie genereren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat Eerste Communie genereren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D242;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat Vormsel genereren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat Vormsel genereren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D243;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat Huwelijk (uittreksel) genereren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat Huwelijk (uittreksel) genereren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D244;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat opnieuw uitgeven (vervanging);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat opnieuw uitgeven (vervanging)
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D245;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat tweetalig (NL‑EN) opmaken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat tweetalig (NL‑EN) opmaken
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D246;DocBase;Catechese & Certificaten;Catechese & Certificaten;Watermerk/nummering toevoegen op certificaat;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Watermerk/nummering toevoegen op certificaat
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D247;DocBase;Catechese & Certificaten;Catechese & Certificaten;Catechesegroep inschrijvingen beheren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Catechesegroep inschrijvingen beheren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D248;DocBase;Catechese & Certificaten;Catechese & Certificaten;Aanwezigheidsrapport catechese exporteren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Aanwezigheidsrapport catechese exporteren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D249;DocBase;Catechese & Certificaten;Catechese & Certificaten;Ouder/voogd toestemming registreren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Ouder/voogd toestemming registreren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D250;DocBase;Catechese & Certificaten;Catechese & Certificaten;Bijlagen (formulieren) koppelen aan deelnemer;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Bijlagen (formulieren) koppelen aan deelnemer
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D251;DocBase;Catechese & Certificaten;Catechese & Certificaten;Onbekende doopgegevens noteren (later aanvullen);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Onbekende doopgegevens noteren (later aanvullen)
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D252;DocBase;Catechese & Certificaten;Catechese & Certificaten;Traject volwassencatechumenen registreren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Traject volwassencatechumenen registreren
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D253;DocBase;Catechese & Certificaten;Catechese & Certificaten;Pastorale notitie beleid (kort/feitelijk);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Pastorale notitie beleid (kort/feitelijk)
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D254;DocBase;Catechese & Certificaten;Catechese & Certificaten;Archivering certificaten per jaar;Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Archivering certificaten per jaar
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D255;DocBase;Catechese & Certificaten;Catechese & Certificaten;Certificaat intrekken en vervangen (fout);Uitleg;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Certificaat intrekken en vervangen (fout)
+
+- Open Ledenkaart/Groep → Certificaten/Documenten
+- Kies het juiste sjabloon en vul datum/plaats/celebrant in
+- Genereer PDF, controleer velden en archiveer bij Bijlagen
+- Lever uit en noteer in Notitie (datum/reden)
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D256;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Bounce: hard vs soft onderscheiden;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Bounce: hard vs soft onderscheiden
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D257;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Domein‑blokkades analyseren (deliverability);Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Domein‑blokkades analyseren (deliverability)
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D258;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Spamklachten afhandelen en uitsluiten;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Spamklachten afhandelen en uitsluiten
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D259;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Opt‑out/voorkeuren beheer (preference center);Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Opt‑out/voorkeuren beheer (preference center)
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D260;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Lijstschoonmaak: inactieve adressen;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Lijstschoonmaak: inactieve adressen
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D261;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Open/click meten (indien beschikbaar);Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Open/click meten (indien beschikbaar)
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D262;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;UTM‑tags toevoegen aan links;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** UTM‑tags toevoegen aan links
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D263;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Segmentatie naar doelgroep/taal;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Segmentatie naar doelgroep/taal
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D264;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Resend naar niet‑openers (zorgvuldig);Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Resend naar niet‑openers (zorgvuldig)
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D265;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;DMARC/SPF/DKIM: afstemming met IT;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** DMARC/SPF/DKIM: afstemming met IT
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D266;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Verzendlimieten en throttling instellen;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Verzendlimieten en throttling instellen
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D267;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Blacklist monitoring & delisting proces;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Blacklist monitoring & delisting proces
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D268;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Warming‑up nieuw afzenderdomein;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Warming‑up nieuw afzenderdomein
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D269;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Deliverability dashboard bijhouden;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Deliverability dashboard bijhouden
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+D270;DocBase;Mailing & Bounce-beheer;Mailing & Bounce-beheer;Rapportage mailprestatie per campagne;Probleem;Procedure;"### Kort vooraf (waarom)
+Door in een vaste volgorde te werken blijven sjablonen, etiketten, parochie-indelingen, catecheseregistraties en mailings consistent en auditbaar. U voorkomt dubbele invoer en fouten.
+
+## Stappenplan
+**Onderwerp:** Rapportage mailprestatie per campagne
+
+- Selecteer de betreffende campagne/lijst
+- Analyseer bounces/klachten en update voorkeuren
+- Corrigeer adressen of sluit uit waar nodig
+- Rapporteer resultaten en verbeter volgende verzending
+
+## Veelgemaakte fouten
+- Niet eerst op dubbelen gecontroleerd.
+- Verouderde sjablonen/etiketten gebruikt.
+- Mailing verstuurd zonder opt‑in of met bounce‑adressen.
+- Onvolledige velden (adres/taal) in selecties.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Gegevens onbekend: laat leeg en licht toe in Notitie.
+- Bij storingen: werk in kleine stappen en meld bij support.
+- Bij privacygevoelige inhoud: volg AVG‑beleid en logging.
+";
+E141;Exact;Bankmatching;Bankmatching;Regex‑matching op omschrijving (donatiepatronen);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Regex‑matching op omschrijving (donatiepatronen)
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E142;Exact;Bankmatching;Bankmatching;Contains‑regels combineren met IBAN‑filter;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Contains‑regels combineren met IBAN‑filter
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E143;Exact;Bankmatching;Bankmatching;Prioriteit/volgorde van herkenningsregels;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Prioriteit/volgorde van herkenningsregels
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E144;Exact;Bankmatching;Bankmatching;Tolerantie op bedrag (±‑marge) instellen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Tolerantie op bedrag (±‑marge) instellen
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E145;Exact;Bankmatching;Bankmatching;Splitsboeking op één bankregel (giften/collecte);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Splitsboeking op één bankregel (giften/collecte)
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E146;Exact;Bankmatching;Bankmatching;Fallback‑grootboek bij geen match;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Fallback‑grootboek bij geen match
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E147;Exact;Bankmatching;Bankmatching;Ruiswoorden in omschrijving negeren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Ruiswoorden in omschrijving negeren
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E148;Exact;Bankmatching;Bankmatching;Dag/datum‑venster voor matching beperken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Dag/datum‑venster voor matching beperken
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E149;Exact;Bankmatching;Bankmatching;Counterparty‑IBAN lijst beheren (whitelist);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Counterparty‑IBAN lijst beheren (whitelist)
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E150;Exact;Bankmatching;Bankmatching;Review‑queue voor niet‑gematchte regels;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Review‑queue voor niet‑gematchte regels
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E151;Exact;Bankmatching;Bankmatching;Archiveren van oude regels (opschonen);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Archiveren van oude regels (opschonen)
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E152;Exact;Bankmatching;Bankmatching;Rapport: matchpercentage per maand;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Rapport: matchpercentage per maand
+
+- Open Bank → Herkenningsregels
+- Maak/orden de regel met de juiste voorwaarden (regex/contains/IBAN)
+- Test op recente transacties en bekijk effect
+- Activeer en monitor het matchpercentage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E153;Exact;Vaste activa;Vaste activa;Herwaardering vaste activa boeken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Herwaardering vaste activa boeken
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E154;Exact;Vaste activa;Vaste activa;Bijzondere waardevermindering (impairment) boeken;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Bijzondere waardevermindering (impairment) boeken
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E155;Exact;Vaste activa;Vaste activa;Gedeeltelijke afstoting van een activum;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Gedeeltelijke afstoting van een activum
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E156;Exact;Vaste activa;Vaste activa;Verkoop van activum met resultaat;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Verkoop van activum met resultaat
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E157;Exact;Vaste activa;Vaste activa;Interne overdracht tussen kostenplaatsen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Interne overdracht tussen kostenplaatsen
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E158;Exact;Vaste activa;Vaste activa;Component‑benadering (onderdelen) toepassen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Component‑benadering (onderdelen) toepassen
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E159;Exact;Vaste activa;Vaste activa;Wijziging gebruiksduur/afschrijvingsmethode;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Wijziging gebruiksduur/afschrijvingsmethode
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E160;Exact;Vaste activa;Vaste activa;Boekwaarde op nul (afschrijving voltooid);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Boekwaarde op nul (afschrijving voltooid)
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E161;Exact;Vaste activa;Vaste activa;Activa in aanbouw overboeken naar actief;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Activa in aanbouw overboeken naar actief
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E162;Exact;Vaste activa;Vaste activa;Kapitalisatiebeleid vastleggen (drempels);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Kapitalisatiebeleid vastleggen (drempels)
+
+- Open Vaste activa → Mutaties
+- Voer de juiste mutatie in met datum/bedrag/toelichting
+- Controleer koppeling met grootboek en rapportage
+- Archiveer onderbouwing (factuur/rapport) als bijlage
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E163;Exact;BTW-controles;BTW-controles;Mapping btw‑codes naar grootboeken controleren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Mapping btw‑codes naar grootboeken controleren
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E164;Exact;BTW-controles;BTW-controles;Reconciliatie btw‑rubrieken vs omzetrekeningen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Reconciliatie btw‑rubrieken vs omzetrekeningen
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E165;Exact;BTW-controles;BTW-controles;Detectie verkeerd gecodeerde boekingen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Detectie verkeerd gecodeerde boekingen
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E166;Exact;BTW-controles;BTW-controles;Controle 0%‑tarief en vrijstellingen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Controle 0%‑tarief en vrijstellingen
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E167;Exact;BTW-controles;BTW-controles;Kruiscontrole verkoop vs inkoop btw;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Kruiscontrole verkoop vs inkoop btw
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E168;Exact;BTW-controles;BTW-controles;EU‑driehoeksverkeer controleren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** EU‑driehoeksverkeer controleren
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E169;Exact;BTW-controles;BTW-controles;Import‑btw (artikel 23) controleren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Import‑btw (artikel 23) controleren
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E170;Exact;BTW-controles;BTW-controles;Btw‑verlegd binnenland controleren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Btw‑verlegd binnenland controleren
+
+- Genereer btw‑rapport en grootboekomzet per periode
+- Vergelijk rubrieken met toegepaste btw‑codes
+- Corrigeer missers via memoriaal en documenteer
+- Archiveer controlestaat in het maand/kwartaalpack
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E171;Exact;Board pack;Rapportage & Board pack;Maandpack automatisch exporteren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Maandpack automatisch exporteren
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E172;Exact;Board pack;Rapportage & Board pack;Kwartaalpack met variatie (YTD vs PY);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Kwartaalpack met variatie (YTD vs PY)
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E173;Exact;Board pack;Rapportage & Board pack;Versienummering en peildata instellen;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Versienummering en peildata instellen
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E174;Exact;Board pack;Rapportage & Board pack;Pakket bundelen (ZIP) met leeswijzer;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Pakket bundelen (ZIP) met leeswijzer
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E175;Exact;Board pack;Rapportage & Board pack;Distributielijst en toegangsrechten beheren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Distributielijst en toegangsrechten beheren
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E176;Exact;Board pack;Rapportage & Board pack;Variance‑analyse toevoegen aan pack;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Variance‑analyse toevoegen aan pack
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E177;Exact;Board pack;Rapportage & Board pack;KPI‑set kiezen (parochiecontext);Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** KPI‑set kiezen (parochiecontext)
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E178;Exact;Board pack;Rapportage & Board pack;Deadlineplanning en reminders;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Deadlineplanning en reminders
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E179;Exact;Board pack;Rapportage & Board pack;Controlelijst pack compleetheid;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Controlelijst pack compleetheid
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
+E180;Exact;Board pack;Rapportage & Board pack;Archivering en terugvindbaarheid verbeteren;Uitleg;Procedure;"### Kort vooraf (waarom)
+Een consequente controlerituele voor bankmatching, activa en btw zorgt voor voorspelbare, audit‑proof cijfers en een herhaalbaar board pack.
+
+## Stappenplan
+**Onderwerp:** Archivering en terugvindbaarheid verbeteren
+
+- Definieer vaste rapportenset en exportformaat (PDF/XLSX)
+- Automatiseer exportvolgorde en bestandsnamen
+- Bundel met leeswijzer en versie/peildatum
+- Deel via beveiligd kanaal en archiveer
+
+## Veelgemaakte fouten
+- Onjuiste btw‑code of grootboekmapping.
+- Bankregels dubbel door overlap koppeling/import.
+- Activa‑mutaties zonder documentatie of verkeerde datum.
+- Board pack zonder versienummer/peildatum.
+
+## Kwaliteitscheck (checklist)
+- [ ] Geen duplicaat / controle uitgevoerd
+- [ ] Basisgegevens compleet
+- [ ] Rechten/rol voldoende voor deze actie
+- [ ] Resultaat gecontroleerd in relevante lijst/rapportage
+- [ ] Eventuele meldingen/fouten opgevolgd
+
+## Uitzonderingen
+- Bij fiscale uitzonderingen: volg intern beleid of raadpleeg adviseur.
+- Bij toegangsfouten: controleer rol/rechten of vraag beheerder om aanpassing.
+- Bij koppelingsstoringen: verwerk tijdelijk handmatig en meld bij support.
+";
