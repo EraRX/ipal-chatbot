@@ -1,11 +1,12 @@
-# IPAL Chatbox — main.py (fix: PDF/Copy actionbar koppelt nu aan daadwerkelijk antwoord + cascade sluit)
+# IPAL Chatbox — main.py (fix: PDF/Copy actionbar koppelt nu aan daadwerkelijk antwoord)
 # - Chat-wizard: Exact | DocBase | Zoeken | Internet
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
-# - Expander sluit na keuze en antwoord komt buiten expander
+# - Geen sidebar
 # - PDF met banner/logo
 # - CSV robustness + smart quotes fix + "Copy answer"
 # - Auto-simple uitleg
-# - Actie-balk (PDF/Kopieer) gebruikt expliciete state i.p.v. laatste chatbericht
+# - FIX: 'actie-balk' onderaan gebruikt nu een expliciete state (actionbar) i.p.v. het laatste chatbericht
+# - FIX: in cascade géén vet, onopgemaakt kopje meer; we tonen alleen het antwoord
 
 import os
 import re
@@ -338,7 +339,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
         return df
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
-        return hits >= eff_min_hits and cov >= min_cov
+        return hits >= eff_min_hits en cov >= min_cov
     filtered = df[df.apply(_ok, axis=1)]
     if filtered.empty:
         q_lower = (vraag or "").strip().lower()
@@ -487,13 +488,8 @@ DEFAULT_STATE = {
     "chat_scope": None,
     "chat_results": [],
     "chat_greeted": False,
-    # Actie-balk context
+    # expliciete actie-balk context
     "actionbar": None,  # dict: {question, content, image, time}
-    # Cascade UI
-    "cascade_open": True,
-    "cascade_answer": None,
-    "cascade_label": None,
-    "cascade_img": None,
 }
 for k, v in DEFAULT_STATE.items():
     if k not in st.session_state:
@@ -546,7 +542,7 @@ def _copy_button(text: str, key_suffix: str):
    .replace("COPY_STATE_ID", f"copystate-{key_suffix}") \
    .replace("JS_TEXT", js_text)
     try:
-        components.html(html_code, height=70)
+        components.html(html_code, height=70, key=f"copyhtml-{key_suffix}")
     except Exception:
         st.info("Automatisch kopiëren niet beschikbaar. Gebruik de tekst hieronder.")
     show_fallback = st.checkbox("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren.", key=f"copy_show_{key_suffix}")
@@ -582,7 +578,6 @@ def render_chat():
         seen.add(key)
         st.chat_message(m["role"], avatar=get_avatar(m["role"]))\
           .markdown(f"{m['content']}\n\n_{m['time']}_")
-    # Altijd de actie-balk renderen op basis van expliciete state
     _render_actionbar()
 
 # ── Conversatie-wizard ───────────────────────────────────────────────────────
@@ -628,7 +623,6 @@ def chat_wizard():
             add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
             st.rerun()
         if c5.button("🔄 Reset", key="wizard_reset", use_container_width=True):
-            # Reset ALLE state, incl. cascade
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             for k, v in DEFAULT_STATE.items():
@@ -657,7 +651,7 @@ def chat_wizard():
             opts = st.session_state["chat_results"]
             labels = [_mk_label(i, pd.Series(r)) for i, r in enumerate(opts)]
             chosen = st.radio("Kies het beste passende item:", labels, key=f"radio_{hash(str(opts))}")
-            if st.button("Toon antwoord", key=f"toon_{hash(str(opts))}")):
+            if st.button("Toon antwoord", key=f"toon_{hash(str(opts))}"):
                 idx = labels.index(chosen)
                 _show_item_answer(idx)
                 st.rerun()
@@ -720,7 +714,7 @@ def chat_wizard():
                 webbits = fetch_web_info_cached(user_text)
                 if webbits:
                     antwoord = webbits
-            content = with_info(antwoord or "Kunt u uw vraag iets concreter maken?")
+            content = with_info(antwoord of "Kunt u uw vraag iets concreter maken?")
             add_msg("assistant", content)
             st.session_state["actionbar"] = {
                 "question": st.session_state.get("last_question") or "Vraag",
@@ -844,7 +838,7 @@ def main():
     st.header("Welkom bij IPAL Chatbox")
 
     # ── Klassieke cascade (expander) ─────────────────────────────────────────
-    with st.expander("Liever de klassieke cascade openen?", expanded=st.session_state.get("cascade_open", True)):
+    with st.expander("Liever de klassieke cascade openen?"):
         if faq_df is None or faq_df.empty:
             st.info("Geen FAQ-gegevens gevonden.")
         else:
@@ -894,7 +888,7 @@ def main():
             sel_soort_raw = "" if sel_soort in ("(Kies)", "(Leeg)") else sel_soort
             step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
 
-            # 7) Antwoord of oplossing — SLUIT CASCADE en toon antwoord BUITEN expander
+            # 7) Antwoord of oplossing (zonder vet kopje)
             if sel_soort != "(Kies)":
                 if step6.empty:
                     st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
@@ -903,40 +897,40 @@ def main():
                     antwoord = (row.get("Antwoord of oplossing","") or "").strip()
                     afbeelding = (row.get("Afbeelding","") or "").strip()
 
-                    # Bereken final answer (maar NIET hier tonen)
+                    # Toon alléén het antwoord (geen vet kopje)
                     final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
+                    st.markdown(final_ans)
 
-                    # Label (pad) voor context
+                    if afbeelding:
+                        try:
+                            st.image(afbeelding, use_column_width=True)
+                            st.session_state["selected_image"] = afbeelding
+                        except Exception:
+                            pass
+
+                    # Context voor PDF/Copy in actie-balk óók bij cascade
                     label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
+                    st.session_state["last_item_label"] = label
+                    st.session_state["last_question"] = label
 
-                    # Sla alles op in state en SLUIT de expander
-                    st.session_state["cascade_label"]  = label
-                    st.session_state["cascade_answer"] = final_ans
-                    st.session_state["cascade_img"]    = afbeelding if afbeelding else None
-                    st.session_state["cascade_open"]   = False
+                    # Cascade-eigen knoppen
+                    _copy_button(final_ans, hashlib.md5(final_ans.encode("utf-8")).hexdigest()[:8])
+                    pdf = make_pdf(label, final_ans)
+                    st.download_button(
+                        "📄 Download PDF",
+                        data=pdf,
+                        file_name="antwoord.pdf",
+                        mime="application/pdf",
+                        key=f"cascade_pdf_{hash(label+final_ans)}"
+                    )
 
-                    # Zet óók de globale actie-balk correct (PDF/Kopieer gebruikt dit)
+                    # Zet óók de globale actie-balk correct:
                     st.session_state["actionbar"] = {
                         "question": label,
                         "content": with_info(final_ans),  # zelfde als chatweergave
-                        "image": st.session_state["cascade_img"],
+                        "image": st.session_state.get("selected_image"),
                         "time": datetime.now(TIMEZONE).isoformat()
                     }
-
-                    # Kleine hint in de expander zelf
-                    st.success("✅ Antwoord gevonden. De cascade is gesloten — zie het antwoord hieronder.")
-
-    # Antwoordpaneel BUITEN de expander (één keer, nette layout)
-    if st.session_state.get("cascade_answer"):
-        st.subheader("Antwoord")
-        st.markdown(st.session_state["cascade_answer"])
-        if st.session_state.get("cascade_img"):
-            try:
-                st.image(st.session_state["cascade_img"], use_column_width=True, caption="Afbeelding bij dit antwoord")
-            except Exception:
-                pass
-        # Actiebalk (PDF/Kopieer) rendert via render_chat() óf we tonen hem ook hier:
-        _render_actionbar()
 
     # ── Wizard ────────────────────────────────────────────────────────────────
     if st.session_state.get("chat_mode", True):
