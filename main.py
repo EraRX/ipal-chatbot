@@ -1,12 +1,9 @@
-# IPAL Chatbox — main.py (fix: PDF/Copy actionbar koppelt nu aan daadwerkelijk antwoord)
+# IPAL Chatbox — main.py (simpel-weergave: bronblok verdwijnt)
 # - Chat-wizard: Exact | DocBase | Zoeken | Internet
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
-# - Geen sidebar
-# - PDF met banner/logo
-# - CSV robustness + smart quotes fix + "Copy answer"
-# - Auto-simple uitleg
-# - FIX: 'actie-balk' onderaan gebruikt nu een expliciete state (actionbar) i.p.v. het laatste chatbericht
-# - FIX: in cascade géén vet, onopgemaakt kopje meer; we tonen alleen het antwoord
+# - PDF met banner/logo + Copy
+# - CSV robustness + smart quotes fix
+# - Auto-simple uitleg (vervangt het ruwe bronantwoord i.p.v. eraan toe te voegen)
 
 import os
 import re
@@ -57,7 +54,7 @@ st.markdown(
       button[kind="primary"] { font-size:22px !important; padding:.75em 1.5em; }
       video { width: 600px !important; height: auto !important; max-width: 100%; }
 
-      /* Sidebar en hamburger verborgen */
+      /* Sidebar/hamburger verbergen */
       [data-testid="stSidebar"],
       [data-testid="stSidebarNav"],
       [data-testid="collapsedControl"] { display: none !important; }
@@ -84,7 +81,7 @@ def chatgpt_cached(messages, temperature=0.2, max_tokens=700) -> str:
     )
     return resp.choices[0].message.content.strip()
 
-# ── Smart punctuation / Windows-1252 cleanup ─────────────────────────────────
+# ── Helpers: text cleanup ────────────────────────────────────────────────────
 def clean_text(s: str) -> str:
     if s is None:
         return ""
@@ -409,13 +406,14 @@ def simplify_text(txt: str, max_bullets: int = 5) -> str:
     if not bullets:
         bullets = sentences[:min(max_bullets, 3)]
 
-    out = "### In het kort\n"
+    out = "### Uitleg voor Vrijwilliger\n\n"
+    out += "#### In het kort\n"
     for b in bullets:
         out += f"- {b}\n"
 
     steps = [s for s in sentences if re.search(r"^(Klik|Open|Ga|Kies|Vul|Controleer|Selecteer)\b", s.strip(), re.I)]
     if steps:
-        out += "\n### Stappenplan\n"
+        out += "\n#### Stappenplan\n"
         for i, s in enumerate(steps[:max_bullets], 1):
             out += f"{i}. {s}\n"
 
@@ -430,10 +428,10 @@ def simple_from_source(text: str) -> str:
             return chatgpt_cached(
                 [
                     {"role": "system", "content":
-                     "Leg in eenvoudige Nederlandse woorden uit voor een vrijwilliger zonder technische kennis. "
-                     "Gebruik maximaal 5 bullets en, indien nuttig, een kort stappenplan. "
-                     "Baseer ALLES uitsluitend op de gegeven bron; geen aannames."},
-                    {"role": "user", "content": f"Bron:\n{txt}\n\nMaak het simpel en concreet; voeg een stappenplan toe als dat helpt."}
+                     "Schrijf in eenvoudig Nederlands voor een vrijwilliger zonder technische kennis. "
+                     "Gebruik maximaal 5 bullets en (indien nuttig) een kort stappenplan. "
+                     "Baseer ALLES uitsluitend op de gegeven bron."},
+                    {"role": "user", "content": f"Bron:\n{txt}\n\nMaak het kort en concreet; een klein stappenplan is prima."}
                 ],
                 temperature=0.2, max_tokens=500
             )
@@ -442,10 +440,12 @@ def simple_from_source(text: str) -> str:
     return simplify_text(txt)
 
 def enrich_with_simple(answer: str) -> str:
+    """
+    NIEUW: vervangt het ruwe bronantwoord door de eenvoudige uitleg.
+    Hierdoor verdwijnt het 'vette onopgemaakte' blok boven de nette uitleg.
+    """
     simple = simple_from_source(answer)
-    if not simple:
-        return answer
-    return f"{answer}\n\n---\n\n{simple}"
+    return simple or (answer or "")
 
 # ── Web-fallback (optioneel) ─────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -488,7 +488,6 @@ DEFAULT_STATE = {
     "chat_scope": None,
     "chat_results": [],
     "chat_greeted": False,
-    # expliciete actie-balk context
     "actionbar": None,  # dict: {question, content, image, time}
 }
 for k, v in DEFAULT_STATE.items():
@@ -542,7 +541,7 @@ def _copy_button(text: str, key_suffix: str):
    .replace("COPY_STATE_ID", f"copystate-{key_suffix}") \
    .replace("JS_TEXT", js_text)
     try:
-        components.html(html_code, height=70, key=f"copyhtml-{key_suffix}")
+        components.html(html_code, height=70)
     except Exception:
         st.info("Automatisch kopiëren niet beschikbaar. Gebruik de tekst hieronder.")
     show_fallback = st.checkbox("Kopiëren lukt niet? Toon tekst om handmatig te kopiëren.", key=f"copy_show_{key_suffix}")
@@ -839,98 +838,98 @@ def main():
 
     # ── Klassieke cascade (expander) ─────────────────────────────────────────
     with st.expander("Liever de klassieke cascade openen?"):
-        if faq_df is None or faq_df.empty:
-            st.info("Geen FAQ-gegevens gevonden.")
-        else:
-            dfv = faq_df.reset_index(drop=False).copy()
+      if faq_df is None or faq_df.empty:
+          st.info("Geen FAQ-gegevens gevonden.")
+      else:
+          dfv = faq_df.reset_index(drop=False).copy()
 
-            def _norm(v: str) -> str:
-                return re.sub(r"\s+", " ", str(v).replace("\ufeff","").replace("\u00A0"," ")).strip().lower()
+          def _norm(v: str) -> str:
+              return re.sub(r"\s+", " ", str(v).replace("\ufeff","").replace("\u00A0"," ")).strip().lower()
 
-            def _disp(v: str) -> str:
-                v = ("" if v is None else str(v)).strip()
-                return v if v else "(Leeg)"
+          def _disp(v: str) -> str:
+              v = ("" if v is None else str(v)).strip()
+              return v if v else "(Leeg)"
 
-            def _opts(series: pd.Series) -> list[str]:
-                return sorted({_disp(x) for x in series.dropna().astype(str).tolist()}, key=lambda x: _norm(x))
+          def _opts(series: pd.Series) -> list[str]:
+              return sorted({_disp(x) for x in series.dropna().astype(str).tolist()}, key=lambda x: _norm(x))
 
-            st.caption("Volgorde: 1) Systeem → 2) Subthema → 3) Categorie → 4) Omschrijving → 5) Toelichting → 6) Soort → 7) Antwoord")
+          st.caption("Volgorde: 1) Systeem → 2) Subthema → 3) Categorie → 4) Omschrijving → 5) Toelichting → 6) Soort → 7) Antwoord")
 
-            # 1) Systeem
-            sys_opts = _opts(dfv["Systeem"])
-            sel_sys = st.selectbox("1) Systeem", ["(Kies)"] + sys_opts, key="c1_sys")
-            step1 = dfv[dfv["Systeem"].apply(_norm) == _norm(sel_sys)] if sel_sys != "(Kies)" else pd.DataFrame(columns=dfv.columns)
+          # 1) Systeem
+          sys_opts = _opts(dfv["Systeem"])
+          sel_sys = st.selectbox("1) Systeem", ["(Kies)"] + sys_opts, key="c1_sys")
+          step1 = dfv[dfv["Systeem"].apply(_norm) == _norm(sel_sys)] if sel_sys != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 2) Subthema
-            sub_opts = _opts(step1["Subthema"]) if not step1.empty else []
-            sel_sub = st.selectbox("2) Subthema", ["(Kies)"] + sub_opts, key="c2_sub")
-            step2 = step1[step1["Subthema"].apply(_norm) == _norm(sel_sub)] if sel_sub != "(Kies)" else pd.DataFrame(columns=dfv.columns)
+          # 2) Subthema
+          sub_opts = _opts(step1["Subthema"]) if not step1.empty else []
+          sel_sub = st.selectbox("2) Subthema", ["(Kies)"] + sub_opts, key="c2_sub")
+          step2 = step1[step1["Subthema"].apply(_norm) == _norm(sel_sub)] if sel_sub != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 3) Categorie
-            cat_opts = _opts(step2["Categorie"]) if not step2.empty else []
-            sel_cat = st.selectbox("3) Categorie", ["(Kies)"] + cat_opts, key="c3_cat")
-            step3 = step2[step2["Categorie"].apply(_norm) == _norm(sel_cat)] if sel_cat != "(Kies)" else pd.DataFrame(columns=dfv.columns)
+          # 3) Categorie
+          cat_opts = _opts(step2["Categorie"]) if not step2.empty else []
+          sel_cat = st.selectbox("3) Categorie", ["(Kies)"] + cat_opts, key="c3_cat")
+          step3 = step2[step2["Categorie"].apply(_norm) == _norm(sel_cat)] if sel_cat != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 4) Omschrijving melding
-            oms_opts = _opts(step3["Omschrijving melding"]) if not step3.empty else []
-            sel_oms = st.selectbox("4) Omschrijving melding", ["(Kies)"] + oms_opts, key="c4_oms")
-            step4 = step3[step3["Omschrijving melding"].apply(_norm) == _norm(sel_oms)] if sel_oms != "(Kies)" else pd.DataFrame(columns=dfv.columns)
+          # 4) Omschrijving melding
+          oms_opts = _opts(step3["Omschrijving melding"]) if not step3.empty else []
+          sel_oms = st.selectbox("4) Omschrijving melding", ["(Kies)"] + oms_opts, key="c4_oms")
+          step4 = step3[step3["Omschrijving melding"].apply(_norm) == _norm(sel_oms)] if sel_oms != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 5) Toelichting melding
-            toe_opts = _opts(step4["Toelichting melding"]) if not step4.empty else []
-            sel_toe = st.selectbox("5) Toelichting melding", ["(Kies)"] + toe_opts, key="c5_toe")
-            sel_toe_raw = "" if sel_toe in ("(Kies)", "(Leeg)") else sel_toe
-            step5 = step4[step4["Toelichting melding"].fillna("").apply(_norm) == _norm(sel_toe_raw)] if not step4.empty else pd.DataFrame(columns=dfv.columns)
+          # 5) Toelichting melding
+          toe_opts = _opts(step4["Toelichting melding"]) if not step4.empty else []
+          sel_toe = st.selectbox("5) Toelichting melding", ["(Kies)"] + toe_opts, key="c5_toe")
+          sel_toe_raw = "" if sel_toe in ("(Kies)", "(Leeg)") else sel_toe
+          step5 = step4[step4["Toelichting melding"].fillna("").apply(_norm) == _norm(sel_toe_raw)] if not step4.empty else pd.DataFrame(columns=dfv.columns)
 
-            # 6) Soort melding
-            soort_opts = _opts(step5["Soort melding"]) if not step5.empty else []
-            sel_soort = st.selectbox("6) Soort melding", ["(Kies)"] + soort_opts, key="c6_soort")
-            sel_soort_raw = "" if sel_soort in ("(Kies)", "(Leeg)") else sel_soort
-            step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
+          # 6) Soort melding
+          soort_opts = _opts(step5["Soort melding"]) if not step5.empty else []
+          sel_soort = st.selectbox("6) Soort melding", ["(Kies)"] + soort_opts, key="c6_soort")
+          sel_soort_raw = "" if sel_soort in ("(Kies)", "(Leeg)") else sel_soort
+          step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
 
-            # 7) Antwoord of oplossing (zonder vet kopje)
-            if sel_soort != "(Kies)":
-                if step6.empty:
-                    st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
-                else:
-                    row = step6.iloc[0]
-                    antwoord = (row.get("Antwoord of oplossing","") or "").strip()
-                    afbeelding = (row.get("Afbeelding","") or "").strip()
+          # 7) Antwoord of oplossing
+          if sel_soort != "(Kies)":
+              if step6.empty:
+                  st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
+              else:
+                  row = step6.iloc[0]
+                  antwoord = (row.get("Antwoord of oplossing","") or "").strip()
+                  afbeelding = (row.get("Afbeelding","") or "").strip()
 
-                    # Toon alléén het antwoord (geen vet kopje)
-                    final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
-                    st.markdown(final_ans)
+                  st.markdown("**7) Antwoord of oplossing**")
+                  final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
+                  st.write(final_ans)
 
-                    if afbeelding:
-                        try:
-                            st.image(afbeelding, use_column_width=True)
-                            st.session_state["selected_image"] = afbeelding
-                        except Exception:
-                            pass
+                  if afbeelding:
+                      try:
+                          st.image(afbeelding, use_column_width=True)
+                          st.session_state["selected_image"] = afbeelding
+                      except Exception:
+                          pass
 
-                    # Context voor PDF/Copy in actie-balk óók bij cascade
-                    label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
-                    st.session_state["last_item_label"] = label
-                    st.session_state["last_question"] = label
+                  # Context voor PDF/Copy in actie-balk óók bij cascade
+                  label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
+                  st.session_state["last_item_label"] = label
+                  st.session_state["last_question"] = label
 
-                    # Cascade-eigen knoppen
-                    _copy_button(final_ans, hashlib.md5(final_ans.encode("utf-8")).hexdigest()[:8])
-                    pdf = make_pdf(label, final_ans)
-                    st.download_button(
-                        "📄 Download PDF",
-                        data=pdf,
-                        file_name="antwoord.pdf",
-                        mime="application/pdf",
-                        key=f"cascade_pdf_{hash(label+final_ans)}"
-                    )
+                  # Cascade-eigen knoppen
+                  _copy_button(final_ans, hashlib.md5(final_ans.encode("utf-8")).hexdigest()[:8])
+                  pdf = make_pdf(label, final_ans)
+                  st.download_button(
+                      "📄 Download PDF",
+                      data=pdf,
+                      file_name="antwoord.pdf",
+                      mime="application/pdf",
+                      key=f"cascade_pdf_{hash(label+final_ans)}"
+                  )
 
-                    # Zet óók de globale actie-balk correct:
-                    st.session_state["actionbar"] = {
-                        "question": label,
-                        "content": with_info(final_ans),  # zelfde als chatweergave
-                        "image": st.session_state.get("selected_image"),
-                        "time": datetime.now(TIMEZONE).isoformat()
-                    }
+                  # Zet óók de globale actie-balk correct:
+                  st.session_state["actionbar"] = {
+                      "question": label,
+                      "content": with_info(final_ans),  # zelfde als chatweergave
+                      "image": st.session_state.get("selected_image"),
+                      "time": datetime.now(TIMEZONE).isoformat()
+                  }
 
     # ── Wizard ────────────────────────────────────────────────────────────────
     if st.session_state.get("chat_mode", True):
@@ -939,4 +938,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
