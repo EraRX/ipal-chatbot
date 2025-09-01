@@ -888,69 +888,61 @@ def main():
           step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
 
         # 7) Antwoord of oplossing
-        if sel_soort != "(Kies)": if step6.empty:
-        st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
-        else:
-        row = step6.iloc[0]
-        antwoord = (row.get("Antwoord of oplossing", "") or "").strip()
-        afbeelding = (row.get("Afbeelding", "") or "").strip()
+        if sel_soort != "(Kies)":
+                if step6.empty:
+                    st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
+                else:
+                    row = step6.iloc[0]
+                    antwoord = (row.get("Antwoord of oplossing", "") or "").strip()
+                    afbeelding = (row.get("Afbeelding", "") or "").strip()
 
-        st.markdown("**7) Antwoord of oplossing**")
+                    st.markdown("**7) Antwoord of oplossing**")
 
-        # 1) het basisantwoord (evt. met eenvoudige uitleg)
-        final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
+                    # 1) basisantwoord → vervang door eenvoudige uitleg
+                    final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
 
-        # 2) wat je in de cascade wilt tonen (inclusief AI-INFO)
-        display_ans = with_info(final_ans)
-        st.write(display_ans)
+                    # 2) wat je toont in cascade (incl. AI-INFO)
+                    display_ans = with_info(final_ans)
+                    st.write(display_ans)
 
-        # eventuele afbeelding
-        if afbeelding:
-            try:
-                st.image(afbeelding, use_column_width=True)
-                st.session_state["selected_image"] = afbeelding
-            except Exception:
-                pass
+                    # Afbeelding (optioneel)
+                    if afbeelding:
+                        try:
+                            st.image(afbeelding, use_column_width=True)
+                            st.session_state["selected_image"] = afbeelding
+                        except Exception:
+                            pass
 
-        # labels/context
-        label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
-        st.session_state["last_item_label"] = label
-        st.session_state["last_question"] = label
+                    # Labels/context
+                    label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
+                    st.session_state["last_item_label"] = label
+                    st.session_state["last_question"] = label
 
-        # 3) copy-knop: kopieert exact wat zichtbaar is (met AI-INFO)
-        _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
+                    # Copy van wat zichtbaar is (met AI-INFO)
+                    _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
 
-        # 4) PDF: geef alléén het schone antwoord mee (zonder AI-INFO)
-        pdf = make_pdf(label, final_ans)
-        st.download_button(
-            "📄 Download PDF",
-            data=pdf,
-            file_name="antwoord.pdf",
-            mime="application/pdf",
-            key=f"cascade_pdf_{hash(label+final_ans)}"
-        )
+                    # PDF met schoon antwoord (zonder AI-INFO)
+                    pdf = make_pdf(label, final_ans)
+                    st.download_button(
+                        "📄 Download PDF",
+                        data=pdf,
+                        file_name="antwoord.pdf",
+                        mime="application/pdf",
+                        key=f"cascade_pdf_{hash(label+final_ans)}"
+                    )
 
-        # 5) actie-balk onderaan ook wat zichtbaar is (met AI-INFO)
-        st.session_state["actionbar"] = {
-            "question": label,
-            "content": display_ans,
-            "image": st.session_state.get("selected_image"),
-            "time": datetime.now(TIMEZONE).isoformat()
-        }
+                    # Actie-balk onderaan (zelfde als getoond)
+                    st.session_state["actionbar"] = {
+                        "question": label,
+                        "content": display_ans,
+                        "image": st.session_state.get("selected_image"),
+                        "time": datetime.now(TIMEZONE).isoformat()
+                    }
 
-# ── App ───────────────────────────────────────────────────────────────────
-def main():
-    # ... je bestaande intro/logo/header en cascade-code hierboven ...
-
-    # ── Wizard ────────────────────────────────────────────────────────────
+    # ── Wizard ───────────────────────────────────────────────────────────────
     if st.session_state.get("chat_mode", True):
         chat_wizard()
-        return  # mag hier, want we zitten in main()
+        return
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
