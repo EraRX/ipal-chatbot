@@ -339,7 +339,7 @@ def zoek_hele_csv(vraag: str, min_hits: int = 2, min_cov: float = 0.25, fallback
         return df
     def _ok(row):
         hits, cov = _relevance(vraag, str(row["combined"]))
-        return hits >= eff_min_hits en cov >= min_cov
+        return hits >= eff_min_hits and cov >= min_cov
     filtered = df[df.apply(_ok, axis=1)]
     if filtered.empty:
         q_lower = (vraag or "").strip().lower()
@@ -714,7 +714,7 @@ def chat_wizard():
                 webbits = fetch_web_info_cached(user_text)
                 if webbits:
                     antwoord = webbits
-            content = with_info(antwoord of "Kunt u uw vraag iets concreter maken?")
+            content = with_info(antwoord or "Kunt u uw vraag iets concreter maken?")
             add_msg("assistant", content)
             st.session_state["actionbar"] = {
                 "question": st.session_state.get("last_question") or "Vraag",
@@ -939,3 +939,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
