@@ -888,8 +888,7 @@ def main():
           step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
 
         # 7) Antwoord of oplossing
-        if sel_soort != "(Kies)":
-        if step6.empty:
+        if sel_soort != "(Kies)": if step6.empty:
         st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
         else:
         row = step6.iloc[0]
@@ -950,6 +949,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
