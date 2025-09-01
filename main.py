@@ -939,11 +939,17 @@ if sel_soort != "(Kies)":
             "time": datetime.now(TIMEZONE).isoformat()
         }
 
-    # ── Wizard ────────────────────────────────────────────────────────────────
+# ── App ───────────────────────────────────────────────────────────────────
+def main():
+    # ... je bestaande intro/logo/header en cascade-code hierboven ...
+
+    # ── Wizard ────────────────────────────────────────────────────────────
     if st.session_state.get("chat_mode", True):
         chat_wizard()
-        return
+        return  # mag hier, want we zitten in main()
 
 if __name__ == "__main__":
     main()
+
+
 
