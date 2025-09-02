@@ -121,16 +121,52 @@ if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
 # ── Helpers voor PDF/chat-inhoud ────────────────────────────────────────────
+# ── Helpers voor PDF/chat-inhoud (VERVANGBLOK) ──────────────────────────────
 def remove_ai_info(text: str) -> str:
-    """Knipt het 'AI-Antwoord Info:'-blok uit een chat/cascade-antwoord (case-insensitive)."""
+    """
+    Knipt het hele AI-INFO-blok weg (ook als er rare streepjes/whitespace staan)
+    zodat er géén markdown-links of “hyperlink-code” in de PDF belanden.
+    """
     if not text:
         return ""
-    parts = re.split(r"(?i)\bAI-Antwoord Info:\b", text, maxsplit=1)
-    return parts[0].rstrip()
+    # match: "AI-Antwoord Info:" (met gewone/minus/en-dash/non-breaking hyphen), case-insensitive
+    pattern = r"(?is)\bAI[\-\u2011\u2013\u2014\u00A0 ]?Antwoord\s*Info\s*:\s*.*$"
+    return re.sub(pattern, "", text).rstrip()
+
+
+def _md_inline_to_paragraph_text(s: str) -> str:
+    """
+    Zet simpele Markdown inline om naar ReportLab-paragraph markup.
+    - **vet** -> <b>vet</b>
+    - *cursief* -> <i>cursief</i>
+    Houdt verder alle tekst ‘veilig’ (escape &<>).
+    """
+    from xml.sax.saxutils import escape
+    if not s:
+        return ""
+    # Eerst escapen, dan de markup terugzetten
+    t = escape(s, entities={'"': "&quot;"})
+    # Bold vóór italic om conflicten te vermijden
+    t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)
+    # Enkelvoudige * ... * (niet overlappende)
+    t = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<i>\1</i>", t)
+    return t
+
 
 def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
-    """Eenvoudige Markdown → ReportLab flowables (###/####, bullets, 1., - [ ] / - [x])."""
-    from reportlab.platypus import Paragraph, Spacer, ListFlowable, ListItem
+    """
+    Maakt nette PDF-opmaak van eenvoudige Markdown:
+    - ### / #### koppen
+    - Genummerde hoofd-stappen (1., 2., 3., …) met DOORTELLING, óók als er
+      sub-bullets (• of -) onder elk punt staan.
+    - Sub-bullets (•, -, *), en checkboxbullets - [ ] / - [x] → ☐ / ☑
+    - Losse bullets buiten de genummerde lijst blijven gewone bullets.
+
+    Implementatie: we groeperen elke hoofd-stap (1.) met zijn sub-bullets
+    tot één ListItem; alle ListItems komen in één ListFlowable met bulletType="1".
+    Zo blijft de nummering netjes doorlopen.
+    """
+    from reportlab.platypus import Paragraph, Spacer, ListFlowable, ListItem, KeepTogether
 
     if not text:
         return []
@@ -139,79 +175,106 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     flow = []
     body = styles["Body"]; h3 = styles["H3"]; h4 = styles["H4"]
 
-    list_buf = []
-    list_type = None  # "ul" | "ol"
+    # Buffers voor ‘lopende’ structuren
+    ol_items = []          # lijst van (title:str, subs:list[str])
+    current_ol = None      # dict {'title': str, 'subs': [str]}
+    ul_buf = []            # bullets buiten een ‘lopende’ ordered list
 
-    def flush_list():
-        nonlocal list_buf, list_type
-        if not list_buf:
+    def flush_ul():
+        nonlocal ul_buf
+        if not ul_buf:
             return
-        items = [ListItem(Paragraph(clean_text(item), body), leftIndent=12) for item in list_buf]
-        flow.append(ListFlowable(items, bulletType=("1" if list_type == "ol" else "bullet")))
-        list_buf = []; list_type = None
+        items = [ListItem(Paragraph(_md_inline_to_paragraph_text(it), body), leftIndent=12) for it in ul_buf]
+        flow.append(ListFlowable(items, bulletType="bullet"))
+        ul_buf = []
+
+    def flush_ol():
+        nonlocal ol_items, current_ol
+        if current_ol:
+            ol_items.append((current_ol["title"], current_ol["subs"]))
+            current_ol = None
+        if not ol_items:
+            return
+        list_items = []
+        for title, subs in ol_items:
+            title_para = Paragraph(_md_inline_to_paragraph_text(title), body)
+            if subs:
+                sub_flows = [ListItem(Paragraph(_md_inline_to_paragraph_text(s), body), leftIndent=12) for s in subs]
+                sub_list = ListFlowable(sub_flows, bulletType="bullet")
+                item_flow = KeepTogether([title_para, sub_list])
+            else:
+                item_flow = KeepTogether([title_para])
+            list_items.append(ListItem(item_flow))
+        flow.append(ListFlowable(list_items, bulletType="1"))
+        ol_items = []
 
     for raw in lines:
         line = raw.strip()
 
-        # lege regel
+        # Lege regel: kleine spacer; sluit losse bullets, maar NIET de OL-groep
         if not line:
-            flush_list()
+            flush_ul()
             flow.append(Spacer(1, 6))
             continue
 
-        # #### / ### koppen
+        # #### / ### koppen sluiten ALLE buffers
         m4 = re.match(r"^####\s+(.*)$", line)
         if m4:
-            flush_list()
-            flow.append(Paragraph(clean_text(m4.group(1)), h4))
+            flush_ul(); flush_ol()
+            flow.append(Paragraph(_md_inline_to_paragraph_text(m4.group(1)), h4))
             continue
 
         m3 = re.match(r"^###\s+(.*)$", line)
         if m3:
-            flush_list()
-            flow.append(Paragraph(clean_text(m3.group(1)), h3))
+            flush_ul(); flush_ol()
+            flow.append(Paragraph(_md_inline_to_paragraph_text(m3.group(1)), h3))
             continue
 
-        # Checkbox-lijst: "- [ ] ..." of "- [x] ..."
-        m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
-        if m_cb:
-            mark = "x" if m_cb.group(1).lower() == "x" else " "
-            txt  = f"[{mark}] {m_cb.group(2)}"
-            if list_type not in (None, "ul"):
-                flush_list()
-            list_type = "ul"
-            list_buf.append(txt)
-            continue
-
-        # Ongeordende lijst "- " of "* "
-        m_ul = re.match(r"^[-*]\s+(.*)$", line)
-        if m_ul:
-            if list_type not in (None, "ul"):
-                flush_list()
-            list_type = "ul"
-            list_buf.append(m_ul.group(1))
-            continue
-
-        # Genummerde lijst "1. " of "1) "
+        # Hoofd-stap: "1. ..." of "1) ..." (we groeperen tot de volgende hoofd-stap)
         m_ol = re.match(r"^\d+[.)]\s+(.*)$", line)
         if m_ol:
-            if list_type not in (None, "ol"):
-                flush_list()
-            list_type = "ol"
-            list_buf.append(m_ol.group(1))
+            # start nieuwe OL-item
+            if current_ol:
+                ol_items.append((current_ol["title"], current_ol["subs"]))
+            current_ol = {"title": m_ol.group(1), "subs": []}
             continue
 
-        # Gewone alinea
-        flush_list()
-        flow.append(Paragraph(clean_text(line), body))
+        # Checkbox bullet: "- [ ] ..." of "- [x] ..." (ook als sub van OL)
+        m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
+        if m_cb:
+            mark = "☑" if m_cb.group(1).lower() == "x" else "☐"
+            txt  = f"{mark} {m_cb.group(2)}"
+            if current_ol:
+                current_ol["subs"].append(txt)
+            else:
+                ul_buf.append(txt)
+            continue
 
-    flush_list()
+        # Bullets: "• ..." of "- ..." of "* ..."
+        m_ul = re.match(r"^[\u2022\-\*]\s+(.*)$", line)  # \u2022 == "•"
+        if m_ul:
+            if current_ol:
+                current_ol["subs"].append(m_ul.group(1))
+            else:
+                ul_buf.append(m_ul.group(1))
+            continue
+
+        # Anders: gewone alinea → flush losse bullets & lopende OL, dan alinea
+        flush_ul(); flush_ol()
+        flow.append(Paragraph(_md_inline_to_paragraph_text(line), body))
+
+    # Einde tekst: flush alles
+    flush_ul(); flush_ol()
     return flow
 
+
 def make_pdf(question: str, answer_markdown: str) -> bytes:
-    """PDF met nette opmaak uit eenvoudige Markdown.
-       - AI-INFO uit chat/cascade wordt automatisch weggeknipt uit de hoofdtekst.
-       - FAQ-links komen standaard onderaan."""
+    """
+    PDF met nette opmaak:
+    - Hoofdstukjes + DOORTELLEN van 1..N voor hoofd-stappen (ook met sub-bullets).
+    - AI-INFO wordt uit de hoofdtekst geknipt.
+    - Onderaan altijd nette FAQ-links (één keer, dus geen dubbele ‘hyperlink-code’).
+    """
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -220,6 +283,7 @@ def make_pdf(question: str, answer_markdown: str) -> bytes:
     from reportlab.lib import colors
 
     question  = clean_text(question or "")
+    # Snij AI-INFO volledig weg uit wat we renderen in de PDF
     answer_md = remove_ai_info((answer_markdown or "").strip())
 
     buffer = io.BytesIO()
@@ -273,10 +337,10 @@ def make_pdf(question: str, answer_markdown: str) -> bytes:
     story.append(Spacer(1, 10))
     story.append(Paragraph("Antwoord:", heading_style))
 
-    # Inhoud uit eenvoudige Markdown
+    # Inhoud uit eenvoudige Markdown → nette flowables
     story.extend(_parse_simple_markdown_to_flowables(answer_md, styles))
 
-    # FAQ-links onderaan (blijven altijd staan)
+    # FAQ-links onderaan (één nette sectie, zonder AI-INFO duplicaat)
     story.append(Spacer(1, 12))
     story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
     link_items = []
@@ -288,6 +352,7 @@ def make_pdf(question: str, answer_markdown: str) -> bytes:
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
+
 
 # ── CSV loading + normalization ──────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -1016,3 +1081,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
