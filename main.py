@@ -157,10 +157,9 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
         show_click = True
     return numbered, show_click
 
-def make_pdf(question: str, answer_md: str) -> bytes:
-    # Houd newlines & markdown, niet strippen naar platte tekst
-    question  = clean_text_keep_newlines(question or "")
-    answer_md = clean_text_keep_newlines(answer_md or "")
+def make_pdf(question: str, answer: str) -> bytes:
+    question = clean_text(question or "")
+    answer = clean_text(_strip_md(answer or ""))
 
     numbered_items, show_click = _parse_ai_info(AI_INFO)
 
@@ -173,22 +172,14 @@ def make_pdf(question: str, answer_md: str) -> bytes:
     content_width = A4[0] - left - right
 
     styles = getSampleStyleSheet()
-    body = ParagraphStyle(
+    body_style = ParagraphStyle(
         "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=8, alignment=TA_LEFT
+        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
     )
-    heading = ParagraphStyle(
+    heading_style = ParagraphStyle(
         "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
-        fontSize=14, leading=18, spaceBefore=12, spaceAfter=6,
-        textColor=colors.HexColor("#333")
-    )
-    h3 = ParagraphStyle(
-        "H3", parent=body, fontName="Helvetica-Bold",
-        fontSize=12, leading=16, spaceBefore=8, spaceAfter=4
-    )
-    h4 = ParagraphStyle(
-        "H4", parent=body, fontName="Helvetica-Bold",
-        fontSize=11, leading=15, spaceBefore=6, spaceAfter=3
+        fontSize=14, leading=18, textColor=colors.HexColor("#333"),
+        spaceBefore=12, spaceAfter=6
     )
 
     story = []
@@ -204,93 +195,27 @@ def make_pdf(question: str, answer_md: str) -> bytes:
         except Exception as e:
             logging.error(f"Kon banner niet laden: {e}")
 
-    story.append(Paragraph(_esc(f"Vraag: {question}"), heading))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("Antwoord:", heading))
+    story.append(Paragraph(f"Vraag: {question}", heading_style))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph("Antwoord:", heading_style))
+    for line in (answer.split("\n") if answer else []):
+        line = line.strip()
+        if line:
+            story.append(Paragraph(line, body_style))
 
-    # --- Eenvoudige Markdown→ReportLab parser ---
-    lines = answer_md.split("\n")
-    i, n = 0, len(lines)
-
-    def add_paragraph(block: list[str]):
-        txt = "<br/>".join(_esc(x) for x in block).strip()
-        if txt:
-            story.append(Paragraph(txt, body))
-
-    while i < n:
-        line = lines[i].rstrip()
-
-        # lege regel → kleine spatie
-        if not line.strip():
-            story.append(Spacer(1, 4))
-            i += 1
-            continue
-
-        # kopjes ### / ####
-        m = re.match(r"^\s*(#{3,4})\s+(.*)$", line)
-        if m:
-            level = len(m.group(1))
-            txt = _esc(m.group(2))
-            story.append(Paragraph(txt, h3 if level == 3 else h4))
-            i += 1
-            continue
-
-        # checkboxlijst: - [ ] / - [x]
-        if re.match(r"^\s*-\s*\[[ xX]\]\s+", line):
-            items = []
-            while i < n and re.match(r"^\s*-\s*\[[ xX]\]\s+", lines[i]):
-                chk = re.match(r"^\s*-\s*\[([ xX])\]\s+(.*)$", lines[i])
-                checked = (chk.group(1).lower() == "x")
-                text = _esc(chk.group(2))
-                items.append(ListItem(Paragraph(text, body), leftIndent=12, bulletText=("☑" if checked else "☐")))
-                i += 1
-            story.append(ListFlowable(items, bulletType="bullet", start="circle"))
-            continue
-
-        # genummerde lijst: "1. ..."
-        if re.match(r"^\s*\d+\.\s+", line):
-            items = []
-            while i < n and re.match(r"^\s*\d+\.\s+", lines[i]):
-                txt = re.sub(r"^\s*\d+\.\s+", "", lines[i]).strip()
-                items.append(ListItem(Paragraph(_esc(txt), body), leftIndent=12))
-                i += 1
-            story.append(ListFlowable(items, bulletType="1"))
-            continue
-
-        # bullets: "- ..." of "• ..."
-        if re.match(r"^\s*(-|•|\*)\s+", line):
-            items = []
-            while i < n and re.match(r"^\s*(-|•|\*)\s+", lines[i]):
-                txt = re.sub(r"^\s*(-|•|\*)\s+", "", lines[i]).strip()
-                items.append(ListItem(Paragraph(_esc(txt), body), leftIndent=12))
-                i += 1
-            story.append(ListFlowable(items, bulletType="bullet"))
-            continue
-
-        # normale paragraaf (accumuleer tot lege regel/volgend blok)
-        block = [line]
-        i += 1
-        while i < n and lines[i].strip() and not re.match(r"^\s*(#{3,4})\s+", lines[i]) \
-              and not re.match(r"^\s*\d+\.\s+", lines[i]) \
-              and not re.match(r"^\s*(-|•|\*)\s+", lines[i]) \
-              and not re.match(r"^\s*-\s*\[[ xX]\]\s+", lines[i]):
-            block.append(lines[i].rstrip())
-            i += 1
-        add_paragraph(block)
-
-    # --- AI-Antwoord Info onderaan als nette sectie ---
     if numbered_items:
         story.append(Spacer(1, 12))
-        story.append(Paragraph("AI-Antwoord Info:", heading))
-        list_items = [ListItem(Paragraph(_esc(item), body), leftIndent=12) for item in numbered_items]
+        story.append(Paragraph("AI-Antwoord Info:", heading_style))
+        list_items = [ListItem(Paragraph(item, body_style), leftIndent=12) for item in numbered_items]
         story.append(ListFlowable(list_items, bulletType="1"))
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 12))
     if show_click:
-        story.append(Paragraph("Klik hieronder om de FAQ te openen:", h4))
+        story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+
     link_items = []
     for label, url in FAQ_LINKS:
-        p = Paragraph(f'<link href="{_esc(url)}" color="blue">{_esc(label)}</link>', body)
+        p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
         link_items.append(ListItem(p, leftIndent=12))
     story.append(ListFlowable(link_items, bulletType="bullet"))
 
@@ -625,204 +550,13 @@ def _copy_button(text: str, key_suffix: str):
     if show_fallback:
         st.text_area("Tekst", payload, height=150, key=f"copy_fallback_{key_suffix}")
 
-# ── Helpers voor PDF/chat-inhoud ─────────────────────────────────────────────
-def remove_ai_info(text: str) -> str:
-    """Knip het 'AI-Antwoord Info:'-blok uit een chat/cascade-antwoord.
-    Laat de rest ongewijzigd. Werkt veilig als text None is.
-    """
-    if not text:
-        return ""
-    return text.split("AI-Antwoord Info:", 1)[0].rstrip()
-
-
-def _strip_md(s: str) -> str:
-    """Verwijder eenvoudige Markdown-opmaak (voor gevallen waar plain text nodig is)."""
-    if not s:
-        return ""
-    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)                   # **vet**
-    s = re.sub(r"#+\s*([^\n]+)", r"\1", s)                     # # koppen
-    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)           # [link](url)
-    return s
-
-
-def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
-    """Zet eenvoudige Markdown (koppen, bullets, nummers, checkboxen) om naar ReportLab flowables."""
-    from reportlab.platypus import Paragraph, Spacer, ListFlowable, ListItem
-
-    if not text:
-        return []
-
-    lines = [ln.rstrip() for ln in text.splitlines()]
-    flow = []
-
-    body = styles["Body"]
-    h3   = styles["H3"]
-    h4   = styles["H4"]
-
-    list_buf = []
-    list_type = None  # "ul" | "ol"
-
-    def flush_list():
-        nonlocal list_buf, list_type
-        if list_buf:
-            items = [ListItem(Paragraph(item, body), leftIndent=12) for item in list_buf]
-            flow.append(ListFlowable(items, bulletType=("1" if list_type == "ol" else "bullet")))
-            list_buf = []
-            list_type = None
-
-    for raw in lines:
-        line = raw.strip()
-
-        # lege regel -> alinea/list afsluiten
-        if not line:
-            flush_list()
-            flow.append(Spacer(1, 6))
-            continue
-
-        # #### / ### koppen
-        m4 = re.match(r"^####\s+(.*)$", line)
-        if m4:
-            flush_list()
-            flow.append(Paragraph(clean_text(m4.group(1)), h4))
-            continue
-
-        m3 = re.match(r"^###\s+(.*)$", line)
-        if m3:
-            flush_list()
-            flow.append(Paragraph(clean_text(m3.group(1)), h3))
-            continue
-
-        # Checkboxen: "- [ ] tekst" of "- [x] tekst"
-        m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
-        if m_cb:
-            mark = "☑" if m_cb.group(1).lower() == "x" else "☐"
-            txt  = f"{mark} {clean_text(m_cb.group(2))}"
-            if list_type not in (None, "ul"):
-                flush_list()
-            list_type = "ul"
-            list_buf.append(txt)
-            continue
-
-        # Ongeordende lijst "- " of "* "
-        m_ul = re.match(r"^[-*]\s+(.*)$", line)
-        if m_ul:
-            if list_type not in (None, "ul"):
-                flush_list()
-            list_type = "ul"
-            list_buf.append(clean_text(m_ul.group(1)))
-            continue
-
-        # Genummerde lijst "1. " of "1) "
-        m_ol = re.match(r"^\d+[.)]\s+(.*)$", line)
-        if m_ol:
-            if list_type not in (None, "ol"):
-                flush_list()
-            list_type = "ol"
-            list_buf.append(clean_text(m_ol.group(1)))
-            continue
-
-        # Anders: gewone alinea
-        flush_list()
-        flow.append(Paragraph(clean_text(line), body))
-
-    flush_list()
-    return flow
-
-
-def make_pdf(question: str, answer_markdown: str) -> bytes:
-    """Maak een PDF met nette opmaak (koppen/bullets), zonder AI-INFO in de hoofdtekst.
-    Onderaan blijven de FAQ-links als opsomming staan.
-    """
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_LEFT
-    from reportlab.lib.units import cm
-    from reportlab.lib import colors
-
-    question = clean_text(question or "")
-    # Voor de PDF verwachten we alleen het eigenlijke antwoord (zonder AI-INFO)
-    answer_md = (answer_markdown or "").strip()
-
-    buffer = io.BytesIO()
-    left = right = top = bottom = 2 * cm
-    doc = SimpleDocTemplate(
-        buffer, pagesize=A4,
-        leftMargin=left, rightMargin=right, topMargin=top, bottomMargin=bottom
-    )
-    content_width = A4[0] - left - right
-
-    # Styles
-    styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(
-        "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=6, alignment=TA_LEFT
-    ))
-    styles.add(ParagraphStyle(
-        "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
-        fontSize=14, leading=18, textColor=colors.HexColor("#333"),
-        spaceBefore=12, spaceAfter=6
-    ))
-    styles.add(ParagraphStyle(
-        "H3", parent=styles["Heading3"], fontName="Helvetica-Bold",
-        fontSize=12, leading=16, textColor=colors.HexColor("#333"),
-        spaceBefore=8, spaceAfter=4
-    ))
-    styles.add(ParagraphStyle(
-        "H4", parent=styles["Heading4"], fontName="Helvetica-Bold",
-        fontSize=11, leading=15, textColor=colors.HexColor("#333"),
-        spaceBefore=6, spaceAfter=3
-    ))
-
-    body_style    = styles["Body"]
-    heading_style = styles["Heading"]
-
-    story = []
-
-    # Banner/logo (optioneel)
-    if os.path.exists("logopdf.png"):
-        try:
-            banner = Image("logopdf.png")
-            banner._restrictSize(content_width, 10000)
-            banner.hAlign = "LEFT"
-            story.append(banner)
-            story.append(Spacer(1, 8))
-        except Exception as e:
-            logging.error(f"Kon banner niet laden: {e}")
-
-    # Koppen
-    story.append(Paragraph(f"Vraag: {question}", heading_style))
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("Antwoord:", heading_style))
-
-    # Gestructureerde inhoud uit Markdown
-    story.extend(_parse_simple_markdown_to_flowables(answer_md, styles))
-
-    # FAQ-links onderaan
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
-    link_items = []
-    for label, url in FAQ_LINKS:
-        p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
-        link_items.append(ListItem(p, leftIndent=12))
-    story.append(ListFlowable(link_items, bulletType="bullet"))
-
-    doc.build(story)
-    buffer.seek(0)
-    return buffer.getvalue()
-
-
-def with_info(text: str) -> str:
-    """Chat/cascade-weergave: voeg AI-INFO toe (alleen voor weergave, niet voor PDF)."""
-    return clean_text((text or "").strip()) + "\n\n" + AI_INFO
-
 def _render_actionbar():
     ab = st.session_state.get("actionbar")
     if not ab:
         return
     st.divider()
     st.caption("Acties voor het laatste antwoord:")
-    pdf = make_pdf(ab["question"], remove_ai_info(ab["content"]))
+    pdf = make_pdf(ab["question"], ab["content"])
     st.download_button(
         "📄 Download PDF", data=pdf, file_name="antwoord.pdf",
         mime="application/pdf", key=f"pdf_{hash(ab['question']+ab['content'])}"
@@ -1215,9 +949,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
 
 
