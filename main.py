@@ -157,9 +157,10 @@ def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
         show_click = True
     return numbered, show_click
 
-def make_pdf(question: str, answer: str) -> bytes:
-    question = clean_text(question or "")
-    answer = clean_text(_strip_md(answer or ""))
+def make_pdf(question: str, answer_md: str) -> bytes:
+    # Houd newlines & markdown, niet strippen naar platte tekst
+    question  = clean_text_keep_newlines(question or "")
+    answer_md = clean_text_keep_newlines(answer_md or "")
 
     numbered_items, show_click = _parse_ai_info(AI_INFO)
 
@@ -172,14 +173,22 @@ def make_pdf(question: str, answer: str) -> bytes:
     content_width = A4[0] - left - right
 
     styles = getSampleStyleSheet()
-    body_style = ParagraphStyle(
+    body = ParagraphStyle(
         "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
+        fontSize=11, leading=16, spaceAfter=8, alignment=TA_LEFT
     )
-    heading_style = ParagraphStyle(
+    heading = ParagraphStyle(
         "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
-        fontSize=14, leading=18, textColor=colors.HexColor("#333"),
-        spaceBefore=12, spaceAfter=6
+        fontSize=14, leading=18, spaceBefore=12, spaceAfter=6,
+        textColor=colors.HexColor("#333")
+    )
+    h3 = ParagraphStyle(
+        "H3", parent=body, fontName="Helvetica-Bold",
+        fontSize=12, leading=16, spaceBefore=8, spaceAfter=4
+    )
+    h4 = ParagraphStyle(
+        "H4", parent=body, fontName="Helvetica-Bold",
+        fontSize=11, leading=15, spaceBefore=6, spaceAfter=3
     )
 
     story = []
@@ -195,27 +204,93 @@ def make_pdf(question: str, answer: str) -> bytes:
         except Exception as e:
             logging.error(f"Kon banner niet laden: {e}")
 
-    story.append(Paragraph(f"Vraag: {question}", heading_style))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("Antwoord:", heading_style))
-    for line in (answer.split("\n") if answer else []):
-        line = line.strip()
-        if line:
-            story.append(Paragraph(line, body_style))
+    story.append(Paragraph(_esc(f"Vraag: {question}"), heading))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("Antwoord:", heading))
 
+    # --- Eenvoudige Markdown→ReportLab parser ---
+    lines = answer_md.split("\n")
+    i, n = 0, len(lines)
+
+    def add_paragraph(block: list[str]):
+        txt = "<br/>".join(_esc(x) for x in block).strip()
+        if txt:
+            story.append(Paragraph(txt, body))
+
+    while i < n:
+        line = lines[i].rstrip()
+
+        # lege regel → kleine spatie
+        if not line.strip():
+            story.append(Spacer(1, 4))
+            i += 1
+            continue
+
+        # kopjes ### / ####
+        m = re.match(r"^\s*(#{3,4})\s+(.*)$", line)
+        if m:
+            level = len(m.group(1))
+            txt = _esc(m.group(2))
+            story.append(Paragraph(txt, h3 if level == 3 else h4))
+            i += 1
+            continue
+
+        # checkboxlijst: - [ ] / - [x]
+        if re.match(r"^\s*-\s*\[[ xX]\]\s+", line):
+            items = []
+            while i < n and re.match(r"^\s*-\s*\[[ xX]\]\s+", lines[i]):
+                chk = re.match(r"^\s*-\s*\[([ xX])\]\s+(.*)$", lines[i])
+                checked = (chk.group(1).lower() == "x")
+                text = _esc(chk.group(2))
+                items.append(ListItem(Paragraph(text, body), leftIndent=12, bulletText=("☑" if checked else "☐")))
+                i += 1
+            story.append(ListFlowable(items, bulletType="bullet", start="circle"))
+            continue
+
+        # genummerde lijst: "1. ..."
+        if re.match(r"^\s*\d+\.\s+", line):
+            items = []
+            while i < n and re.match(r"^\s*\d+\.\s+", lines[i]):
+                txt = re.sub(r"^\s*\d+\.\s+", "", lines[i]).strip()
+                items.append(ListItem(Paragraph(_esc(txt), body), leftIndent=12))
+                i += 1
+            story.append(ListFlowable(items, bulletType="1"))
+            continue
+
+        # bullets: "- ..." of "• ..."
+        if re.match(r"^\s*(-|•|\*)\s+", line):
+            items = []
+            while i < n and re.match(r"^\s*(-|•|\*)\s+", lines[i]):
+                txt = re.sub(r"^\s*(-|•|\*)\s+", "", lines[i]).strip()
+                items.append(ListItem(Paragraph(_esc(txt), body), leftIndent=12))
+                i += 1
+            story.append(ListFlowable(items, bulletType="bullet"))
+            continue
+
+        # normale paragraaf (accumuleer tot lege regel/volgend blok)
+        block = [line]
+        i += 1
+        while i < n and lines[i].strip() and not re.match(r"^\s*(#{3,4})\s+", lines[i]) \
+              and not re.match(r"^\s*\d+\.\s+", lines[i]) \
+              and not re.match(r"^\s*(-|•|\*)\s+", lines[i]) \
+              and not re.match(r"^\s*-\s*\[[ xX]\]\s+", lines[i]):
+            block.append(lines[i].rstrip())
+            i += 1
+        add_paragraph(block)
+
+    # --- AI-Antwoord Info onderaan als nette sectie ---
     if numbered_items:
         story.append(Spacer(1, 12))
-        story.append(Paragraph("AI-Antwoord Info:", heading_style))
-        list_items = [ListItem(Paragraph(item, body_style), leftIndent=12) for item in numbered_items]
+        story.append(Paragraph("AI-Antwoord Info:", heading))
+        list_items = [ListItem(Paragraph(_esc(item), body), leftIndent=12) for item in numbered_items]
         story.append(ListFlowable(list_items, bulletType="1"))
 
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 8))
     if show_click:
-        story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
-
+        story.append(Paragraph("Klik hieronder om de FAQ te openen:", h4))
     link_items = []
     for label, url in FAQ_LINKS:
-        p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
+        p = Paragraph(f'<link href="{_esc(url)}" color="blue">{_esc(label)}</link>', body)
         link_items.append(ListItem(p, leftIndent=12))
     story.append(ListFlowable(link_items, bulletType="bullet"))
 
@@ -949,6 +1024,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
