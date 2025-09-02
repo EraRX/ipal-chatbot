@@ -631,7 +631,7 @@ def _render_actionbar():
         return
     st.divider()
     st.caption("Acties voor het laatste antwoord:")
-    pdf = make_pdf(ab["question"], ab["content"])
+    pdf = make_pdf(ab["question"], remove_ai_info(ab["content"]))
     st.download_button(
         "📄 Download PDF", data=pdf, file_name="antwoord.pdf",
         mime="application/pdf", key=f"pdf_{hash(ab['question']+ab['content'])}"
@@ -1024,6 +1024,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
