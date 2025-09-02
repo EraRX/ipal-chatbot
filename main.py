@@ -888,48 +888,57 @@ def main():
           step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
 
           # 7) Antwoord of oplossing
-          if sel_soort != "(Kies)":
-              if step6.empty:
-                  st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
-              else:
-                  row = step6.iloc[0]
-                  antwoord = (row.get("Antwoord of oplossing","") or "").strip()
-                  afbeelding = (row.get("Afbeelding","") or "").strip()
+if sel_soort != "(Kies)":
+    st.markdown("**7) Antwoord of oplossing**")
 
-                  st.markdown("**7) Antwoord of oplossing**")
-                  final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
-                  st.write(final_ans)
+    if step6.empty:
+        st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
+    else:
+        row = step6.iloc[0]
+        antwoord   = (row.get("Antwoord of oplossing", "") or "").strip()
+        afbeelding = (row.get("Afbeelding", "") or "").strip()
 
-                  if afbeelding:
-                      try:
-                          st.image(afbeelding, use_column_width=True)
-                          st.session_state["selected_image"] = afbeelding
-                      except Exception:
-                          pass
+        # Maak het antwoord (evt. vereenvoudigd) en zorg voor een fallback
+        final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
+        if not final_ans:
+            final_ans = "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
 
-                  # Context voor PDF/Copy in actie-balk óók bij cascade
-                  label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
-                  st.session_state["last_item_label"] = label
-                  st.session_state["last_question"] = label
+        # Toon het antwoord + AI-INFO in de cascade
+        display_ans = f"{final_ans}\n\n{AI_INFO}"
+        st.markdown(display_ans)
 
-                  # Cascade-eigen knoppen
-                  _copy_button(final_ans, hashlib.md5(final_ans.encode("utf-8")).hexdigest()[:8])
-                  pdf = make_pdf(label, final_ans)
-                  st.download_button(
-                      "📄 Download PDF",
-                      data=pdf,
-                      file_name="antwoord.pdf",
-                      mime="application/pdf",
-                      key=f"cascade_pdf_{hash(label+final_ans)}"
-                  )
+        # Optionele afbeelding
+        if afbeelding:
+            try:
+                st.image(afbeelding, use_column_width=True)
+                st.session_state["selected_image"] = afbeelding
+            except Exception:
+                pass
 
-                  # Zet óók de globale actie-balk correct:
-                  st.session_state["actionbar"] = {
-                      "question": label,
-                      "content": with_info(final_ans),  # zelfde als chatweergave
-                      "image": st.session_state.get("selected_image"),
-                      "time": datetime.now(TIMEZONE).isoformat()
-                  }
+        # Label voor PDF/actie-balk
+        label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
+        st.session_state["last_item_label"] = label
+        st.session_state["last_question"]   = label
+
+        # Kopieer- en PDF-knoppen
+        _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
+
+        pdf = make_pdf(label, final_ans)  # PDF: schoon antwoord zonder AI-INFO
+        st.download_button(
+            "📄 Download PDF",
+            data=pdf,
+            file_name="antwoord.pdf",
+            mime="application/pdf",
+            key=f"cascade_pdf_{hash(label+final_ans)}"
+        )
+
+        # Actie-balk onderaan: zelfde inhoud als zichtbaar
+        st.session_state["actionbar"] = {
+            "question": label,
+            "content": display_ans,
+            "image": st.session_state.get("selected_image"),
+            "time": datetime.now(TIMEZONE).isoformat()
+        }
 
     # ── Wizard ────────────────────────────────────────────────────────────────
     if st.session_state.get("chat_mode", True):
@@ -938,3 +947,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
