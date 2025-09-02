@@ -506,9 +506,10 @@ def add_msg(role: str, content: str):
         return
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
 
-AI_INFO_MD = AI_INFO
 def with_info(text: str) -> str:
-    return clean_text((text or "").strip()) + "\n\n" + AI_INFO_MD
+    txt = (text or "").strip()
+    # GEEN clean_text meer → newlines blijven staan en Markdown rendert netjes
+    return f"{txt}\n\n{AI_INFO}".strip()
 
 def _copy_button(text: str, key_suffix: str):
     payload = text or ""
@@ -948,5 +949,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
