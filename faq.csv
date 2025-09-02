@@ -1,43 +1,101 @@
 ﻿ID;Systeem;Subthema;Categorie;Omschrijving melding;Toelichting melding;Soort melding;Antwoord of oplossing
 D1174;DocBase;Ledenadministratie;Ledenadministratie;Nieuw lid registreren (volwassene);Operationele werkinstructie met exacte klikpaden, parochie-/wijk-specifiek.;Procedure;"### Kort vooraf (waarom)
-Een juiste registratie zorgt dat het lid zichtbaar is in rapportages, mailings en gezinsrelaties. Ook blijven kerkelijke gegevens (doop, communie, vormsel, huwelijk) bewaard.
+Bij het **aanmaken van een nieuw lid** moet u exact de juiste velden vullen om dubbele registraties, foutieve postbezorging en verkeerde tellingen te voorkomen. Onderstaand een **veld-voor-veld** gids op basis van uw schermvelden.
 
-### Stappenplan
-1) Zoek eerst op dubbelen: Personen/Leden → Zoeken. Gebruik achternaam + geboortedatum en, indien bekend, postcode + huisnummer. Controleer ook Afgemeld/Prullenbak. Bestaat de persoon al? Schrijf opnieuw in of herstel; maak geen nieuw record.
-2) Maak het lid aan: Personen/Leden → Nieuw. Vul roepnaam/voorletters, achternaam, geboortedatum, geboorteplaats. Kies Parochie = uw parochie, Status = Ingeschreven en vul de Vanaf-datum (vandaag of werkelijke instroom).
-3) Adres/contact: Gebruik de postcode/huisnummer-zoeker. Vul e‑mail en telefoon (zonder spaties). Stel taal en aanhef (Familie of Individueel) in.
-4) Huishouden/relaties: Maak een huishouden (Alleenstaand of Gezin), koppel partner/kinderen en zet hoofd van het huishouden. Voorkeursparochie alleen invullen indien iemand buiten het territorium toch bij u wil horen.
-5) Communicatievoorkeuren: Vink e‑mail/nieuwsbrief en post aan/uit. Noteer alleen functionele opmerkingen.
-6) Doop (kerkelijke gegevens): Kerkelijke gegevens → Doop → Toevoegen. Vul doopdatum (dd‑mm‑jjjj), kerk/parochie en plaats. Voeg, indien beschikbaar, registratienummer en een scan van het doopbewijs toe. Voeg ook Communie/Vormsel toe als bekend.
-7) Opslaan en controleren: Sla op en controleer de ledenkaart/gezinskaart. Pas de SILA‑indicatie niet handmatig aan. Controleer of het lid verschijnt in uw overzicht “Nieuwe inschrijvingen”. 
-8) (Optioneel) Communicatie: Voeg het lid toe aan gewenste selecties/mailing via Communicatie → Selecties/Mailing.
+### Stappen (samengevat)
+1) Zoek eerst op dubbelen (naam + geboortedatum; controleer ook Afgemeld/Prullenbak).  
+2) Vul kerngegevens (Relatiestatus, naamvelden, geboortedatum/-plaats).  
+3) Vul adres via **Open PostNL** (woon- én evt. postadres).  
+4) Huishouden & burgerlijke staat (hoofdbewoner, gezinsrelatie, partner/ouders koppelen).  
+5) Parochie-gegevens (geografisch vs. voorkeursparochie).  
+6) Contact, IBAN(s), correspondentievoorkeur.  
+7) Opslaan, controleren, daarna sacramenten toevoegen (Doop/Communie/Vormsel).
 
+---
+
+### Veldmapping (wat invullen, verplichting, validatie)
+
+| Veldnaam | Verplicht | Wie vult/bron | Formaat / voorbeeld | Opmerkingen & validatie |
+|---|---:|---|---|---|
+| Rel-ID | Auto | Systeem | (voorbeeld: 16008458) | **Automatisch** gegenereerd; niet handmatig aanpassen. |
+| Relatiestatus | **Ja** | Gebruiker | Ingeschreven / Gast / Lokale relatie | Kies **Ingeschreven** voor daadwerkelijke parochieleden. |
+| Organisatienaam | Nee | n.v.t. | — | Alleen voor organisaties; bij personen leeg laten. |
+| Zoeknaam (volledige naam) | Aanbevolen | Systeem/gebruik | Achternaam, Voornaam | Wordt vaak automatisch opgebouwd; controleer weergave. |
+| Aanduiding naamgebruik | Aanbevolen | Gebruiker | bv. naam partner / eigen naam | Conform pastorale richtlijn; bepaalt aanhef/etiketten. |
+| Roepnaam | Aanbevolen | Gebruiker | “Jan” | Gebruikt in correspondentie als aanhef. |
+| Voornamen | Aanbevolen | Gebruiker | “Johannes Petrus” | Volledige voornamen volgens identiteitsbewijs indien bekend. |
+| Initialen | Nee | Gebruiker | “J.P.” | Automatisch af te leiden; optioneel. |
+| Tussenvoegsels | Nee | Gebruiker | “van”, “de” | Zonder hoofdletter tenzij begin van weergave. |
+| Achternaam (incl. tussenvoegsels) | **Ja** | Gebruiker | “Van Dijk” | Hoofdveld voor naam; nodig voor zoeken en etiketten. |
+| Geslachtsnaam (geboorte) | Nee | Gebruiker | — | Voor meisjesnaam/geb. naam indien van toepassing. |
+| Geslacht | Aanbevolen | Gebruiker | M/V/X | Indien bekend invullen. |
+| Open PostNL Straatnaam | **Ja** | PostNL lookup | “Kerkstraat” | Vul **Postcode + Huisnummer** eerst; systeem vult straat. |
+| Open PostNL Huisnummer | **Ja** | Gebruiker | “12” | Alleen cijfer(s) hier; toevoeging elders. |
+| Open PostNL Huisnummer letter | Nee | Gebruiker | “A” | Alleen indien van toepassing. |
+| Huisnummer aanduiding | Nee | Gebruiker | “t/m”, “to” | Zelden gebruikt. |
+| Huisnummer toevoeging | Aanbevolen | Gebruiker | “bis”, “-2” | Belangrijk voor bezorging/selecties. |
+| Open PostNL Postcode | **Ja** | Gebruiker | **1234AB** | Zonder spatie (systeemconventie). |
+| Open PostNL Plaatsnaam | **Ja** | PostNL lookup | “Weert” | Automatisch na postcode/huisnr. |
+| Land | **Ja** | Gebruiker | “Nederland” | Standaard “Nederland”; anders handmatig kiezen. |
+| Telefoon | Nee | Gebruiker | “0431234567” | Alleen cijfers; geen spaties of + als niet vereist. |
+| Telefoon (mobiel) | Aanbevolen | Gebruiker | “0612345678” | Nodig voor snelle bereikbaarheid. |
+| Emailadres | Aanbevolen | Gebruiker | “naam@domein.nl” | Geen spaties/komma’s; kleine letters aanbevolen. |
+| Open PostNL Straatnaam (postadres) | Nee | PostNL lookup | — | Alleen invullen indien afwijkend postadres. |
+| … Postadres velden | Nee | PostNL lookup/gebruik | — | Vul compleet of laat alles leeg bij ‘zelfde als woonadres’. |
+| Geboortedatum | Aanbevolen | Gebruiker | dd-mm-jjjj | Belangrijk voor ontdubbelen/rapportages. |
+| Geboorteplaats | Aanbevolen | Gebruiker | “Heerlen” |  |
+| Geboorteland | Aanbevolen | Gebruiker | “Nederland” |  |
+| Gezinsnummer (oud) | Nee | Historie | — | Alleen bij migratie/opschoning. |
+| Hoofdbewoner van dit adres? | **Ja** | Gebruiker | Ja/Nee | Markeer **Ja** voor het huishouden-hoofd. |
+| Gezinsrelatie\woonrelatie | Aanbevolen | Gebruiker | Partner/Kind/Ouder | Koppelen voor correcte gezinskaarten. |
+| Burgerlijke staat | Aanbevolen | Gebruiker | Ongehuwd/Gehuwd e.d. |  |
+| Weduwstaat sinds | Nee | Gebruiker | dd-mm-jjjj | Alleen indien van toepassing. |
+| Datum huwelijk | Nee | Gebruiker | dd-mm-jjjj |  |
+| Echtgeno(o)t(e) DocBase-ID | Aanbevolen | Koppeling | numeriek | Gebruik relatie-koppeling i.p.v. dubbel invoeren. |
+| Achternaam echtgeno(o)t(e) | Aanbevolen | Gebruiker | — | Ter controle weergave. |
+| Datum ontbinding huwelijk | Nee | Gebruiker | dd-mm-jjjj |  |
+| Overlijdensdatum | Nee | Gebruiker | dd-mm-jjjj |  |
+| Overlijdensleeftijd | Nee | Systeem/gebruik | jaren | Afgeleid veld. |
+| Geografisch parochienaam | Aanbevolen | Gebruiker | — | Voor territoriale parochiekoppeling. |
+| Geografisch parochieplaats | Aanbevolen | Gebruiker | — |  |
+| Geografisch parochienummer | Aanbevolen | Gebruiker | numeriek |  |
+| Geografisch locatienaam | Aanbevolen | Gebruiker | — |  |
+| Geografisch locatienummer | Aanbevolen | Gebruiker | numeriek |  |
+| Voorkeursparochie DocBase-ID | Optioneel | Gebruiker | numeriek | Alleen invullen bij **voorkeursparochie**. |
+| Voorkeur parochienaam/plaats/nr./locatie | Optioneel | Gebruiker | — | Niet invullen als geo-parochie leidend is. |
+| Bij voorkeursparochie sinds | Optioneel | Gebruiker | dd-mm-jjjj |  |
+| Geloofsovertuiging | Optioneel | Gebruiker | — | Alleen indien geregistreerd gewenst/noodzakelijk. |
+| IBANnr. (primair) | Aanbevolen | Gebruiker | NLkk BBBB CCCC CCCC CC | Zonder spaties invoeren indien systeem zo vereist. |
+| IBANnr. (secundair-1/2) | Optioneel | Gebruiker | idem |  |
+| Correspondentievoorkeur | **Ja** | Gebruiker | Post / E-mail / Geen | Bepaalt mailings/etiketten. |
+| Wijknaam / Wijknummer / Bezorgwijk / Wijksectie | Optioneel | Gebruiker | — | Alleen gebruiken als uw bezorgmodel dit vereist. |
+| Wijkbezorger / Wijk contactpersoon | Optioneel | Gebruiker | — |  |
+| Bezorgingen-ID (relatie) | Optioneel | Gebruiker | numeriek | Koppel i.p.v. vrij tekst. |
+| Vrij veld (1–9) | Optioneel | Gebruiker | — | Gebruik **conform interne afspraken**. |
+| SILA-nummer | Auto/nee | Koppeling | — | **Niet handmatig aanpassen**. |
+| Sila aan- afmelding | Auto/nee | Koppeling | — | Loopt via SILA; niet handmatig wijzigen. |
+| Lidnummer (oud) / char | Optioneel | Historie | — | Alleen bij migratie/opschoning. |
+| Vorig geo-/voork.- parochie/locatie nr. | Optioneel | Historie | — |  |
+| Registratiedatum | Auto/aanbev. | Systeem/gebruik | dd-mm-jjjj | Vaak automatisch (huidige datum); zo niet: invullen. |
+| Registrator | Auto | Systeem | “E.M.J. de Ras” | Gebruikersaccount dat registreert. |
+
+---
 ### Veelgemaakte fouten
-- Nieuw lid aanmaken zonder dubbelen te zoeken → dubbele personen.
-- Status “Lokale relatie/Gast” kiezen in plaats van “Ingeschreven”.
-- Vanaf-datum vergeten.
-- Huisnummertoevoeging weglaten → fout in adres/mailing.
-- Doopdatum in verkeerd formaat of bij de verkeerde persoon.
-- Kind als apart huishouden registreren i.p.v. koppelen aan ouders.
-- Voorkeursparochie verkeerd gebruiken → verkeerde tellingen.
-- E‑mail met spaties of hoofdletters → hogere kans op bounces.
+- **Relatiestatus** onjuist (Gast/Lokale relatie i.p.v. Ingeschreven) → komt niet mee in tellingen.
+- **Adres** niet via PostNL-lookup ingevuld → ongeldige straat/plaats, retourpost.
+- **Huisnummer toevoeging** vergeten → foutieve bezorging/selecties.
+- **Hoofdbewoner** niet aangevinkt → huishouden/gezinskaarten kloppen niet.
+- **Voorkeursparochie** gebruikt i.p.v. geografische parochie (of omgekeerd) → dubbele/missende leden.
+- **SILA**-velden handmatig aangepast → afwijking met landelijke registratie.
 
-### Kwaliteitscheck (checklist)
-- [ ] Zoekactie (naam + geboortedatum) levert maximaal 1 record op.
-- [ ] Parochie correct, Status = Ingeschreven, Vanaf-datum gevuld.
-- [ ] Adres via postcode-service; postcode in 1234AB‑vorm.
-- [ ] Huishouden correct (hoofd, partner/kinderen gekoppeld).
-- [ ] Taal/aanhef en correspondentie ingesteld; e‑mail/telefoon gecontroleerd.
-- [ ] Doop ingevuld (datum, kerk, plaats) + eventuele bijlage.
-- [ ] Communie/Vormsel ingevuld of gemarkeerd als onbekend.
-- [ ] Lid staat in “Nieuwe inschrijvingen”.
-
-### Uitzonderingen
-- Overkomst uit andere parochie: gebruik Overkomst/Vertrek; maak geen nieuw persoon aan.
-- Minderjarigen: registreer via huishouden van ouder/voogd; beperkte eigen contactgegevens.
-- Buitenlands adres: voer handmatig in; controleer landcode.
-- Onbekende doopdatum: vul wat u weet (bijv. jaar) en noteer dat dit onvolledig is.
-- Tijdelijke pastorale gast: kies Gast/Lokale relatie, niet Ingeschreven."
+### Kwaliteitscheck (kort)
+- [ ] Zoeken op dubbelen gedaan (naam + geboortedatum).
+- [ ] Achternaam + kernnaamvelden correct, relatiestatus = **Ingeschreven**.
+- [ ] Adres via PostNL compleet (straat, nr, toevoeging, postcode **1234AB**, plaats, land).
+- [ ] **Hoofdbewoner** correct; gezinsrelaties gekoppeld (partner/kind/ouders).
+- [ ] Correspondentievoorkeur gezet; e-mail/telefoon gevalideerd.
+- [ ] Parochie-koppeling correct (geo óf voorkeursparochie).
+- [ ] Registratiedatum/registrator akkoord."
 D1175;DocBase;Ledenadministratie;Ledenadministratie;Nieuw kind registreren (met doop);Operationele werkinstructie met exacte klikpaden, parochie-/wijk-specifiek.;Procedure;"### Kort vooraf (waarom)
 - Concreet klikpad + controles leveren betrouwbare data en auditsporen. ## Stappenplan
 **Klikpad (exacte labels):**
