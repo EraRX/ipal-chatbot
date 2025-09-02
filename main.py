@@ -1,8 +1,7 @@
-
-# IPAL Chatbox — main.py (simpel-weergave: bronblok verdwijnt)
+# IPAL Chatbox — main.py (simpel-weergave + nette PDF-opmaak)
 # - Chat-wizard: Exact | DocBase | Zoeken | Internet
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
-# - PDF met banner/logo + Copy
+# - PDF met banner/logo + Copy (AI-INFO wordt niet in hoofdtekst PDF gezet; FAQ-links wel)
 # - CSV robustness + smart quotes fix
 # - Auto-simple uitleg (vervangt het ruwe bronantwoord i.p.v. eraan toe te voegen)
 
@@ -121,47 +120,107 @@ AI-Antwoord Info:
 if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
-def _strip_md(s: str) -> str:
-    s = re.sub(r"\*\*([^*]+)\*\*", r"\1", s)
-    s = re.sub(r"#+\s*([^\n]+)", r"\1", s)
-    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)
-    return s
+# ── Helpers voor PDF/chat-inhoud ────────────────────────────────────────────
+def remove_ai_info(text: str) -> str:
+    """Knipt het 'AI-Antwoord Info:'-blok uit een chat/cascade-antwoord (case-insensitive)."""
+    if not text:
+        return ""
+    parts = re.split(r"(?i)\bAI-Antwoord Info:\b", text, maxsplit=1)
+    return parts[0].rstrip()
 
-def _parse_ai_info(ai_info: str) -> tuple[list[str], bool]:
-    numbered: list[str] = []
-    show_click = False
-    for raw in (ai_info or "").splitlines():
+def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
+    """Eenvoudige Markdown → ReportLab flowables (###/####, bullets, 1., - [ ] / - [x])."""
+    from reportlab.platypus import Paragraph, Spacer, ListFlowable, ListItem
+
+    if not text:
+        return []
+
+    lines = [ln.rstrip() for ln in text.splitlines()]
+    flow = []
+    body = styles["Body"]; h3 = styles["H3"]; h4 = styles["H4"]
+
+    list_buf = []
+    list_type = None  # "ul" | "ol"
+
+    def flush_list():
+        nonlocal list_buf, list_type
+        if not list_buf:
+            return
+        items = [ListItem(Paragraph(clean_text(item), body), leftIndent=12) for item in list_buf]
+        flow.append(ListFlowable(items, bulletType=("1" if list_type == "ol" else "bullet")))
+        list_buf = []; list_type = None
+
+    for raw in lines:
         line = raw.strip()
+
+        # lege regel
         if not line:
+            flush_list()
+            flow.append(Spacer(1, 6))
             continue
-        if line.startswith("- ["):
-            break
-        if line.lower().startswith("ai-antwoord info"):
+
+        # #### / ### koppen
+        m4 = re.match(r"^####\s+(.*)$", line)
+        if m4:
+            flush_list()
+            flow.append(Paragraph(clean_text(m4.group(1)), h4))
             continue
-        m = re.match(r"^(\d+)\.\s*(.*)$", line)
-        if m:
-            txt = m.group(2)
-            key = "Klik hieronder om de FAQ te openen"
-            if key in txt:
-                txt = txt.split(key, 1)[0].strip()
-                show_click = True
-            txt = clean_text(_strip_md(txt))
-            if txt:
-                numbered.append(txt)
-        else:
-            if numbered:
-                extra = clean_text(_strip_md(line))
-                if extra:
-                    numbered[-1] += " + " + extra
-    if not show_click and "Klik hieronder om de FAQ te openen" in (ai_info or ""):
-        show_click = True
-    return numbered, show_click
 
-def make_pdf(question: str, answer: str) -> bytes:
-    question = clean_text(question or "")
-    answer = clean_text(_strip_md(answer or ""))
+        m3 = re.match(r"^###\s+(.*)$", line)
+        if m3:
+            flush_list()
+            flow.append(Paragraph(clean_text(m3.group(1)), h3))
+            continue
 
-    numbered_items, show_click = _parse_ai_info(AI_INFO)
+        # Checkbox-lijst: "- [ ] ..." of "- [x] ..."
+        m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
+        if m_cb:
+            mark = "x" if m_cb.group(1).lower() == "x" else " "
+            txt  = f"[{mark}] {m_cb.group(2)}"
+            if list_type not in (None, "ul"):
+                flush_list()
+            list_type = "ul"
+            list_buf.append(txt)
+            continue
+
+        # Ongeordende lijst "- " of "* "
+        m_ul = re.match(r"^[-*]\s+(.*)$", line)
+        if m_ul:
+            if list_type not in (None, "ul"):
+                flush_list()
+            list_type = "ul"
+            list_buf.append(m_ul.group(1))
+            continue
+
+        # Genummerde lijst "1. " of "1) "
+        m_ol = re.match(r"^\d+[.)]\s+(.*)$", line)
+        if m_ol:
+            if list_type not in (None, "ol"):
+                flush_list()
+            list_type = "ol"
+            list_buf.append(m_ol.group(1))
+            continue
+
+        # Gewone alinea
+        flush_list()
+        flow.append(Paragraph(clean_text(line), body))
+
+    flush_list()
+    return flow
+
+def make_pdf(question: str, answer_markdown: str) -> bytes:
+    """PDF met nette opmaak uit eenvoudige Markdown.
+       - AI-INFO uit chat/cascade wordt automatisch weggeknipt uit de hoofdtekst.
+       - FAQ-links komen standaard onderaan."""
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_LEFT
+    from reportlab.lib.units import cm
+    from reportlab.lib import colors
+
+    question  = clean_text(question or "")
+    answer_md = remove_ai_info((answer_markdown or "").strip())
 
     buffer = io.BytesIO()
     left = right = top = bottom = 2 * cm
@@ -171,16 +230,30 @@ def make_pdf(question: str, answer: str) -> bytes:
     )
     content_width = A4[0] - left - right
 
+    # Styles
     styles = getSampleStyleSheet()
-    body_style = ParagraphStyle(
+    styles.add(ParagraphStyle(
         "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
-    )
-    heading_style = ParagraphStyle(
+        fontSize=11, leading=16, spaceAfter=6, alignment=TA_LEFT
+    ))
+    styles.add(ParagraphStyle(
         "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
         fontSize=14, leading=18, textColor=colors.HexColor("#333"),
         spaceBefore=12, spaceAfter=6
-    )
+    ))
+    styles.add(ParagraphStyle(
+        "H3", parent=styles["Heading3"], fontName="Helvetica-Bold",
+        fontSize=12, leading=16, textColor=colors.HexColor("#333"),
+        spaceBefore=8, spaceAfter=4
+    ))
+    styles.add(ParagraphStyle(
+        "H4", parent=styles["Heading4"], fontName="Helvetica-Bold",
+        fontSize=11, leading=15, textColor=colors.HexColor("#333"),
+        spaceBefore=6, spaceAfter=3
+    ))
+
+    body_style    = styles["Body"]
+    heading_style = styles["Heading"]
 
     story = []
 
@@ -195,24 +268,17 @@ def make_pdf(question: str, answer: str) -> bytes:
         except Exception as e:
             logging.error(f"Kon banner niet laden: {e}")
 
+    # Koppen
     story.append(Paragraph(f"Vraag: {question}", heading_style))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 10))
     story.append(Paragraph("Antwoord:", heading_style))
-    for line in (answer.split("\n") if answer else []):
-        line = line.strip()
-        if line:
-            story.append(Paragraph(line, body_style))
 
-    if numbered_items:
-        story.append(Spacer(1, 12))
-        story.append(Paragraph("AI-Antwoord Info:", heading_style))
-        list_items = [ListItem(Paragraph(item, body_style), leftIndent=12) for item in numbered_items]
-        story.append(ListFlowable(list_items, bulletType="1"))
+    # Inhoud uit eenvoudige Markdown
+    story.extend(_parse_simple_markdown_to_flowables(answer_md, styles))
 
+    # FAQ-links onderaan (blijven altijd staan)
     story.append(Spacer(1, 12))
-    if show_click:
-        story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
-
+    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
     link_items = []
     for label, url in FAQ_LINKS:
         p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
@@ -442,7 +508,7 @@ def simple_from_source(text: str) -> str:
 
 def enrich_with_simple(answer: str) -> str:
     """
-    NIEUW: vervangt het ruwe bronantwoord door de eenvoudige uitleg.
+    Vervangt het ruwe bronantwoord door de eenvoudige uitleg.
     Hierdoor verdwijnt het 'vette onopgemaakte' blok boven de nette uitleg.
     """
     simple = simple_from_source(answer)
@@ -508,7 +574,7 @@ def add_msg(role: str, content: str):
 
 def with_info(text: str) -> str:
     txt = (text or "").strip()
-    # GEEN clean_text meer → newlines blijven staan en Markdown rendert netjes
+    # GEEN clean_text hier → newlines blijven staan en Markdown rendert netjes
     return f"{txt}\n\n{AI_INFO}".strip()
 
 def _copy_button(text: str, key_suffix: str):
@@ -556,6 +622,7 @@ def _render_actionbar():
         return
     st.divider()
     st.caption("Acties voor het laatste antwoord:")
+    # Maak PDF van zichtbare content; AI-INFO wordt binnen make_pdf weggeknipt
     pdf = make_pdf(ab["question"], ab["content"])
     st.download_button(
         "📄 Download PDF", data=pdf, file_name="antwoord.pdf",
@@ -619,7 +686,7 @@ def chat_wizard():
             st.session_state.update({"chat_scope": "Zoeken", "chat_step": "ask_topic"})
             add_msg("assistant", "Waar wilt u in de kennisbank op zoeken? Typ een korte zoekterm.")
             st.rerun()
-        if c4.button("Internet", key="wizard_internet", use_container_width=True):
+        if c4.button("Internet", use_container_width=True, key="wizard_internet"):
             st.session_state.update({"chat_scope": "Algemeen", "chat_step": "ask_topic"})
             add_msg("assistant", "Waarover gaat uw vraag? Beschrijf dit kort in één zin.")
             st.rerun()
@@ -924,7 +991,8 @@ def main():
 
                     # Kopieer en PDF
                     _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
-                    pdf = make_pdf(label, final_ans)  # PDF: schoon antwoord zonder AI-INFO
+                    # PDF: je kunt display_ans meegeven (AI-INFO wordt automatisch weggeknipt)
+                    pdf = make_pdf(label, final_ans)
                     st.download_button(
                         "📄 Download PDF",
                         data=pdf,
@@ -946,8 +1014,5 @@ def main():
         chat_wizard()
         return
 
-
 if __name__ == "__main__":
     main()
-
-
