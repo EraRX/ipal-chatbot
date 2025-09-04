@@ -1023,7 +1023,7 @@ def main():
 
             # 7) Antwoord of oplossing
             if sel_soort != "(Kies)":
-                st.markdown("**7) Antwoord of oplossing even geduld**")
+                st.markdown("**7) Antwoord of oplossing komt eraan, even geduld aub**")
 
                 if step6.empty:
                     st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
@@ -1081,5 +1081,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
