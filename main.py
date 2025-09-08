@@ -860,8 +860,7 @@ def chat_wizard():
             if hits.empty:
                 add_msg("assistant", "Ik vond geen andere goede match. Formuleer het anders of kies **Internet**.")
             else:
-                st.session_state["chat_results"] = hits.to_dict("records"]
-                )
+                st.session_state["chat_results"] = hits.to_dict("records")
                 st.session_state["chat_step"] = "pick_item"
                 add_msg("assistant", "Ik heb nieuwe opties gevonden. Kies hieronder een ander item.")
             st.rerun(); return
@@ -1055,3 +1054,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
