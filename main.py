@@ -1,9 +1,10 @@
 # IPAL Chatbox — main.py (simpel-weergave + nette PDF-opmaak)
 # - Chat-wizard: Exact | DocBase | Zoeken | Internet
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
-# - PDF met banner/logo + Copy (AI-INFO onderaan, zonder hyperlink-code)
+# - PDF met banner/logo + Copy
 # - CSV robustness + smart quotes fix
 # - Auto-simple uitleg (vervangt het ruwe bronantwoord i.p.v. eraan toe te voegen)
+# - PDF: doorlopende 1..N, sub-bullets, checkboxes; AI-INFO + klikbare FAQ-links
 
 import os
 import re
@@ -121,40 +122,30 @@ if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
 # ── Helpers voor PDF/chat-inhoud ────────────────────────────────────────────
-def with_info(text: str) -> str:
-    txt = (text or "").strip()
-    # GEEN clean_text hier → newlines blijven staan en Markdown rendert netjes
-    return f"{txt}\n\n{AI_INFO}".strip()
-
 def remove_ai_info(text: str) -> str:
-    """
-    Knipt het hele AI-INFO-blok weg (ongeacht rare streepjes/whitespace)
-    zodat er géén markdown-links of “hyperlink-code” in de PDF belanden.
-    """
+    """Knipt het hele AI-INFO-blok uit de tekst (zodat we het netjes opnieuw kunnen zetten in de PDF)."""
     if not text:
         return ""
     pattern = r"(?is)\bAI[\-\u2011\u2013\u2014\u00A0 ]?Antwoord\s*Info\s*:\s*.*$"
     return re.sub(pattern, "", text).rstrip()
 
 def _md_inline_to_paragraph_text(s: str) -> str:
-    """
-    Simpele Markdown inline -> ReportLab:
-    **vet** -> <b>..</b>, *cursief* -> <i>..</i>. (&, <, >, " worden ge-escaped)
-    """
+    """Zet simpele Markdown inline om naar ReportLab-paragraph markup (bold/italic) en escape HTML-tekens."""
     from xml.sax.saxutils import escape
     if not s:
         return ""
     t = escape(s, entities={'"': "&quot;"})
-    t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)                       # bold
-    t = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<i>\1</i>", t)              # italic
+    t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)                      # **vet**
+    t = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<i>\1</i>", t)            # *cursief*
     return t
 
 def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     """
-    Bouwt nette PDF-opmaak voor eenvoudige Markdown in het antwoord:
+    PDF-opmaak van eenvoudige Markdown:
     - ### / #### koppen
-    - DOORTELLEN van hoofd-stappen (1., 2., 3., …), ook met sub-bullets
-    - Sub-bullets met • / - / * en checkbox bullets - [ ] / - [x]
+    - Genummerde hoofd-stappen (1., 1) of '1 ' → DOORTELLING via ListFlowable(bulletType='1')
+    - Sub-bullets (•, -, *), en checkboxbullets - [ ] / - [x] → ☐ / ☑
+    - Losse bullets buiten OL blijven bullets
     """
     if not text:
         return []
@@ -163,9 +154,9 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     flow = []
     body = styles["Body"]; h3 = styles["H3"]; h4 = styles["H4"]
 
-    ol_items = []       # lijst van (title:str, subs:list[str])
-    current_ol = None   # {'title': str, 'subs': [str]}
-    ul_buf = []         # losse bullets buiten een OL
+    ol_items = []                  # (title:str, subs:list[str])
+    current_ol = None              # {"title": str, "subs": []}
+    ul_buf = []                    # losse bullets buiten OL
 
     def flush_ul():
         nonlocal ul_buf
@@ -198,13 +189,12 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     for raw in lines:
         line = raw.strip()
 
-        # Lege regel -> kleine spacer; sluit losse UL (niet de OL-groep)
         if not line:
             flush_ul()
             flow.append(Spacer(1, 6))
             continue
 
-        # #### / ### koppen sluiten ALLE buffers
+        # #### / ### headings sluiten buffers
         m4 = re.match(r"^####\s+(.*)$", line)
         if m4:
             flush_ul(); flush_ol()
@@ -217,15 +207,15 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
             flow.append(Paragraph(_md_inline_to_paragraph_text(m3.group(1)), h3))
             continue
 
-        # Hoofd-stap: "1. ..." of "1) ..."
-        m_ol = re.match(r"^\d+[.)]\s+(.*)$", line)
+        # Ordered list hoofd-stap: 1. ... of 1) ... of "1 ..." (met spatie)
+        m_ol = re.match(r"^\d+(?:[.)]|\s)\s*(.*)$", line)
         if m_ol:
             if current_ol:
                 ol_items.append((current_ol["title"], current_ol["subs"]))
             current_ol = {"title": m_ol.group(1), "subs": []}
             continue
 
-        # Checkbox bullet
+        # Checkbox bullets: - [ ] ... of - [x] ...
         m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
         if m_cb:
             mark = "☑" if m_cb.group(1).lower() == "x" else "☐"
@@ -236,8 +226,8 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
                 ul_buf.append(txt)
             continue
 
-        # Bullets: "• ..." of "- ..." of "* ..."
-        m_ul = re.match(r"^[\u2022\-\*]\s+(.*)$", line)  # \u2022 == "•"
+        # Bullets: • ... of - ... of * ...
+        m_ul = re.match(r"^[\u2022\-\*]\s+(.*)$", line)
         if m_ul:
             if current_ol:
                 current_ol["subs"].append(m_ul.group(1))
@@ -249,44 +239,57 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
         flush_ul(); flush_ol()
         flow.append(Paragraph(_md_inline_to_paragraph_text(line), body))
 
-    # Einde tekst
     flush_ul(); flush_ol()
     return flow
 
 def _extract_ai_info_points(ai_info: str) -> list[str]:
-    """
-    Haalt ALLEEN de genummerde regels 1/2 uit AI_INFO.
-    Robuust voor '1.' én '1 ' (punt optioneel). Links worden genegeerd.
-    """
+    """Pak de twee genummerde regels (1., 2.) uit AI_INFO en voeg doorlopende regel(s) samen."""
     points = []
+    cur = None
     for raw in (ai_info or "").splitlines():
-        s = raw.strip()
-        if not s:
+        line = raw.strip()
+        if not line:
             continue
-        if re.match(r"^-\s*\[", s):         # start van link-lijst -> stop
+        if line.lower().startswith("ai-antwoord info"):
+            continue
+        if line.lower().startswith("klik hieronder"):
             break
-        if re.match(r"(?i)^ai[\-\u2011\u2013\u2014\u00A0 ]?antwoord\s*info\s*:", s):
-            continue
-        m = re.match(r"^(\d+)[\.\)]?\s+(.*)$", s)  # '1.' of '1 ' of '1)'
+        if re.match(r"^\-\s*\[", line):
+            break
+        m = re.match(r"^\d+[.)]\s+(.*)$", line)
         if m:
-            txt = clean_text(re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", m.group(2)))  # strip inline markdown link
-            points.append(txt)
+            if cur:
+                points.append(cur.strip())
+            cur = m.group(1)
         else:
-            # regel na een punt -> voeg samen met vorige
-            if points:
-                extra = clean_text(re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", s))
-                if extra:
-                    points[-1] += " " + extra
-    return points
+            if cur:
+                cur += " " + line
+    if cur:
+        points.append(cur.strip())
+    return points[:2]
+
+def _extract_ai_info_links(ai_info: str) -> list[tuple[str, str]]:
+    """Pak '- [Label](URL)' regels uit AI_INFO als (label, url)."""
+    links = []
+    for raw in (ai_info or "").splitlines():
+        m = re.match(r"^\-\s*\[([^\]]+)\]\(([^)]+)\)", raw.strip())
+        if m:
+            label = clean_text(m.group(1))
+            url   = m.group(2).strip()
+            links.append((label, url))
+    return links
 
 def make_pdf(question: str, answer: str) -> bytes:
     """
     Bouwt de PDF:
     - Antwoord met nette layout (koppen, doorlopende 1..N, sub-bullets, checkboxes)
-    - Onderaan: AI-Antwoord Info (2 genummerde regels), zónder link-lijst
+    - Onderaan: AI-Antwoord Info (2 genummerde regels)
+    - Daaronder: 'Klik hieronder...' met twee klikbare FAQ-links (zonder kale URL-tekst)
     """
+    from xml.sax.saxutils import escape
+
     question = clean_text(question or "")
-    # Als de zichtbare content AI-INFO bevat, knip die eerst weg
+    # Knip AI-INFO uit de hoofdtekst; we voegen die onderaan gestructureerd toe.
     answer_no_info = remove_ai_info(answer or "")
 
     buffer = io.BytesIO()
@@ -298,10 +301,10 @@ def make_pdf(question: str, answer: str) -> bytes:
     content_width = A4[0] - left - right
 
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle("Body",    parent=styles["Normal"],  fontName="Helvetica",       fontSize=11, leading=16, spaceAfter=10, alignment=TA_LEFT))
-    styles.add(ParagraphStyle("Heading", parent=styles["Heading2"],fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333"), spaceBefore=12, spaceAfter=6))
-    styles.add(ParagraphStyle("H3",      parent=styles["Heading3"],fontName="Helvetica-Bold", fontSize=12, leading=16, spaceBefore=8,  spaceAfter=4))
-    styles.add(ParagraphStyle("H4",      parent=styles["Heading4"],fontName="Helvetica-Bold", fontSize=11, leading=14, spaceBefore=6,  spaceAfter=2))
+    styles.add(ParagraphStyle("Body",    parent=styles["Normal"],   fontName="Helvetica",       fontSize=11, leading=16, spaceAfter=10, alignment=TA_LEFT))
+    styles.add(ParagraphStyle("Heading", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=14, leading=18, textColor=colors.HexColor("#333"), spaceBefore=12, spaceAfter=6))
+    styles.add(ParagraphStyle("H3",      parent=styles["Heading3"], fontName="Helvetica-Bold", fontSize=12, leading=16, spaceBefore=8,  spaceAfter=4))
+    styles.add(ParagraphStyle("H4",      parent=styles["Heading4"], fontName="Helvetica-Bold", fontSize=11, leading=14, spaceBefore=6,  spaceAfter=2))
 
     story = []
 
@@ -324,13 +327,24 @@ def make_pdf(question: str, answer: str) -> bytes:
     story.append(Paragraph("Antwoord:", styles["Heading"]))
     story.extend(_parse_simple_markdown_to_flowables(answer_no_info, styles))
 
-    # AI-Antwoord Info (altijd NA het antwoord)
+    # AI-Antwoord Info (twee genummerde regels)
     ai_points = _extract_ai_info_points(AI_INFO)
     if ai_points:
         story.append(Spacer(1, 12))
         story.append(Paragraph("AI-Antwoord Info:", styles["Heading"]))
         items = [ListItem(Paragraph(_md_inline_to_paragraph_text(p), styles["Body"]), leftIndent=12) for p in ai_points]
         story.append(ListFlowable(items, bulletType="1"))
+
+    # “Klik hieronder…” + klikbare links
+    ai_links = _extract_ai_info_links(AI_INFO)
+    if ai_links:
+        story.append(Spacer(1, 6))
+        story.append(Paragraph("Klik hieronder om de FAQ te openen:", styles["H4"]))
+        link_items = []
+        for label, url in ai_links:
+            p = Paragraph(f'<link href="{escape(url)}" color="blue">{_md_inline_to_paragraph_text(label)}</link>', styles["Body"])
+            link_items.append(ListItem(p, leftIndent=12))
+        story.append(ListFlowable(link_items, bulletType="bullet"))
 
     doc.build(story)
     buffer.seek(0)
@@ -554,10 +568,7 @@ def simple_from_source(text: str) -> str:
     return simplify_text(txt)
 
 def enrich_with_simple(answer: str) -> str:
-    """
-    Vervangt het ruwe bronantwoord door de eenvoudige uitleg.
-    Hierdoor verdwijnt het 'vette onopgemaakte' blok boven de nette uitleg.
-    """
+    """Vervangt het ruwe bronantwoord door de eenvoudige uitleg."""
     simple = simple_from_source(answer)
     return simple or (answer or "")
 
@@ -568,7 +579,7 @@ def fetch_web_info_cached(query: str) -> Optional[str]:
     try:
         r = requests.get("https://docbase.nl", timeout=5); r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
+        txt = " " .join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
         if txt and (query or "").lower() in txt.lower():
             result.append(f"Vanuit docbase.nl: {txt[:200]}... (verkort)")
     except Exception:
@@ -576,7 +587,7 @@ def fetch_web_info_cached(query: str) -> Optional[str]:
     try:
         r = requests.get("https://support.exactonline.com/community/s/knowledge-base", timeout=5); r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        txt = " ".join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
+        txt = " " .join(p.get_text(strip=True) for p in soup.find_all(['p','h1','h2','h3']))
         if txt and (query or "").lower() in txt.lower():
             result.append(f"Vanuit Exact Online Knowledge Base: {txt[:200]}... (verkort)")
     except Exception:
@@ -618,6 +629,11 @@ def add_msg(role: str, content: str):
     if st.session_state.history and st.session_state.history[-1].get("content") == content and st.session_state.history[-1].get("role") == role:
         return
     st.session_state.history = (st.session_state.history + [{"role": role, "content": content, "time": ts}])[-MAX_HISTORY:]
+
+def with_info(text: str) -> str:
+    txt = (text or "").strip()
+    # GEEN clean_text hier → newlines blijven staan en Markdown rendert netjes
+    return f"{txt}\n\n{AI_INFO}".strip()
 
 def _copy_button(text: str, key_suffix: str):
     payload = text or ""
@@ -664,8 +680,7 @@ def _render_actionbar():
         return
     st.divider()
     st.caption("Acties voor het laatste antwoord:")
-    # Maak PDF van zichtbare content; AI-INFO wordt binnen make_pdf weggeknipt en onderaan netjes toegevoegd
-    pdf = make_pdf(ab["question"], ab["content"])
+    pdf = make_pdf(ab["question"], ab["content"])  # content bevat AI_INFO; wordt in PDF opnieuw netjes opgebouwd
     st.download_button(
         "📄 Download PDF", data=pdf, file_name="antwoord.pdf",
         mime="application/pdf", key=f"pdf_{hash(ab['question']+ab['content'])}"
@@ -911,7 +926,7 @@ def _show_item_answer(idx: int):
     row = pd.Series(opts[idx])
     ans = clean_text(str(row.get('Antwoord of oplossing', '') or '').strip())
     if not ans:
-        oms = clean_text(str(row.get('Omschrijving melding', '') or '').strip())
+        oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
         ans = f"(Geen uitgewerkt antwoord in onze kennisbank voor: {oms})"
     label = _mk_label(idx, row)
     img = clean_text(str(row.get('Afbeelding', '') or '').strip())
@@ -1015,7 +1030,7 @@ def main():
                         final_ans = "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
 
                     # Toon antwoord + AI-INFO binnen de cascade
-                    display_ans = with_info(final_ans)
+                    display_ans = f"{final_ans}\n\n{AI_INFO}"
                     st.markdown(display_ans)
 
                     # Eventuele afbeelding
@@ -1031,9 +1046,8 @@ def main():
                     st.session_state["last_item_label"] = label
                     st.session_state["last_question"]   = label
 
-                    # Kopieer en PDF
+                    # Kopieer en PDF (PDF bouwt AI-INFO en links zelf in nette vorm op)
                     _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
-                    # PDF van zichtbare content (AI-INFO wordt binnen make_pdf weggeknipt en onderaan toegevoegd)
                     pdf = make_pdf(label, display_ans)
                     st.download_button(
                         "📄 Download PDF",
