@@ -34,7 +34,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 
 # PDF
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
+    SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem, KeepTogether
 )
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -121,64 +121,51 @@ if os.path.exists("Calibri.ttf"):
     pdfmetrics.registerFont(TTFont("Calibri", "Calibri.ttf"))
 
 # ── Helpers voor PDF/chat-inhoud ────────────────────────────────────────────
-# ── Helpers voor PDF/chat-inhoud (VERVANGBLOK) ──────────────────────────────
 def remove_ai_info(text: str) -> str:
     """
-    Knipt het hele AI-INFO-blok weg (ook als er rare streepjes/whitespace staan)
-    zodat er géén markdown-links of “hyperlink-code” in de PDF belanden.
+    Knipt het hele AI-INFO-blok weg (ook als er variaties in streepjes/whitespace zijn)
+    zodat er géén AI-INFO in de PDF-antwoordsectie belandt.
     """
     if not text:
         return ""
-    # match: "AI-Antwoord Info:" (met gewone/minus/en-dash/non-breaking hyphen), case-insensitive
     pattern = r"(?is)\bAI[\-\u2011\u2013\u2014\u00A0 ]?Antwoord\s*Info\s*:\s*.*$"
     return re.sub(pattern, "", text).rstrip()
-
 
 def _md_inline_to_paragraph_text(s: str) -> str:
     """
     Zet simpele Markdown inline om naar ReportLab-paragraph markup.
     - **vet** -> <b>vet</b>
     - *cursief* -> <i>cursief</i>
-    Houdt verder alle tekst ‘veilig’ (escape &<>).
+    - [label](url) -> label (dus geen ruwe URL in de antwoordtekst)
     """
     from xml.sax.saxutils import escape
     if not s:
         return ""
-    # Eerst escapen, dan de markup terugzetten
+    # Strip markdown links naar alleen label
+    s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", s)
     t = escape(s, entities={'"': "&quot;"})
-    # Bold vóór italic om conflicten te vermijden
-    t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)
-    # Enkelvoudige * ... * (niet overlappende)
-    t = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<i>\1</i>", t)
+    t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)                       # bold
+    t = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<i>\1</i>", t)              # italic
     return t
 
-
-def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
+def _parse_simple_markdown_to_flowables(text: str, styles_map: dict) -> list:
     """
     Maakt nette PDF-opmaak van eenvoudige Markdown:
     - ### / #### koppen
-    - Genummerde hoofd-stappen (1., 2., 3., …) met DOORTELLING, óók als er
-      sub-bullets (• of -) onder elk punt staan.
-    - Sub-bullets (•, -, *), en checkboxbullets - [ ] / - [x] → ☐ / ☑
-    - Losse bullets buiten de genummerde lijst blijven gewone bullets.
-
-    Implementatie: we groeperen elke hoofd-stap (1.) met zijn sub-bullets
-    tot één ListItem; alle ListItems komen in één ListFlowable met bulletType="1".
-    Zo blijft de nummering netjes doorlopen.
+    - Genummerde hoofd-stappen (1., 2., 3., …) met DOORTELLING, óók met sub-bullets
+    - Sub-bullets (•, -, *), en checkbox-bullets - [ ] / - [x] → ☐ / ☑
+    - Losse bullets buiten de genummerde lijst blijven bullets
     """
-    from reportlab.platypus import Paragraph, Spacer, ListFlowable, ListItem, KeepTogether
-
     if not text:
         return []
 
     lines = [ln.rstrip() for ln in text.splitlines()]
     flow = []
-    body = styles["Body"]; h3 = styles["H3"]; h4 = styles["H4"]
+    body = styles_map["Body"]; h3 = styles_map["H3"]; h4 = styles_map["H4"]
 
-    # Buffers voor ‘lopende’ structuren
-    ol_items = []          # lijst van (title:str, subs:list[str])
-    current_ol = None      # dict {'title': str, 'subs': [str]}
-    ul_buf = []            # bullets buiten een ‘lopende’ ordered list
+    ol_items = []        # lijst van (title:str, subs:list[str])
+    current_ol = None    # dict {'title': str, 'subs': [str]}
+    ul_buf = []          # bullets buiten een ‘lopende’ ordered list
 
     def flush_ul():
         nonlocal ul_buf
@@ -230,16 +217,15 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
             flow.append(Paragraph(_md_inline_to_paragraph_text(m3.group(1)), h3))
             continue
 
-        # Hoofd-stap: "1. ..." of "1) ..." (we groeperen tot de volgende hoofd-stap)
+        # Hoofd-stap: "1. ..." of "1) ..."
         m_ol = re.match(r"^\d+[.)]\s+(.*)$", line)
         if m_ol:
-            # start nieuwe OL-item
             if current_ol:
                 ol_items.append((current_ol["title"], current_ol["subs"]))
             current_ol = {"title": m_ol.group(1), "subs": []}
             continue
 
-        # Checkbox bullet: "- [ ] ..." of "- [x] ..." (ook als sub van OL)
+        # Checkbox bullet
         m_cb = re.match(r"^-\s+\[([ xX])\]\s+(.*)$", line)
         if m_cb:
             mark = "☑" if m_cb.group(1).lower() == "x" else "☐"
@@ -267,16 +253,16 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     flush_ul(); flush_ol()
     return flow
 
-
-def make_pdf(question: str, answer: str) -> bytes:
-    # Let op: we laten AI-INFO in de PDF zien als twee genummerde punten,
-    # maar zonder "Klik hieronder..." en zonder linklijst.
-
+def make_pdf(question: str, answer_md: str) -> bytes:
+    """
+    Bouwt de PDF:
+    - 'Vraag'
+    - 'Antwoord' gerenderd uit Markdown (kopjes, bullets, 1..N nummering)
+    - Onderaan: FAQ-links (klikbaar). AI-INFO wordt NIET toegevoegd aan de hoofdtekst.
+    """
     question = clean_text(question or "")
-    answer   = clean_text(_strip_md(answer or ""))
-
-    # Haal alleen de genummerde items (1., 2.) uit AI_INFO
-    numbered_items, _ = _parse_ai_info(AI_INFO)  # we negeren show_click
+    # Content die in chat zichtbaar is kan AI-INFO bevatten → eerst verwijderen
+    answer_md = remove_ai_info(answer_md or "")
 
     buffer = io.BytesIO()
     left = right = top = bottom = 2 * cm
@@ -289,13 +275,22 @@ def make_pdf(question: str, answer: str) -> bytes:
     styles = getSampleStyleSheet()
     body_style = ParagraphStyle(
         "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
+        fontSize=11, leading=16, spaceAfter=8, alignment=TA_LEFT
     )
     heading_style = ParagraphStyle(
         "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
         fontSize=14, leading=18, textColor=colors.HexColor("#333"),
         spaceBefore=12, spaceAfter=6
     )
+    h3_style = ParagraphStyle(
+        "H3", parent=styles["Heading3"], fontName="Helvetica-Bold",
+        fontSize=13, leading=17, spaceBefore=8, spaceAfter=4
+    )
+    h4_style = ParagraphStyle(
+        "H4", parent=styles["Heading4"], fontName="Helvetica-Bold",
+        fontSize=12, leading=16, spaceBefore=6, spaceAfter=3
+    )
+    styles_map = {"Body": body_style, "H3": h3_style, "H4": h4_style}
 
     story = []
 
@@ -312,30 +307,25 @@ def make_pdf(question: str, answer: str) -> bytes:
 
     # Vraag
     story.append(Paragraph(f"Vraag: {question}", heading_style))
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 8))
 
-    # Antwoord
+    # Antwoord (Markdown → story)
     story.append(Paragraph("Antwoord:", heading_style))
-    for line in (answer.split("\n") if answer else []):
-        line = line.strip()
-        if line:
-            story.append(Paragraph(line, body_style))
+    story.extend(_parse_simple_markdown_to_flowables(answer_md, styles_map))
 
-    # AI-Antwoord Info (alleen de twee genummerde regels)
-    if numbered_items:
-        story.append(Spacer(1, 12))
-        story.append(Paragraph("AI-Antwoord Info:", heading_style))
-        list_items = [
-            ListItem(Paragraph(item, body_style), leftIndent=12)
-            for item in numbered_items
-        ]
-        story.append(ListFlowable(list_items, bulletType="1"))
+    # FAQ-links onderaan
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
+    link_items = []
+    for label, url in FAQ_LINKS:
+        # Klikbare link in PDF
+        p = Paragraph(f'<link href="{url}">{clean_text(label)}</link>', body_style)
+        link_items.append(ListItem(p, leftIndent=12))
+    story.append(ListFlowable(link_items, bulletType="bullet"))
 
-    # Geen "Klik hieronder..." en geen linklijst in de PDF
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
-
 
 # ── CSV loading + normalization ──────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -870,7 +860,8 @@ def chat_wizard():
             if hits.empty:
                 add_msg("assistant", "Ik vond geen andere goede match. Formuleer het anders of kies **Internet**.")
             else:
-                st.session_state["chat_results"] = hits.to_dict("records")
+                st.session_state["chat_results"] = hits.to_dict("records"]
+                )
                 st.session_state["chat_step"] = "pick_item"
                 add_msg("assistant", "Ik heb nieuwe opties gevonden. Kies hieronder een ander item.")
             st.rerun(); return
@@ -1039,8 +1030,8 @@ def main():
 
                     # Kopieer en PDF
                     _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
-                    # PDF: je kunt display_ans meegeven (AI-INFO wordt automatisch weggeknipt)
-                    pdf = make_pdf(label, final_ans)
+                    # PDF: AI-INFO wordt automatisch weggeknipt; FAQ-links komen onderaan
+                    pdf = make_pdf(label, display_ans)
                     st.download_button(
                         "📄 Download PDF",
                         data=pdf,
@@ -1064,7 +1055,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
