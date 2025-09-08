@@ -268,23 +268,15 @@ def _parse_simple_markdown_to_flowables(text: str, styles) -> list:
     return flow
 
 
-def make_pdf(question: str, answer_markdown: str) -> bytes:
-    """
-    PDF met nette opmaak:
-    - Hoofdstukjes + DOORTELLEN van 1..N voor hoofd-stappen (ook met sub-bullets).
-    - AI-INFO wordt uit de hoofdtekst geknipt.
-    - Onderaan altijd nette FAQ-links (één keer, dus geen dubbele ‘hyperlink-code’).
-    """
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, ListFlowable, ListItem
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_LEFT
-    from reportlab.lib.units import cm
-    from reportlab.lib import colors
+def make_pdf(question: str, answer: str) -> bytes:
+    # Let op: we laten AI-INFO in de PDF zien als twee genummerde punten,
+    # maar zonder "Klik hieronder..." en zonder linklijst.
 
-    question  = clean_text(question or "")
-    # Snij AI-INFO volledig weg uit wat we renderen in de PDF
-    answer_md = remove_ai_info((answer_markdown or "").strip())
+    question = clean_text(question or "")
+    answer   = clean_text(_strip_md(answer or ""))
+
+    # Haal alleen de genummerde items (1., 2.) uit AI_INFO
+    numbered_items, _ = _parse_ai_info(AI_INFO)  # we negeren show_click
 
     buffer = io.BytesIO()
     left = right = top = bottom = 2 * cm
@@ -294,30 +286,16 @@ def make_pdf(question: str, answer_markdown: str) -> bytes:
     )
     content_width = A4[0] - left - right
 
-    # Styles
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(
+    body_style = ParagraphStyle(
         "Body", parent=styles["Normal"], fontName="Helvetica",
-        fontSize=11, leading=16, spaceAfter=6, alignment=TA_LEFT
-    ))
-    styles.add(ParagraphStyle(
+        fontSize=11, leading=16, spaceAfter=12, alignment=TA_LEFT
+    )
+    heading_style = ParagraphStyle(
         "Heading", parent=styles["Heading2"], fontName="Helvetica-Bold",
         fontSize=14, leading=18, textColor=colors.HexColor("#333"),
         spaceBefore=12, spaceAfter=6
-    ))
-    styles.add(ParagraphStyle(
-        "H3", parent=styles["Heading3"], fontName="Helvetica-Bold",
-        fontSize=12, leading=16, textColor=colors.HexColor("#333"),
-        spaceBefore=8, spaceAfter=4
-    ))
-    styles.add(ParagraphStyle(
-        "H4", parent=styles["Heading4"], fontName="Helvetica-Bold",
-        fontSize=11, leading=15, textColor=colors.HexColor("#333"),
-        spaceBefore=6, spaceAfter=3
-    ))
-
-    body_style    = styles["Body"]
-    heading_style = styles["Heading"]
+    )
 
     story = []
 
@@ -332,23 +310,28 @@ def make_pdf(question: str, answer_markdown: str) -> bytes:
         except Exception as e:
             logging.error(f"Kon banner niet laden: {e}")
 
-    # Koppen
+    # Vraag
     story.append(Paragraph(f"Vraag: {question}", heading_style))
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("Antwoord:", heading_style))
-
-    # Inhoud uit eenvoudige Markdown → nette flowables
-    story.extend(_parse_simple_markdown_to_flowables(answer_md, styles))
-
-    # FAQ-links onderaan (één nette sectie, zonder AI-INFO duplicaat)
     story.append(Spacer(1, 12))
-    story.append(Paragraph("Klik hieronder om de FAQ te openen:", heading_style))
-    link_items = []
-    for label, url in FAQ_LINKS:
-        p = Paragraph(f'<link href="{url}" color="blue">{clean_text(label)}</link>', body_style)
-        link_items.append(ListItem(p, leftIndent=12))
-    story.append(ListFlowable(link_items, bulletType="bullet"))
 
+    # Antwoord
+    story.append(Paragraph("Antwoord:", heading_style))
+    for line in (answer.split("\n") if answer else []):
+        line = line.strip()
+        if line:
+            story.append(Paragraph(line, body_style))
+
+    # AI-Antwoord Info (alleen de twee genummerde regels)
+    if numbered_items:
+        story.append(Spacer(1, 12))
+        story.append(Paragraph("AI-Antwoord Info:", heading_style))
+        list_items = [
+            ListItem(Paragraph(item, body_style), leftIndent=12)
+            for item in numbered_items
+        ]
+        story.append(ListFlowable(list_items, bulletType="1"))
+
+    # Geen "Klik hieronder..." en geen linklijst in de PDF
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
@@ -1081,6 +1064,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
