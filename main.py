@@ -964,7 +964,7 @@ def main():
     st.header("Welkom bij IPAL Chatbox")
 
     # ── Klassieke cascade (expander) ─────────────────────────────────────────
-    with st.expander("Liever de klassieke cascade openen?"):
+    with st.expander("Maak hier uw keuze?"):
         if faq_df is None or faq_df.empty:
             st.info("Geen FAQ-gegevens gevonden.")
         else:
@@ -1073,6 +1073,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
