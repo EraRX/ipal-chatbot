@@ -961,7 +961,7 @@ def main():
     else:
         st.info("Welkom bij onze IPAL Chatbox")
 
-    st.header("Welkom bij IPAL Chatbox")
+    st.header("Welkom bij onze IPAL Chatbox")
 
     # ── Klassieke cascade (expander) ─────────────────────────────────────────
     with st.expander("Maak hier uw keuze:"):
@@ -1073,6 +1073,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
