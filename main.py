@@ -959,7 +959,7 @@ def main():
     elif os.path.exists("logo.png"):
         st.image("logo.png", width=244)
     else:
-        st.info("Welkom bij IPAL Chatbox")
+        st.info("Welkom bij onze IPAL Chatbox")
 
     st.header("Welkom bij IPAL Chatbox")
 
@@ -1073,6 +1073,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
