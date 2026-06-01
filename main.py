@@ -1026,7 +1026,7 @@ def main():
 
         with col_refresh:
             st.button(
-                "🔄 Kennisbank vernieuwen",
+                "🔄 Nieuwe vraag",
                 use_container_width=True,
                 key="refresh_kennisbank",
                 on_click=refresh_kennisbank
