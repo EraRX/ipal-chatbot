@@ -1001,6 +1001,10 @@ def main():
             if st.button("🔄 vernieuwen", use_container_width=True, key="refresh_kennisbank"):
                 st.cache_data.clear()
 
+                # Zoekveld leegmaken en zoekbereik terugzetten naar Alles.
+                st.session_state["simple_search_text"] = ""
+                st.session_state["simple_scope"] = "Alles"
+
                 # Reset alleen zoek- en antwoordstatus, niet de hele app-inrichting.
                 for k in [
                     "history", "selected_answer_text", "selected_image",
