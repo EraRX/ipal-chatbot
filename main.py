@@ -998,7 +998,7 @@ def main():
             )
 
         with col_refresh:
-            if st.button("🔄 Kennisbank vernieuwen", use_container_width=True, key="refresh_kennisbank"):
+            if st.button("🔄 vernieuwen", use_container_width=True, key="refresh_kennisbank"):
                 st.cache_data.clear()
 
                 # Reset alleen zoek- en antwoordstatus, niet de hele app-inrichting.
