@@ -619,7 +619,7 @@ DEFAULT_STATE = {
     "allow_ai": True,
     "allow_web": False,
     "auto_simple": False,
-    "chat_mode": True,
+    "chat_mode": False,
     "chat_step": "greet",
     "chat_scope": None,
     "chat_results": [],
@@ -975,8 +975,88 @@ def main():
 
     st.header("Welkom bij onze IPAL Chatbox")
 
+    # ── Eenvoudig zoeken voor vrijwilligers ─────────────────────────────────
+    st.info(
+        "Typ hieronder gewoon wat u zoekt. Bijvoorbeeld: export naar excel, kerkbijdrage, "
+        "abonnement stoppen, adres wijzigen of koppelen partners."
+    )
+
+    if faq_df is None or faq_df.empty:
+        st.warning("Geen FAQ-gegevens gevonden. Controleer of faq.csv aanwezig is.")
+    else:
+        scope_keuze = st.radio(
+            "Waar wilt u zoeken?",
+            ["Alles", "DocBase", "Exact"],
+            horizontal=True,
+            key="simple_scope"
+        )
+        zoekterm = st.text_input(
+            "Waarmee kunnen wij u helpen?",
+            placeholder="Bijvoorbeeld: export naar excel",
+            key="simple_search_text"
+        )
+
+        if zoekterm.strip():
+            scope = None if scope_keuze == "Alles" else scope_keuze
+            resultaten = zoek_in_scope(scope, zoekterm.strip(), topn=8)
+
+            if resultaten.empty:
+                st.warning("Geen passend antwoord gevonden. Probeer een ander zoekwoord, bijvoorbeeld 'export', 'abonnement' of 'kerkbijdrage'.")
+            else:
+                def _simple_label(i: int, row: pd.Series) -> str:
+                    onderwerp = clean_text(str(row.get("Onderwerp", "") or ""))
+                    oms = clean_text(str(row.get("Omschrijving melding", "") or ""))
+                    cat = clean_text(str(row.get("Categorie", "") or ""))
+                    sub = clean_text(str(row.get("Subthema", "") or ""))
+                    titel = onderwerp or oms or cat or sub or clean_text(str(row.get("Antwoord of oplossing", "") or ""))[:80]
+                    context = " / ".join([x for x in [str(row.get("Systeem", "") or ""), sub, cat] if x])
+                    return f"{i+1}. {titel}" + (f"  —  {context}" if context else "")
+
+                resultaten = resultaten.reset_index(drop=True)
+                labels = [_simple_label(i, resultaten.iloc[i]) for i in range(len(resultaten))]
+                keuze = st.radio("Kies het beste passende antwoord:", labels, key="simple_result_choice")
+                idx = labels.index(keuze)
+                row = resultaten.iloc[idx]
+
+                if st.button("Toon antwoord", key="simple_show_answer", use_container_width=True):
+                    antwoord = str(row.get("Antwoord of oplossing", "") or "").strip()
+                    afbeelding = str(row.get("Afbeelding", "") or "").strip()
+                    if not antwoord:
+                        antwoord = "_Geen uitgewerkt antwoord in de kennisbank voor deze keuze._"
+
+                    display_ans = with_info(antwoord)
+                    st.markdown("### Antwoord")
+                    st.markdown(display_ans)
+
+                    if afbeelding:
+                        try:
+                            st.image(afbeelding, use_column_width=True)
+                        except Exception:
+                            pass
+
+                    label = _simple_label(idx, row)
+                    _copy_button(display_ans, hashlib.md5(display_ans.encode("utf-8")).hexdigest()[:8])
+                    pdf = make_pdf(label, display_ans)
+                    st.download_button(
+                        "📄 Download PDF",
+                        data=pdf,
+                        file_name="antwoord.pdf",
+                        mime="application/pdf",
+                        key=f"simple_pdf_{hash(label+display_ans)}"
+                    )
+
+                    st.session_state["selected_answer_text"] = antwoord
+                    st.session_state["last_item_label"] = label
+                    st.session_state["last_question"] = label
+                    st.session_state["actionbar"] = {
+                        "question": label,
+                        "content": display_ans,
+                        "image": afbeelding if afbeelding else None,
+                        "time": datetime.now(TIMEZONE).isoformat()
+                    }
+
     # ── Klassieke cascade (expander) ─────────────────────────────────────────
-    with st.expander("Maak hier uw keuze:"):
+    with st.expander("Geavanceerd zoeken (alleen voor beheerder)", expanded=False):
         if faq_df is None or faq_df.empty:
             st.info("Geen FAQ-gegevens gevonden.")
         else:
@@ -1088,10 +1168,9 @@ def main():
                         "time": datetime.now(TIMEZONE).isoformat()
                     }
 
-    # ── Wizard ───────────────────────────────────────────────────────────────
-    if st.session_state.get("chat_mode", True):
-        chat_wizard()
-        return
+    # ── Chat-wizard uitgeschakeld voor eenvoudige bediening ─────────────────
+    # De oude chat-wizard staat nog in de code, maar wordt niet automatisch getoond.
+    # Gebruik het eenvoudige zoekveld bovenaan voor vrijwilligers en secretariaten.
 
 if __name__ == "__main__":
     main()
