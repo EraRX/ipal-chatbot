@@ -3,7 +3,7 @@
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
 # - PDF met banner/logo + Copy
 # - CSV robustness + smart quotes fix
-# - Letterlijke FAQ-weergave: geen AI-samenvatting, geen herschrijven
+# - Letterlijke FAQ-weergave: geen AI-samenvatting, geen herschrijven; wel vaste AI-INFO onderaan
 # - PDF: doorlopende 1..N, sub-bullets, checkboxes; AI-INFO + klikbare FAQ-links
 
 import os
@@ -946,9 +946,9 @@ def _show_item_answer(idx: int):
     st.session_state["last_item_label"] = label
     st.session_state["last_question"] = f"Gekozen item: {label}"
     # Toon exact het veld "Antwoord of oplossing" uit de CSV.
-    # Geen AI, geen "Uitleg voor Vrijwilliger", geen samenvatting.
+    # Daarna wordt alleen de vaste AI-INFO toegevoegd. Geen herschrijven, geen samenvatting.
     st.session_state["selected_answer_text"] = ans
-    content = ans
+    content = with_info(ans)
     add_msg("assistant", content)
     st.session_state["actionbar"] = {
         "question": st.session_state.get("last_question") or "Vraag",
@@ -1052,8 +1052,8 @@ def main():
                     afbeelding = (row.get("Afbeelding", "") or "").strip()
 
                     # Toon exact het veld "Antwoord of oplossing" uit de CSV.
-                    # Geen AI, geen "Uitleg voor Vrijwilliger", geen samenvatting en geen AI-INFO erbij.
-                    display_ans = antwoord if antwoord else "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
+                    # Daarna wordt alleen de vaste AI-INFO toegevoegd. Geen herschrijven, geen samenvatting.
+                    display_ans = with_info(antwoord) if antwoord else "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
                     st.markdown(display_ans)
 
                     # Eventuele afbeelding
