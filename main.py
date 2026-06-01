@@ -984,12 +984,34 @@ def main():
     if faq_df is None or faq_df.empty:
         st.warning("Geen FAQ-gegevens gevonden. Controleer of faq.csv aanwezig is.")
     else:
-        scope_keuze = st.radio(
-            "Waar wilt u zoeken?",
-            ["Alles", "DocBase", "Exact"],
-            horizontal=True,
-            key="simple_scope"
-        )
+        st.markdown("### Waar wilt u zoeken?")
+
+        col_scope, col_refresh = st.columns([7, 3])
+
+        with col_scope:
+            scope_keuze = st.radio(
+                "",
+                ["Alles", "DocBase", "Exact"],
+                horizontal=True,
+                key="simple_scope",
+                label_visibility="collapsed"
+            )
+
+        with col_refresh:
+            if st.button("🔄 Kennisbank vernieuwen", use_container_width=True, key="refresh_kennisbank"):
+                st.cache_data.clear()
+
+                # Reset alleen zoek- en antwoordstatus, niet de hele app-inrichting.
+                for k in [
+                    "history", "selected_answer_text", "selected_image",
+                    "last_question", "last_item_label", "chat_results",
+                    "actionbar"
+                ]:
+                    if k in st.session_state:
+                        del st.session_state[k]
+
+                st.rerun()
+
         zoekterm = st.text_input(
             "Waarmee kunnen wij u helpen?",
             placeholder="Bijvoorbeeld: export naar excel",
