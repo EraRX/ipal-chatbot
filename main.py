@@ -3,7 +3,7 @@
 # - Klassieke cascade (Systeem → Subthema → Categorie → Omschrijving → Toelichting → Soort → Antwoord)
 # - PDF met banner/logo + Copy
 # - CSV robustness + smart quotes fix
-# - Auto-simple uitleg (vervangt het ruwe bronantwoord i.p.v. eraan toe te voegen)
+# - Letterlijke FAQ-weergave: geen AI-samenvatting, geen herschrijven
 # - PDF: doorlopende 1..N, sub-bullets, checkboxes; AI-INFO + klikbare FAQ-links
 
 import os
@@ -354,7 +354,7 @@ def make_pdf(question: str, answer: str) -> bytes:
 @st.cache_data(show_spinner=False)
 def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     cols = [
-        "ID", "Systeem", "Subthema", "Categorie",
+        "ID", "Systeem", "Subthema", "Categorie", "Onderwerp",
         "Omschrijving melding", "Toelichting melding", "Soort melding",
         "Antwoord of oplossing", "Afbeelding"
     ]
@@ -372,12 +372,15 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
         if c not in df.columns:
             df[c] = None
 
-    norm_cols = [
-        "Systeem", "Subthema", "Categorie",
+    # Velden voor keuzes mogen worden opgeschoond.
+    # Het veld "Antwoord of oplossing" moet juist LETTERLIJK uit de CSV komen:
+    # niet samenvatten, niet herschrijven en ook geen witruimte/newlines plat slaan.
+    choice_cols = [
+        "Systeem", "Subthema", "Categorie", "Onderwerp",
         "Omschrijving melding", "Toelichting melding",
-        "Soort melding", "Antwoord of oplossing", "Afbeelding"
+        "Soort melding", "Afbeelding"
     ]
-    for c in norm_cols:
+    for c in choice_cols:
         df[c] = (df[c]
                  .fillna("")
                  .astype(str)
@@ -385,6 +388,13 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
                  .str.strip()
                  .str.replace(r"\s+", " ", regex=True))
         df[c] = df[c].apply(clean_text)
+
+    df["Antwoord of oplossing"] = (
+        df["Antwoord of oplossing"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
 
     # Normalize Systeem
     sys_raw = df["Systeem"].astype(str).str.lower().str.strip()
@@ -402,7 +412,7 @@ def load_faq(path: str = "faq.csv") -> pd.DataFrame:
     df["Systeem"] = sys_raw.replace(direct_map)
 
     # Combined search field
-    keep = ["Systeem", "Subthema", "Categorie", "Omschrijving melding", "Toelichting melding"]
+    keep = ["Systeem", "Subthema", "Categorie", "Onderwerp", "Omschrijving melding", "Toelichting melding", "Antwoord of oplossing"]
     df["combined"] = df[keep].fillna("").agg(" ".join, axis=1)
 
     # Index voor cascade
@@ -608,7 +618,7 @@ DEFAULT_STATE = {
     "last_item_label": "",
     "allow_ai": True,
     "allow_web": False,
-    "auto_simple": True,
+    "auto_simple": False,
     "chat_mode": True,
     "chat_step": "greet",
     "chat_scope": None,
@@ -720,9 +730,10 @@ def _detect_scope(msg: str) -> Optional[str]:
     return None
 
 def _mk_label(i: int, row: pd.Series) -> str:
+    ond = clean_text(str(row.get('Onderwerp', '')).strip())
     oms = clean_text(str(row.get('Omschrijving melding', '')).strip())
     toel = clean_text(str(row.get('Toelichting melding', '')).strip())
-    preview = oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
+    preview = ond or oms or toel or clean_text(str(row.get('Antwoord of oplossing', '')).strip())
     preview = re.sub(r"\s+", " ", preview)[:140]
     return f"{i+1:02d}. {preview}"
 
@@ -934,9 +945,10 @@ def _show_item_answer(idx: int):
     st.session_state["selected_image"] = img if img else None
     st.session_state["last_item_label"] = label
     st.session_state["last_question"] = f"Gekozen item: {label}"
-    final_ans = enrich_with_simple(ans) if st.session_state.get("auto_simple", True) else ans
+    # Toon exact het veld "Antwoord of oplossing" uit de CSV.
+    # Geen AI, geen "Uitleg voor Vrijwilliger", geen samenvatting.
     st.session_state["selected_answer_text"] = ans
-    content = with_info(final_ans)
+    content = ans
     add_msg("assistant", content)
     st.session_state["actionbar"] = {
         "question": st.session_state.get("last_question") or "Vraag",
@@ -980,7 +992,7 @@ def main():
             def _opts(series: pd.Series) -> list[str]:
                 return sorted({_disp(x) for x in series.dropna().astype(str).tolist()}, key=lambda x: _norm(x))
 
-            st.caption("Volgorde: 1) Systeem → 2) Subthema → 3) Categorie → 4) Omschrijving → 5) Toelichting → 6) Soort → 7) Antwoord")
+            st.caption("Volgorde: 1) Systeem → 2) Subthema → 3) Categorie → 4) Onderwerp → 5) Omschrijving → 6) Toelichting → 7) Soort → 8) Antwoord")
 
             # 1) Systeem
             sys_opts = _opts(dfv["Systeem"])
@@ -997,41 +1009,51 @@ def main():
             sel_cat = st.selectbox("3) Categorie", ["(Kies)"] + cat_opts, key="c3_cat")
             step3 = step2[step2["Categorie"].apply(_norm) == _norm(sel_cat)] if sel_cat != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 4) Omschrijving melding
-            oms_opts = _opts(step3["Omschrijving melding"]) if not step3.empty else []
-            sel_oms = st.selectbox("4) Omschrijving melding", ["(Kies)"] + oms_opts, key="c4_oms")
-            step4 = step3[step3["Omschrijving melding"].apply(_norm) == _norm(sel_oms)] if sel_oms != "(Kies)" else pd.DataFrame(columns=dfv.columns)
+            # 4) Onderwerp
+            ond_opts = _opts(step3["Onderwerp"]) if not step3.empty else []
+            sel_ond = st.selectbox("4) Onderwerp", ["(Kies)"] + ond_opts, key="c4_ond")
+            step4 = step3[step3["Onderwerp"].apply(_norm) == _norm(sel_ond)] if sel_ond != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 5) Toelichting melding
-            toe_opts = _opts(step4["Toelichting melding"]) if not step4.empty else []
-            sel_toe = st.selectbox("5) Toelichting melding", ["(Kies)"] + toe_opts, key="c5_toe")
-            sel_toe_raw = "" if sel_toe in ("(Kies)", "(Leeg)") else sel_toe
-            step5 = step4[step4["Toelichting melding"].fillna("").apply(_norm) == _norm(sel_toe_raw)] if not step4.empty else pd.DataFrame(columns=dfv.columns)
+            # 5) Omschrijving melding
+            oms_opts = _opts(step4["Omschrijving melding"]) if not step4.empty else []
+            sel_oms = st.selectbox("5) Omschrijving melding", ["(Kies)"] + oms_opts, key="c5_oms")
+            step5 = step4[step4["Omschrijving melding"].apply(_norm) == _norm(sel_oms)] if sel_oms != "(Kies)" else pd.DataFrame(columns=dfv.columns)
 
-            # 6) Soort melding
-            soort_opts = _opts(step5["Soort melding"]) if not step5.empty else []
-            sel_soort = st.selectbox("6) Soort melding", ["(Kies)"] + soort_opts, key="c6_soort")
+            # 6) Toelichting melding
+            def _is_page_ref(v: str) -> bool:
+                return bool(re.fullmatch(r"\s*Pagina\s+\d+\s*", str(v or ""), flags=re.I))
+
+            def _toel_disp(v: str) -> str:
+                v = "" if v is None else str(v).strip()
+                return "(Leeg)" if (not v or _is_page_ref(v)) else v
+
+            toe_opts = sorted({_toel_disp(x) for x in step5["Toelichting melding"].fillna("").astype(str).tolist()}, key=lambda x: _norm(x)) if not step5.empty else []
+            sel_toe = st.selectbox("6) Toelichting melding", ["(Kies)"] + toe_opts, key="c6_toe")
+            if sel_toe != "(Kies)":
+                step6 = step5[step5["Toelichting melding"].fillna("").apply(lambda x: _norm(_toel_disp(x)) == _norm(sel_toe))]
+            else:
+                step6 = pd.DataFrame(columns=dfv.columns)
+
+            # 7) Soort melding
+            soort_opts = _opts(step6["Soort melding"]) if not step6.empty else []
+            sel_soort = st.selectbox("7) Soort melding", ["(Kies)"] + soort_opts, key="c7_soort")
             sel_soort_raw = "" if sel_soort in ("(Kies)", "(Leeg)") else sel_soort
-            step6 = step5[step5["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step5.empty else pd.DataFrame(columns=dfv.columns)
+            step7 = step6[step6["Soort melding"].fillna("").apply(_norm) == _norm(sel_soort_raw)] if not step6.empty else pd.DataFrame(columns=dfv.columns)
 
-            # 7) Antwoord of oplossing
+            # 8) Antwoord of oplossing
             if sel_soort != "(Kies)":
-                st.markdown("**7) Antwoord of oplossing**")
+                st.markdown("**8) Antwoord of oplossing**")
 
-                if step6.empty:
+                if step7.empty:
                     st.warning("Geen overeenkomstige rij gevonden voor deze keuzes.")
                 else:
-                    row = step6.iloc[0]
+                    row = step7.iloc[0]
                     antwoord   = (row.get("Antwoord of oplossing", "") or "").strip()
                     afbeelding = (row.get("Afbeelding", "") or "").strip()
 
-                    # Eenvoudige uitleg i.p.v. ruwe bron (fallback indien leeg)
-                    final_ans = enrich_with_simple(antwoord) if st.session_state.get("auto_simple", True) else antwoord
-                    if not final_ans:
-                        final_ans = "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
-
-                    # Toon antwoord + AI-INFO binnen de cascade
-                    display_ans = f"{final_ans}\n\n{AI_INFO}"
+                    # Toon exact het veld "Antwoord of oplossing" uit de CSV.
+                    # Geen AI, geen "Uitleg voor Vrijwilliger", geen samenvatting en geen AI-INFO erbij.
+                    display_ans = antwoord if antwoord else "_Geen uitgewerkt antwoord in de kennisbank voor deze combinatie._"
                     st.markdown(display_ans)
 
                     # Eventuele afbeelding
@@ -1043,7 +1065,7 @@ def main():
                             pass
 
                     # Labels / context voor PDF & actie-balk
-                    label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_oms] if x and x != "(Kies)"])
+                    label = " › ".join([x for x in [sel_sys, sel_sub, sel_cat, sel_ond, sel_oms] if x and x != "(Kies)"])
                     st.session_state["last_item_label"] = label
                     st.session_state["last_question"]   = label
 
@@ -1073,10 +1095,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
