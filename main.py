@@ -958,6 +958,28 @@ def _show_item_answer(idx: int):
     }
     st.session_state["chat_step"] = "followup"
 
+# ── Refresh helper ───────────────────────────────────────────────────────────
+def refresh_kennisbank():
+    """Vernieuwt de kennisbank en maakt zoekveld/resultaten leeg.
+
+    Belangrijk: dit is een callback. Daardoor mag Streamlit de waarden
+    van widgets met key simple_search_text en simple_scope veilig aanpassen
+    vóórdat de widgets opnieuw worden getekend.
+    """
+    st.cache_data.clear()
+
+    st.session_state["simple_search_text"] = ""
+    st.session_state["simple_scope"] = "Alles"
+
+    for k in [
+        "history", "selected_answer_text", "selected_image",
+        "last_question", "last_item_label", "chat_results",
+        "actionbar"
+    ]:
+        if k in st.session_state:
+            del st.session_state[k]
+
+
 # ── App ──────────────────────────────────────────────────────────────────────
 def main():
     # Intro (video of logo)
@@ -986,6 +1008,11 @@ def main():
     else:
         st.markdown("### Waar wilt u zoeken?")
 
+        if "simple_scope" not in st.session_state:
+            st.session_state["simple_scope"] = "Alles"
+        if "simple_search_text" not in st.session_state:
+            st.session_state["simple_search_text"] = ""
+
         col_scope, col_refresh = st.columns([7, 3])
 
         with col_scope:
@@ -998,23 +1025,12 @@ def main():
             )
 
         with col_refresh:
-            if st.button("🔄 vernieuwen", use_container_width=True, key="refresh_kennisbank"):
-                st.cache_data.clear()
-
-                # Zoekveld leegmaken en zoekbereik terugzetten naar Alles.
-                st.session_state["simple_search_text"] = ""
-                st.session_state["simple_scope"] = "Alles"
-
-                # Reset alleen zoek- en antwoordstatus, niet de hele app-inrichting.
-                for k in [
-                    "history", "selected_answer_text", "selected_image",
-                    "last_question", "last_item_label", "chat_results",
-                    "actionbar"
-                ]:
-                    if k in st.session_state:
-                        del st.session_state[k]
-
-                st.rerun()
+            st.button(
+                "🔄 Kennisbank vernieuwen",
+                use_container_width=True,
+                key="refresh_kennisbank",
+                on_click=refresh_kennisbank
+            )
 
         zoekterm = st.text_input(
             "Waarmee kunnen wij u helpen?",
